@@ -1,6 +1,4 @@
-//
-// Created by Gio on 12/28/2021.
-//
+
 
 #define _POSIX_C_SOURCE 200809L
 /*If this macro is defined to 1, security hardening is added to various library functions. If def
@@ -28,20 +26,52 @@
 /*  LOCAL IMPORT*/
 
 #include "local_lib/headers/glob_vars.h"
+#include "local_lib/headers/conf_file.h"
+#include "local_lib/headers/boolean.h"
+#include "local_lib/headers/simulation_errors.h"
 
-#define EXIT_PROCEDURE(exit_value)  wait_kids()     \
-                                kill_kids();        \
-                                free_mem();         \
-                                free_sysVar();      \
-                                exit(exit_value);   \
-
-#define ERROR_MESSAGE(err_mex) fprintf(stderr, "%s%s := Errore -> | file_out: %s | line: %s | proc_pid: %d | \n (-) %s\n (-){%d} %s\n%s\n", ANSI_COLOR_RESET, ANSI_COLOR_RED, __FILE__, __LINE_ ,getpid(), errno, strerror(errno), ANSI_COLOR_RESET)
 /*  DEBUG_MESSAGE definitions:  */
 #ifdef DEBUG
-#define DEBUG_MESSAGE(mex) fprintf()
-#define DEBUG_SIGNAL(mex) fprintf()
-#define DEBUG_ERROR_MESSAGE(mex) fprintf()
+#define DEBUG_MESSAGE(mex) fprintf(stderr, "%s%s [DEBUG]:= | file_in: %s | pid: %d | line %d |\n -> %s\n%s")
+#define DEBUG_SIGNAL(mex) fprintf(stderr, "%s%s [DEBUG]:= | file_in: %s | pid: %d | line %d |\n -> %s\n%s")
+#define DEBUG_ERROR_MESSAGE(mex) fprintf(stderr, "%s%s [DEBUG]:= | file_in: %s | pid: %d | line %d |\n -> %s\n%s")
 #endif
 
-
 struct conf simulation_conf;
+
+/*Funzioni di supporto al main*/
+Bool read_conf();
+
+/*Variabili di SYS*/
+
+/*Variabili Globali*/
+pid_t main_pid;
+
+int main() {
+    read_conf();
+    main_pid = getpid();
+    return 0;
+}
+
+Bool read_conf() {
+    switch (load_configuration(&simulation_conf)) {
+        case 0:
+            break;
+        case -1:
+            MESSAGE_ERROR_FILE_CONF("Missing file or Empty");
+            EXIT_PROCEDURE(EXIT_FAILURE);
+        case -2:
+            MESSAGE_ERROR_FILE_CONF("Broken simulation logic, check conf value");
+            EXIT_PROCEDURE(EXIT_FAILURE);
+        case -3:
+            MESSAGE_ERROR_FILE_CONF("Not enough users for nodes");
+            EXIT_PROCEDURE(EXIT_FAILURE);
+        case -4:
+            MESSAGE_ERROR_FILE_CONF("Min Max Excecution time wrong");
+            EXIT_PROCEDURE(EXIT_FAILURE);
+        case -5:
+            MESSAGE_ERROR_FILE_CONF("Node reward is over possibilities of users");
+            EXIT_PROCEDURE(EXIT_FAILURE);
+    }
+}
+

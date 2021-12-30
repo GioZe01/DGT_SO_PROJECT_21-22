@@ -1,6 +1,4 @@
-//
-// Created by Gio on 12/28/2021.
-//
+
 
 #ifndef DGT_SO_PROJECT_21_22_GLOB_VARS_H
 #define DGT_SO_PROJECT_21_22_GLOB_VARS_H
@@ -12,4 +10,4 @@
 #define COLOR_RESET_ANSI_CODE "\x1b[0m"
 
 
-#endif //DGT_SO_PROJECT_21_22_GLOB_VARS_H
+#endif /*DGT_SO_PROJECT_21_22_GLOB_VARS_H*/
