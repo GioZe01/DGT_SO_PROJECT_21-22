@@ -1,0 +1,1 @@
+/usr/bin/cc -g   CMakeFiles/DGT_SO_PROJECT_21_22.dir/src/local_lib/conf_file.c.o CMakeFiles/DGT_SO_PROJECT_21_22.dir/src/main.c.o  -o DGT_SO_PROJECT_21_22 

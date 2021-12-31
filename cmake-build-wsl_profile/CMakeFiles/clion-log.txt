@@ -1,0 +1,4 @@
+/usr/bin/cmake -DCMAKE_BUILD_TYPE=Debug -G "CodeBlocks - Unix Makefiles" /home/clion/DGT_SO_PROJECT_21-22
+-- Configuring done
+-- Generating done
+-- Build files have been written to: /home/clion/DGT_SO_PROJECT_21-22/cmake-build-wsl_profile
