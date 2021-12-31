@@ -11,6 +11,9 @@ typedef struct {
     float amount; /*TODO: verificare se basta*/
     float reward;
 }Transaction;
+/**
+ *
+ */
 typedef struct transaction_list *Queue;/*Real impl in transaction_list.c*/
 Queue queue_create(void);
 void queue_destroy(Queue q);
