@@ -32,9 +32,15 @@
 
 /*  DEBUG_MESSAGE definitions:  */
 #ifdef DEBUG
+#define DEBUG_NOTIFY_ACTIVITY(mex) print("%s%s [DEBUG-NOTIFY]:= %s\n", COLOR_RESET_ANSI_CODE,COLOR_YELLOW_ANSI_CODE,mex)
 #define DEBUG_MESSAGE(mex) fprintf(stderr, "%s%s [DEBUG]:= | file_in: %s | pid: %d | line %d |\n -> %s\n%s")
-#define DEBUG_SIGNAL(mex) fprintf(stderr, "%s%s [DEBUG]:= | file_in: %s | pid: %d | line %d |\n -> %s\n%s")
-#define DEBUG_ERROR_MESSAGE(mex) fprintf(stderr, "%s%s [DEBUG]:= | file_in: %s | pid: %d | line %d |\n -> %s\n%s")
+#define DEBUG_SIGNAL(mex, signum) fprintf(stderr, "%s%s [DEBUG]:= | file_in: %s | pid: %d | line %d |\n -> %s\n%s")
+#define DEBUG_ERROR_MESSAGE(mex) fprintf(stderr, "%s%s [DEBUG-SIGNAL]:= | file_in: %s | pid: %d | line %d |\n -> %s, {%d}\n%s",COLOR_RESET_ANSI_CODE, COLOR_YELLOW_ANSI_CODE, __FILE__, getpid(), __LINE__,mex,signum,COLOR_RESET_ANSI_CODE)
+#else /*unimplemented*/
+#define DEBUG_NOTIFY_ACTIVITY(mex)
+#define DEBUG_MESSAGE(mex)
+#define DEBUG_SIGNAL(mex, signum)
+#define DEBUG_ERROR_MESSAGE(mex)
 #endif
 
 struct conf simulation_conf;
@@ -42,36 +48,70 @@ struct conf simulation_conf;
 /*Funzioni di supporto al main*/
 Bool read_conf();
 
+void signals_handler(int signum);
 /*Variabili di SYS*/
-
+/*TODO: message transaction queue for single user auto incremento with ## macro*/
+int msg_transaction_reports = -1; /*Identifier for message queue*/
 /*Variabili Globali*/
 pid_t main_pid;
 
 int main() {
-    read_conf();
-    main_pid = getpid();
+    if (read_conf() == TRUE) {
+        struct sigaction sa; /*Structure for handling signals*/
+        main_pid = getpid();
+        DEBUG_NOTIFY_ACTIVITY("Setting Signals Handlers...");
+
+        memset(&sa, 0, sizeof(sa));/*initialize the structure*/
+        sa.sa_handler = signals_handler;
+        if (sigaction(SIGINT, &sa, NULL) < 0 ||
+            sigaction(SIGTERM, &sa, NULL) < 0 ||
+            sigaction(SIGALRM, &sa, NULL) < 0) {
+            ERROR_MESSAGE("Errore Setting Signal Handlers");
+            EXIT_PROCEDURE(EXIT_FAILURE);
+        }
+        DEBUG_NOTIFY_ACTIVITY("Setting Signals Handlers COMPLETED");
+
+    }
     return 0;
 }
 
+/**
+ * Handler for the signals SIGINT, SIGTERM, SIGALARM
+ * @param signum
+ */
+void signals_handler(int signum) { /*TODO: Scrivere implementazione*/
+    DEBUG_SIGNAL("Signal recived", signum);
+    switch (signum) {
+        case SIGINT:
+        case SIGTERM:
+        case SIGALRM:
+        default:
+            break;
+    }
+}
+
+/**
+ * Load and read the configuration, in case of error during loading close the proc. with EXIT_FAILURE
+ * @return TRUE if ALL OK
+ */
 Bool read_conf() {
+
+    DEBUG_NOTIFY_ACTIVITY("LOADING CONFIGURATION...");
     switch (load_configuration(&simulation_conf)) {
         case 0:
             break;
         case -1:
-            MESSAGE_ERROR_FILE_CONF("Missing file or Empty");
-            EXIT_PROCEDURE(EXIT_FAILURE);
+        ERROR_EXIT_SEQUENCE(" during conf. loading: Missing File or Empty");
         case -2:
-            MESSAGE_ERROR_FILE_CONF("Broken simulation logic, check conf value");
-            EXIT_PROCEDURE(EXIT_FAILURE);
+        ERROR_EXIT_SEQUENCE(" during conf. loading: Broken simultation logic, check conf. value");
         case -3:
-            MESSAGE_ERROR_FILE_CONF("Not enough users for nodes");
-            EXIT_PROCEDURE(EXIT_FAILURE);
+        ERROR_EXIT_SEQUENCE(" during conf. loading: Not enough users for nodes");
         case -4:
-            MESSAGE_ERROR_FILE_CONF("Min Max Excecution time wrong");
-            EXIT_PROCEDURE(EXIT_FAILURE);
+        ERROR_EXIT_SEQUENCE(" during conf. loading: Min Max Execution time wrong");
         case -5:
-            MESSAGE_ERROR_FILE_CONF("Node reward is over possibilities of users");
-            EXIT_PROCEDURE(EXIT_FAILURE);
+        ERROR_EXIT_SEQUENCE(" during conf. loading: Node reward is over possibilities of users");
     }
+    DEBUG_NOTIFY_ACTIVITY("CONFIGURATION LOADED");
+    return TRUE;
 }
 

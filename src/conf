@@ -1,0 +1,11 @@
+so_user_num=0
+so_nodes_num=0
+so_budget_init=0
+so_reward=0
+so_min_trans_gen_nsec=0
+so_max_trans_gen_nsec=0
+so_retry=0
+so_tp_size=0
+so_min_trans_proc_nsec=0
+so_max_trans_proc_nsec=0
+so_sim_sec=0

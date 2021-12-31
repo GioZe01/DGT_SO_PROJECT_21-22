@@ -3,7 +3,7 @@
 #ifndef DGT_SO_PROJECT_21_22_CONF_FILE_H
 #define DGT_SO_PROJECT_21_22_CONF_FILE_H
 
-#define CONFIGURATION_FILE_PATH "./configuration"
+#define CONFIGURATION_FILE_PATH "conf"
 
 struct conf{
     /*TODO: Verificare tipi*/
