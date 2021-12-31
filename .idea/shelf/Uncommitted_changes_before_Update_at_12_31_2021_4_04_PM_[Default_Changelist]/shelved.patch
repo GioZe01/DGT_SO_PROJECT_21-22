@@ -1,0 +1,57 @@
+Index: CMakeLists.txt
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/CMakeLists.txt b/CMakeLists.txt
+new file mode 100644
+--- /dev/null	(date 1640948904551)
++++ b/CMakeLists.txt	(date 1640948904551)
+@@ -0,0 +1,19 @@
++cmake_minimum_required(VERSION 3.16)
++project(DGT_SO_PROJECT_21_22 C)
++
++set(CMAKE_C_STANDARD 11)
++
++include_directories(src/local_lib/headers)
++
++add_executable(DGT_SO_PROJECT_21_22
++        src/local_lib/headers/boolean.h
++        src/local_lib/headers/conf_file.h
++        src/local_lib/headers/glob_vars.h
++        src/local_lib/headers/simulation_errors.h
++        src/local_lib/headers/transaction_list.h
++        src/local_lib/headers/user.h
++        src/local_lib/conf_file.c
++        src/local_lib/simulation_errors.c
++        src/local_lib/transaction_list.c
++        src/local_lib/user.c
++        src/main.c)
+Index: cmake-build-wsl_profile/CMakeFiles/clion-log.txt
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/cmake-build-wsl_profile/CMakeFiles/clion-log.txt b/cmake-build-wsl_profile/CMakeFiles/clion-log.txt
+new file mode 100644
+--- /dev/null	(date 1640962572061)
++++ b/cmake-build-wsl_profile/CMakeFiles/clion-log.txt	(date 1640962572061)
+@@ -0,0 +1,4 @@
++/usr/bin/cmake -DCMAKE_BUILD_TYPE=Debug -G "CodeBlocks - Unix Makefiles" /home/clion/DGT_SO_PROJECT_21-22
++-- Configuring done
++-- Generating done
++-- Build files have been written to: /home/clion/DGT_SO_PROJECT_21-22/cmake-build-wsl_profile
+Index: cmake-build-debug/CMakeFiles/clion-log.txt
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/cmake-build-debug/CMakeFiles/clion-log.txt b/cmake-build-debug/CMakeFiles/clion-log.txt
+new file mode 100644
+--- /dev/null	(date 1640962572061)
++++ b/cmake-build-debug/CMakeFiles/clion-log.txt	(date 1640962572061)
+@@ -0,0 +1,4 @@
++/usr/bin/cmake -DCMAKE_BUILD_TYPE=Debug -G "CodeBlocks - Unix Makefiles" /home/clion/DGT_SO_PROJECT_21-22
++-- Configuring done
++-- Generating done
++-- Build files have been written to: /home/clion/DGT_SO_PROJECT_21-22/cmake-build-debug
