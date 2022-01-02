@@ -4,7 +4,7 @@
 #define DGT_SO_PROJECT_21_22_ERRORS_H
 #include <string.h>
 #include <errno.h>
-
+#include "glob_vars.h"
 #define EXIT_PROCEDURE(exit_value)  wait_kids();     \
                                 kill_kids();        \
                                 free_mem();         \

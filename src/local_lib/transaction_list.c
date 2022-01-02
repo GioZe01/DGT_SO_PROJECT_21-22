@@ -3,10 +3,12 @@
 #include <errno.h>
 #include <unistd.h>
 #include <string.h>
-#include "transaction_list.h"
-#include "simulation_errors.h"
-#include "glob_vars.h"
-#include "boolean.h"
+/*Local import */
+#include "headers/transaction_list.h"
+#include "headers/simulation_errors.h"
+#include "headers/glob_vars.h"
+#include "headers/boolean.h"
+#include "headers/debug_utility.h"
 
 static void queue_underflow(void);
 
@@ -29,11 +31,17 @@ Queue queue_create() {
         ERROR_MESSAGE("Malloc failed in the creation of quque_t");
         EXIT_PROCEDURE(EXIT_FAILURE);
     }
+    q->first = NULL;
+    q->last = NULL;
+    q->transactions = 0;
+    return q;
 }
 
 void queue_destroy(Queue q) {
+    DEBUG_NOTIFY_ACTIVITY_RUNNING("REMOVING ITEM FROM TRANSACTION QUEUE... ");
     empty_queue(q);
     free(q);
+    DEBUG_NOTIFY_ACTIVITY_DONE("REMOVING ITEM FROM TRANSACTION QUEUE COMPLETED ");
 }
 
 static void empty_queue(Queue q) {
@@ -43,8 +51,10 @@ static void empty_queue(Queue q) {
 }
 
 void queue_append(Queue q, Transaction t) {
+    DEBUG_NOTIFY_ACTIVITY_RUNNING("APPENDING TO TRANSACTION QUEUE A NEW TRANSACTION...");
     struct node *new_node;
     if ((new_node = malloc(sizeof(struct node)) == NULL)) {
+        DEBUG_ERROR_MESSAGE("MALLOC ON NODE STRUCT IS NULL");
         ERROR_MESSAGE("Malloc failed in queue append");
         EXIT_PROCEDURE(EXIT_FAILURE);
     }
@@ -56,12 +66,14 @@ void queue_append(Queue q, Transaction t) {
         q->last->next = new_node;
     q->last = new_node;
     q->transactions++;
+
+    DEBUG_NOTIFY_ACTIVITY_RUNNING("APPENDING TO TRANSACTION QUEUE A NEW TRANSACTION DONE");
 }
 
 void queue_remove_head(Queue q) {
     if (queue_is_empty(q) == FALSE) {
         struct node *temp = q->first;
-        if(q-> first == q->last)
+        if (q->first == q->last)
             q->first = q->last = NULL;
         else
             q->first = q->first->next;
@@ -70,24 +82,33 @@ void queue_remove_head(Queue q) {
     } else
         queue_underflow();
 }
-Transaction queue_head(Queue q){
-    if(queue_is_empty(q) == FALSE)
+
+Transaction queue_head(Queue q) {
+    if (queue_is_empty(q) == FALSE)
         return q->first->t;
-    else
+    else {
+        DEBUG_MESSAGE("queue_head in transaction: UNDERFLOW CALLED");
         queue_underflow();
+    }
 }
-Transaction queue_last(Queue q){
-    if(queue_is_empty(q) == FALSE)
+
+Transaction queue_last(Queue q) {
+    if (queue_is_empty(q) == FALSE)
         return q->last->t;
-    else
+    else {
+        DEBUG_MESSAGE("queue_last in transaction: UNDERFLOW CALLED");
         queue_underflow();
+    }
 }
-Bool queue_is_empty(Queue q){
-   if(q->transactions == 0)
-       return TRUE;
-   return FALSE;
+
+Bool queue_is_empty(Queue q) {
+    if (q->transactions == 0)
+        return TRUE;
+    return FALSE;
 }
+
 static void queue_underflow(void) {
+    DEBUG_ERROR_MESSAGE("queue_underflow has been called")
     ERROR_MESSAGE("Invalid Operation on Queue empty");
     EXIT_PROCEDURE(EXIT_FAILURE);
 }

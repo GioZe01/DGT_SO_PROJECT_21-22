@@ -2,7 +2,7 @@
 
 #ifndef DGT_SO_PROJECT_21_22_CONF_FILE_H
 #define DGT_SO_PROJECT_21_22_CONF_FILE_H
-
+#include "headers/boolean.h"
 #define CONFIGURATION_FILE_PATH "conf"
 
 struct conf{
@@ -35,4 +35,5 @@ struct conf{
   * 5) -5 if node rewards is max for budget init; TODO: vedere se si vuole bloccare fin da subito considerando worst case e se negative buget safe è da fare o no
   */
 int load_configuration(struct conf* self);
+Bool read_conf(struct conf simulation_conf);
 #endif /*DGT_SO_PROJECT_21_22_CONF_FILE_H*/

@@ -1,9 +1,11 @@
-
 #include <stdio.h>
+#include <stdlib.h>
+#include <unistd.h>
 #include "headers/conf_file.h"
+#include "headers/debug_utility.h"
+#include "headers/simulation_errors.h"
+#include "headers/boolean.h"
 
-
-/*TODO:scrivere funzione di caricamento configurazione e vedere se manca qualcosa*/
 int load_configuration(struct conf *self) {
     FILE *conf_file;
 
@@ -13,7 +15,7 @@ int load_configuration(struct conf *self) {
     if (fscanf(conf_file, "so_user_num=%u", &self->so_user_num) == EOF) return -1;
     if (fscanf(conf_file, "so_nodes_num=%u", &self->so_nodes_num) == EOF) return -1;
     if (fscanf(conf_file, "so_budget_init=%u", &self->so_buget_init) == EOF) return -1;
-    if (fscanf(conf_file, "so_reward=%f", &self->so_reward)== EOF) return -1;
+    if (fscanf(conf_file, "so_reward=%f", &self->so_reward) == EOF) return -1;
     if (fscanf(conf_file, "so_min_trans_gen_nsec=%lu", &self->so_min_trans_gen_nsec) == EOF) return -1;
     if (fscanf(conf_file, "so_max_trans_gen_nsec=%lu", &self->so_max_trans_gen_nsec) == EOF) return -1;
     if (fscanf(conf_file, "so_retry=%u", &self->so_retry) == EOF) return -1;
@@ -37,4 +39,30 @@ int load_configuration(struct conf *self) {
     if (self->so_reward > 1) /*Vorrebbe dire che con una transazione da max budget non puoi pagare le spese*/
         return -5;
     return 0;
+}
+
+
+/**
+ * Load and read the configuration, in case of error during loading close the proc. with EXIT_FAILURE
+ * @return TRUE if ALL OK
+ */
+Bool read_conf(struct conf simulation_conf) {
+
+    DEBUG_NOTIFY_ACTIVITY_RUNNING("LOADING CONFIGURATION...");
+    switch (load_configuration(&simulation_conf)) {
+        case 0:
+            break;
+        case -1:
+            ERROR_EXIT_SEQUENCE(" during conf. loading: Missing File or Empty");
+        case -2:
+            ERROR_EXIT_SEQUENCE(" during conf. loading: Broken simultation logic, check conf. value");
+        case -3:
+            ERROR_EXIT_SEQUENCE(" during conf. loading: Not enough users for nodes");
+        case -4:
+            ERROR_EXIT_SEQUENCE(" during conf. loading: Min Max Execution time wrong");
+        case -5:
+            ERROR_EXIT_SEQUENCE(" during conf. loading: Node reward is over possibilities of users");
+    }
+    DEBUG_NOTIFY_ACTIVITY_DONE("CONFIGURATION LOADED");
+    return TRUE;
 }
