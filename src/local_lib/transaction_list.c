@@ -8,7 +8,15 @@
 #include "headers/simulation_errors.h"
 #include "headers/glob_vars.h"
 #include "headers/boolean.h"
+#ifdef DEBUG
 #include "headers/debug_utility.h"
+#else /*unimplemented*/
+#define DEBUG_NOTIFY_ACTIVITY_RUNNING(mex)
+#define DEBUG_NOTIFY_ACTIVITY_DONE(mex)
+#define DEBUG_MESSAGE(mex)
+#define DEBUG_SIGNAL(mex, signum)
+#define DEBUG_ERROR_MESSAGE(mex)
+#endif
 
 static void queue_underflow(void);
 
@@ -29,7 +37,7 @@ Queue queue_create() {
     Queue q = malloc(sizeof(struct transaction_list));
     if (q == NULL) {
         ERROR_MESSAGE("Malloc failed in the creation of quque_t");
-        EXIT_PROCEDURE(EXIT_FAILURE);
+        EXIT_PROCEDURE_USER(EXIT_FAILURE);
     }
     q->first = NULL;
     q->last = NULL;
@@ -56,7 +64,7 @@ void queue_append(Queue q, Transaction t) {
     if ((new_node = malloc(sizeof(struct node)) == NULL)) {
         DEBUG_ERROR_MESSAGE("MALLOC ON NODE STRUCT IS NULL");
         ERROR_MESSAGE("Malloc failed in queue append");
-        EXIT_PROCEDURE(EXIT_FAILURE);
+        EXIT_PROCEDURE_USER(EXIT_FAILURE);
     }
     new_node->t = t;
     new_node->next = NULL;
@@ -110,5 +118,5 @@ Bool queue_is_empty(Queue q) {
 static void queue_underflow(void) {
     DEBUG_ERROR_MESSAGE("queue_underflow has been called")
     ERROR_MESSAGE("Invalid Operation on Queue empty");
-    EXIT_PROCEDURE(EXIT_FAILURE);
+    EXIT_PROCEDURE_USER(EXIT_FAILURE);
 }

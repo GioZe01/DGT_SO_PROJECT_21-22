@@ -2,6 +2,8 @@
 
 #ifndef DGT_SO_PROJECT_21_22_GLOB_VARS_H
 #define DGT_SO_PROJECT_21_22_GLOB_VARS_H
+/*  EXVE PATH   */
+#define PATH_TO_USER "build/bin/user"
 /*  SINCRONIZATION KEY  */
 #define SEMAPHORE_SINC_KEY_START 0x76418
 /*  QUEUE ID    */
@@ -11,6 +13,7 @@
 #define COLOR_GREEN_ANSI_CODE "\x1b[32m" /* Usato per printing debugging mode per semafori*/
 #define COLOR_YELLOW_ANSI_CODE "\x1b[33m"
 #define COLOR_BLUE_ANSI_CODE    "\x1b[34m"
+#define COLOR_WHITE_ANSI_CODE "\x1b[37m"
 #define COLOR_RESET_ANSI_CODE "\x1b[0m"
 
 

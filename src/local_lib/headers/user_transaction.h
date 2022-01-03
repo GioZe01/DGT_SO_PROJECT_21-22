@@ -3,7 +3,7 @@
 #define DGT_SO_PROJECT_21_22_USER_TRANSACTION_H
 typedef int (*Balance)(unsigned int budget/*TODO: aggiungere transaction list e quelli da fare ancora*/);
 
-#include "headers/transaction_list.h"
+#include "transaction_list.h"
 struct user_transaction{
     int pid;
     int budget;
@@ -21,4 +21,9 @@ struct user_snapshot{
  * @return 0 if success
  */
 struct user_transaction user_create(int budget,int pid, Balance balance);
+/**
+ * Free the memory from the queue list of transactions;
+ * @param self
+ */
+void free_user(struct user_transaction self);
 #endif /*DGT_SO_PROJECT_21_22_USER_TRANSACTION_H*/
