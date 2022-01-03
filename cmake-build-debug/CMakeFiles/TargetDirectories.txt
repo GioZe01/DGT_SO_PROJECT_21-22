@@ -1,3 +1,0 @@
-/home/clion/DGT_SO_PROJECT_21-22/cmake-build-debug/CMakeFiles/rebuild_cache.dir
-/home/clion/DGT_SO_PROJECT_21-22/cmake-build-debug/CMakeFiles/edit_cache.dir
-/home/clion/DGT_SO_PROJECT_21-22/cmake-build-debug/CMakeFiles/DGT_SO_PROJECT_21_22.dir
