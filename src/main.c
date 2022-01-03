@@ -29,19 +29,22 @@
 #include "local_lib/headers/boolean.h"
 #include "local_lib/headers/semaphore.h"
 #include "local_lib/headers/simulation_errors.h"
+
 #ifdef DEBUG
+
 #include "local_lib/headers/debug_utility.h"
+
 #else /*unimplemented*/
 #define DEBUG_NOTIFY_ACTIVITY_RUNNING(mex)
 #define DEBUG_NOTIFY_ACTIVITY_DONE(mex)
 #define DEBUG_MESSAGE(mex)
 #define DEBUG_SIGNAL(mex, signum)
 #define DEBUG_ERROR_MESSAGE(mex)
-#define DEBUG_BLOCK_ACTION_START (mex)
-#define DEBUG_BLOCK_ACTION_END ()
+#define DEBUG_BLOCK_ACTION_START(mex)
+#define DEBUG_BLOCK_ACTION_END()
 #endif
-#include "local_lib/headers/process_info_list.h"
 
+#include "local_lib/headers/process_info_list.h"
 
 
 /* Funzioni di supporto al main */
@@ -72,8 +75,8 @@ int main() {
      *      CONFIGURATION FASE
      * ***********************************/
     main_pid = getpid();
-   if (read_conf() == TRUE) {
-       int i; /*  utility index */
+    if (read_conf() == TRUE) {
+        int i; /*  utility index */
         struct sigaction sa; /*Structure for handling signals*/
         set_signal_handlers(sa);
         create_semaphores();
@@ -169,8 +172,8 @@ void create_semaphores(void) {
     DEBUG_BLOCK_ACTION_START("CREATE START_SEM");
     DEBUG_NOTIFY_ACTIVITY_RUNNING("CREATION OF START_SEMAPHORE CHILDREN....");
 
-    semaphore_start_id = semget(SEMAPHORE_SINC_KEY_START, 1, IPC_CREAT|IPC_EXCL|0600);
-    if (semaphore_start_id < 0){
+    semaphore_start_id = semget(SEMAPHORE_SINC_KEY_START, 1, IPC_CREAT | IPC_EXCL | 0600);
+    if (semaphore_start_id < 0) {
         ERROR_EXIT_SEQUENCE_MAIN("IMPOSSIBLE TO CREATE START_SEMAPHORE");
     }
 
@@ -179,7 +182,7 @@ void create_semaphores(void) {
     DEBUG_NOTIFY_ACTIVITY_RUNNING("INITIALIZATION OF START_SEMAPHORE CHILDREN....");
     if (semctl(semaphore_start_id, 0, SETVAL, simulation_conf.so_user_num + simulation_conf.so_nodes_num) <
         0)
-        ERROR_EXIT_SEQUENCE_MAIN("IMPOSSIBLE TO INITIALISE SEMAPHORE START CHILDREN");
+    ERROR_EXIT_SEQUENCE_MAIN("IMPOSSIBLE TO INITIALISE SEMAPHORE START CHILDREN");
     DEBUG_NOTIFY_ACTIVITY_DONE("INITIALIZATION OF START_SEMAPHORE CHILDREN DONE");
     DEBUG_BLOCK_ACTION_END();
 }
@@ -208,7 +211,7 @@ void kill_kids() {
                  * the termination has not been read by main, in this case need wait on the proc to update the proc-list
                  * state
                  */
-                    DEBUG_MESSAGE("PROC KILLED");
+                DEBUG_MESSAGE("PROC KILLED");
             else {
                 if (errno == EINTR) continue;
                 ERROR_MESSAGE("IMPOSSIBLE TO SEND TERMINATION SIGNAL TO KID");
