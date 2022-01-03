@@ -17,23 +17,19 @@
 /*  Helper Funciton*/
 void process_info_print(struct processes_info_list *pList);
 
-/*  PORCESS TYPES   */
-struct UserProcInfo {
-    /*TODO: additional information based on the procces type*/
-};
-
-struct NodeProcInfo {
-    /*TODO: additional information based on the procces type*/
-} ;
-
-struct processes_info_list *insert_in_list(struct processes_info_list *self, pid_t pid, short int type, union ProcInfo proc) {
+struct processes_info_list *insert_in_list(struct processes_info_list *self, pid_t pid, short int type) {
     struct processes_info_list *new;
     new = (struct processes_info_list *) malloc(sizeof(*new));
-    new->pid = pid;
-    new->proc_type = type;
-    new->proc_state = PROC_INFO_STATE_RUNNING;
-    new->proc = proc;
-    new->next = self;
+    if (new!= NULL){
+        new->pid = pid;
+        new->proc_type = type;
+        new->proc_state = PROC_INFO_STATE_RUNNING;
+        new->next = self;
+        return new;
+    }
+    DEBUG_ERROR_MESSAGE("FAILED PROC INFO MALLOC");
+    free(new);
+    return NULL;
 }
 
 struct processes_info_list *get_proc_from_pid(struct processes_info_list *self, pid_t pid) {

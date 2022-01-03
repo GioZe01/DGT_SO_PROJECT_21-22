@@ -116,7 +116,7 @@ Bool queue_is_empty(Queue q) {
 }
 
 static void queue_underflow(void) {
-    DEBUG_ERROR_MESSAGE("queue_underflow has been called")
+    DEBUG_ERROR_MESSAGE("queue_underflow has been called");
     ERROR_MESSAGE("Invalid Operation on Queue empty");
     EXIT_PROCEDURE_USER(EXIT_FAILURE);
 }

@@ -15,7 +15,7 @@ struct user_transaction{
 struct user_snapshot{
     int budget;
 };/*Structure to be saved in sharedmemory*/
-/*struct user_snapshot* get_user_snapshot(struct user_transaction u);/*TODO: verifica snapshot se ritornare puntatore o no per salvare in shm*/
+/*struct user_snapshot* get_user_snapshot(struct user_transaction u);TODO: verifica snapshot se ritornare puntatore o no per salvare in shm*/
 /**
  * Initiale the user_transaction to default value
  * @return 0 if success

@@ -1,0 +1,513 @@
+make all --print-data-base --no-builtin-variables --no-builtin-rules --question
+# GNU Make 4.3
+# Built for x86_64-pc-linux-gnu
+# Copyright (C) 1988-2020 Free Software Foundation, Inc.
+# License GPLv3+: GNU GPL version 3 or later <http://gnu.org/licenses/gpl.html>
+# This is free software: you are free to change and redistribute it.
+# There is NO WARRANTY, to the extent permitted by law.
+
+# Make data base, printed on Mon Jan  3 17:37:13 2022
+
+# Variables
+
+# environment
+GDK_BACKEND = x11
+# environment
+LC_ALL = C
+# environment
+NO_AT_BRIDGE = 1
+# environment
+GNOME_SHELL_SESSION_MODE = ubuntu
+# environment
+SSH_AGENT_LAUNCHER = gnome-keyring
+# makefile (from 'Makefile', line 21)
+_DEF_COMP_TIME = DEBUG
+# environment
+SNAP_INSTANCE_KEY = 
+# environment
+GJS_DEBUG_OUTPUT = stderr
+# environment
+VSCODE_IPC_HOOK_EXTHOST = /run/user/1000/vscode-ipc-f8d6a5d1-6d84-4f2f-b04c-6acfb1c19d41.sock
+# environment
+MANDATORY_PATH = /usr/share/gconf/ubuntu.mandatory.path
+# environment
+LC_NAME = en_US.UTF-8
+# environment
+LC_NUMERIC = en_US.UTF-8
+# makefile (from 'Makefile', line 27)
+_DEPENDENCIES_MAIN = conf_file.h glob_vars.h boolean.h simulation_errors.h debug_utility.h process_info_list.h semaphore.h
+# environment
+VSCODE_CWD = /home/gio
+# makefile (from 'Makefile', line 11)
+SOURCE_IMPL_DIR = $(SOURCE_DIR)/local_lib
+# environment
+WINDOWPATH = 2
+# environment
+LC_ADDRESS = en_US.UTF-8
+# default
+MAKE_COMMAND := make
+# environment
+QT_ACCESSIBILITY = 1
+# automatic
+@D = $(patsubst %/,%,$(dir $@))
+# environment
+SNAP_INSTANCE_NAME = code
+# environment
+GDK_PIXBUF_MODULEDIR = /snap/code/85/usr/lib/x86_64-linux-gnu/gdk-pixbuf-2.0/2.10.0/loaders
+# environment
+VSCODE_HANDLES_UNCAUGHT_ERRORS = true
+# default
+.VARIABLES := 
+# environment
+PWD = /home/gio/Desktop/Uni/Secondo/SO/Progetto/DGT_SO_PROJECT_21-22
+# automatic
+%D = $(patsubst %/,%,$(dir $%))
+# environment
+XDG_DATA_DIRS = /usr/share/ubuntu:/usr/local/share/:/usr/share/:/var/lib/snapd/desktop
+# automatic
+^D = $(patsubst %/,%,$(dir $^))
+# environment
+VSCODE_LOG_STACK = false
+# automatic
+%F = $(notdir $%)
+# environment
+CONDA_PROMPT_MODIFIER = (base) 
+# environment
+VSCODE_CODE_CACHE_PATH = /home/gio/.config/Code/CachedData/899d46d82c4c95423fb7e10e68eba52050e30ba3
+# environment
+LANG = C
+# environment
+XAUTHORITY = /run/user/1000/gdm/Xauthority
+# default
+.LOADED := 
+# default
+.INCLUDE_DIRS = /usr/local/include /usr/include /usr/include
+# makefile
+MAKEFLAGS = pqrR
+# environment
+DBUS_STARTER_ADDRESS = unix:path=/run/user/1000/bus,guid=4d0a259968c3f598f209a6e561d2f41a
+# makefile
+CURDIR := /home/gio/Desktop/Uni/Secondo/SO/Progetto/DGT_SO_PROJECT_21-22
+# environment
+VSCODE_PIPE_LOGGING = true
+# environment
+APPLICATION_INSIGHTS_NO_DIAGNOSTIC_CHANNEL = true
+# environment
+LESSOPEN = | /usr/bin/lesspipe %s
+# automatic
+*D = $(patsubst %/,%,$(dir $*))
+# environment
+MFLAGS = -pqrR
+# environment
+SSH_AUTH_SOCK = /run/user/1000/keyring/ssh
+# default
+.SHELLFLAGS := -c
+# environment
+XDG_CONFIG_DIRS = /etc/xdg/xdg-ubuntu:/etc/xdg
+# automatic
++D = $(patsubst %/,%,$(dir $+))
+# environment
+VSCODE_CRASH_REPORTER_START_OPTIONS = {"companyName":"Microsoft","productName":"VSCode","submitURL":"appcenter://code?aid=fba07a4d-84bd-4fc8-a125-9640fc8ce171&uid=3f35631d-5944-4462-80f9-4c04cc32a727&iid=3f35631d-5944-4462-80f9-4c04cc32a727&sid=3f35631d-5944-4462-80f9-4c04cc32a727","uploadToServer":true}
+# environment
+XDG_SESSION_DESKTOP = ubuntu
+# makefile (from 'Makefile', line 1)
+MAKEFILE_LIST := Makefile
+# makefile (from 'Makefile', line 28)
+DEPENDENCIES_MAIN = $(patsubst %, $(SOURCE_HEADERS_DIR)/%, $(_DEPENDENCIES_MAIN))
+# environment
+CONDA_SHLVL = 1
+# environment
+SNAP_REEXEC = 
+# automatic
+@F = $(notdir $@)
+# environment
+VSCODE_VERBOSE_LOGGING = true
+# environment
+VSCODE_PID = 6713
+# makefile (from 'Makefile', line 33)
+OBJECTS_MAIN = $(patsubst %, $(BUILD_OBJECT_DIR)/%, $(_OBJECTS_MAIN))
+# environment
+XDG_SESSION_TYPE = x11
+# automatic
+?D = $(patsubst %/,%,$(dir $?))
+# environment
+BAMF_DESKTOP_FILE_HINT = /var/lib/snapd/desktop/applications/code_code.desktop
+# environment
+CONDA_PYTHON_EXE = /home/gio/anaconda3/bin/python
+# environment
+SESSION_MANAGER = local/big-golia:@/tmp/.ICE-unix/2489,unix/big-golia:/tmp/.ICE-unix/2489
+# automatic
+*F = $(notdir $*)
+# environment
+CHROME_DESKTOP = code-url-handler.desktop
+# environment
+DBUS_SESSION_BUS_ADDRESS = unix:path=/run/user/1000/bus,guid=4d0a259968c3f598f209a6e561d2f41a
+# automatic
+<D = $(patsubst %/,%,$(dir $<))
+# environment
+VSCODE_NLS_CONFIG = {"locale":"en-us","availableLanguages":{},"_languagePackSupport":true}
+# environment
+BREAKPAD_DUMP_LOCATION = /home/gio/.config/Code/exthost Crash Reports
+# makefile (from 'Makefile', line 15)
+MKDIR_P = mkdir -p
+# default
+MAKE_HOST := x86_64-pc-linux-gnu
+# environment
+GNOME_DESKTOP_SESSION_ID = this-is-deprecated
+# environment
+CONDA_PREFIX = /home/gio/anaconda3
+# makefile
+SHELL = /bin/sh
+# default
+MAKECMDGOALS := all
+# environment
+XMODIFIERS = @im=ibus
+# environment
+GJS_DEBUG_TOPICS = JS ERROR;JS LOG
+# environment
+SHLVL = 0
+# environment
+MAKELEVEL := 0
+# default
+MAKE = $(MAKE_COMMAND)
+# environment
+SNAP_COOKIE = ROkGc6aUERgBpLZq9PdKYeTUmV3U8SF5QZtkGxaf3L2fuT7gnuHy
+# environment
+PATH = /usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/games:/usr/local/games:/snap/bin:/snap/bin
+# default
+MAKEFILES := 
+# environment
+LANGUAGE = en_US:en
+# environment
+LC_MONETARY = en_US.UTF-8
+# automatic
+^F = $(notdir $^)
+# environment
+SNAP_USER_COMMON = /home/gio/snap/code/common
+# environment
+LC_TIME = en_US.UTF-8
+# environment
+SNAP = /snap/code/85
+# environment
+INVOCATION_ID = 15d692d963914c8581a97dd13d7601e0
+# environment
+SNAP_REVISION = 85
+# environment
+SNAP_REAL_HOME = /home/gio
+# makefile (from 'Makefile', line 22)
+DEF_COMP_TIME = $(patsubst %, -D%, $(_DEF_COMP_TIME))
+# environment
+VSCODE_LOG_NATIVE = false
+# environment
+USERNAME = gio
+# makefile (from 'Makefile', line 35)
+OBJECTS_USER = $(patsubst %, $(BUILD_OBJECT_DIR)/%, $(_OBJECTS_USER))
+# environment
+LC_TELEPHONE = en_US.UTF-8
+# environment
+LESSCLOSE = /usr/bin/lesspipe %s %s
+# automatic
+?F = $(notdir $?)
+# environment
+XDG_CURRENT_DESKTOP = Unity
+# makefile (from 'Makefile', line 10)
+SOURCE_HEADERS_DIR = $(SOURCE_DIR)/local_lib/headers
+# environment
+LS_COLORS = 
+# automatic
++F = $(notdir $+)
+# environment
+DESKTOP_SESSION = ubuntu
+# environment
+ORIGINAL_XDG_CURRENT_DESKTOP = ubuntu:GNOME
+# 'override' directive
+GNUMAKEFLAGS := 
+# makefile (from 'Makefile', line 8)
+BUILD_BIN_DIR = $(BUILDING_DIR)/bin
+# environment
+CONDA_DEFAULT_ENV = base
+# environment
+LOGNAME = gio
+# environment
+GIO_LAUNCHED_DESKTOP_FILE = /var/lib/snapd/desktop/applications/code_code.desktop
+# makefile (from 'Makefile', line 9)
+SOURCE_DIR = src
+# environment
+SNAP_ARCH = amd64
+# makefile
+.DEFAULT_GOAL := build/bin/main
+# environment
+SYSTEMD_EXEC_PID = 2489
+# environment
+DISPLAY = :0
+# environment
+USER = gio
+# environment
+GTK_MODULES = gail:atk-bridge
+# environment
+DEFAULTS_PATH = /usr/share/gconf/ubuntu.default.path
+# default
+MAKE_VERSION := 4.3
+# environment
+DISABLE_WAYLAND = 1
+# environment
+SNAP_DATA = /var/snap/code/85
+# environment
+SNAP_CONTEXT = ROkGc6aUERgBpLZq9PdKYeTUmV3U8SF5QZtkGxaf3L2fuT7gnuHy
+# environment
+MANAGERPID = 1810
+# environment
+DBUS_STARTER_BUS_TYPE = session
+# environment
+LC_MEASUREMENT = en_US.UTF-8
+# environment
+GIO_LAUNCHED_DESKTOP_FILE_PID = 45085
+# makefile (from 'Makefile', line 32)
+_OBJECTS_MAIN = main.o conf_file.o process_info_list.o semaphore_wrap.o
+# environment
+_ = /snap/code/85/usr/share/code/code
+# environment
+LC_PAPER = en_US.UTF-8
+# environment
+XDG_RUNTIME_DIR = /run/user/1000
+# makefile (from 'Makefile', line 3)
+CFLAGS = -std=c89 -pedantic -Wall -Wextra
+# makefile (from 'Makefile', line 7)
+BUILD_OBJECT_DIR = $(BUILDING_DIR)/obj
+# environment
+GPG_AGENT_INFO = /run/user/1000/gnupg/S.gpg-agent:0:1
+# environment
+GDK_PIXBUF_MODULE_FILE = /home/gio/snap/code/common/.cache/gdk-pixbuf-loaders.cache
+# environment
+_CE_M = 
+# environment
+JOURNAL_STREAM = 8:41429
+# environment
+XDG_SESSION_CLASS = user
+# makefile (from 'Makefile', line 14)
+LIBRARIES = -lm
+# environment
+VSCODE_AMD_ENTRYPOINT = vs/workbench/services/extensions/node/extensionHostProcess
+# makefile (from 'Makefile', line 34)
+_OBJECTS_USER = user_proc.o conf_file.o semaphore_wrap.o user_transaction.o transaction_list.o
+# environment
+HOME = /home/gio
+# environment
+QT_IM_MODULE = ibus
+ 
+# environment
+ELECTRON_RUN_AS_NODE = 1
+# environment
+VSCODE_IPC_HOOK = /run/user/1000/vscode-1b46d568-1.63.2-main.sock
+# environment
+SNAP_NAME = code
+# environment
+GSETTINGS_SCHEMA_DIR = /snap/code/85/usr/share/glib-2.0/schemas
+# environment
+IM_CONFIG_PHASE = 1
+# environment
+PAPERSIZE = letter
+# default
+.RECIPEPREFIX := 
+# automatic
+<F = $(notdir $<)
+# environment
+SNAP_VERSION = 899d46d8
+# default
+SUFFIXES := 
+# environment
+VSCODE_CLI = 1
+# environment
+ELECTRON_NO_ATTACH_CONSOLE = 1
+# makefile (from 'Makefile', line 6)
+BUILDING_DIR = build
+# environment
+SNAP_COMMON = /var/snap/code/common
+# default
+.FEATURES := target-specific order-only second-expansion else-if shortest-stem undefine oneshell nocomment grouped-target extra-prereqs archives jobserver output-sync check-symlink load
+# makefile (from 'Makefile', line 29)
+_DEPENDENCIES_USER = conf_file.h boolean.h simulation_errors.h debug_utility.h semaphore.h transaction_list.h user_transaction.h
+# environment
+SNAP_USER_DATA = /home/gio/snap/code/85
+# environment
+XDG_MENU_PREFIX = gnome-
+# makefile (from 'Makefile', line 30)
+DEPENDENCIES_USER = $(patsubst %, $(SOURCE_HEADERS_DIR)/%, $(_DEPENDENCIES_USER))
+# environment
+CONDA_EXE = /home/gio/anaconda3/bin/conda
+# environment
+_CE_CONDA = 
+# environment
+GDMSESSION = ubuntu
+# environment
+LC_IDENTIFICATION = en_US.UTF-8
+# environment
+SNAP_LIBRARY_PATH = /var/lib/snapd/lib/gl:/var/lib/snapd/lib/gl32:/var/lib/snapd/void
+# variable set hash-table stats:
+# Load=166/1024=16%, Rehash=0, Collisions=23/226=10%
+
+# Pattern-specific Variable Values
+
+# No pattern-specific variable values.
+
+# Directories
+
+# src (device 2082, inode 35785928): 4 files, no impossibilities so far.
+# . (device 2082, inode 35263446): 10 files, no impossibilities.
+# src/local_lib (device 2082, inode 35785930): 8 files, no impossibilities.
+
+# 22 files, no impossibilities in 3 directories.
+
+# Implicit Rules
+
+build/obj/%.o: src/local_lib/%.c Makefile
+#  recipe to execute (from 'Makefile', line 37):
+	$(CC) -c -o $@ $< $(CFLAGS) $(DEF_COMP_TIME)
+
+build/obj/%.o: src/%.c Makefile
+#  recipe to execute (from 'Makefile', line 39):
+	$(CC) -c -o $@ $< $(CFLAGS) $(DEF_COMP_TIME)
+
+# 2 implicit rules, 0 (0.0%) terminal.
+# Files
+
+# Not a target:
+build/obj/conf_file.o:
+#  Implicit rule search has not been done.
+#  Modification time never checked.
+#  File has not been updated.
+
+# Not a target:
+Makefile:
+#  Implicit rule search has been done.
+#  Last modified 2022-01-03 15:36:19.305073104
+#  File has been updated.
+#  Successfully updated.
+
+clean:
+#  Implicit rule search has not been done.
+#  Modification time never checked.
+#  File has not been updated.
+#  recipe to execute (from 'Makefile', line 52):
+	$(RM) $(BUILD_OBJECT_DIR)/* $(BUILD_BIN_DIR)/*
+
+# Not a target:
+build/obj/user_proc.o:
+#  Implicit rule search has not been done.
+#  Modification time never checked.
+#  File has not been updated.
+
+build/obj/main.o: src/main.c Makefile
+#  Implicit rule search has been done.
+#  Implicit/static pattern stem: 'main'
+#  Last modified 2022-01-03 17:32:55.359954948
+#  File has been updated.
+#  Needs to be updated (-q is set).
+# automatic
+# @ := build/obj/main.o
+# automatic
+# * := main
+# automatic
+# < := src/main.c
+# automatic
+# + := src/main.c Makefile
+# automatic
+# % := 
+# automatic
+# ^ := src/main.c Makefile
+# automatic
+# ? := src/main.c
+# automatic
+# | := 
+# variable set hash-table stats:
+# Load=8/32=25%, Rehash=0, Collisions=7/17=41%
+#  recipe to execute (from 'Makefile', line 39):
+	$(CC) -c -o $@ $< $(CFLAGS) $(DEF_COMP_TIME)
+
+# Not a target:
+src/main.c:
+#  Implicit rule search has been done.
+#  Last modified 2022-01-03 17:35:46.911438018
+#  File has been updated.
+#  Successfully updated.
+
+# Not a target:
+build/obj/user_transaction.o:
+#  Implicit rule search has not been done.
+#  Modification time never checked.
+#  File has not been updated.
+
+# Not a target:
+build/obj/process_info_list.o:
+#  Implicit rule search has not been done.
+#  Modification time never checked.
+#  File has not been updated.
+
+# Not a target:
+.DEFAULT:
+#  Implicit rule search has not been done.
+#  Modification time never checked.
+#  File has not been updated.
+
+all: build/bin/main build/bin/user
+#  Command line target.
+#  Implicit rule search has been done.
+#  File does not exist.
+#  File has been updated.
+#  Needs to be updated (-q is set).
+# variable set hash-table stats:
+# Load=0/32=0%, Rehash=0, Collisions=0/7=0%
+
+run: all
+#  Implicit rule search has not been done.
+#  Modification time never checked.
+#  File has not been updated.
+#  recipe to execute (from 'Makefile', line 50):
+	./$(BUILD_BIN_DIR)/main
+
+# Not a target:
+build/obj/semaphore_wrap.o:
+#  Implicit rule search has not been done.
+#  Modification time never checked.
+#  File has not been updated.
+
+# Not a target:
+build/obj/transaction_list.o:
+#  Implicit rule search has not been done.
+#  Modification time never checked.
+#  File has not been updated.
+
+build/bin/user: build/obj/user_proc.o build/obj/conf_file.o build/obj/semaphore_wrap.o build/obj/user_transaction.o build/obj/transaction_list.o
+#  Implicit rule search has not been done.
+#  Modification time never checked.
+#  File has not been updated.
+#  recipe to execute (from 'Makefile', line 45):
+	$(CC) -o $@ $^ $(CFLAGS) $(LIBRARIES)
+
+build/bin/main: build/obj/main.o build/obj/conf_file.o build/obj/process_info_list.o build/obj/semaphore_wrap.o
+#  Implicit rule search has not been done.
+#  Last modified 2022-01-03 17:32:55.419954773
+#  File has been updated.
+#  Needs to be updated (-q is set).
+# variable set hash-table stats:
+# Load=0/32=0%, Rehash=0, Collisions=0/7=0%
+#  recipe to execute (from 'Makefile', line 42):
+	$(CC) -o $@ $^ $(CFLAGS) $(LIBRARIES)
+
+# files hash-table stats:
+# Load=16/1024=2%, Rehash=0, Collisions=0/45=0%
+# VPATH Search Paths
+
+# No 'vpath' search paths.
+
+# No general ('VPATH' variable) search path.
+
+# strcache buffers: 1 (0) / strings = 42 / storage = 544 B / avg = 12 B
+# current buf: size = 8162 B / used = 544 B / count = 42 / avg = 12 B
+
+# strcache performance: lookups = 67 / hit rate = 37%
+# hash-table stats:
+# Load=42/8192=1%, Rehash=0, Collisions=0/67=0%
+# Finished Make data base on Mon Jan  3 17:37:13 2022
+
+ 

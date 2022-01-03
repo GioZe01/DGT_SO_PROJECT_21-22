@@ -71,6 +71,7 @@ pid_t main_pid;
 struct processes_info_list *proc_list;
 
 int main() {
+    semctl(42,0,IPC_RMID);
     /************************************
      *      CONFIGURATION FASE
      * ***********************************/
@@ -93,8 +94,22 @@ int main() {
             if (create_user_proc(0) < 0)ERROR_MESSAGE("IMPOSSIBLE TO CREATE USER_PROC");
 
         DEBUG_MESSAGE("PROCESS GENERATED");
+#ifdef DEBUG
+        printf("%s", COLOR_RESET_ANSI_CODE);
+        print_list(proc_list);
+        printf("%s", COLOR_RESET_ANSI_CODE);
+#endif
+
+        /*-------------------------*/
+        /*  WAITING STARTING SIM   *
+        /*-------------------------*/
+
+        if(semaphore_wait_for_sinc(semaphore_start_id, 0)<0) ERROR_EXIT_SEQUENCE_MAIN("IMPOSSIBLE WAITING ON START_SEM");
+
     }
-    return 0;
+    free_sysVar();
+    free_mem();
+    exit(0);
 }
 
 /**
@@ -114,10 +129,7 @@ int create_user_proc(pid_t old_pid) {
             return -1;
         default: /*  parent  */
             list_set_state(proc_list, old_pid, PROC_INFO_STATE_TERMINATED);
-            union ProcInfo proc_info;
-            UserProcInfo user_info;
-            proc_info.user_proc = user_info;
-            proc_list = insert_in_list(proc_list, kid_pid, PROC_TYPE_USER, proc_info);
+            proc_list = insert_in_list(proc_list, kid_pid, PROC_TYPE_USER);
             /*Free if utilized pointers to argv*/
             if (argv_user[1] != NULL) free(argv_user[1]);
             if (argv_user[2] != NULL) free(argv_user[2]);
@@ -148,6 +160,7 @@ void set_signal_handlers(struct sigaction sa) {
  */
 void signals_handler(int signum) { /*TODO: Scrivere implementazione*/
     int old_errno;
+    old_errno = errno;
     static int num_inv = 0;
     DEBUG_SIGNAL("SIGNAL RECIVED", signum);
     switch (signum) {
@@ -181,8 +194,7 @@ void create_semaphores(void) {
 
     DEBUG_NOTIFY_ACTIVITY_RUNNING("INITIALIZATION OF START_SEMAPHORE CHILDREN....");
     if (semctl(semaphore_start_id, 0, SETVAL, simulation_conf.so_user_num + simulation_conf.so_nodes_num) <
-        0)
-    ERROR_EXIT_SEQUENCE_MAIN("IMPOSSIBLE TO INITIALISE SEMAPHORE START CHILDREN");
+        0) { ERROR_EXIT_SEQUENCE_MAIN("IMPOSSIBLE TO INITIALISE SEMAPHORE START CHILDREN"); }
     DEBUG_NOTIFY_ACTIVITY_DONE("INITIALIZATION OF START_SEMAPHORE CHILDREN DONE");
     DEBUG_BLOCK_ACTION_END();
 }
@@ -203,8 +215,8 @@ void wait_kids() {
 
 void kill_kids() {
     struct processes_info_list *proc = proc_list;
-    for (; proc != NULL; proc = proc->next)
-        if (proc->proc_state == PROC_INFO_STATE_RUNNING)
+    for (; proc != NULL; proc = proc->next) {
+        if (proc->proc_state == PROC_INFO_STATE_RUNNING) {
             if (kill(proc->pid, SIGINT) >= 0 || errno == ESRCH)
                 /**
                  * errno == ESRCH is allowed because it might be that the proc intrest is terminated and
@@ -216,6 +228,8 @@ void kill_kids() {
                 if (errno == EINTR) continue;
                 ERROR_MESSAGE("IMPOSSIBLE TO SEND TERMINATION SIGNAL TO KID");
             }
+        }
+    }
 }
 
 void free_mem() {
@@ -224,10 +238,11 @@ void free_mem() {
 
 void free_sysVar() {
     DEBUG_NOTIFY_ACTIVITY_RUNNING("REMOVING STARTING SEMAPHORE...");
-    if (semaphore_start_id >= 0 && semctl(semaphore_start_id, 0, IPC_RMID) < 0)
+    printf("%d", semaphore_start_id);
+    if (semaphore_start_id >= 0 && semctl(semaphore_start_id, 0, IPC_RMID) < 0) {
         ERROR_MESSAGE("REMOVING PROCEDURE FOR START_SEM HAS FAILED");
+    }
     DEBUG_NOTIFY_ACTIVITY_DONE("REMOVING STARTING SEMAPHORE DONE");
-
 }
 
 /**
@@ -250,6 +265,8 @@ Bool read_conf() {
         ERROR_EXIT_SEQUENCE_MAIN("DURING CONF. LOADING: MIN MAX EXECUTION TIME WRONG");
         case -5:
         ERROR_EXIT_SEQUENCE_MAIN(" DURING CONF. LOADING: NODE REWARD IS OVER POSSIBILITIES OF USERS");
+        default:
+            break;
     }
     DEBUG_NOTIFY_ACTIVITY_DONE("READING CONFIGURATION DONE");
     DEBUG_BLOCK_ACTION_END();

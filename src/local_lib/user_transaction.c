@@ -24,5 +24,5 @@ void free_user(struct user_transaction self){
     DEBUG_NOTIFY_ACTIVITY_RUNNING("FREE USER OPERATION...");
     queue_destroy(self.in_process);
     queue_destroy(self.transactions_done);
-    DEBUG_NOTIFY_ACTIVITY_RUNNING("FREE USER OPERATION DONE");
+    DEBUG_NOTIFY_ACTIVITY_DONE("FREE USER OPERATION DONE");
 }

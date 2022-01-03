@@ -3,10 +3,12 @@
 #define DGT_SO_PROJECT_21_22_TRANSACTION_LIST_H
 /*TODO: Implementare transaction -> ogni user_transaction avra una transaction list per quelli processati e quelli da fare*/
 
-#include <unistd.h>
 #include "boolean.h"
 #define TRANSACTION_SUCCE 1
 #define TRANSACTION_FAILED 0
+#include <unistd.h>
+#include <sys/types.h>
+
 typedef struct {
     short int t_type;
     int timestamp;

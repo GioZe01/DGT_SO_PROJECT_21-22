@@ -32,7 +32,7 @@ DEPENDENCIES_USER = $(patsubst %, $(SOURCE_HEADERS_DIR)/%, $(_DEPENDENCIES_USER)
 _OBJECTS_MAIN = main.o conf_file.o process_info_list.o semaphore_wrap.o
 OBJECTS_MAIN = $(patsubst %, $(BUILD_OBJECT_DIR)/%, $(_OBJECTS_MAIN))
 _OBJECTS_USER = user_proc.o conf_file.o semaphore_wrap.o user_transaction.o transaction_list.o
-
+OBJECTS_USER = $(patsubst %, $(BUILD_OBJECT_DIR)/%, $(_OBJECTS_USER))
 $(BUILD_OBJECT_DIR)/%.o: $(SOURCE_IMPL_DIR)/%.c Makefile
 	$(CC) -c -o $@ $< $(CFLAGS) $(DEF_COMP_TIME)
 $(BUILD_OBJECT_DIR)/%.o: $(SOURCE_DIR)/%.c Makefile
@@ -41,7 +41,7 @@ $(BUILD_OBJECT_DIR)/%.o: $(SOURCE_DIR)/%.c Makefile
 $(BUILD_BIN_DIR)/main: $(OBJECTS_MAIN)
 	$(CC) -o $@ $^ $(CFLAGS) $(LIBRARIES)
 
-$(BUILD_BIN_DIR)/user: $(OBJECTS_MAIN)
+$(BUILD_BIN_DIR)/user: $(OBJECTS_USER)
 	$(CC) -o $@ $^ $(CFLAGS) $(LIBRARIES)
 #TODO: Aggiungere altri anche qui
 all: $(BUILD_BIN_DIR)/main $(BUILD_BIN_DIR)/user

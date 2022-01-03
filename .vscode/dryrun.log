@@ -1,0 +1,9 @@
+make --dry-run --always-make --keep-going --print-directory
+make: Entering directory '/home/gio/Desktop/Uni/Secondo/SO/Progetto/DGT_SO_PROJECT_21-22'
+cc -c -o build/obj/main.o src/main.c -std=c89 -pedantic -Wall -Wextra  -DDEBUG
+cc -c -o build/obj/conf_file.o src/local_lib/conf_file.c -std=c89 -pedantic -Wall -Wextra  -DDEBUG
+cc -c -o build/obj/process_info_list.o src/local_lib/process_info_list.c -std=c89 -pedantic -Wall -Wextra  -DDEBUG
+cc -c -o build/obj/semaphore_wrap.o src/local_lib/semaphore_wrap.c -std=c89 -pedantic -Wall -Wextra  -DDEBUG
+cc -o build/bin/main build/obj/main.o build/obj/conf_file.o build/obj/process_info_list.o build/obj/semaphore_wrap.o -std=c89 -pedantic -Wall -Wextra -lm
+make: Leaving directory '/home/gio/Desktop/Uni/Secondo/SO/Progetto/DGT_SO_PROJECT_21-22'
+ 
