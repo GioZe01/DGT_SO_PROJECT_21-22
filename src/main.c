@@ -2,9 +2,7 @@
 #define _GNU_SOURCE
 /*If this macro is defined to 1, security hardening is added to various library functions. If def
  * ined to 2, even stricter checks are applied. If defined to 3, the GNU C Library may also use checks that may have
- * an additional performance overhead.*/
-
-
+ * an additional performance*/
 /* Std  */
 #include <stdio.h>
 #include <stdlib.h>
@@ -46,7 +44,6 @@
 
 #include "local_lib/headers/process_info_list.h"
 
-
 /* Funzioni di supporto al main */
 void set_signal_handlers(struct sigaction sa);
 
@@ -71,6 +68,7 @@ pid_t main_pid;
 struct processes_info_list *proc_list;
 
 int main() {
+    /*semctl(3, 0, IPC_RMID);TODO: Remove*/
     /************************************
      *      CONFIGURATION FASE
      * ***********************************/
@@ -89,11 +87,21 @@ int main() {
         /*-------------------------*/
         /*  CREAZINE DEI PROC USER *
         /*-------------------------*/
+
+        DEBUG_BLOCK_ACTION_START("PROC GENERATION");
         for (i = 0; i < simulation_conf.so_user_num; i++)
             if (create_user_proc(0) < 0)ERROR_MESSAGE("IMPOSSIBLE TO CREATE USER_PROC");
 
-        DEBUG_MESSAGE("PROCESS GENERATED");
+        DEBUG_MESSAGE("PROCESS USER GENERATED");
+
+        DEBUG_BLOCK_ACTION_END();
+
+        if (semaphore_wait_for_sinc(semaphore_start_id, 0) < 0) {
+            ERROR_EXIT_SEQUENCE_USER("IMPOSSIBLE TO WAIT ON SEM_START");
+        }
     }
+    free_sysVar();
+    free_mem();
     return 0;
 }
 
@@ -138,7 +146,7 @@ void set_signal_handlers(struct sigaction sa) {
         ERROR_MESSAGE("Errore Setting Signal Handlers");
         EXIT_PROCEDURE_MAIN(EXIT_FAILURE);
     }
-    DEBUG_NOTIFY_ACTIVITY_DONE("Setting Signals Handlers COMPLETED");
+    DEBUG_NOTIFY_ACTIVITY_DONE("Setting )free_sysVar_userSignals Handlers COMPLETED");
     DEBUG_BLOCK_ACTION_END();
 }
 
@@ -180,9 +188,12 @@ void create_semaphores(void) {
     DEBUG_NOTIFY_ACTIVITY_DONE("CREATION OF START_SEMAPHORE CHILDREN DONE");
 
     DEBUG_NOTIFY_ACTIVITY_RUNNING("INITIALIZATION OF START_SEMAPHORE CHILDREN....");
+    printf("%d", simulation_conf.so_user_num);
     if (semctl(semaphore_start_id, 0, SETVAL, simulation_conf.so_user_num + simulation_conf.so_nodes_num) <
-        0)
-    ERROR_EXIT_SEQUENCE_MAIN("IMPOSSIBLE TO INITIALISE SEMAPHORE START CHILDREN");
+        0) {
+
+        ERROR_EXIT_SEQUENCE_MAIN("IMPOSSIBLE TO INITIALISE SEMAPHORE START CHILDREN");
+    }
     DEBUG_NOTIFY_ACTIVITY_DONE("INITIALIZATION OF START_SEMAPHORE CHILDREN DONE");
     DEBUG_BLOCK_ACTION_END();
 }
@@ -211,7 +222,7 @@ void kill_kids() {
                  * the termination has not been read by main, in this case need wait on the proc to update the proc-list
                  * state
                  */
-                DEBUG_MESSAGE("PROC KILLED");
+                    DEBUG_MESSAGE("PROC KILLED");
             else {
                 if (errno == EINTR) continue;
                 ERROR_MESSAGE("IMPOSSIBLE TO SEND TERMINATION SIGNAL TO KID");

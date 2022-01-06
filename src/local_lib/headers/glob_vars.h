@@ -5,9 +5,9 @@
 /*  EXVE PATH   */
 #define PATH_TO_USER "build/bin/user"
 /*  SINCRONIZATION KEY  */
-#define SEMAPHORE_SINC_KEY_START 0x76418
+#define SEMAPHORE_SINC_KEY_START 0x76
 /*  QUEUE ID    */
-#define QUEUE_SHIFT_ID 0x76419 /*TODO:vedere se ha senso*/
+#define QUEUE_SHIFT_ID 0x77/*TODO:vedere se ha senso*/
 /*  COLOR DEFINITION    */
 #define COLOR_RED_ANSI_CODE "\x1b[31m"
 #define COLOR_GREEN_ANSI_CODE "\x1b[32m" /* Usato per printing debugging mode per semafori*/
