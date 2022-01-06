@@ -13,6 +13,9 @@
 /*  Local Library */
 #include "local_lib/headers/simulation_errors.h"
 
+#define EXIT_PROCEDURE_USER(exit_value) free_mem_user();         \
+                                free_sysVar_user();      \
+                                exit(exit_value)
 #ifdef DEBUG
 #include "local_lib/headers/debug_utility.h"
 #else /*unimplemented*/
@@ -42,6 +45,12 @@ int calc_balance(unsigned int budget);
 Bool set_signal_handler(struct sigaction sa, sigset_t sigmask);
 
 Bool read_conf(struct conf simulation_conf);
+
+/*  FUNCTION TO PROTECT EXIT SEQUENCE USER*/
+void free_mem_user();
+
+void free_sysVar_user();
+
 /*  SysV  */
 int budget;
 int state;
@@ -50,7 +59,7 @@ int queue_report_id = -1; /* -1 is the value if it is not initialized */
 struct user_transaction current_user;
 
 int main(int arc, char const *argv[]) {
-    DEBUG_MESSAGE("USER PROCESS STARTED")
+    DEBUG_MESSAGE("USER PROCESS STARTED");
     struct sigaction sa;
     sigset_t sigmask; /* sinal mask */
 
@@ -68,24 +77,25 @@ int main(int arc, char const *argv[]) {
 
         read_conf(configuration);
         budget = configuration.so_buget_init;
-        current_user = user_create(budget, getpid(), calc_balance);
+        user_create(&current_user,budget, getpid(), calc_balance);
 
-        /*-------------------------*/
-        /*  CREAZINE DEI SEMAFORI  *
-        /*-------------------------*/
+        /*---------------------------*/
+        /*  SEMAPHORES CREATOIN FASE *
+        /*---------------------------*/
 
         /*TODO: need a semafore for reading into the message queue*/
         semaphore_start_id = semget(SEMAPHORE_SINC_KEY_START, 1, 0);
-        if (semaphore_start_id < 0) { ERROR_EXIT_SEQUENCE_USER("IMPOSSIBLE TO OBTAIN THE START SEMAPHORE"); }
-
+        if (semaphore_lock(semaphore_start_id,0)< 0) { ERROR_EXIT_SEQUENCE_USER("IMPOSSIBLE TO OBTAIN THE START SEMAPHORE"); }
+        DEBUG_MESSAGE("READY, ON START_SEM");
         if (semaphore_wait_for_sinc(semaphore_start_id, 0) < 0) {
             ERROR_EXIT_SEQUENCE_USER("IMPOSSIBILE TO WAIT FOR START");
         }
+
         /*-------------------------*/
         /*  CREAZIONE QUEUE REPORT *
         /*-------------------------*/
-        queue_report_id = msgget(current_user.pid, IPC_CREAT | IPC_EXCL | 0600);
-        if (queue_report_id < 0) {ERROR_EXIT_SEQUENCE_USER("IMPOSSIBLE TO CREATE THE MESSAGE QUEUE");}
+        queue_report_id = msgget(current_user.pid, IPC_CREAT|IPC_EXCL|0600);
+        if (queue_report_id < 0) { ERROR_EXIT_SEQUENCE_USER("IMPOSSIBLE TO CREATE THE MESSAGE QUEUE"); }
 
 
         DEBUG_MESSAGE("USER READY, WAINT FOR SEMAPHORE TO FREE");
@@ -104,12 +114,14 @@ int main(int arc, char const *argv[]) {
         /*------------------------------------*/
         DEBUG_NOTIFY_ACTIVITY_RUNNING("SEMAPHORE START UNLOAKING....");
         semaphore_start_Value = semctl(semaphore_start_id, 0, GETVAL);/* 0 as reading op. */
-        if (semaphore_start_Value < 0){
-            ERROR_EXIT_SEQUENCE_USER("IMPOSSIBLE TO RETRIVE INFORMATION FROM START_SEMAPHORE");}
-        if (semaphore_start_Value != 0 && semaphore_lock(semaphore_start_id, 0) < 0){
-            ERROR_EXIT_SEQUENCE_USER("ERROR OCCURED DURING UNLOCK OF THE START_SEMAPHORE");}
+        if (semaphore_start_Value < 0) {
+            ERROR_EXIT_SEQUENCE_USER("IMPOSSIBLE TO RETRIVE INFORMATION FROM START_SEMAPHORE");
+        }
+        if (semaphore_start_Value != 0 && semaphore_lock(semaphore_start_id, 0) < 0) {
+            ERROR_EXIT_SEQUENCE_USER("ERROR OCCURED DURING UNLOCK OF THE START_SEMAPHORE");
+        }
 
-        if (semaphore_wait_for_sinc(semaphore_start_id, 0) < 0){
+        if (semaphore_wait_for_sinc(semaphore_start_id, 0) < 0) {
             ERROR_EXIT_SEQUENCE_USER("ERROR DURING WAITING START_SEMAPHORE UNLOAK");
         }
         state = RUNNING_STATE;

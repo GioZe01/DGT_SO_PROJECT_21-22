@@ -6,24 +6,11 @@
 #define PROC_INFO_STATE_TERMINATED 0
 
 #include <unistd.h>
-typedef struct {
-
-} UserProcInfo;
-
-typedef struct {
-
-} NodeProcInfo;
-/*  PROCESS TYPE DEFINITION */
-union ProcInfo {
-    UserProcInfo user_proc;
-    NodeProcInfo node_proc;
-};
 struct processes_info_list{
     pid_t pid;
     short int proc_state;
     short int proc_type;
     float budget;/*TODO: verificare se basta*/
-    union ProcInfo proc;
     struct processes_info_list* next;
 };
 /**
@@ -33,7 +20,7 @@ struct processes_info_list{
  * @param type proc_type ex: PROC_TYPE_USER or PROC_TYPE_NODE
  * @return the new linked list with the structure inserted
  */
-struct processes_info_list* insert_in_list(struct processes_info_list* self, pid_t pid, short int type, union ProcInfo proc);
+struct processes_info_list* insert_in_list(struct processes_info_list* self, pid_t pid, short int type);
 /**
  * Return the process inside the list associated with the pid given as param
  * @param self the list to search in

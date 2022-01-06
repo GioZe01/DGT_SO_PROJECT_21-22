@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include "headers/user_transaction.h"
+
 #ifdef DEBUG
 #include "headers/debug_utility.h"
 #else /*unimplemented*/
@@ -11,16 +12,15 @@
 #define DEBUG_ERROR_MESSAGE(mex)
 #endif
 
-struct user_transaction user_create(int budget, int pid, Balance balance) {
-    struct user_transaction u;
-    u.pid = pid;
-    u.budget = budget;
-    u.u_balance = balance;
-    u.transactions_done = queue_create();
-    u.in_process = queue_create();
-    return u;
+void user_create(struct user_transaction *u, int budget, int pid, Balance balance) {
+    u->pid = pid;
+    u->budget = budget;
+    u->u_balance = balance;
+    u->transactions_done = queue_create();
+    u->in_process = queue_create();
 }
-void free_user(struct user_transaction self){
+
+void free_user(struct user_transaction self) {
     DEBUG_NOTIFY_ACTIVITY_RUNNING("FREE USER OPERATION...");
     queue_destroy(self.in_process);
     queue_destroy(self.transactions_done);

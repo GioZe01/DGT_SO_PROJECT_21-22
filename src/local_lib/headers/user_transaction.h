@@ -20,7 +20,7 @@ struct user_snapshot{
  * Initiale the user_transaction to default value
  * @return 0 if success
  */
-user_transaction user_create(int budget,int pid, Balance balance);
+void user_create(struct user_transaction *u, int budget, int pid, Balance balance);
 /**
  * Free the memory from the queue list of transactions;
  * @param self

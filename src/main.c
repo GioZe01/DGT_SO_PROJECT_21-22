@@ -53,7 +53,7 @@ void create_semaphores(void);
 
 void create_masterbook(void);
 
-int create_user_proc(pid_t old_pid);
+int create_users_proc();
 
 Bool read_conf();
 
@@ -68,7 +68,7 @@ pid_t main_pid;
 struct processes_info_list *proc_list;
 
 int main() {
-    /*semctl(3, 0, IPC_RMID);TODO: Remove*/
+    semctl(18, 0, IPC_RMID);/*TODO: Remove*/
     /************************************
      *      CONFIGURATION FASE
      * ***********************************/
@@ -89,16 +89,15 @@ int main() {
         /*-------------------------*/
 
         DEBUG_BLOCK_ACTION_START("PROC GENERATION");
-        for (i = 0; i < simulation_conf.so_user_num; i++)
-            if (create_user_proc(0) < 0)ERROR_MESSAGE("IMPOSSIBLE TO CREATE USER_PROC");
-
-        DEBUG_MESSAGE("PROCESS USER GENERATED");
-
+        if (create_users_proc()<0){ERROR_MESSAGE("IMPOSSIBLE TO CREATE USERS PROC");}
         DEBUG_BLOCK_ACTION_END();
 
+        DEBUG_MESSAGE("PROCESSES USERS GENERATED");
+
         if (semaphore_wait_for_sinc(semaphore_start_id, 0) < 0) {
-            ERROR_EXIT_SEQUENCE_USER("IMPOSSIBLE TO WAIT ON SEM_START");
+            ERROR_EXIT_SEQUENCE_MAIN("IMPOSSIBLE TO WAIT ON SEM_START");
         }
+        DEBUG_MESSAGE("WAITING DONE");
     }
     free_sysVar();
     free_mem();
@@ -110,43 +109,42 @@ int main() {
  * @param old_pid the pid of the proc to be replaced TODO: possible adding funtionality 0 = no replacement
  * @return
  */
-int create_user_proc(pid_t old_pid) {
-    char *argv_user[] = {PATH_TO_USER, NULL, NULL}; /*TODO: verify if needed*/
-    pid_t kid_pid;
-    switch (kid_pid = fork()) {
-        case -1:
-            return -1;
-        case 0: /*  kid   */
-            execve(argv_user[0], argv_user, NULL);
-            ERROR_MESSAGE("IMPOSSIBLE TO CREATE A USER");
-            return -1;
-        default: /*  parent  */
-            list_set_state(proc_list, old_pid, PROC_INFO_STATE_TERMINATED);
-            union ProcInfo proc_info;
-            UserProcInfo user_info;
-            proc_info.user_proc = user_info;
-            proc_list = insert_in_list(proc_list, kid_pid, PROC_TYPE_USER, proc_info);
-            /*Free if utilized pointers to argv*/
-            if (argv_user[1] != NULL) free(argv_user[1]);
-            if (argv_user[2] != NULL) free(argv_user[2]);
-            DEBUG_MESSAGE("USER CREATED");
-            break;
+int create_users_proc() {
+    char *argv_user[] = {"build/bin/user",NULL}; /*Future addon*/
+    pid_t user_pid;
+    int i;
+    for (i = 0; i < simulation_conf.so_user_num; i++) {
+        switch (user_pid = fork()) {
+            case -1:
+                return -1;
+            case 0: /*kid*/
+                execve(argv_user[0], argv_user, NULL);
+                ERROR_MESSAGE("IMPOSSIBLE TO CREATE A USER");
+                return -1;
+            default: /*father*/
+                proc_list = insert_in_list(proc_list, user_pid, PROC_TYPE_USER);
+                /*Free if utilized pointers to argv*/
+                if (argv_user[1] != NULL) free(argv_user[1]);
+                if (argv_user[2] != NULL) free(argv_user[2]);
+                DEBUG_MESSAGE("USER CREATED");
+                break;
+        }
     }
     return 0;
 }
 
 void set_signal_handlers(struct sigaction sa) {
     DEBUG_BLOCK_ACTION_START("SIGNAL HANDLERS");
-    DEBUG_NOTIFY_ACTIVITY_RUNNING("Setting Signals Handlers...");
+    DEBUG_NOTIFY_ACTIVITY_RUNNING("SETTING SIGNALS HANDLERS...");
     memset(&sa, 0, sizeof(sa));/*initialize the structure*/
     sa.sa_handler = signals_handler;
     if (sigaction(SIGINT, &sa, NULL) < 0 ||
         sigaction(SIGTERM, &sa, NULL) < 0 ||
         sigaction(SIGALRM, &sa, NULL) < 0) {
-        ERROR_MESSAGE("Errore Setting Signal Handlers");
+        ERROR_MESSAGE("ERRORE SETTING SIGNAL HANDLERS");
         EXIT_PROCEDURE_MAIN(EXIT_FAILURE);
     }
-    DEBUG_NOTIFY_ACTIVITY_DONE("Setting )free_sysVar_userSignals Handlers COMPLETED");
+    DEBUG_NOTIFY_ACTIVITY_DONE("SETTING HANDLERS DONE");
     DEBUG_BLOCK_ACTION_END();
 }
 
@@ -157,6 +155,8 @@ void set_signal_handlers(struct sigaction sa) {
 void signals_handler(int signum) { /*TODO: Scrivere implementazione*/
     int old_errno;
     static int num_inv = 0;
+
+    old_errno = errno;
     DEBUG_SIGNAL("SIGNAL RECIVED", signum);
     switch (signum) {
         case SIGINT:
@@ -188,10 +188,8 @@ void create_semaphores(void) {
     DEBUG_NOTIFY_ACTIVITY_DONE("CREATION OF START_SEMAPHORE CHILDREN DONE");
 
     DEBUG_NOTIFY_ACTIVITY_RUNNING("INITIALIZATION OF START_SEMAPHORE CHILDREN....");
-    printf("%d", simulation_conf.so_user_num);
-    if (semctl(semaphore_start_id, 0, SETVAL, simulation_conf.so_user_num + simulation_conf.so_nodes_num) <
+    if (semctl(semaphore_start_id, 0, SETVAL, simulation_conf.so_user_num /*TODO+ simulation_conf.so_nodes_num*/) <
         0) {
-
         ERROR_EXIT_SEQUENCE_MAIN("IMPOSSIBLE TO INITIALISE SEMAPHORE START CHILDREN");
     }
     DEBUG_NOTIFY_ACTIVITY_DONE("INITIALIZATION OF START_SEMAPHORE CHILDREN DONE");
@@ -199,7 +197,11 @@ void create_semaphores(void) {
 }
 
 void create_masterbook() {
+    DEBUG_BLOCK_ACTION_START("CREATE MASTERBOOK");
+    DEBUG_NOTIFY_ACTIVITY_RUNNING("CREATING THE MASTER_BOOK....");
     /*TODO:da implementare create_masterbook*/
+    DEBUG_NOTIFY_ACTIVITY_DONE("CREATING THE MASTER BOOK DOONE");
+    DEBUG_BLOCK_ACTION_END();
 }
 
 /*  IMPLEMENTATION OF PROC_INFO_LIST METHOD*/
