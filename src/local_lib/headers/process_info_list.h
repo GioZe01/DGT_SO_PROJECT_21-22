@@ -6,6 +6,7 @@
 #define PROC_INFO_STATE_TERMINATED 0
 
 #include <unistd.h>
+#include <sys/types.h>
 struct processes_info_list{
     pid_t pid;
     short int proc_state;

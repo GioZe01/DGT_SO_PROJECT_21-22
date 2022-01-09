@@ -12,7 +12,7 @@ struct conf {
     /*TODO: Finire di scrivere la configurazione -> potrebbe arrivare da socket*/
     int so_user_num;
     int so_nodes_num;
-    int so_buget_init;
+    float so_buget_init;
     float so_reward;
     long so_min_trans_gen_nsec;
     long so_max_trans_gen_nsec;

@@ -28,7 +28,7 @@ int load_configuration(struct conf *self) {
     if (conf_file == NULL) return -1;
     if (fscanf(conf_file, "so_user_num=%d ", &self->so_user_num) == EOF) return -1;
     if (fscanf(conf_file, "so_nodes_num=%d ", &self->so_nodes_num) == EOF) return -1;
-    if (fscanf(conf_file, "so_budget_init=%d ", &self->so_buget_init) == EOF) return -1;
+    if (fscanf(conf_file, "so_budget_init=%f ", &self->so_buget_init) == EOF) return -1;
     if (fscanf(conf_file, "so_reward=%f ", &self->so_reward) == EOF) return -1;
     if (fscanf(conf_file, "so_min_trans_gen_nsec=%ld ", &self->so_min_trans_gen_nsec) == EOF) return -1;
     if (fscanf(conf_file, "so_max_trans_gen_nsec=%ld ", &self->so_max_trans_gen_nsec) == EOF) return -1;
@@ -41,7 +41,6 @@ int load_configuration(struct conf *self) {
     if (fscanf(conf_file, "so_sim_sec=%ld ", &self->so_sim_sec) == EOF) return -1;
     DEBUG_NOTIFY_ACTIVITY_DONE("LOADING CONFIGURATION DONE");
     DEBUG_NOTIFY_ACTIVITY_RUNNING("CHECKING CONF VALUE....");
-
     /*Checks for -2*/
     if (self->so_user_num <= 0 ||
         self->so_nodes_num <= 0 ||
@@ -55,6 +54,7 @@ int load_configuration(struct conf *self) {
         self->so_sim_sec <= 0 ||
         self->so_min_trans_proc_nsec <= 0 ||
         self->so_max_trans_proc_nsec <= 0 ||
+        self->so_registry_size <= 0 ||
         self->so_sim_sec <= 0)
         return -2;
     /*Checks for -3*/

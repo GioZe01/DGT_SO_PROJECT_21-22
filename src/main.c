@@ -68,7 +68,7 @@ pid_t main_pid;
 struct processes_info_list *proc_list;
 
 int main() {
-    semctl(18, 0, IPC_RMID);/*TODO: Remove*/
+    /*semctl(1, 0, IPC_RMID); TODO: Remove*/
     /************************************
      *      CONFIGURATION FASE
      * ***********************************/
@@ -93,11 +93,14 @@ int main() {
         DEBUG_BLOCK_ACTION_END();
 
         DEBUG_MESSAGE("PROCESSES USERS GENERATED");
-
+        DEBUG_BLOCK_ACTION_START("WAITING CHILDREN");
         if (semaphore_wait_for_sinc(semaphore_start_id, 0) < 0) {
             ERROR_EXIT_SEQUENCE_MAIN("IMPOSSIBLE TO WAIT ON SEM_START");
         }
+
         DEBUG_MESSAGE("WAITING DONE");
+
+        DEBUG_BLOCK_ACTION_END();
     }
     free_sysVar();
     free_mem();
@@ -106,11 +109,10 @@ int main() {
 
 /**
  *  Create a new user proc
- * @param old_pid the pid of the proc to be replaced TODO: possible adding funtionality 0 = no replacement
- * @return
+ * @return -1 if fail. 0 otherwise
  */
 int create_users_proc() {
-    char *argv_user[] = {"build/bin/user",NULL}; /*Future addon*/
+    char *argv_user[] = {PATH_TO_USER,NULL}; /*Future addon*/
     pid_t user_pid;
     int i;
     for (i = 0; i < simulation_conf.so_user_num; i++) {
@@ -161,7 +163,7 @@ void signals_handler(int signum) { /*TODO: Scrivere implementazione*/
     switch (signum) {
         case SIGINT:
         case SIGTERM:
-            if (getpid() == main_pid)EXIT_PROCEDURE_MAIN(0);
+            if (getpid() == main_pid){EXIT_PROCEDURE_MAIN(0);}
             exit(0);
         case SIGALRM:
             if (getpid() == main_pid) {

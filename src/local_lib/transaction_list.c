@@ -58,7 +58,7 @@ static void empty_queue(Queue q) {
     }
 }
 
-void queue_append(Queue q, Transaction t) {
+void queue_append(Queue q, struct Transaction t) {
     DEBUG_NOTIFY_ACTIVITY_RUNNING("APPENDING TO TRANSACTION QUEUE A NEW TRANSACTION...");
     struct node *new_node;
     if ((new_node = malloc(sizeof(struct node)) == NULL)) {
@@ -91,7 +91,7 @@ void queue_remove_head(Queue q) {
         queue_underflow();
 }
 
-Transaction queue_head(Queue q) {
+struct Transaction queue_head(Queue q) {
     if (queue_is_empty(q) == FALSE)
         return q->first->t;
     else {
@@ -100,7 +100,7 @@ Transaction queue_head(Queue q) {
     }
 }
 
-Transaction queue_last(Queue q) {
+struct Transaction queue_last(Queue q) {
     if (queue_is_empty(q) == FALSE)
         return q->last->t;
     else {
@@ -116,7 +116,7 @@ Bool queue_is_empty(Queue q) {
 }
 
 static void queue_underflow(void) {
-    DEBUG_ERROR_MESSAGE("queue_underflow has been called")
+    DEBUG_ERROR_MESSAGE("queue_underflow has been called");
     ERROR_MESSAGE("Invalid Operation on Queue empty");
     EXIT_PROCEDURE_USER(EXIT_FAILURE);
 }

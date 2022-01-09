@@ -6,6 +6,7 @@
 #include <signal.h>
 #include <errno.h>
 #include <unistd.h>
+#include <math.h>
 /*  Sys Library */
 #include <sys/sem.h>
 #include <sys/msg.h>
@@ -17,7 +18,9 @@
                                 free_sysVar_user();      \
                                 exit(exit_value)
 #ifdef DEBUG
+
 #include "local_lib/headers/debug_utility.h"
+
 #else /*unimplemented*/
 #define DEBUG_NOTIFY_ACTIVITY_RUNNING(mex)
 #define DEBUG_NOTIFY_ACTIVITY_DONE(mex)
@@ -40,19 +43,13 @@ void signals_handler(int signum);
 /*  Helper  */
 Bool check_argument(int arc, char const *argv[]);
 
-int calc_balance(unsigned int budget);
-
 Bool set_signal_handler(struct sigaction sa, sigset_t sigmask);
 
-Bool read_conf(struct conf simulation_conf);
+Bool read_conf(struct conf *simulation_conf);
 
-/*  FUNCTION TO PROTECT EXIT SEQUENCE USER*/
-void free_mem_user();
-
-void free_sysVar_user();
 
 /*  SysV  */
-int budget;
+
 int state;
 int semaphore_start_id = -1;
 int queue_report_id = -1; /* -1 is the value if it is not initialized */
@@ -72,12 +69,12 @@ int main(int arc, char const *argv[]) {
 
     if (check_argument(arc, argv) && set_signal_handler(sa, sigmask)) {
         /*  VARIABLE INITIALIZATION */
-        int semaphore_start_Value = -1;
-        struct conf configuration;
+        int semaphore_start_value = -1;
 
-        read_conf(configuration);
-        budget = configuration.so_buget_init;
-        user_create(&current_user,budget, getpid(), calc_balance);
+        struct conf configuration;
+        read_conf(&configuration);
+        printf("\n...............Configuration budget: %f\n", configuration.so_buget_init);
+        user_create(&current_user, configuration.so_buget_init, getpid(), calc_balance);
 
         /*---------------------------*/
         /*  SEMAPHORES CREATOIN FASE *
@@ -85,7 +82,9 @@ int main(int arc, char const *argv[]) {
 
         /*TODO: need a semafore for reading into the message queue*/
         semaphore_start_id = semget(SEMAPHORE_SINC_KEY_START, 1, 0);
-        if (semaphore_lock(semaphore_start_id,0)< 0) { ERROR_EXIT_SEQUENCE_USER("IMPOSSIBLE TO OBTAIN THE START SEMAPHORE"); }
+        if (semaphore_lock(semaphore_start_id, 0) < 0) {
+            ERROR_EXIT_SEQUENCE_USER("IMPOSSIBLE TO OBTAIN THE START SEMAPHORE");
+        }
         DEBUG_MESSAGE("READY, ON START_SEM");
         if (semaphore_wait_for_sinc(semaphore_start_id, 0) < 0) {
             ERROR_EXIT_SEQUENCE_USER("IMPOSSIBILE TO WAIT FOR START");
@@ -94,11 +93,10 @@ int main(int arc, char const *argv[]) {
         /*-------------------------*/
         /*  CREAZIONE QUEUE REPORT *
         /*-------------------------*/
-        queue_report_id = msgget(current_user.pid, IPC_CREAT|IPC_EXCL|0600);
+        /*TODO: Aggiungerla come optional alla compilazione*/
+
+        queue_report_id = msgget(current_user.pid, IPC_CREAT | IPC_EXCL | 0600);
         if (queue_report_id < 0) { ERROR_EXIT_SEQUENCE_USER("IMPOSSIBLE TO CREATE THE MESSAGE QUEUE"); }
-
-
-        DEBUG_MESSAGE("USER READY, WAINT FOR SEMAPHORE TO FREE");
 
 
         /************************************
@@ -112,23 +110,30 @@ int main(int arc, char const *argv[]) {
          * unlock is done if sem hasn't 0 as  *
          * value                              *
         /*------------------------------------*/
-        DEBUG_NOTIFY_ACTIVITY_RUNNING("SEMAPHORE START UNLOAKING....");
-        semaphore_start_Value = semctl(semaphore_start_id, 0, GETVAL);/* 0 as reading op. */
-        if (semaphore_start_Value < 0) {
+        semaphore_start_value = semctl(semaphore_start_id, 0, GETVAL);/* 0 as reading op. */
+        if (semaphore_start_value < 0) {
             ERROR_EXIT_SEQUENCE_USER("IMPOSSIBLE TO RETRIVE INFORMATION FROM START_SEMAPHORE");
         }
-        if (semaphore_start_Value != 0 && semaphore_lock(semaphore_start_id, 0) < 0) {
+        if (semaphore_start_value != 0 && semaphore_lock(semaphore_start_id, 0) < 0) {
             ERROR_EXIT_SEQUENCE_USER("ERROR OCCURED DURING UNLOCK OF THE START_SEMAPHORE");
         }
+
+        DEBUG_MESSAGE("USER READY, WAITING FOR SEMAPHORE TO FREE");
 
         if (semaphore_wait_for_sinc(semaphore_start_id, 0) < 0) {
             ERROR_EXIT_SEQUENCE_USER("ERROR DURING WAITING START_SEMAPHORE UNLOAK");
         }
         state = RUNNING_STATE;
-        DEBUG_NOTIFY_ACTIVITY_DONE("SEMAPHORE START UNLOAKING DONE");
-        /*------------------------------*/
-        /*  CONNESSIONE AI QUEUE REPORT *
-        /*------------------------------*/
+
+
+        /****************************************
+         *      GENERATIION OF TRANSACTION FASE *
+         * **************************************/
+        raise(SIGALRM);
+        while(1) pause(); /*Waiting for a signal to come*/
+            
+
+        DEBUG_MESSAGE("USER ENDED -----------------------------");
         EXIT_PROCEDURE_USER(0);
 
     }
@@ -172,31 +177,23 @@ Bool set_signal_handler(struct sigaction sa, sigset_t sigmask) {
     return TRUE;
 }
 
-/**
- * Calculate the balance of the current user_proc
- * @param budget the current budget that is available for the user_proc;
- * @return the value of the balance
- */
-int calc_balance(unsigned int budget) {
-    /*TODO: implement calc_balance*/
-}
-
-struct user_snapshot *get_user_snapshot(struct user_transaction user) {
-    /*TODO: implement get_user_snapshot*/
-}
 
 void signals_handler(int signum) {
     DEBUG_SIGNAL("SIGNAL RECEIVED", signum);
     switch (signum) {
         case SIGINT:
-            alarm(0);
+            alarm(0);/* pending alarm canceld*/
             EXIT_PROCEDURE_USER(0);
+        case SIGALRM: /*    Generate a new transaction  */
+            DEBUG_NOTIFY_ACTIVITY_RUNNING("GENERATING A NEW TRANSACTION...");
+            generate_transaction(&current_user);
+            DEBUG_NOTIFY_ACTIVITY_DONE("GENERATING A NEW TRANSACTION DONE");
     }
 }
 
 
 void free_mem_user() {
-    free_user(current_user);
+    free_user(&current_user);
 }
 
 void free_sysVar_user() {
@@ -216,10 +213,9 @@ void free_sysVar_user() {
  * Load and read the configuration, in case of error during loading close the proc. with EXIT_FAILURE
  * @return TRUE if ALL OK
  */
-Bool read_conf(struct conf simulation_conf) {
-    printf("ENTRATO");
+Bool read_conf(struct conf *simulation_conf) {
     DEBUG_NOTIFY_ACTIVITY_RUNNING("LOADING CONFIGURATION...");
-    switch (load_configuration(&simulation_conf)) {
+    switch (load_configuration(simulation_conf)) {
         case 0:
             break;
         case -1:
