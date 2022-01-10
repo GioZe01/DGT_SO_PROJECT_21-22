@@ -18,9 +18,9 @@
 #define DEBUG_ERROR_MESSAGE(mex)
 #endif
 
-pid_t extract_node();
+pid_t extract_node(int nodes_num);
 
-pid_t extract_user();
+pid_t extract_user(int users_num);
 
 void user_create(struct user_transaction *u, float budget, int pid, Balance balance) {
     u->pid = pid;
@@ -49,7 +49,7 @@ float calc_balance(struct user_transaction *self) {
     return fabs(self->entries) - fabs(self->outcomes) - fabs(self->expected_out);
 }
 
-int generate_transaction(struct user_transaction *self, pid_t user_proc_pid) {
+int generate_transaction(struct user_transaction *self, pid_t user_proc_pid, int nodes_num, int users_num) {
     struct Transaction t;
     struct timespec timestamp;
 
@@ -58,7 +58,13 @@ int generate_transaction(struct user_transaction *self, pid_t user_proc_pid) {
         return -1;
     }
     t.sender = user_proc_pid;
-    t.reciver = extract_user();
+    t.reciver = extract_user(users_num);
     t.timestamp = timestamp.tv_nsec;
     printf("\n ----------------- timestamp: %lf", t.timestamp);
+}
+pid_t extract_user(int users_num){
+    srand();
+}
+pid_t extract_node(int nodes_num){
+
 }

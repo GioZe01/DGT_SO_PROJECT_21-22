@@ -19,7 +19,12 @@ struct user_transaction {
 };
 
 struct user_snapshot {
+    int pid;
     int budget;
+    float u_balance;
+    float entries;
+    float outcomes;
+    float expected_out;
 };/*Structure to be saved in sharedmemory*/
 /*struct user_snapshot* get_user_snapshot(struct user_transaction u);/*TODO: verifica snapshot se ritornare puntatore o no per salvare in shm*/
 /**
@@ -54,7 +59,7 @@ float calc_balance(struct user_transaction *self);
  * @param self
  * @return -1 in case o failure. 0 otherwise.
  */
-int generate_transaction(struct user_transaction *self, pid_t user_proc_pid);
+int generate_transaction(struct user_transaction *self, pid_t user_proc_pid, int nodes_num, int users_num);
 
 
 /*

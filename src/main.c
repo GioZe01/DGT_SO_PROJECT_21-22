@@ -63,6 +63,7 @@ struct conf simulation_conf;
 int simulation_end = 0;
 int msg_transaction_reports = -1; /*Identifier for message queue*/
 int semaphore_start_id = -1;
+int * users_id_to_pid;
 /*Variabili Globali*/
 pid_t main_pid;
 struct processes_info_list *proc_list;
@@ -76,6 +77,7 @@ int main() {
     if (read_conf() == TRUE) {
         int i; /*  utility index */
         struct sigaction sa; /*Structure for handling signals*/
+
         set_signal_handlers(sa);
         create_semaphores();
         create_masterbook();
@@ -120,6 +122,7 @@ int create_users_proc() {
             case -1:
                 return -1;
             case 0: /*kid*/
+                users_id_to_pid[i] = user_pid;
                 execve(argv_user[0], argv_user, NULL);
                 ERROR_MESSAGE("IMPOSSIBLE TO CREATE A USER");
                 return -1;

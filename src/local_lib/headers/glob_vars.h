@@ -8,6 +8,8 @@
 #define SEMAPHORE_SINC_KEY_START 0x76
 /*  QUEUE ID    */
 #define QUEUE_SHIFT_ID 0x77/*TODO:vedere se ha senso*/
+/*  SHARED MEM. */
+#define SHM_USERS_PROC_KEY 0x78
 /*  COLOR DEFINITION    */
 #define COLOR_RED_ANSI_CODE "\x1b[31m"
 #define COLOR_GREEN_ANSI_CODE "\x1b[32m" /* Usato per printing debugging mode per semafori*/

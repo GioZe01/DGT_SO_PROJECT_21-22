@@ -13,6 +13,10 @@
 #include <sys/shm.h>
 /*  Local Library */
 #include "local_lib/headers/simulation_errors.h"
+#include "local_lib/headers/transaction_list.h"
+#include "local_lib/headers/user_transaction.h"
+#include "local_lib/headers/semaphore.h"
+#include "local_lib/headers/conf_file.h"
 
 #define EXIT_PROCEDURE_USER(exit_value) free_mem_user();         \
                                 free_sysVar_user();      \
@@ -29,10 +33,6 @@
 #define DEBUG_ERROR_MESSAGE(mex)
 #endif
 
-#include "local_lib/headers/transaction_list.h"
-#include "local_lib/headers/user_transaction.h"
-#include "local_lib/headers/semaphore.h"
-#include "local_lib/headers/conf_file.h"
 /*  Constant definition */
 #define INIT_STATE 0
 #define RUNNING_STATE 1
@@ -47,6 +47,7 @@ Bool set_signal_handler(struct sigaction sa, sigset_t sigmask);
 
 Bool read_conf(struct conf *simulation_conf);
 
+void configure_shm();
 
 /*  SysV  */
 
@@ -77,7 +78,7 @@ int main(int arc, char const *argv[]) {
         user_create(&current_user, configuration.so_buget_init, getpid(), calc_balance);
 
         /*---------------------------*/
-        /*  SEMAPHORES CREATOIN FASE *
+        /*  SEMAPHORES CREATION FASE *
         /*---------------------------*/
 
         /*TODO: need a semafore for reading into the message queue*/
@@ -89,6 +90,13 @@ int main(int arc, char const *argv[]) {
         if (semaphore_wait_for_sinc(semaphore_start_id, 0) < 0) {
             ERROR_EXIT_SEQUENCE_USER("IMPOSSIBILE TO WAIT FOR START");
         }
+
+
+        /*-------------------------*/
+        /*  SHARED MEM  CONFIG     *
+        /*-------------------------*/
+
+        /*configure_shm(); TODO: convert*/
 
         /*-------------------------*/
         /*  CREAZIONE QUEUE REPORT *
@@ -127,11 +135,11 @@ int main(int arc, char const *argv[]) {
 
 
         /****************************************
-         *      GENERATIION OF TRANSACTION FASE *
+         *      GENERATION OF TRANSACTION FASE *
          * **************************************/
         raise(SIGALRM);
-        while(1) pause(); /*Waiting for a signal to come*/
-            
+        while (1) pause(); /*Waiting for a signal to come*/
+
 
         DEBUG_MESSAGE("USER ENDED -----------------------------");
         EXIT_PROCEDURE_USER(0);
@@ -143,7 +151,7 @@ int main(int arc, char const *argv[]) {
 
 /**
  * Check if the argument respect initialization value for the user_proc
- * @param arc numer of value in argv
+ * @param arc number of value in argv
  * @param argv argument pass in the main function
  * @return  TRUE if all OK, otherwise FALSE
  */
@@ -176,8 +184,24 @@ Bool set_signal_handler(struct sigaction sa, sigset_t sigmask) {
     }
     return TRUE;
 }
+/* TODO: Convert or remove
+void configure_shm() {
+    int shm_user_id = -1;
+    DEBUG_NOTIFY_ACTIVITY_RUNNING("RETRIEVING SHM ID...");
+    shm_user_id = shmget(SHM_USERS_PROC_KEY, sizeof(struct user_snapshot), 0);
+    if (shm_user_id < 0) {
+        ERROR_EXIT_SEQUENCE_USER("IMPOSSIBLE TO GET THE USER PROC SHARED MEMORY ");
+    }
+    DEBUG_NOTIFY_ACTIVITY_DONE("RETRIEVING SHM ID DONE");
 
-
+    DEBUG_NOTIFY_ACTIVITY_RUNNING("ATTACHING TO THE SHM...");
+    users = (struct user_snapshot *) shmat(shm_user_id, NULL, 0);
+    if (users == (void *) -1) {
+        ERROR_EXIT_SEQUENCE_USER("IMPOSSIBLE TO CONNECT TO THE SHARED MEMORY ");
+    }
+    DEBUG_NOTIFY_ACTIVITY_DONE("ATTACHING TO THE SHM DONE");
+}
+*/
 void signals_handler(int signum) {
     DEBUG_SIGNAL("SIGNAL RECEIVED", signum);
     switch (signum) {
