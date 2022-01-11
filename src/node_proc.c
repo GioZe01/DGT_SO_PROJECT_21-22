@@ -18,7 +18,7 @@
 
 
 /*  Local Library  */
-#include "local_lib/headers/glob_vars.h"
+#include "local_lib/headers/glob.h"
 #include "local_lib/headers/boolean.h"
 #include "local_lib/headers/conf_file.h"
 #include "local_lib/headers/simulation_errors.h"

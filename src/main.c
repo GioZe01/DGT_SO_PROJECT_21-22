@@ -1,5 +1,6 @@
 /*Deprecated: new standard is not implemented for university course constrain*/
 #define _GNU_SOURCE
+#define _OPEN_SYS_ITOA_EXT
 /*If this macro is defined to 1, security hardening is added to various library functions. If def
  * ined to 2, even stricter checks are applied. If defined to 3, the GNU C Library may also use checks that may have
  * an additional performance*/
@@ -19,14 +20,14 @@
 #include <unistd.h>
 #include <signal.h>
 
-#define _FORTIFY_SOURCE 2
 /*  LOCAL IMPORT*/
 
-#include "local_lib/headers/glob_vars.h"
+#include "local_lib/headers/glob.h"
 #include "local_lib/headers/conf_file.h"
 #include "local_lib/headers/boolean.h"
 #include "local_lib/headers/semaphore.h"
 #include "local_lib/headers/simulation_errors.h"
+#include "local_lib/headers/user_msg_report.h"
 
 #ifdef DEBUG
 
@@ -57,19 +58,21 @@ int create_users_proc();
 
 Bool read_conf();
 
+void notify_users_of_pid_to_id();
+
 struct conf simulation_conf;
 /*Variabili di SYS*/
 /*TODO: message transaction queue for single user_transaction auto incremento with ## macro*/
 int simulation_end = 0;
 int msg_transaction_reports = -1; /*Identifier for message queue*/
 int semaphore_start_id = -1;
-int * users_id_to_pid;
+int *users_id_to_pid;
 /*Variabili Globali*/
 pid_t main_pid;
 struct processes_info_list *proc_list;
 
 int main() {
-    /*semctl(1, 0, IPC_RMID); TODO: Remove*/
+    semctl(23, 0, IPC_RMID); /*TODO: Remove*/
     /************************************
      *      CONFIGURATION FASE
      * ***********************************/
@@ -77,7 +80,7 @@ int main() {
     if (read_conf() == TRUE) {
         int i; /*  utility index */
         struct sigaction sa; /*Structure for handling signals*/
-
+        users_id_to_pid = (int *) malloc(sizeof(int) * simulation_conf.so_user_num);
         set_signal_handlers(sa);
         create_semaphores();
         create_masterbook();
@@ -91,7 +94,7 @@ int main() {
         /*-------------------------*/
 
         DEBUG_BLOCK_ACTION_START("PROC GENERATION");
-        if (create_users_proc()<0){ERROR_MESSAGE("IMPOSSIBLE TO CREATE USERS PROC");}
+        if (create_users_proc() < 0) { ERROR_MESSAGE("IMPOSSIBLE TO CREATE USERS PROC"); }
         DEBUG_BLOCK_ACTION_END();
 
         DEBUG_MESSAGE("PROCESSES USERS GENERATED");
@@ -102,6 +105,10 @@ int main() {
 
         DEBUG_MESSAGE("WAITING DONE");
 
+        DEBUG_BLOCK_ACTION_END();
+
+        DEBUG_BLOCK_ACTION_START("NOTIFY USERS");
+        notify_users_of_pid_to_id();
         DEBUG_BLOCK_ACTION_END();
     }
     free_sysVar();
@@ -114,7 +121,7 @@ int main() {
  * @return -1 if fail. 0 otherwise
  */
 int create_users_proc() {
-    char *argv_user[] = {PATH_TO_USER,NULL}; /*Future addon*/
+    char *argv_user[] = {PATH_TO_USER, NULL}; /*Future addon*/
     pid_t user_pid;
     int i;
     for (i = 0; i < simulation_conf.so_user_num; i++) {
@@ -122,11 +129,12 @@ int create_users_proc() {
             case -1:
                 return -1;
             case 0: /*kid*/
-                users_id_to_pid[i] = user_pid;
                 execve(argv_user[0], argv_user, NULL);
                 ERROR_MESSAGE("IMPOSSIBLE TO CREATE A USER");
                 return -1;
             default: /*father*/
+                users_id_to_pid[i] = user_pid;
+
                 proc_list = insert_in_list(proc_list, user_pid, PROC_TYPE_USER);
                 /*Free if utilized pointers to argv*/
                 if (argv_user[1] != NULL) free(argv_user[1]);
@@ -136,6 +144,35 @@ int create_users_proc() {
         }
     }
     return 0;
+}
+
+void notify_users_of_pid_to_id() {
+    DEBUG_NOTIFY_ACTIVITY_RUNNING("SENDING INFORMATION TO USERS...");
+    struct processes_info_list *list = proc_list;
+    struct user_msg msg;
+    int user_queue_id;
+    char buffer[sizeof(int) * 8 + 1];
+    if (user_msg_create(&msg, MSG_CONFIG_TYPE, main_pid, users_id_to_pid) < 0) {
+        printf("\nERRORE ON CREATE: %s\n", strerror(errno) );
+        ERROR_EXIT_SEQUENCE_MAIN("IMPOSSIBLE TO CREATE THE MESSAGE");
+    }
+#ifdef DEBUG
+    user_msg_print(&msg);
+#endif
+    for (; list != NULL; list = list->next) {
+        int_to_hex(list->pid, buffer);
+        printf("\nDIO CANE: %s, ATOI: %d\n", buffer, atoi(buffer));
+        if (list->proc_type == PROC_TYPE_USER) {
+            if (user_queue_id = msgget(buffer,0600) < 0) {
+                ERROR_EXIT_SEQUENCE_MAIN("IMPOSSIBLE TO RETRIEVE QUEUE");
+            }
+            printf("\nid: %d | sizeof msg: %ld\n", buffer, sizeof(msg));
+            if (user_msg_snd(user_queue_id, &msg, MSG_CONFIG_TYPE, users_id_to_pid, main_pid, FALSE) < 0) {
+                ERROR_EXIT_SEQUENCE_MAIN("IMPOSSIBLE TO SEND MESSAGE ERROR");
+            }
+        }
+    }
+    DEBUG_NOTIFY_ACTIVITY_DONE("SENDING INFORMATION TO USERS DONE");
 }
 
 void set_signal_handlers(struct sigaction sa) {
@@ -166,7 +203,7 @@ void signals_handler(int signum) { /*TODO: Scrivere implementazione*/
     switch (signum) {
         case SIGINT:
         case SIGTERM:
-            if (getpid() == main_pid){EXIT_PROCEDURE_MAIN(0);}
+            if (getpid() == main_pid) { EXIT_PROCEDURE_MAIN(0); }
             exit(0);
         case SIGALRM:
             if (getpid() == main_pid) {
@@ -229,7 +266,7 @@ void kill_kids() {
                  * the termination has not been read by main, in this case need wait on the proc to update the proc-list
                  * state
                  */
-                    DEBUG_MESSAGE("PROC KILLED");
+                DEBUG_MESSAGE("PROC KILLED");
             else {
                 if (errno == EINTR) continue;
                 ERROR_MESSAGE("IMPOSSIBLE TO SEND TERMINATION SIGNAL TO KID");

@@ -17,6 +17,7 @@
 #include "local_lib/headers/user_transaction.h"
 #include "local_lib/headers/semaphore.h"
 #include "local_lib/headers/conf_file.h"
+#include "local_lib/headers/user_msg_report.h"
 
 #define EXIT_PROCEDURE_USER(exit_value) free_mem_user();         \
                                 free_sysVar_user();      \
@@ -59,6 +60,7 @@ struct user_transaction current_user;
 int main(int arc, char const *argv[]) {
     DEBUG_MESSAGE("USER PROCESS STARTED");
     struct sigaction sa;
+    struct user_msg msg_rep;
     sigset_t sigmask; /* sinal mask */
 
     /************************************
@@ -71,42 +73,24 @@ int main(int arc, char const *argv[]) {
     if (check_argument(arc, argv) && set_signal_handler(sa, sigmask)) {
         /*  VARIABLE INITIALIZATION */
         int semaphore_start_value = -1;
-
+        char * buffer[sizeof (int)*8+1];
         struct conf configuration;
         read_conf(&configuration);
-        printf("\n...............Configuration budget: %f\n", configuration.so_buget_init);
         user_create(&current_user, configuration.so_buget_init, getpid(), calc_balance);
-
-        /*---------------------------*/
-        /*  SEMAPHORES CREATION FASE *
-        /*---------------------------*/
-
-        /*TODO: need a semafore for reading into the message queue*/
-        semaphore_start_id = semget(SEMAPHORE_SINC_KEY_START, 1, 0);
-        if (semaphore_lock(semaphore_start_id, 0) < 0) {
-            ERROR_EXIT_SEQUENCE_USER("IMPOSSIBLE TO OBTAIN THE START SEMAPHORE");
-        }
-        DEBUG_MESSAGE("READY, ON START_SEM");
-        if (semaphore_wait_for_sinc(semaphore_start_id, 0) < 0) {
-            ERROR_EXIT_SEQUENCE_USER("IMPOSSIBILE TO WAIT FOR START");
-        }
-
-
-        /*-------------------------*/
-        /*  SHARED MEM  CONFIG     *
-        /*-------------------------*/
-
-        /*configure_shm(); TODO: convert*/
 
         /*-------------------------*/
         /*  CREAZIONE QUEUE REPORT *
         /*-------------------------*/
         /*TODO: Aggiungerla come optional alla compilazione*/
-
-        queue_report_id = msgget(current_user.pid, IPC_CREAT | IPC_EXCL | 0600);
+        int_to_hex(current_user.pid, buffer);
+        queue_report_id = msgget(buffer,IPC_CREAT | IPC_EXCL | 0600);
+        printf("----------------USER_QUEUE ID: %d\n",queue_report_id);
         if (queue_report_id < 0) { ERROR_EXIT_SEQUENCE_USER("IMPOSSIBLE TO CREATE THE MESSAGE QUEUE"); }
 
-
+        /*-------------------------*/
+        /*  SHARED MEM  CONFIG     *
+        /*-------------------------*/
+        /*configure_shm(); TODO: convert*/
         /************************************
          *      SINC AND WAITING FASE       *
          * **********************************/
@@ -118,22 +102,27 @@ int main(int arc, char const *argv[]) {
          * unlock is done if sem hasn't 0 as  *
          * value                              *
         /*------------------------------------*/
-        semaphore_start_value = semctl(semaphore_start_id, 0, GETVAL);/* 0 as reading op. */
-        if (semaphore_start_value < 0) {
-            ERROR_EXIT_SEQUENCE_USER("IMPOSSIBLE TO RETRIVE INFORMATION FROM START_SEMAPHORE");
+        /*TODO: need a semafore for reading into the message queue*/
+        semaphore_start_id = semget(SEMAPHORE_SINC_KEY_START, 1, 0);
+        if (semaphore_lock(semaphore_start_id, 0) < 0) {
+            ERROR_EXIT_SEQUENCE_USER("IMPOSSIBLE TO OBTAIN THE START SEMAPHORE");
         }
-        if (semaphore_start_value != 0 && semaphore_lock(semaphore_start_id, 0) < 0) {
-            ERROR_EXIT_SEQUENCE_USER("ERROR OCCURED DURING UNLOCK OF THE START_SEMAPHORE");
-        }
-
         DEBUG_MESSAGE("USER READY, WAITING FOR SEMAPHORE TO FREE");
-
         if (semaphore_wait_for_sinc(semaphore_start_id, 0) < 0) {
-            ERROR_EXIT_SEQUENCE_USER("ERROR DURING WAITING START_SEMAPHORE UNLOAK");
+            ERROR_EXIT_SEQUENCE_USER("ERROR DURING WAITING START_SEMAPHORE UNLOCK");
         }
         state = RUNNING_STATE;
 
+        /*-------------------------------------------*
+         *  GETTING THE KNOWLEDGE OF USERS id_to_pid *
+         * ------------------------------------------*/
 
+        if (msgrcv(queue_report_id, &msg_rep, sizeof(msg_rep) - sizeof(msg_rep.type),
+                   MSG_CONFIG_TYPE, 0) < 0 &&
+            errno == EINTR) {
+            ERROR_EXIT_SEQUENCE_USER("MISSED CONFIG ON MESSAGE QUEUE");
+        }
+        printf("\nCONFIGURAZIONE RICEVUTA: %d\n", msg_rep.data.users_id_to_pid[0]);
         /****************************************
          *      GENERATION OF TRANSACTION FASE *
          * **************************************/
@@ -184,6 +173,7 @@ Bool set_signal_handler(struct sigaction sa, sigset_t sigmask) {
     }
     return TRUE;
 }
+
 /* TODO: Convert or remove
 void configure_shm() {
     int shm_user_id = -1;
@@ -210,7 +200,7 @@ void signals_handler(int signum) {
             EXIT_PROCEDURE_USER(0);
         case SIGALRM: /*    Generate a new transaction  */
             DEBUG_NOTIFY_ACTIVITY_RUNNING("GENERATING A NEW TRANSACTION...");
-            generate_transaction(&current_user);
+            /*generate_transaction(&current_user);*/
             DEBUG_NOTIFY_ACTIVITY_DONE("GENERATING A NEW TRANSACTION DONE");
     }
 }
@@ -225,11 +215,14 @@ void free_sysVar_user() {
     int semaphore_start_value;
     if (state == INIT_STATE && semaphore_start_id >= 0) {
         semaphore_start_value = semctl(semaphore_start_id, 0, GETVAL);
-        if (semaphore_start_value < 0) ERROR_MESSAGE("IMPOSSIBLE TO RETRIVE INFORMATION ON STARTING SEMAPHORE");
+        if (semaphore_start_value < 0) ERROR_MESSAGE("IMPOSSIBLE TO RETRIEVE INFORMATION ON STARTING SEMAPHORE");
         else if (semaphore_start_value > 0) {
             if (semaphore_lock(semaphore_start_id, 0) < 0)
                 ERROR_MESSAGE("IMPOSSIBLE TO EXECUTE THE FREE SYS VAR (prob. sem_lock not set so cannot be closed)");
         }
+    }
+    if (queue_report_id >= 0 && msgctl(queue_report_id, IPC_RMID, NULL) < 0) {
+        ERROR_MESSAGE("IMPOSSIBLE TO DELETE MESSAGE QUEUE OF USER");
     }
 }
 

@@ -63,7 +63,6 @@ int generate_transaction(struct user_transaction *self, pid_t user_proc_pid, int
     printf("\n ----------------- timestamp: %lf", t.timestamp);
 }
 pid_t extract_user(int users_num){
-    srand();
 }
 pid_t extract_node(int nodes_num){
 

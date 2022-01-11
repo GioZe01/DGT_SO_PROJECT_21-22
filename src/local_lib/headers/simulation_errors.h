@@ -3,7 +3,7 @@
 
 #include <string.h>
 #include <errno.h>
-#include "glob_vars.h"
+#include "glob.h"
 
 #define EXIT_PROCEDURE_MAIN(exit_value) wait_kids();     \
                                 kill_kids();        \

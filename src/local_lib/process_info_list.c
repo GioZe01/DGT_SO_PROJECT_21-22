@@ -2,7 +2,7 @@
 #include <stdio.h>
 #include <unistd.h>
 #include <sys/types.h>
-#include "headers/glob_vars.h"
+#include "headers/glob.h"
 #include "headers/process_info_list.h"
 #ifdef DEBUG
 #include "headers/debug_utility.h"

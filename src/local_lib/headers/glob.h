@@ -1,7 +1,9 @@
 
 
-#ifndef DGT_SO_PROJECT_21_22_GLOB_VARS_H
-#define DGT_SO_PROJECT_21_22_GLOB_VARS_H
+#ifndef DGT_SO_PROJECT_21_22_GLOB_H
+#define DGT_SO_PROJECT_21_22_GLOB_H
+#include <unistd.h>
+#include "sys/types.h"
 /*  EXVE PATH   */
 #define PATH_TO_USER "build/bin/user"
 /*  SINCRONIZATION KEY  */
@@ -18,5 +20,6 @@
 #define COLOR_WHITE_ANSI_CODE "\x1b[37m"
 #define COLOR_RESET_ANSI_CODE "\x1b[0m"
 
+void int_to_hex(pid_t pid, char * buffer);
 
-#endif /*DGT_SO_PROJECT_21_22_GLOB_VARS_H*/
+#endif /*DGT_SO_PROJECT_21_22_GLOB_H*/

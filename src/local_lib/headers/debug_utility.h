@@ -1,7 +1,7 @@
 
 #ifndef DGT_SO_PROJECT_21_22_DEBUG_UTILITY_H
 #define DGT_SO_PROJECT_21_22_DEBUG_UTILITY_H
-#include "glob_vars.h"
+#include "glob.h"
 /*  DEBUG_MESSAGE definitions:  */
 /*TODO: add DEBUG Line Splitter*/
 #ifdef DEBUG

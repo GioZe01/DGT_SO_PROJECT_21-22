@@ -6,7 +6,7 @@
 /*Local import */
 #include "headers/transaction_list.h"
 #include "headers/simulation_errors.h"
-#include "headers/glob_vars.h"
+#include "headers/glob.h"
 #include "headers/boolean.h"
 #ifdef DEBUG
 #include "headers/debug_utility.h"
@@ -23,7 +23,7 @@ static void queue_underflow(void);
 static void empty_queue(Queue q);
 
 struct node {
-    Transaction t;
+    struct Transaction t;
     struct node *next;
 };
 /*Implement the real queue structure*/
