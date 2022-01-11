@@ -82,8 +82,7 @@ int main(int arc, char const *argv[]) {
         /*  CREAZIONE QUEUE REPORT *
         /*-------------------------*/
         /*TODO: Aggiungerla come optional alla compilazione*/
-        int_to_hex(current_user.pid, buffer);
-        queue_report_id = msgget(buffer,IPC_CREAT | IPC_EXCL | 0600);
+        queue_report_id = msgget(current_user.pid,IPC_CREAT | IPC_EXCL | 0600);
         printf("----------------USER_QUEUE ID: %d\n",queue_report_id);
         if (queue_report_id < 0) { ERROR_EXIT_SEQUENCE_USER("IMPOSSIBLE TO CREATE THE MESSAGE QUEUE"); }
 

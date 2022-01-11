@@ -20,6 +20,5 @@
 #define COLOR_WHITE_ANSI_CODE "\x1b[37m"
 #define COLOR_RESET_ANSI_CODE "\x1b[0m"
 
-void int_to_hex(pid_t pid, char * buffer);
 
 #endif /*DGT_SO_PROJECT_21_22_GLOB_H*/

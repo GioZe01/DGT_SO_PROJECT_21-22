@@ -34,6 +34,8 @@ struct processes_info_list *insert_in_list(struct processes_info_list *self, pid
     new->proc_type = type;
     new->proc_state = PROC_INFO_STATE_RUNNING;
     new->next = self;
+    return new;
+
 }
 
 struct processes_info_list *get_proc_from_pid(struct processes_info_list *self, pid_t pid) {

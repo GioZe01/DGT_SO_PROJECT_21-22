@@ -72,7 +72,7 @@ pid_t main_pid;
 struct processes_info_list *proc_list;
 
 int main() {
-    semctl(23, 0, IPC_RMID); /*TODO: Remove*/
+    semctl(7, 0, IPC_RMID); /*TODO: Remove*/
     /************************************
      *      CONFIGURATION FASE
      * ***********************************/
@@ -153,7 +153,7 @@ void notify_users_of_pid_to_id() {
     int user_queue_id;
     char buffer[sizeof(int) * 8 + 1];
     if (user_msg_create(&msg, MSG_CONFIG_TYPE, main_pid, users_id_to_pid) < 0) {
-        printf("\nERRORE ON CREATE: %s\n", strerror(errno) );
+        printf("\nERRORE ON CREATE: %s\n", strerror(errno));
         ERROR_EXIT_SEQUENCE_MAIN("IMPOSSIBLE TO CREATE THE MESSAGE");
     }
 #ifdef DEBUG
@@ -161,12 +161,11 @@ void notify_users_of_pid_to_id() {
 #endif
     for (; list != NULL; list = list->next) {
         int_to_hex(list->pid, buffer);
-        printf("\nDIO CANE: %s, ATOI: %d\n", buffer, atoi(buffer));
         if (list->proc_type == PROC_TYPE_USER) {
-            if (user_queue_id = msgget(buffer,0600) < 0) {
+            user_queue_id = msgget(proc_list->pid, 0600);
+            if (user_queue_id < 0) {
                 ERROR_EXIT_SEQUENCE_MAIN("IMPOSSIBLE TO RETRIEVE QUEUE");
             }
-            printf("\nid: %d | sizeof msg: %ld\n", buffer, sizeof(msg));
             if (user_msg_snd(user_queue_id, &msg, MSG_CONFIG_TYPE, users_id_to_pid, main_pid, FALSE) < 0) {
                 ERROR_EXIT_SEQUENCE_MAIN("IMPOSSIBLE TO SEND MESSAGE ERROR");
             }

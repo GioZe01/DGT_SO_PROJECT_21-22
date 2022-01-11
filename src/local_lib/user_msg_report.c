@@ -51,7 +51,8 @@ void user_msg_print(struct user_msg *self) {
 }
 int user_msg_snd(int id, struct user_msg *msg,long type, data *data, pid_t sender, Bool create){
     if (create == TRUE){user_msg_create(&msg, type, sender, data);}
-    while(msgsnd(id, msg, sizeof (struct user_msg)-sizeof (long), 0)<0){
+    printf("ID RECEIVED: %d\n", id);
+    while(msgsnd(id, msg, sizeof (*msg)-sizeof (long), 0)<0){
         if (errno!=EINTR) return -1;
     }
     return 0;
