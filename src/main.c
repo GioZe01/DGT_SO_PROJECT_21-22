@@ -66,7 +66,7 @@ struct conf simulation_conf;
 int simulation_end = 0;
 int msg_transaction_reports = -1; /*Identifier for message queue*/
 int semaphore_start_id = -1;
-int *users_id_to_pid;
+int *users_id_to_pid; /*in 0 position is saved the actual size of the array of id saved in the pointer*/
 /*Variabili Globali*/
 pid_t main_pid;
 struct processes_info_list *proc_list;
@@ -96,7 +96,9 @@ int main() {
         DEBUG_BLOCK_ACTION_START("PROC GENERATION");
         if (create_users_proc() < 0) { ERROR_MESSAGE("IMPOSSIBLE TO CREATE USERS PROC"); }
         DEBUG_BLOCK_ACTION_END();
-
+        if (users_id_to_pid[0] < (simulation_conf.so_user_num-REALLOC_MARGIN)){
+            users_id_to_pid=realloc(users_id_to_pid, sizeof(int) * users_id_to_pid[0] );
+        }
         DEBUG_MESSAGE("PROCESSES USERS GENERATED");
         DEBUG_BLOCK_ACTION_START("WAITING CHILDREN");
         if (semaphore_wait_for_sinc(semaphore_start_id, 0) < 0) {
@@ -124,6 +126,7 @@ int create_users_proc() {
     char *argv_user[] = {PATH_TO_USER, NULL}; /*Future addon*/
     pid_t user_pid;
     int i;
+    users_id_to_pid[0] = 0;
     for (i = 0; i < simulation_conf.so_user_num; i++) {
         switch (user_pid = fork()) {
             case -1:
@@ -133,8 +136,8 @@ int create_users_proc() {
                 ERROR_MESSAGE("IMPOSSIBLE TO CREATE A USER");
                 return -1;
             default: /*father*/
-                users_id_to_pid[i] = user_pid;
-
+                users_id_to_pid[i+1] = user_pid;
+                users_id_to_pid[0]+=1;
                 proc_list = insert_in_list(proc_list, user_pid, PROC_TYPE_USER);
                 /*Free if utilized pointers to argv*/
                 if (argv_user[1] != NULL) free(argv_user[1]);
@@ -160,7 +163,6 @@ void notify_users_of_pid_to_id() {
     user_msg_print(&msg);
 #endif
     for (; list != NULL; list = list->next) {
-        int_to_hex(list->pid, buffer);
         if (list->proc_type == PROC_TYPE_USER) {
             user_queue_id = msgget(proc_list->pid, 0600);
             if (user_queue_id < 0) {

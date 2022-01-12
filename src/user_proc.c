@@ -55,6 +55,7 @@ void configure_shm();
 int state;
 int semaphore_start_id = -1;
 int queue_report_id = -1; /* -1 is the value if it is not initialized */
+int * users_id_to_pid;
 struct user_transaction current_user;
 
 int main(int arc, char const *argv[]) {
@@ -76,7 +77,7 @@ int main(int arc, char const *argv[]) {
         char * buffer[sizeof (int)*8+1];
         struct conf configuration;
         read_conf(&configuration);
-        user_create(&current_user, configuration.so_buget_init, getpid(), calc_balance);
+        user_create(&current_user, configuration.so_buget_init, getpid(), calc_balance, update_cash_flow);
 
         /*-------------------------*/
         /*  CREAZIONE QUEUE REPORT *
@@ -122,6 +123,7 @@ int main(int arc, char const *argv[]) {
             ERROR_EXIT_SEQUENCE_USER("MISSED CONFIG ON MESSAGE QUEUE");
         }
         printf("\nCONFIGURAZIONE RICEVUTA: %d\n", msg_rep.data.users_id_to_pid[0]);
+        users_id_to_pid = msg_rep.data.users_id_to_pid;
         /****************************************
          *      GENERATION OF TRANSACTION FASE *
          * **************************************/
@@ -199,7 +201,7 @@ void signals_handler(int signum) {
             EXIT_PROCEDURE_USER(0);
         case SIGALRM: /*    Generate a new transaction  */
             DEBUG_NOTIFY_ACTIVITY_RUNNING("GENERATING A NEW TRANSACTION...");
-            /*generate_transaction(&current_user);*/
+            generate_transaction(&current_user, current_user.pid, NULL, users_id_to_pid);
             DEBUG_NOTIFY_ACTIVITY_DONE("GENERATING A NEW TRANSACTION DONE");
     }
 }

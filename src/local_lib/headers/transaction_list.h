@@ -6,15 +6,17 @@
 #include <unistd.h>
 #include <sys/types.h>
 #include "boolean.h"
-#define TRANSACTION_SUCCES 1
-#define TRANSACTION_FAILED 0
- struct Transaction{
+#define TRANSACTION_SUCCES 0
+#define TRANSACTION_FAILED -1
+#define TRANSACTION_WAITING 1
+struct Transaction{
     short int t_type;
     double timestamp;
     pid_t sender;
     pid_t reciver;
-    float amount; /*TODO: verificare se basta*/
+    float amount; /*Cambiare nel caso in cui non bastasse*/
     float reward;
+    int hops;
 };
 typedef struct transaction_list *Queue;/*Real impl in transaction_list.c*/
 /*Functionality*/
