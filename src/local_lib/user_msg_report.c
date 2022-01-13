@@ -11,7 +11,6 @@ int user_msg_create(struct user_msg *self, long type, pid_t sender_pid, data *da
     switch (type) {
         case MSG_CONFIG_TYPE:
             self->data.users_id_to_pid = data->users_id_to_pid;
-            printf("\nENTRATO | data : %d | msg_data: %d\n", data->users_id_to_pid, self->data.users_id_to_pid);
             break;
         case MSG_TRANSACTION_CONFIRMED_TYPE:
         case MSG_TRANSACTION_FAILED_TYPE:
@@ -22,9 +21,7 @@ int user_msg_create(struct user_msg *self, long type, pid_t sender_pid, data *da
             return -1;
     }
     self->type = type;
-    printf("Type: %d\n", self->type);
     self->sender_pid = sender_pid;
-    printf("sender_pid: %d", sender_pid);
     return 0;
 }
 

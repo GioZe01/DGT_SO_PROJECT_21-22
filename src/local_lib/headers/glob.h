@@ -9,9 +9,9 @@
 /*  SINCRONIZATION KEY  */
 #define SEMAPHORE_SINC_KEY_START 0x76
 /*  QUEUE ID    */
-#define QUEUE_SHIFT_ID 0x77/*TODO:vedere se ha senso*/
+#define MASTER_QUEUE_KEY 0x77
 /*  SHARED MEM. */
-#define SHM_USERS_PROC_KEY 0x78
+#define MASTER_BOOK_SHM_KEY 0x78
 /*  COLOR DEFINITION    */
 #define COLOR_RED_ANSI_CODE "\x1b[31m"
 #define COLOR_GREEN_ANSI_CODE "\x1b[32m" /* Usato per printing debugging mode per semafori*/
@@ -20,5 +20,7 @@
 #define COLOR_WHITE_ANSI_CODE "\x1b[37m"
 #define COLOR_RESET_ANSI_CODE "\x1b[0m"
 
+/*  GENERAL UTILITY MACRO*/
 #define REALLOC_MARGIN 10 /*delta in wich is not usefull to realloc TODO: make a function that calculate it*/
+
 #endif /*DGT_SO_PROJECT_21_22_GLOB_H*/

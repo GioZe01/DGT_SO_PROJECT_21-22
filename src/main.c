@@ -72,7 +72,7 @@ pid_t main_pid;
 struct processes_info_list *proc_list;
 
 int main() {
-    semctl(7, 0, IPC_RMID); /*TODO: Remove*/
+    semctl(3, 0, IPC_RMID); /*TODO: Remove*/
     /************************************
      *      CONFIGURATION FASE
      * ***********************************/
@@ -96,8 +96,8 @@ int main() {
         DEBUG_BLOCK_ACTION_START("PROC GENERATION");
         if (create_users_proc() < 0) { ERROR_MESSAGE("IMPOSSIBLE TO CREATE USERS PROC"); }
         DEBUG_BLOCK_ACTION_END();
-        if (users_id_to_pid[0] < (simulation_conf.so_user_num-REALLOC_MARGIN)){
-            users_id_to_pid=realloc(users_id_to_pid, sizeof(int) * users_id_to_pid[0] );
+        if (users_id_to_pid[0] < (simulation_conf.so_user_num - REALLOC_MARGIN)) {
+            users_id_to_pid = realloc(users_id_to_pid, sizeof(int) * users_id_to_pid[0]);
         }
         DEBUG_MESSAGE("PROCESSES USERS GENERATED");
         DEBUG_BLOCK_ACTION_START("WAITING CHILDREN");
@@ -112,6 +112,14 @@ int main() {
         DEBUG_BLOCK_ACTION_START("NOTIFY USERS");
         notify_users_of_pid_to_id();
         DEBUG_BLOCK_ACTION_END();
+        while(simulation_end != 1){
+
+        }
+        printf("====TIME FINISHED====\n");
+        kill_kids();
+        /*TODO: verifica messaggi di report*/
+        wait_kids();
+        /*TODO: final printing*/
     }
     free_sysVar();
     free_mem();
@@ -136,8 +144,8 @@ int create_users_proc() {
                 ERROR_MESSAGE("IMPOSSIBLE TO CREATE A USER");
                 return -1;
             default: /*father*/
-                users_id_to_pid[i+1] = user_pid;
-                users_id_to_pid[0]+=1;
+                users_id_to_pid[i + 1] = user_pid;
+                users_id_to_pid[0] += 1;
                 proc_list = insert_in_list(proc_list, user_pid, PROC_TYPE_USER);
                 /*Free if utilized pointers to argv*/
                 if (argv_user[1] != NULL) free(argv_user[1]);
@@ -154,9 +162,7 @@ void notify_users_of_pid_to_id() {
     struct processes_info_list *list = proc_list;
     struct user_msg msg;
     int user_queue_id;
-    char buffer[sizeof(int) * 8 + 1];
     if (user_msg_create(&msg, MSG_CONFIG_TYPE, main_pid, users_id_to_pid) < 0) {
-        printf("\nERRORE ON CREATE: %s\n", strerror(errno));
         ERROR_EXIT_SEQUENCE_MAIN("IMPOSSIBLE TO CREATE THE MESSAGE");
     }
 #ifdef DEBUG
@@ -181,7 +187,8 @@ void set_signal_handlers(struct sigaction sa) {
     DEBUG_NOTIFY_ACTIVITY_RUNNING("SETTING SIGNALS HANDLERS...");
     memset(&sa, 0, sizeof(sa));/*initialize the structure*/
     sa.sa_handler = signals_handler;
-    if (sigaction(SIGINT, &sa, NULL) < 0 ||
+    if (sigaction(SIGTSTP, &sa, NULL) < 0 ||
+        sigaction(SIGINT, &sa, NULL) < 0 ||
         sigaction(SIGTERM, &sa, NULL) < 0 ||
         sigaction(SIGALRM, &sa, NULL) < 0) {
         ERROR_MESSAGE("ERRORE SETTING SIGNAL HANDLERS");
@@ -200,12 +207,13 @@ void signals_handler(int signum) { /*TODO: Scrivere implementazione*/
     static int num_inv = 0;
 
     old_errno = errno;
-    DEBUG_SIGNAL("SIGNAL RECIVED", signum);
+    DEBUG_SIGNAL("SIGNAL RECEIVED", signum);
     switch (signum) {
         case SIGINT:
+        case SIGTSTP:
         case SIGTERM:
             if (getpid() == main_pid) { EXIT_PROCEDURE_MAIN(0); }
-            exit(0);
+            else { exit(0); }
         case SIGALRM:
             if (getpid() == main_pid) {
                 num_inv++;
@@ -213,6 +221,7 @@ void signals_handler(int signum) { /*TODO: Scrivere implementazione*/
                 else alarm(1);
                 /*TODO: METTO IN PAUSA I NODI vedere se mettere anche in pausa i processi user*/
             }
+            break;
         default:
             break;
     }

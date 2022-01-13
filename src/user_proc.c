@@ -7,6 +7,7 @@
 #include <errno.h>
 #include <unistd.h>
 #include <math.h>
+#include <time.h>
 /*  Sys Library */
 #include <sys/sem.h>
 #include <sys/msg.h>
@@ -55,13 +56,15 @@ void configure_shm();
 int state;
 int semaphore_start_id = -1;
 int queue_report_id = -1; /* -1 is the value if it is not initialized */
-int * users_id_to_pid;
+int *users_id_to_pid;
 struct user_transaction current_user;
+struct conf configuration;
 
 int main(int arc, char const *argv[]) {
     DEBUG_MESSAGE("USER PROCESS STARTED");
     struct sigaction sa;
     struct user_msg msg_rep;
+    struct timespec gen_sleep;
     sigset_t sigmask; /* sinal mask */
 
     /************************************
@@ -74,17 +77,16 @@ int main(int arc, char const *argv[]) {
     if (check_argument(arc, argv) && set_signal_handler(sa, sigmask)) {
         /*  VARIABLE INITIALIZATION */
         int semaphore_start_value = -1;
-        char * buffer[sizeof (int)*8+1];
-        struct conf configuration;
+        char *buffer[sizeof(int) * 8 + 1];
         read_conf(&configuration);
         user_create(&current_user, configuration.so_buget_init, getpid(), calc_balance, update_cash_flow);
-
+        gen_sleep.tv_sec = 0;
         /*-------------------------*/
         /*  CREAZIONE QUEUE REPORT *
         /*-------------------------*/
         /*TODO: Aggiungerla come optional alla compilazione*/
-        queue_report_id = msgget(current_user.pid,IPC_CREAT | IPC_EXCL | 0600);
-        printf("----------------USER_QUEUE ID: %d\n",queue_report_id);
+        queue_report_id = msgget(current_user.pid, IPC_CREAT | IPC_EXCL | 0600);
+        printf("----------------USER_QUEUE ID: %d\n", queue_report_id);
         if (queue_report_id < 0) { ERROR_EXIT_SEQUENCE_USER("IMPOSSIBLE TO CREATE THE MESSAGE QUEUE"); }
 
         /*-------------------------*/
@@ -128,12 +130,20 @@ int main(int arc, char const *argv[]) {
          *      GENERATION OF TRANSACTION FASE *
          * **************************************/
         raise(SIGALRM);
-        while (1) pause(); /*Waiting for a signal to come*/
-
+        while (current_user.u_balance > 2) {
+            if (generate_transaction(&current_user, current_user.pid, NULL, users_id_to_pid) < 0) {
+                ERROR_EXIT_SEQUENCE_USER("IMPOSSIBLE TO GENERATE TRANSACTION");
+            }
+            gen_sleep.tv_nsec = (rand()%(configuration.so_max_trans_gen_nsec-configuration.so_min_trans_gen_nsec+1))+configuration.so_min_trans_gen_nsec;
+            nanosleep(&gen_sleep, (void * ) NULL);
+#ifdef U_CASHING
+#else
+            /*SENDING TRANSACTION TO THE NODE*/
+#endif
+        }
 
         DEBUG_MESSAGE("USER ENDED -----------------------------");
         EXIT_PROCEDURE_USER(0);
-
     }
 
     ERROR_EXIT_SEQUENCE_USER("CREATION OF USER_PROC FAILED DUE TO: Arg or Signal handler creation failure");
@@ -200,9 +210,11 @@ void signals_handler(int signum) {
             alarm(0);/* pending alarm canceld*/
             EXIT_PROCEDURE_USER(0);
         case SIGALRM: /*    Generate a new transaction  */
-            DEBUG_NOTIFY_ACTIVITY_RUNNING("GENERATING A NEW TRANSACTION...");
-            generate_transaction(&current_user, current_user.pid, NULL, users_id_to_pid);
-            DEBUG_NOTIFY_ACTIVITY_DONE("GENERATING A NEW TRANSACTION DONE");
+            DEBUG_NOTIFY_ACTIVITY_RUNNING("GENERATING A NEW TRANSACTION FROM SIG...");
+            if (generate_transaction(&current_user, current_user.pid, NULL, users_id_to_pid) < 0) {
+                ERROR_EXIT_SEQUENCE_USER("IMPOSSIBLE TO GENERATE TRANSACTION");
+            }
+            DEBUG_NOTIFY_ACTIVITY_DONE("GENERATING A NEW TRANSACTION FROM SIG DONE");
     }
 }
 
@@ -222,6 +234,7 @@ void free_sysVar_user() {
                 ERROR_MESSAGE("IMPOSSIBLE TO EXECUTE THE FREE SYS VAR (prob. sem_lock not set so cannot be closed)");
         }
     }
+
     if (queue_report_id >= 0 && msgctl(queue_report_id, IPC_RMID, NULL) < 0) {
         ERROR_MESSAGE("IMPOSSIBLE TO DELETE MESSAGE QUEUE OF USER");
     }

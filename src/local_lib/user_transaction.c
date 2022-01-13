@@ -93,6 +93,7 @@ int generate_transaction(struct user_transaction *self, pid_t user_proc_pid, int
     queue_append(self->in_process, t);
     self->update_cash_flow(self, &t);
     printf("\n ----------------- timestamp: %lf", t.timestamp);
+    return 0;
 }
 
 pid_t extract_user(int *users_num) {
