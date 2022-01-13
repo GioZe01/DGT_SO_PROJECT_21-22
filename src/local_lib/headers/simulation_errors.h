@@ -15,8 +15,8 @@
                                 free_sysVar_user();      \
                                 exit(exit_value)
 
-#define EXIT_PROCEDURE_NODE(exit_value) free_mem_user();         \
-                                free_sysVar_user();      \
+#define EXIT_PROCEDURE_NODE(exit_value) free_mem_node();         \
+                                free_sysVar_node();      \
                                 exit(exit_value)
 #define ERROR_MESSAGE(err_mex)fprintf(stderr, "%s%s Error: %s -> | file: %s | line: %d | proc_pid: %d | \n (-) %d\n(-)%s\n %s\n", COLOR_RESET_ANSI_CODE, COLOR_RED_ANSI_CODE,err_mex, __FILE__, __LINE__ ,getpid(), errno, strerror(errno),COLOR_RESET_ANSI_CODE)
 
@@ -40,7 +40,7 @@ void free_mem_user();
 
 void free_sysVar_user();
 /*  FUNCTION TO PROTECT EXIT SEQUENCE NODE*/
-void free_meme_node();
+void free_mem_node();
 
 void free_sysVar_node();
 #endif /*DGT_SO_PROJECT_21_22_ERRORS_H*/

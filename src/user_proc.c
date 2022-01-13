@@ -135,12 +135,14 @@ int main(int arc, char const *argv[]) {
             if (generate_transaction(&current_user, current_user.pid, NULL, users_id_to_pid) < 0) {
                 ERROR_EXIT_SEQUENCE_USER("IMPOSSIBLE TO GENERATE TRANSACTION");
             }
-            gen_sleep.tv_nsec = (rand()%(configuration.so_max_trans_gen_nsec-configuration.so_min_trans_gen_nsec+1))+configuration.so_min_trans_gen_nsec;
+            gen_sleep.tv_nsec =
+                    (rand() % (configuration.so_max_trans_gen_nsec - configuration.so_min_trans_gen_nsec + 1)) +
+                    configuration.so_min_trans_gen_nsec;
 #ifdef U_CASHING
 #else
             /*SENDING TRANSACTION TO THE NODE*/
 #endif
-            nanosleep(&gen_sleep, (void * ) NULL);
+            nanosleep(&gen_sleep, (void *) NULL);
         }
 
         DEBUG_MESSAGE("USER ENDED -----------------------------");

@@ -5,7 +5,7 @@
 #include "boolean.h"
 #include "transaction_list.h"
 
-typedef float(*Balance)(/*TODO: aggiungere transaction list e quelli da fare ancora*/);
+typedef float(*Balance)(struct user_transaction* self);
 
 typedef int (*CalcCashFlow)(struct user_transaction *self, struct Transaction *t);
 
@@ -20,7 +20,7 @@ struct user_transaction {
     Queue transactions_done; /*Actually confermed by the nodes_proc -> updated into the shm*/
     Queue in_process;/*Validated, but still to be confirmed by the nodes_proc*/
     struct UCashFlow cash_flow;
-    CalcCashFlow update_cash_flow;
+    CalcCashFlow update_cash_flow; /*Can set the function u desire while implementing, consider the one already implemented below*/
     float expected_out;/*Expected outcome that still have to be processed, abs value*/
 };
 
@@ -32,16 +32,16 @@ struct user_snapshot {
     float outcomes;
     float expected_out;
 };/*Structure to be saved in sharedmemory*/
-/*struct user_snapshot* get_user_snapshot(struct user_transaction u);/*TODO: verifica snapshot se ritornare puntatore o no per salvare in shm*/
- /**
-  * Initiale the user_transaction to default value with entrie set as budget given
-  * @param u current user
-  * @param budget to start
-  * @param pid current proc_pid
-  * @param balance pointer to function that calc balance
-  * @param update_cash_flow pointer to function that update cash flow | and budget!!
-  */
-void user_create(struct user_transaction *u, float budget, int pid, Balance balance, CalcCashFlow update_cash_flow);
+/*struct user_snapshot* get_user_snapshot(struct user_transaction self);/*TODO: verifica snapshot se ritornare puntatore o no per salvare in shm*/
+/**
+ * Initialize the user_transaction to default value with entries set as budget given
+ * @param self current user
+ * @param budget to start
+ * @param pid current proc_pid
+ * @param balance pointer to function that calc balance
+ * @param update_cash_flow pointer to function that update cash flow | and budget!!
+ */
+void user_create(struct user_transaction *self, float budget, int pid, Balance balance, CalcCashFlow update_cash_flow);
 
 /**
  * Free the memory from the queue list of transactions;

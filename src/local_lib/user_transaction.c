@@ -29,17 +29,18 @@ pid_t extract_node(int nodes_num);
  */
 pid_t extract_user(int *users_num);
 
-float gen_amount(struct user_transaction * user);
-void user_create(struct user_transaction *u, float budget, int pid, Balance balance, CalcCashFlow update_cash_flow) {
-    u->pid = pid;
-    u->budget = budget;
-    u->u_balance = balance;
-    u->transactions_done = queue_create();
-    u->in_process = queue_create();
-    u->cash_flow.entries = budget;
-    u->cash_flow.outcomes = 0;
-    u->expected_out = 0;
-    u->update_cash_flow= update_cash_flow;
+float gen_amount(struct user_transaction *user);
+
+void user_create(struct user_transaction *self, float budget, int pid, Balance balance, CalcCashFlow update_cash_flow) {
+    self->pid = pid;
+    self->budget = budget;
+    self->u_balance = balance;
+    self->transactions_done = queue_create();
+    self->in_process = queue_create();
+    self->cash_flow.entries = budget;
+    self->cash_flow.outcomes = 0;
+    self->expected_out = 0;
+    self->update_cash_flow = update_cash_flow;
 }
 
 void free_user(struct user_transaction *self) {
@@ -110,7 +111,7 @@ pid_t extract_node(int nodes_num) {
 }
 
 
-float gen_amount(struct user_transaction * user){
+float gen_amount(struct user_transaction *user) {
     /* TODO: Possible bug*/
-   return (rand()%((int)user->budget - 2 + 1)) + 2;
+    return (rand() % ((int) user->budget - 2 + 1)) + 2;
 }

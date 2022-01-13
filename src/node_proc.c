@@ -23,6 +23,8 @@
 #include "local_lib/headers/conf_file.h"
 #include "local_lib/headers/simulation_errors.h"
 #include "local_lib/headers/semaphore.h"
+#include "local_lib/headers/node_transactor.h"
+
 #ifdef DEBUG
 #include "local_lib/headers/debug_utility"
 #else
@@ -118,11 +120,18 @@ Bool check_arguments(int argc, char const *argv) {
  * @return TRUE if success, FALSE otherwise.
  */
 void signals_handler(int signum) {
+    DEBUG_SIGNAL("SIGNAL RECEIVED ", signum);
+    switch (signum) {
+        case SIGINT:
+            break;
+        case SIGALRM:
+            break;
 
+    }
 }
 void free_sysVar_node(){
-
+    free_node();
 }
-void free_meme_node(){
+void free_mem_node(){
 
 }
