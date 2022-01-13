@@ -28,6 +28,8 @@
 #include "local_lib/headers/semaphore.h"
 #include "local_lib/headers/simulation_errors.h"
 #include "local_lib/headers/user_msg_report.h"
+#include "local_lib/headers/master_msg_report.h"
+#include "local_lib/headers/node_msg_report.h"
 
 #ifdef DEBUG
 
@@ -54,36 +56,50 @@ void create_semaphores(void);
 
 void create_masterbook(void);
 
-int create_users_proc();
+int create_users_proc(void);
 
-Bool read_conf();
+int create_nodes_proc(void);
 
-void notify_users_of_pid_to_id();
+Bool read_conf(void);
 
+void notify_users_of_pid_to_id(void);
+
+void notify_nodes_pid_to_id(void);
+
+void create_msg_report_queue(void);
+
+int check_msg_report(struct master_msg_report *msgReport);
+
+/* Variabili */
 struct conf simulation_conf;
-/*Variabili di SYS*/
-/*TODO: message transaction queue for single user_transaction auto incremento with ## macro*/
-int simulation_end = 0;
-int msg_transaction_reports = -1; /*Identifier for message queue*/
-int semaphore_start_id = -1;
 int *users_id_to_pid; /*in 0 position is saved the actual size of the array of id saved in the pointer*/
-/*Variabili Globali*/
-pid_t main_pid;
+int *nodes_id_to_pid; /*in 0 position is saved the actual size */
 struct processes_info_list *proc_list;
 
+int simulation_end = 0;
+int msg_report_id = -1; /*Identifier for message queue*/
+int semaphore_start_id = -1;
+pid_t main_pid;
+
 int main() {
-    semctl(3, 0, IPC_RMID); /*TODO: Remove*/
-    /************************************
-     *      CONFIGURATION FASE
-     * ***********************************/
+    /*   semctl(3, 0, IPC_RMID); TODO: Remove*/
     main_pid = getpid();
     if (read_conf() == TRUE) {
+        /*  Local Var Declaration   */
         int i; /*  utility index */
-        struct sigaction sa; /*Structure for handling signals*/
+        struct sigaction sa; /*Structure for handling signals */
+        struct master_msg_report msg_repo;
+        /* Pointers allocation  */
         users_id_to_pid = (int *) malloc(sizeof(int) * simulation_conf.so_user_num);
+        nodes_id_to_pid = (int *) malloc(sizeof(int) * simulation_conf.so_nodes_num);
+        /************************************
+         *      CONFIGURATION FASE
+         * ***********************************/
+
         set_signal_handlers(sa);
         create_semaphores();
         create_masterbook();
+        create_msg_report_queue();
 
         /*************************************
          *  CREATION OF CHILD PROCESSES FASE *
@@ -94,11 +110,26 @@ int main() {
         /*-------------------------*/
 
         DEBUG_BLOCK_ACTION_START("PROC GENERATION");
+        /* Crating users*/
         if (create_users_proc() < 0) { ERROR_MESSAGE("IMPOSSIBLE TO CREATE USERS PROC"); }
+        /* Creating nodes*/
+        if (create_nodes_proc() < 0) { ERROR_MESSAGE("IMPOSSIBLE TO CREATE NODES PROC"); }
         DEBUG_BLOCK_ACTION_END();
+
+        DEBUG_NOTIFY_ACTIVITY_RUNNING("SHRINKING ID_TO_PID REF...");
         if (users_id_to_pid[0] < (simulation_conf.so_user_num - REALLOC_MARGIN)) {
             users_id_to_pid = realloc(users_id_to_pid, sizeof(int) * users_id_to_pid[0]);
         }
+        if (nodes_id_to_pid[0]< (simulation_conf.so_nodes_num - REALLOC_MARGIN)){
+            nodes_id_to_pid = realloc(nodes_id_to_pid, sizeof(int) * users_id_to_pid[0]);
+        }
+        DEBUG_NOTIFY_ACTIVITY_DONE("SHRINKING ID_TO_PID REF DONE");
+#ifdef DEBUG
+        printf("\n==========DEBUG INFO TABLE==========\n");
+        printf("# Users generated: %d\n", users_id_to_pid[0]);
+        printf("# Nodes generated: %d\n", nodes_id_to_pid[0]);
+        printf("======================================\n");
+#endif
         DEBUG_MESSAGE("PROCESSES USERS GENERATED");
         DEBUG_BLOCK_ACTION_START("WAITING CHILDREN");
         if (semaphore_wait_for_sinc(semaphore_start_id, 0) < 0) {
@@ -109,11 +140,14 @@ int main() {
 
         DEBUG_BLOCK_ACTION_END();
 
-        DEBUG_BLOCK_ACTION_START("NOTIFY USERS");
+        DEBUG_BLOCK_ACTION_START("NOTIFY USERS AND NODES");
         notify_users_of_pid_to_id();
+        notify_nodes_pid_to_id();
         DEBUG_BLOCK_ACTION_END();
-        while(simulation_end != 1){
-
+        while (simulation_end != 1) {
+            if (check_msg_report(&msg_repo) < 0) {
+                /*If a message arrive make the knowledge*/
+            }
         }
         printf("====TIME FINISHED====\n");
         kill_kids();
@@ -130,7 +164,7 @@ int main() {
  *  Create a new user proc
  * @return -1 if fail. 0 otherwise
  */
-int create_users_proc() {
+int create_users_proc(void) {
     char *argv_user[] = {PATH_TO_USER, NULL}; /*Future addon*/
     pid_t user_pid;
     int i;
@@ -156,8 +190,63 @@ int create_users_proc() {
     }
     return 0;
 }
+/**
+ * Create a new node proc
+ * @return -1 if fail. 0 otherwise
+ */
+int create_nodes_proc(void) {
+    char *argv_node[] = {PATH_TO_NODE, NULL};
+    pid_t node_pid;
+    int i;
+    nodes_id_to_pid[0] = 0;
+    for (i = 0; i < simulation_conf.so_nodes_num; i++) {
+        switch (node_pid = fork()) {
+            case -1:
+                return -1;
+            case 0: /*kid*/
+                execve(argv_node[0], argv_node, NULL);
+                ERROR_MESSAGE("IMPOSSIBLE TO CREATE A USER");
+                return -1;
+            default:/*father*/
+                nodes_id_to_pid[i + 1] = node_pid;
+                nodes_id_to_pid[0] += 1;
+                proc_list = insert_in_list(proc_list, node_pid, PROC_TYPE_NODE);
+                /*Free if utilized pointer to argv*/
+                if (argv_node[1] != NULL) free(argv_node[1]);
+                if (argv_node[2] != NULL) free(argv_node[2]);
+                DEBUG_MESSAGE("NODE CREATED");
+                break;
+        }
+    }
+    return 0;
+}
 
-void notify_users_of_pid_to_id() {
+void notify_users_of_pid_to_id(void) {
+    DEBUG_NOTIFY_ACTIVITY_RUNNING("SENDING INFORMATION TO USERS...");
+    struct processes_info_list *list = proc_list;
+    struct user_msg msg;
+    int user_queue_id;
+    if (node_msg_create(&msg, MSG_CONFIG_TYPE, main_pid, users_id_to_pid) < 0) {
+        ERROR_EXIT_SEQUENCE_MAIN("IMPOSSIBLE TO CREATE THE MESSAGE");
+    }
+#ifdef DEBUG
+    user_msg_print(&msg);
+#endif
+    for (; list != NULL; list = list->next) {
+        if (list->proc_type == PROC_TYPE_USER) {
+            user_queue_id = msgget(proc_list->pid, 0600);
+            if (user_queue_id < 0) {
+                ERROR_EXIT_SEQUENCE_MAIN("IMPOSSIBLE TO RETRIEVE QUEUE");
+            }
+            if (user_msg_snd(user_queue_id, &msg, MSG_CONFIG_TYPE, users_id_to_pid, main_pid, FALSE) < 0) {
+                ERROR_EXIT_SEQUENCE_MAIN("IMPOSSIBLE TO SEND MESSAGE ERROR");
+            }
+        }
+    }
+    DEBUG_NOTIFY_ACTIVITY_DONE("SENDING INFORMATION TO USERS DONE");
+}
+
+void notify_nodes_pid_to_id(void) {
     DEBUG_NOTIFY_ACTIVITY_RUNNING("SENDING INFORMATION TO USERS...");
     struct processes_info_list *list = proc_list;
     struct user_msg msg;
@@ -169,7 +258,7 @@ void notify_users_of_pid_to_id() {
     user_msg_print(&msg);
 #endif
     for (; list != NULL; list = list->next) {
-        if (list->proc_type == PROC_TYPE_USER) {
+        if (list->proc_type == PROC_TYPE_NODE) {
             user_queue_id = msgget(proc_list->pid, 0600);
             if (user_queue_id < 0) {
                 ERROR_EXIT_SEQUENCE_MAIN("IMPOSSIBLE TO RETRIEVE QUEUE");
@@ -299,7 +388,7 @@ void free_sysVar() {
  * Load and read the configuration, in case of error during loading close the proc. with EXIT_FAILURE
  * @return TRUE if ALL OK
  */
-Bool read_conf() {
+Bool read_conf(void) {
     DEBUG_BLOCK_ACTION_START("READING CONF")
     DEBUG_NOTIFY_ACTIVITY_RUNNING("READING CONFIGURATION...");
     switch (load_configuration(&simulation_conf)) {
@@ -308,7 +397,7 @@ Bool read_conf() {
         case -1:
         ERROR_EXIT_SEQUENCE_MAIN(" DURING CONF. LOADING: MISSING FILE OR EMPTY");
         case -2:
-        ERROR_EXIT_SEQUENCE_MAIN(" DURING CONF. LOADING: BROKEN SIMULTATION LOGIC, CHECK CONF. VALUE");
+        ERROR_EXIT_SEQUENCE_MAIN(" DURING CONF. LOADING: BROKEN SIMULATION LOGIC, CHECK CONF. VALUE");
         case -3:
         ERROR_EXIT_SEQUENCE_MAIN(" DURING CONF. LOADING: NOT ENOUGH USERS FOR NODES");
         case -4:
@@ -319,4 +408,30 @@ Bool read_conf() {
     DEBUG_NOTIFY_ACTIVITY_DONE("READING CONFIGURATION DONE");
     DEBUG_BLOCK_ACTION_END();
     return TRUE;
+}
+
+void create_msg_report_queue(void) {
+    DEBUG_BLOCK_ACTION_START("MSG REPORT QUEUE");
+    DEBUG_NOTIFY_ACTIVITY_RUNNING("CREATING THE MESSAGE REPORT QUEUE...");
+    msg_report_id = msgget(MASTER_QUEUE_KEY, IPC_CREAT | IPC_EXCL | 0600);
+    if (msg_report_id < 0) {
+        ERROR_EXIT_SEQUENCE_MAIN("IMPOSSIBLE TO CREATE THE MESSAGE REPORT QUEUE");
+    }
+    DEBUG_NOTIFY_ACTIVITY_DONE("CREATING THE MESSAGE REPORT QUEUE DONE");
+    DEBUG_BLOCK_ACTION_END();
+
+}
+
+int check_msg_report(struct master_msg_report *msg_report) {
+    struct msqid_ds msg_rep_info;
+    if (msgctl(msg_report_id, IPC_STAT, &msg_rep_info) < 0) {
+        ERROR_MESSAGE("IMPOSSIBLE TO RETRIEVE MESSAGE QUEUE INFO");
+        return -1;
+    } else {
+        /*fetching all msg if present*/
+        if (msg_rep_info.msg_qnum != 0 && msgrcv(msg_report_id, msg_report, sizeof(*msg_report) - sizeof(long), 0, 0)) {
+            /*make_knowledge*/
+        }
+        return 0;
+    }
 }

@@ -33,6 +33,9 @@
 #define DEBUG_ERROR_MESSAGE(mex)
 #endif
 
+#define INIT_STATE 0
+#define RUNNING_STATE 1
+
 /* Function def. */
 
 void signals_handler(int signum);
@@ -44,14 +47,14 @@ Bool set_signal_handler(struct sigaction sa, sigset_t sigmask);
 Bool check_arguments(int argc, char const *argv);
 
 /* SysVar */
+int state;
 int semaphore_start_id = -1;
 /*struct node node;*/
 int main(int argc, char const *argv[]) {
     DEBUG_MESSAGE("NODE PROCESS STARTED");
     struct sigaction sa;
     sigset_t sigmask;
-
-
+    state = INIT_STATE;
     /************************************
      *      CONFIGURATION FASE          *
      * **********************************/
@@ -62,17 +65,17 @@ int main(int argc, char const *argv[]) {
        /*node_create(node)*/
 
         /*---------------------------*/
-        /*  SEMAPHORES CREATOIN FASE *
+        /*  SEMAPHORES CREATION FASE *
         /*---------------------------*/
         semaphore_start_id = semget(SEMAPHORE_SINC_KEY_START, 1, 0);
         if (semaphore_lock(semaphore_start_id,0)< 0) { ERROR_EXIT_SEQUENCE_USER("IMPOSSIBLE TO OBTAIN THE START SEMAPHORE"); }
-        DEBUG_MESSAGE("READY, ON START_SEM");
+        DEBUG_MESSAGE("NODE READY, ON START_SEM");
         if (semaphore_wait_for_sinc(semaphore_start_id, 0) < 0) {
-            ERROR_EXIT_SEQUENCE_USER("IMPOSSIBILE TO WAIT FOR START");
+            ERROR_EXIT_SEQUENCE_USER("IMPOSSIBLE TO WAIT FOR START");
         }
-
+        state = RUNNING_STATE;
         /*-------------------------*/
-        /*  CREAZIONE QUEUE REPORT *
+        /*  CREATION QUEUE REPORT *
         /*-------------------------*/
     }
     return 0;

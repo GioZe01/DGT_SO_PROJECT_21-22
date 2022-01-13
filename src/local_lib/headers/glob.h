@@ -4,8 +4,9 @@
 #define DGT_SO_PROJECT_21_22_GLOB_H
 #include <unistd.h>
 #include "sys/types.h"
-/*  EXVE PATH   */
+/*  EXCVE PATH   */
 #define PATH_TO_USER "build/bin/user"
+#define PATH_TO_NODE "build/bin/node"
 /*  SINCRONIZATION KEY  */
 #define SEMAPHORE_SINC_KEY_START 0x76
 /*  QUEUE ID    */

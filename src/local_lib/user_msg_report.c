@@ -7,7 +7,7 @@
 #include "headers/simulation_errors.h"
 #include "headers/glob.h"
 #include "headers/boolean.h"
-int user_msg_create(struct user_msg *self, long type, pid_t sender_pid, data *data) {
+int user_msg_create(struct user_msg *self, long type, pid_t sender_pid, user_data *data) {
     switch (type) {
         case MSG_CONFIG_TYPE:
             self->data.users_id_to_pid = data->users_id_to_pid;
@@ -46,8 +46,8 @@ void user_msg_print(struct user_msg *self) {
             break;
     }
 }
-int user_msg_snd(int id, struct user_msg *msg,long type, data *data, pid_t sender, Bool create){
-    if (create == TRUE){user_msg_create(&msg, type, sender, data);}
+int user_msg_snd(int id, struct user_msg *msg, long type, user_data *data, pid_t sender, Bool create){
+    if (create == TRUE){user_msg_create(msg, type, sender, data);}
     printf("ID RECEIVED: %d\n", id);
     while(msgsnd(id, msg, sizeof (*msg)-sizeof (long), 0)<0){
         if (errno!=EINTR) return -1;

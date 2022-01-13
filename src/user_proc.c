@@ -57,6 +57,7 @@ int state;
 int semaphore_start_id = -1;
 int queue_report_id = -1; /* -1 is the value if it is not initialized */
 int *users_id_to_pid;
+int *nodes_id_to_pid;
 struct user_transaction current_user;
 struct conf configuration;
 
@@ -135,11 +136,11 @@ int main(int arc, char const *argv[]) {
                 ERROR_EXIT_SEQUENCE_USER("IMPOSSIBLE TO GENERATE TRANSACTION");
             }
             gen_sleep.tv_nsec = (rand()%(configuration.so_max_trans_gen_nsec-configuration.so_min_trans_gen_nsec+1))+configuration.so_min_trans_gen_nsec;
-            nanosleep(&gen_sleep, (void * ) NULL);
 #ifdef U_CASHING
 #else
             /*SENDING TRANSACTION TO THE NODE*/
 #endif
+            nanosleep(&gen_sleep, (void * ) NULL);
         }
 
         DEBUG_MESSAGE("USER ENDED -----------------------------");
@@ -158,7 +159,6 @@ int main(int arc, char const *argv[]) {
 Bool check_argument(int arc, char const *argv[]) {
     /*TODO: controllo dell arc*/
     DEBUG_NOTIFY_ACTIVITY_RUNNING("CHECKING ARGC AND ARGV...");
-
     DEBUG_NOTIFY_ACTIVITY_DONE("CHECKING ARGC AND ARGV DONE");
     return TRUE;
 }
@@ -180,7 +180,7 @@ Bool set_signal_handler(struct sigaction sa, sigset_t sigmask) {
     if (sigaction(SIGINT, &sa, NULL) < 0 ||
         sigaction(SIGALRM, &sa, NULL) < 0 ||
         sigaction(SIGUSR1, &sa, NULL) < 0) {
-        ERROR_EXIT_SEQUENCE_USER("ERRORE DURING THE CREATION OF THE SIG HANDLER ");
+        ERROR_EXIT_SEQUENCE_USER("ERROR DURING THE CREATION OF THE SIG HANDLER ");
     }
     return TRUE;
 }
