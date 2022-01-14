@@ -27,17 +27,24 @@ struct NodeProcInfo {
 } ;
 
 
-struct processes_info_list *insert_in_list(struct processes_info_list *self, pid_t pid, short int type) {
+struct processes_info_list *insert_in_list(struct processes_info_list *self, pid_t pid, short int type, int queue_id) {
     struct processes_info_list *new;
     new = (struct processes_info_list *) malloc(sizeof(*new));
     new->pid = pid;
     new->proc_type = type;
     new->proc_state = PROC_INFO_STATE_RUNNING;
     new->next = self;
+    new->id_queue = queue_id;
     return new;
 
 }
 
+struct processes_info_list* get_proc_from_queue_id(struct processes_info_list* self, int id_queue){
+    /*Implemented linear search :( */
+    for (; self != NULL; self = self->next)
+        if (self->id_queue== id_queue) return self;
+    return NULL;
+}
 struct processes_info_list *get_proc_from_pid(struct processes_info_list *self, pid_t pid) {
     /*Implemented linear search :( */
     for (; self != NULL; self = self->next)

@@ -56,6 +56,7 @@ void configure_shm();
 int state;
 int semaphore_start_id = -1;
 int queue_report_id = -1; /* -1 is the value if it is not initialized */
+int my_id = -1;
 int *users_id_to_pid;
 int *nodes_id_to_pid;
 struct user_transaction current_user;
@@ -82,11 +83,11 @@ int main(int arc, char const *argv[]) {
         read_conf(&configuration);
         user_create(&current_user, configuration.so_buget_init, getpid(), calc_balance, update_cash_flow);
         gen_sleep.tv_sec = 0;
-        /*-------------------------*/
-        /*  CREAZIONE QUEUE REPORT *
-        /*-------------------------*/
+        /*-----------------------------*/
+        /*  CONNECTING TO QUEUE REPORT *
+        /*-----------------------------*/
         /*TODO: Aggiungerla come optional alla compilazione*/
-        queue_report_id = msgget(current_user.pid, IPC_CREAT | IPC_EXCL | 0600);
+        queue_report_id = msgget(USERS_QUEUE_KEY, 0600);
         printf("----------------USER_QUEUE ID: %d\n", queue_report_id);
         if (queue_report_id < 0) { ERROR_EXIT_SEQUENCE_USER("IMPOSSIBLE TO CREATE THE MESSAGE QUEUE"); }
 
@@ -121,11 +122,13 @@ int main(int arc, char const *argv[]) {
          * ------------------------------------------*/
 
         if (msgrcv(queue_report_id, &msg_rep, sizeof(msg_rep) - sizeof(msg_rep.type),
-                   MSG_CONFIG_TYPE, 0) < 0 &&
+                   my_id-MSG_TRANSACTION_FAILED_TYPE, 0) < 0 &&
             errno == EINTR) {
             ERROR_EXIT_SEQUENCE_USER("MISSED CONFIG ON MESSAGE QUEUE");
         }
-        printf("\nCONFIGURAZIONE RICEVUTA: %d\n", msg_rep.data.users_id_to_pid[0]);
+#ifdef DEBUG
+        printf("\nCONFIGURATION RECEIVED: %d\n", msg_rep.data.users_id_to_pid[0]);
+#endif
         users_id_to_pid = msg_rep.data.users_id_to_pid;
         /****************************************
          *      GENERATION OF TRANSACTION FASE *
@@ -161,6 +164,10 @@ int main(int arc, char const *argv[]) {
 Bool check_argument(int arc, char const *argv[]) {
     /*TODO: controllo dell arc*/
     DEBUG_NOTIFY_ACTIVITY_RUNNING("CHECKING ARGC AND ARGV...");
+    if(arc<2){
+        ERROR_EXIT_SEQUENCE_USER("MISSING ARGUMENT");
+    }
+    my_id = atoi(argv[1]);
     DEBUG_NOTIFY_ACTIVITY_DONE("CHECKING ARGC AND ARGV DONE");
     return TRUE;
 }

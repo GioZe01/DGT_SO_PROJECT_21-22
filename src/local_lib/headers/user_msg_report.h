@@ -5,6 +5,7 @@
 #include <unistd.h>
 #include "transaction_list.h"
 #include "boolean.h"
+#define DELTA_USER_MSG_TYPE 3 /*To give priority to single user*/
 #define MSG_CONFIG_TYPE 1
 #define MSG_TRANSACTION_FAILED_TYPE 2
 #define MSG_TRANSACTION_CONFIRMED_TYPE 3

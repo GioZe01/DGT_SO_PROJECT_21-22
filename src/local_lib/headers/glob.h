@@ -12,6 +12,7 @@
 #define SEMAPHORE_SINC_KEY_START 0x76
 /*  QUEUE ID    */
 #define MASTER_QUEUE_KEY 0x77
+#define USERS_QUEUE_KEY 0x78
 /*  SHARED MEM. */
 #define MASTER_BOOK_SHM_KEY 0x78
 /*  COLOR DEFINITION    */
@@ -24,5 +25,4 @@
 
 /*  GENERAL UTILITY MACRO*/
 #define REALLOC_MARGIN 10 /*delta in wich is not usefull to realloc TODO: make a function that calculate it*/
-
 #endif /*DGT_SO_PROJECT_21_22_GLOB_H*/

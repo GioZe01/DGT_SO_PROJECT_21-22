@@ -58,6 +58,8 @@ void create_masterbook(void);
 
 int create_users_proc(void);
 
+void create_users_msg_queue(void);
+
 int create_nodes_proc(void);
 
 Bool read_conf(void);
@@ -66,7 +68,7 @@ void notify_users_of_pid_to_id(void);
 
 void notify_nodes_pid_to_id(void);
 
-void create_msg_report_queue(void);
+void create_master_msg_report_queue(void);
 
 int check_msg_report(struct master_msg_report *msgReport);
 
@@ -77,7 +79,8 @@ int *nodes_id_to_pid; /*in 0 position is saved the actual size */
 struct processes_info_list *proc_list;
 
 int simulation_end = 0;
-int msg_report_id = -1; /*Identifier for message queue*/
+int msg_report_id_master = -1; /*Identifier for message queue for master comunication*/
+int msg_report_id_users = -1;
 int semaphore_start_id = -1;
 pid_t main_pid;
 
@@ -99,14 +102,18 @@ int main() {
         set_signal_handlers(sa);
         create_semaphores();
         create_masterbook();
-        create_msg_report_queue();
+        create_master_msg_report_queue();
 
         /*************************************
          *  CREATION OF CHILD PROCESSES FASE *
          * ***********************************/
 
+        /*-------------------------------*/
+        /*  CREATING THE QUEUE FOR USERS *
+        /*-------------------------------*/
+        create_users_msg_queue();
         /*-------------------------*/
-        /*  CREAZINE DEI PROC USER *
+        /*  CREATION OF PROCS USERS*
         /*-------------------------*/
 
         DEBUG_BLOCK_ACTION_START("PROC GENERATION");
@@ -120,10 +127,11 @@ int main() {
         if (users_id_to_pid[0] < (simulation_conf.so_user_num - REALLOC_MARGIN)) {
             users_id_to_pid = realloc(users_id_to_pid, sizeof(int) * users_id_to_pid[0]);
         }
-        if (nodes_id_to_pid[0]< (simulation_conf.so_nodes_num - REALLOC_MARGIN)){
+        if (nodes_id_to_pid[0] < (simulation_conf.so_nodes_num - REALLOC_MARGIN)) {
             nodes_id_to_pid = realloc(nodes_id_to_pid, sizeof(int) * users_id_to_pid[0]);
         }
         DEBUG_NOTIFY_ACTIVITY_DONE("SHRINKING ID_TO_PID REF DONE");
+
 #ifdef DEBUG
         printf("\n==========DEBUG INFO TABLE==========\n");
         printf("# Users generated: %d\n", users_id_to_pid[0]);
@@ -165,56 +173,61 @@ int main() {
  * @return -1 if fail. 0 otherwise
  */
 int create_users_proc(void) {
-    char *argv_user[] = {PATH_TO_USER, NULL}; /*Future addon*/
+    char *argv_user[] = {PATH_TO_USER, -1, NULL}; /*Future addon*/
     pid_t user_pid;
-    int i;
+    int i, queue_id = DELTA_USER_MSG_TYPE;
     users_id_to_pid[0] = 0;
     for (i = 0; i < simulation_conf.so_user_num; i++) {
         switch (user_pid = fork()) {
             case -1:
                 return -1;
             case 0: /*kid*/
+                argv_user[1] = queue_id; /*Let the user know is position*/
                 execve(argv_user[0], argv_user, NULL);
                 ERROR_MESSAGE("IMPOSSIBLE TO CREATE A USER");
                 return -1;
             default: /*father*/
                 users_id_to_pid[i + 1] = user_pid;
                 users_id_to_pid[0] += 1;
-                proc_list = insert_in_list(proc_list, user_pid, PROC_TYPE_USER);
+                proc_list = insert_in_list(proc_list, user_pid, PROC_TYPE_USER, queue_id);
                 /*Free if utilized pointers to argv*/
                 if (argv_user[1] != NULL) free(argv_user[1]);
                 if (argv_user[2] != NULL) free(argv_user[2]);
+                queue_id += DELTA_USER_MSG_TYPE;
                 DEBUG_MESSAGE("USER CREATED");
                 break;
         }
     }
     return 0;
 }
+
 /**
  * Create a new node proc
  * @return -1 if fail. 0 otherwise
  */
 int create_nodes_proc(void) {
-    char *argv_node[] = {PATH_TO_NODE, NULL};
+    char *argv_node[] = {PATH_TO_NODE, -1, NULL}; /*Future addon*/
     pid_t node_pid;
-    int i;
+    int i, queue_id = DELTA_NODE_MSG_TYPE;
     nodes_id_to_pid[0] = 0;
-    for (i = 0; i < simulation_conf.so_nodes_num; i++) {
+    for (i = 0; i < simulation_conf.so_user_num; i++) {
         switch (node_pid = fork()) {
             case -1:
                 return -1;
             case 0: /*kid*/
+                argv_node[1] = queue_id; /*Let the user know is position*/
                 execve(argv_node[0], argv_node, NULL);
                 ERROR_MESSAGE("IMPOSSIBLE TO CREATE A USER");
                 return -1;
-            default:/*father*/
+            default: /*father*/
                 nodes_id_to_pid[i + 1] = node_pid;
                 nodes_id_to_pid[0] += 1;
-                proc_list = insert_in_list(proc_list, node_pid, PROC_TYPE_NODE);
-                /*Free if utilized pointer to argv*/
+                proc_list = insert_in_list(proc_list, node_pid, PROC_TYPE_NODE, queue_id);
+                /*Free if utilized pointers to argv*/
                 if (argv_node[1] != NULL) free(argv_node[1]);
                 if (argv_node[2] != NULL) free(argv_node[2]);
-                DEBUG_MESSAGE("NODE CREATED");
+                queue_id += DELTA_NODE_MSG_TYPE;
+                DEBUG_MESSAGE("USER CREATED");
                 break;
         }
     }
@@ -225,22 +238,18 @@ void notify_users_of_pid_to_id(void) {
     DEBUG_NOTIFY_ACTIVITY_RUNNING("SENDING INFORMATION TO USERS...");
     struct processes_info_list *list = proc_list;
     struct user_msg msg;
-    int user_queue_id;
-    if (node_msg_create(&msg, MSG_CONFIG_TYPE, main_pid, users_id_to_pid) < 0) {
-        ERROR_EXIT_SEQUENCE_MAIN("IMPOSSIBLE TO CREATE THE MESSAGE");
-    }
-#ifdef DEBUG
-    user_msg_print(&msg);
-#endif
     for (; list != NULL; list = list->next) {
         if (list->proc_type == PROC_TYPE_USER) {
-            user_queue_id = msgget(proc_list->pid, 0600);
-            if (user_queue_id < 0) {
+            if (msg_report_id_users < 0) {
                 ERROR_EXIT_SEQUENCE_MAIN("IMPOSSIBLE TO RETRIEVE QUEUE");
             }
-            if (user_msg_snd(user_queue_id, &msg, MSG_CONFIG_TYPE, users_id_to_pid, main_pid, FALSE) < 0) {
+            if (user_msg_snd(msg_report_id_users, &msg, (list->id_queue - MSG_TRANSACTION_FAILED_TYPE), users_id_to_pid,
+                             main_pid, TRUE) < 0) {
                 ERROR_EXIT_SEQUENCE_MAIN("IMPOSSIBLE TO SEND MESSAGE ERROR");
             }
+#ifdef DEBUG
+            user_msg_print(&msg);
+#endif
         }
     }
     DEBUG_NOTIFY_ACTIVITY_DONE("SENDING INFORMATION TO USERS DONE");
@@ -410,11 +419,11 @@ Bool read_conf(void) {
     return TRUE;
 }
 
-void create_msg_report_queue(void) {
+void create_master_msg_report_queue(void) {
     DEBUG_BLOCK_ACTION_START("MSG REPORT QUEUE");
     DEBUG_NOTIFY_ACTIVITY_RUNNING("CREATING THE MESSAGE REPORT QUEUE...");
-    msg_report_id = msgget(MASTER_QUEUE_KEY, IPC_CREAT | IPC_EXCL | 0600);
-    if (msg_report_id < 0) {
+    msg_report_id_master = msgget(MASTER_QUEUE_KEY, IPC_CREAT | IPC_EXCL | 0600);
+    if (msg_report_id_master < 0) {
         ERROR_EXIT_SEQUENCE_MAIN("IMPOSSIBLE TO CREATE THE MESSAGE REPORT QUEUE");
     }
     DEBUG_NOTIFY_ACTIVITY_DONE("CREATING THE MESSAGE REPORT QUEUE DONE");
@@ -424,14 +433,24 @@ void create_msg_report_queue(void) {
 
 int check_msg_report(struct master_msg_report *msg_report) {
     struct msqid_ds msg_rep_info;
-    if (msgctl(msg_report_id, IPC_STAT, &msg_rep_info) < 0) {
+    if (msgctl(msg_report_id_master, IPC_STAT, &msg_rep_info) < 0) {
         ERROR_MESSAGE("IMPOSSIBLE TO RETRIEVE MESSAGE QUEUE INFO");
         return -1;
     } else {
         /*fetching all msg if present*/
-        if (msg_rep_info.msg_qnum != 0 && msgrcv(msg_report_id, msg_report, sizeof(*msg_report) - sizeof(long), 0, 0)) {
+        if (msg_rep_info.msg_qnum != 0 &&
+            msgrcv(msg_report_id_master, msg_report, sizeof(*msg_report) - sizeof(long), 0, 0)) {
             /*make_knowledge*/
         }
         return 0;
     }
+}
+
+void create_users_msg_queue(void) {
+    DEBUG_NOTIFY_ACTIVITY_RUNNING("CREATING MSG REPORT QUEUE FOR USERS....");
+    /*TODO: Aggiungerla come optional alla compilazione*/
+    msg_report_id_users = msgget(USERS_QUEUE_KEY, IPC_CREAT | IPC_EXCL | 0600);
+    printf("----------------USER_QUEUE ID: %d\n", msg_report_id_users);
+    if (msg_report_id_users < 0) { ERROR_EXIT_SEQUENCE_USER("IMPOSSIBLE TO CREATE THE USER MESSAGE QUEUE"); }
+    DEBUG_NOTIFY_ACTIVITY_DONE("CREATING MSG REPORT QUEUE FOR USERS DONE");
 }
