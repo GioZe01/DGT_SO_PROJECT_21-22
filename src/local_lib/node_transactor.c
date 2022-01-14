@@ -39,12 +39,12 @@ void free_node(struct node *self) {
 
 int update_budget(struct node *self) {
     float budget = 0;
-    for (; queue_is_empty(self->transaction_block) == TRUE; queue_remove_head(self->transaction_block)) {
-        budget += queue_head(self->transaction_pool).reward;
-    }
     struct Transaction t_reward;
     t_reward.sender = -1;
     t_reward.reward = 0;
+    t_reward.amount = queue_get_reward(self->transaction_block);
+    t_reward.timestamp =
+    self->budget+=t_reward.amount;
     return 0;
 }
 

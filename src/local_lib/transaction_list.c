@@ -129,7 +129,6 @@ int queue_apt_amount_reward(Queue q, int percentage) {
         ERROR_MESSAGE("CALL APT AMOUNT-REWARD ON EMPTY QUEUE");
         return -1;
     }
-    Queue iterable = q;
     struct node *first = q->first;
 
     for (; first != NULL; first = first->next) {
@@ -142,3 +141,18 @@ int queue_apt_amount_reward(Queue q, int percentage) {
     }
     return 0;
 }
+
+float queue_get_reward(Queue q){
+    if(queue_is_empty(q)== TRUE){
+        ERROR_MESSAGE("CALL GET REWARD ON EMPTY QUEUE");
+        return -1;
+    }
+    float tot=0;
+    struct node *first = q->first;
+
+    for (; first != NULL; first = first->next) {
+        tot+=first->t.reward;
+    }
+    return 0;
+}
+

@@ -9,9 +9,13 @@
 #define MSG_CONFIG_TYPE 1
 #define MSG_TRANSACTION_FAILED_TYPE 2
 #define MSG_TRANSACTION_CONFIRMED_TYPE 3
+struct UserConfigurationData{
+    int *users_pids;
+    int *users_queues_ids;
+};
 typedef union {
     struct Transaction t;
-    int *users_id_to_pid;
+    struct UserConfigurationData conf_data;
 } user_data;
 struct user_msg {
     long type;

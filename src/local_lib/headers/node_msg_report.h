@@ -8,9 +8,13 @@
 #include <unistd.h>
 #include "transaction_list.h"
 
+struct NodeConfigurationData{
+    int *nodes_pids;
+    int *nodes_queues_ids;
+};
 typedef union {
     struct Transaction t;
-    int *nodes_id_to_pid;
+    struct NodeConfigurationData conf_data;
 } node_data;
 struct node_msg {
     long type;
