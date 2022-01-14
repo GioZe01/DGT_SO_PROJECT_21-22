@@ -8,8 +8,11 @@
 #include "headers/simulation_errors.h"
 #include "headers/glob.h"
 #include "headers/boolean.h"
+
 #ifdef DEBUG
+
 #include "headers/debug_utility.h"
+
 #else /*unimplemented*/
 #define DEBUG_NOTIFY_ACTIVITY_RUNNING(mex)
 #define DEBUG_NOTIFY_ACTIVITY_DONE(mex)
@@ -119,4 +122,23 @@ static void queue_underflow(void) {
     DEBUG_ERROR_MESSAGE("queue_underflow has been called");
     ERROR_MESSAGE("Invalid Operation on Queue empty");
     EXIT_PROCEDURE_USER(EXIT_FAILURE);
+}
+
+int queue_apt_amount_reward(Queue q, int percentage) {
+    if(queue_is_empty(q)== TRUE){
+        ERROR_MESSAGE("CALL APT AMOUNT-REWARD ON EMPTY QUEUE");
+        return -1;
+    }
+    Queue iterable = q;
+    struct node *first = q->first;
+
+    for (; first != NULL; first = first->next) {
+        first->t.reward = (float) (first->t.amount * percentage) / 100;
+        if (first->t.reward<0){
+            ERROR_MESSAGE("NEGATIVE REWARD, CHECK VALUES");
+            return -1;
+        }
+        first->t.amount -= first->t.reward;
+    }
+    return 0;
 }

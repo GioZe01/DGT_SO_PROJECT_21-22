@@ -83,9 +83,9 @@ int main(int arc, char const *argv[]) {
         read_conf(&configuration);
         user_create(&current_user, configuration.so_buget_init, getpid(), calc_balance, update_cash_flow);
         gen_sleep.tv_sec = 0;
-        /*-----------------------------*/
-        /*  CONNECTING TO QUEUE REPORT *
-        /*-----------------------------*/
+        /*--------------------------------------*/
+        /*  CONNECTING TO THE USER REPORT QUEUE *
+        /*--------------------------------------*/
         /*TODO: Aggiungerla come optional alla compilazione*/
         queue_report_id = msgget(USERS_QUEUE_KEY, 0600);
         printf("----------------USER_QUEUE ID: %d\n", queue_report_id);

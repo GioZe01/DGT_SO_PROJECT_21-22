@@ -73,8 +73,16 @@ int main(int argc, char const *argv[]) {
         int semaphore_start_value = -1;
         struct node_msg msg_rep;
         read_conf_node(&configuration);
-        node_create(&current_node, getpid(), 0, configuration.so_tp_size, configuration.so_block_size, configuration.so_reward);
+        node_create(&current_node, getpid(), 0, configuration.so_tp_size, configuration.so_block_size,
+                    configuration.so_reward, calc_reward);
 
+        /*-----------------------------------*/
+        /*  CONNECTING TO NODE REPORT QUEUE  *
+        /*-----------------------------------*/
+        /*TODO: Aggiungerla come optional alla compilazione*/
+        queue_node_id = msgget(NODES_QUEUE_KEY, 0600);
+        printf("----------------USER_QUEUE ID: %d\n", queue_node_id);
+        if (queue_node_id < 0) { ERROR_EXIT_SEQUENCE_USER("IMPOSSIBLE TO CREATE THE MESSAGE QUEUE"); }
         /*---------------------------*/
         /*  SEMAPHORES CREATION FASE *
         /*---------------------------*/
@@ -87,9 +95,6 @@ int main(int argc, char const *argv[]) {
             ERROR_EXIT_SEQUENCE_USER("IMPOSSIBLE TO WAIT FOR START");
         }
         state = RUNNING_STATE;
-        /*-------------------------*/
-        /*  CREATION QUEUE REPORT *
-        /*-------------------------*/
     }
     return 0;
 }

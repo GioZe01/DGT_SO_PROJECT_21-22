@@ -1,6 +1,6 @@
 #TODO: mkdir maker
 #Flags per la compilazione
-CFLAGS = -std=c89 -pedantic -Wall -Wextra
+CFLAGS = -std=c89 -pedantic -Wall -Wextra -Werror=format-security -fstack-protector-strong
 
 # Folders
 BUILDING_DIR = build
@@ -18,7 +18,7 @@ MKDIR_P = mkdir -p
 
 
 # DEFINITION AT COMP TIME
-_DEF_COMP_TIME = DEBUG _FORTIFY_SOURCE=2
+_DEF_COMP_TIME = DEBUG _FORTIFY_SOURCE=2 _GNU_SOURCE
 DEF_COMP_TIME = $(patsubst %, -D%, $(_DEF_COMP_TIME))
 
 

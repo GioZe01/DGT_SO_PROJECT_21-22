@@ -27,4 +27,11 @@ void queue_remove_head(Queue q);
 struct Transaction queue_head(Queue q);
 struct Transaction queue_last(Queue q);
 Bool queue_is_empty(Queue q);
+/**
+ * Calculate the reward for each transaction with give perc and apt the amount
+ * @param q
+ * @param percentage
+ * @return -1 in case of FAILURE. 0 otherwise
+ */
+int queue_apt_amount_reward(Queue q, int percentage);
 #endif /*DGT_SO_PROJECT_21_22_TRANSACTION_LIST_H*/

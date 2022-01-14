@@ -13,8 +13,9 @@
 /*  QUEUE ID    */
 #define MASTER_QUEUE_KEY 0x77
 #define USERS_QUEUE_KEY 0x78
+#define NODES_QUEUE_KEY 0x79
 /*  SHARED MEM. */
-#define MASTER_BOOK_SHM_KEY 0x78
+#define MASTER_BOOK_SHM_KEY 0x75
 /*  COLOR DEFINITION    */
 #define COLOR_RED_ANSI_CODE "\x1b[31m"
 #define COLOR_GREEN_ANSI_CODE "\x1b[32m" /* Usato per printing debugging mode per semafori*/

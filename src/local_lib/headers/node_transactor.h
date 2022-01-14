@@ -58,11 +58,11 @@ int add_to_pool(struct node *self, struct Transaction *t);
  */
 int add_to_block(struct node *self, struct Transaction *t);
 /**
- * Calculate the expected reward on the transaction
+ * Calculate the expected reward on the transaction block of the given node
  * @param self node to operate the calc on
  * @param percentage the non default percentage that u want to use to calc the reward
  * @param use_default if u want to use the default percentage loaded in the node on creation time
- * @return
+ * @return -1 in case of FAILURE. 0 otherwise
  */
-float calc_reward(struct node * self, int percentage, Bool use_default);
+int calc_reward(struct node * self, int percentage, Bool use_default);
 #endif //DGT_SO_PROJECT_21_22_NODE_TRANSACTOR_H

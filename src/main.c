@@ -1,9 +1,4 @@
-/*Deprecated: new standard is not implemented for university course constrain*/
 #define _GNU_SOURCE
-#define _OPEN_SYS_ITOA_EXT
-/*If this macro is defined to 1, security hardening is added to various library functions. If def
- * ined to 2, even stricter checks are applied. If defined to 3, the GNU C Library may also use checks that may have
- * an additional performance*/
 /* Std  */
 #include <stdio.h>
 #include <stdlib.h>
@@ -48,17 +43,20 @@
 #include "local_lib/headers/process_info_list.h"
 
 /* Funzioni di supporto al main */
-void set_signal_handlers(struct sigaction sa);
 
-void signals_handler(int signum);
-
-void create_semaphores(void);
+int check_msg_report(struct master_msg_report *msgReport);
 
 void create_masterbook(void);
+
+void create_master_msg_report_queue(void);
+
+void create_semaphores(void);
 
 int create_users_proc(void);
 
 void create_users_msg_queue(void);
+
+void create_nodes_msg_queue(void);
 
 int create_nodes_proc(void);
 
@@ -68,10 +66,9 @@ void notify_users_of_pid_to_id(void);
 
 void notify_nodes_pid_to_id(void);
 
-void create_master_msg_report_queue(void);
+void set_signal_handlers(struct sigaction sa);
 
-int check_msg_report(struct master_msg_report *msgReport);
-
+void signals_handler(int signum);
 /* Variabili */
 struct conf simulation_conf;
 int *users_id_to_pid; /*in 0 position is saved the actual size of the array of id saved in the pointer*/
@@ -81,6 +78,7 @@ struct processes_info_list *proc_list;
 int simulation_end = 0;
 int msg_report_id_master = -1; /*Identifier for message queue for master comunication*/
 int msg_report_id_users = -1;
+int msg_report_id_nodes = -1;
 int semaphore_start_id = -1;
 pid_t main_pid;
 
@@ -109,11 +107,12 @@ int main() {
          * ***********************************/
 
         /*-------------------------------*/
-        /*  CREATING THE QUEUE FOR USERS *
+        /*  CREATING THE QUEUES          *
         /*-------------------------------*/
         create_users_msg_queue();
+        create_nodes_msg_queue();
         /*-------------------------*/
-        /*  CREATION OF PROCS USERS*
+        /*  CREATION OF PROCESSES  *
         /*-------------------------*/
 
         DEBUG_BLOCK_ACTION_START("PROC GENERATION");
@@ -187,7 +186,7 @@ int create_users_proc(void) {
                 ERROR_MESSAGE("IMPOSSIBLE TO CREATE A USER");
                 return -1;
             default: /*father*/
-                users_id_to_pid[i + 1] = user_pid;
+                users_id_to_pid[i + 1] = queue_id;
                 users_id_to_pid[0] += 1;
                 proc_list = insert_in_list(proc_list, user_pid, PROC_TYPE_USER, queue_id);
                 /*Free if utilized pointers to argv*/
@@ -220,7 +219,7 @@ int create_nodes_proc(void) {
                 ERROR_MESSAGE("IMPOSSIBLE TO CREATE A USER");
                 return -1;
             default: /*father*/
-                nodes_id_to_pid[i + 1] = node_pid;
+                nodes_id_to_pid[i + 1] = queue_id;
                 nodes_id_to_pid[0] += 1;
                 proc_list = insert_in_list(proc_list, node_pid, PROC_TYPE_NODE, queue_id);
                 /*Free if utilized pointers to argv*/
@@ -451,6 +450,14 @@ void create_users_msg_queue(void) {
     /*TODO: Aggiungerla come optional alla compilazione*/
     msg_report_id_users = msgget(USERS_QUEUE_KEY, IPC_CREAT | IPC_EXCL | 0600);
     printf("----------------USER_QUEUE ID: %d\n", msg_report_id_users);
-    if (msg_report_id_users < 0) { ERROR_EXIT_SEQUENCE_USER("IMPOSSIBLE TO CREATE THE USER MESSAGE QUEUE"); }
+    if (msg_report_id_users < 0) { ERROR_EXIT_SEQUENCE_MAIN("IMPOSSIBLE TO CREATE THE USER MESSAGE QUEUE"); }
     DEBUG_NOTIFY_ACTIVITY_DONE("CREATING MSG REPORT QUEUE FOR USERS DONE");
+}
+
+void create_nodes_msg_queue(void){
+    DEBUG_NOTIFY_ACTIVITY_RUNNING("CREATING MSG REPORT QUEUE FOR NODES...");
+    msg_report_id_nodes = msgget(NODES_QUEUE_KEY, IPC_CREAT | IPC_CREAT | 0600);
+    printf("------------------NODE_QUEUE ID: %d\n", msg_report_id_users);
+    if(msg_report_id_nodes<0){ ERROR_EXIT_SEQUENCE_MAIN("IMPOSSIBLE TO CREATE THE NODES MESSAGE QUEUE");}
+    DEBUG_NOTIFY_ACTIVITY_DONE("CREATING MSG REPORT QUEUE FOR NODES DONE");
 }
