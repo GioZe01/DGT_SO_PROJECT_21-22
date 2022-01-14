@@ -12,6 +12,7 @@ struct node {
     float budget;
     int tp_size;
     int block_size;
+    int percentage;
     Queue transaction_pool;
     Queue transaction_block;
     Reward calc_reward;
@@ -26,7 +27,7 @@ struct node {
  * @param block_size size of the transaction block
  * @param calc_reward pointer to function that calculate the reward
  */
-void node_create(struct node *self, pid_t node_pid, float budget, int tp_size, int block_size, Reward calc_reward);
+void node_create(struct node *self, pid_t node_pid, float budget, int tp_size, int block_size, int percentage,Reward calc_reward);
 
 /**
  * Free the memory from the queue list of transactions
@@ -56,5 +57,12 @@ int add_to_pool(struct node *self, struct Transaction *t);
  * @return -1 in case of FAILURE. 0 otherwise
  */
 int add_to_block(struct node *self, struct Transaction *t);
-
+/**
+ * Calculate the expected reward on the transaction
+ * @param self node to operate the calc on
+ * @param percentage the non default percentage that u want to use to calc the reward
+ * @param use_default if u want to use the default percentage loaded in the node on creation time
+ * @return
+ */
+float calc_reward(struct node * self, int percentage, Bool use_default);
 #endif //DGT_SO_PROJECT_21_22_NODE_TRANSACTOR_H

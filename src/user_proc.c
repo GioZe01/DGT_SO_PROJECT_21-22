@@ -121,7 +121,7 @@ int main(int arc, char const *argv[]) {
          *  GETTING THE KNOWLEDGE OF USERS id_to_pid *
          * ------------------------------------------*/
 
-        if (msgrcv(queue_report_id, &msg_rep, sizeof(msg_rep) - sizeof(msg_rep.type),
+        if (queue_report_id == -1 && msgrcv(queue_report_id, &msg_rep, sizeof(msg_rep) - sizeof(msg_rep.type),
                    my_id-MSG_TRANSACTION_FAILED_TYPE, 0) < 0 &&
             errno == EINTR) {
             ERROR_EXIT_SEQUENCE_USER("MISSED CONFIG ON MESSAGE QUEUE");

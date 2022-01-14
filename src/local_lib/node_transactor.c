@@ -52,3 +52,4 @@ int add_to_pool(struct node *self, struct Transaction *t) {
 int add_to_block(struct node *self, struct Transaction *t) {
     queue_append(self->transaction_block, *t);
 }
+float calc_reward(struct node* self, int percentage, Bool use_default);

@@ -29,7 +29,7 @@ int load_configuration(struct conf *self) {
     if (fscanf(conf_file, "so_user_num=%d ", &self->so_user_num) == EOF) return -1;
     if (fscanf(conf_file, "so_nodes_num=%d ", &self->so_nodes_num) == EOF) return -1;
     if (fscanf(conf_file, "so_budget_init=%f ", &self->so_buget_init) == EOF) return -1;
-    if (fscanf(conf_file, "so_reward=%f ", &self->so_reward) == EOF) return -1;
+    if (fscanf(conf_file, "so_reward=%d ", &self->so_reward) == EOF) return -1;
     if (fscanf(conf_file, "so_min_trans_gen_nsec=%ld ", &self->so_min_trans_gen_nsec) == EOF) return -1;
     if (fscanf(conf_file, "so_max_trans_gen_nsec=%ld ", &self->so_max_trans_gen_nsec) == EOF) return -1;
     if (fscanf(conf_file, "so_retry=%d ", &self->so_retry) == EOF) return -1;

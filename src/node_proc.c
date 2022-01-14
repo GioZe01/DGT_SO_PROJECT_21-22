@@ -24,6 +24,7 @@
 #include "local_lib/headers/simulation_errors.h"
 #include "local_lib/headers/semaphore.h"
 #include "local_lib/headers/node_transactor.h"
+#include "local_lib/headers/node_msg_report.h"
 
 #ifdef DEBUG
 #include "local_lib/headers/debug_utility"
@@ -42,7 +43,8 @@
 
 void signals_handler(int signum);
 
-Bool read_conf(struct conf simulation_conf);
+Bool read_conf_node(struct conf *simulation_conf);
+
 /* Helper */
 Bool set_signal_handler(struct sigaction sa, sigset_t sigmask);
 
@@ -51,26 +53,35 @@ Bool check_arguments(int argc, char const *argv);
 /* SysVar */
 int state;
 int semaphore_start_id = -1;
+int queue_node_id = -1;
+int *users_id_to_pid;
+int *nodes_id_to_pid;
+struct node current_node;
+struct conf configuration;
+
 /*struct node node;*/
 int main(int argc, char const *argv[]) {
     DEBUG_MESSAGE("NODE PROCESS STARTED");
     struct sigaction sa;
     sigset_t sigmask;
+    DEBUG_MESSAGE("USER STATE SET TO INIT");
     state = INIT_STATE;
     /************************************
      *      CONFIGURATION FASE          *
      * **********************************/
     if (check_arguments(argc, argv) && set_signal_handler(sa, sigmask)) {
-       int semaphore_start_value = -1;
-       struct conf configuration;
-       read_conf(configuration);
-       /*node_create(node)*/
+        int semaphore_start_value = -1;
+        struct node_msg msg_rep;
+        read_conf_node(&configuration);
+        node_create(&current_node, getpid(), 0, configuration.so_tp_size, configuration.so_block_size, configuration.so_reward);
 
         /*---------------------------*/
         /*  SEMAPHORES CREATION FASE *
         /*---------------------------*/
         semaphore_start_id = semget(SEMAPHORE_SINC_KEY_START, 1, 0);
-        if (semaphore_lock(semaphore_start_id,0)< 0) { ERROR_EXIT_SEQUENCE_USER("IMPOSSIBLE TO OBTAIN THE START SEMAPHORE"); }
+        if (semaphore_lock(semaphore_start_id, 0) < 0) {
+            ERROR_EXIT_SEQUENCE_USER("IMPOSSIBLE TO OBTAIN THE START SEMAPHORE");
+        }
         DEBUG_MESSAGE("NODE READY, ON START_SEM");
         if (semaphore_wait_for_sinc(semaphore_start_id, 0) < 0) {
             ERROR_EXIT_SEQUENCE_USER("IMPOSSIBLE TO WAIT FOR START");
@@ -87,25 +98,26 @@ int main(int argc, char const *argv[]) {
  * Load and read the configuration, in case of error during loading close the proc. with EXIT_FAILURE
  * @return TRUE if ALL OK
  */
-Bool read_conf(struct conf simulation_conf) {
+Bool read_conf_node(struct conf *simulation_conf) {
     DEBUG_NOTIFY_ACTIVITY_RUNNING("LOADING CONFIGURATION...");
     switch (load_configuration(&simulation_conf)) {
         case 0:
             break;
         case -1:
-            ERROR_EXIT_SEQUENCE_NODE(" DURING CONF. LOADING: MISSING FILE OR EMPTY");
+        ERROR_EXIT_SEQUENCE_NODE(" DURING CONF. LOADING: MISSING FILE OR EMPTY");
         case -2:
-            ERROR_EXIT_SEQUENCE_NODE(" DURING CONF. LOADING: BROKEN SIMULTATION LOGIC, CHECK CONF. VALUE");
+        ERROR_EXIT_SEQUENCE_NODE(" DURING CONF. LOADING: BROKEN SIMULTATION LOGIC, CHECK CONF. VALUE");
         case -3:
-            ERROR_EXIT_SEQUENCE_NODE(" DURING CONF. LOADING: NOT ENOUGH USERS FOR NODES");
+        ERROR_EXIT_SEQUENCE_NODE(" DURING CONF. LOADING: NOT ENOUGH USERS FOR NODES");
         case -4:
-            ERROR_EXIT_SEQUENCE_NODE(" DURING CONF. LOADING: MIN MAX EXECUTION TIME WRONG");
+        ERROR_EXIT_SEQUENCE_NODE(" DURING CONF. LOADING: MIN MAX EXECUTION TIME WRONG");
         case -5:
-            ERROR_EXIT_SEQUENCE_NODE(" DURING CONF. LOADING: NODE REWARD IS OVER POSSIBILITIES OF USERS");
+        ERROR_EXIT_SEQUENCE_NODE(" DURING CONF. LOADING: NODE REWARD IS OVER POSSIBILITIES OF USERS");
     }
     DEBUG_NOTIFY_ACTIVITY_DONE("CONFIGURATION LOADED");
     return TRUE;
 }
+
 /**
  * Calculate the balance of the current user_proc
  * @param budget the current budget that is available for the user_proc;
@@ -129,9 +141,11 @@ void signals_handler(int signum) {
 
     }
 }
-void free_sysVar_node(){
-    free_node();
+
+void free_sysVar_node() {
+    free_node(&current_node);
 }
-void free_mem_node(){
+
+void free_mem_node() {
 
 }

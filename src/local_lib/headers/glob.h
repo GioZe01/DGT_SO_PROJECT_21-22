@@ -25,4 +25,5 @@
 
 /*  GENERAL UTILITY MACRO*/
 #define REALLOC_MARGIN 10 /*delta in wich is not usefull to realloc TODO: make a function that calculate it*/
+
 #endif /*DGT_SO_PROJECT_21_22_GLOB_H*/
