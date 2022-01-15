@@ -19,6 +19,7 @@
 #include "local_lib/headers/node_msg_report.h"
 #include "local_lib/headers/master_msg_report.h"
 #include "local_lib/headers/boolean.h"
+
 #define EXIT_PROCEDURE_USER(exit_value) free_mem_user();         \
                                 free_sysVar_user();      \
                                 exit(exit_value)
@@ -71,6 +72,7 @@ int main(int arc, char const *argv[]) {
     struct sigaction sa;
     struct user_msg msg_rep;
     struct timespec gen_sleep;
+    int start_sem_value;
     sigset_t sigmask; /* sinal mask */
 
     /************************************
@@ -110,7 +112,12 @@ int main(int arc, char const *argv[]) {
         /*------------------------------------*/
         /*TODO: need a semafore for reading into the message queue*/
         semaphore_start_id = semget(SEMAPHORE_SINC_KEY_START, 1, 0);
-        if (semaphore_lock(semaphore_start_id, 0) < 0) {
+        if (semaphore_start_id < 0) {
+            ERROR_EXIT_SEQUENCE_USER("IMPOSSIBLE TO OBTAIN ID OF START SEM.");
+        }
+        start_sem_value = semctl(semaphore_start_id, 0, GETVAL);
+        if (start_sem_value < 0) { ERROR_EXIT_SEQUENCE_USER("IMPOSSIBLE TO OBTAIN INFO FROM START SEM."); }
+        if (start_sem_value != 0 && semaphore_lock(semaphore_start_id, 0) < 0) {
             ERROR_EXIT_SEQUENCE_USER("IMPOSSIBLE TO OBTAIN THE START SEMAPHORE");
         }
         DEBUG_MESSAGE("USER READY, WAITING FOR SEMAPHORE TO FREE");

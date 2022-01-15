@@ -25,7 +25,9 @@
 #include "local_lib/headers/node_msg_report.h"
 
 #ifdef DEBUG
+
 #include "local_lib/headers/debug_utility.h"
+
 #else
 #define DEBUG_NOTIFY_ACTIVITY_RUNNING(mex)
 #define DEBUG_NOTIFY_ACTIVITY_DONE(mex)
@@ -56,6 +58,7 @@ int queue_node_id = -1;
 int *users_queue_ids;
 int *nodes_pids;
 int *nodes_queue_ids;
+int node_id = -1;
 struct node current_node;
 struct conf node_configuration;
 
@@ -80,7 +83,7 @@ int main(int argc, char const *argv[]) {
         /*-----------------------------------*/
         /*TODO: Aggiungerla come optional alla compilazione*/
         queue_node_id = msgget(NODES_QUEUE_KEY, 0600);
-        printf("----------------USER_QUEUE ID: %d\n", queue_node_id);
+        printf("----------------NODE QUEUE ID: %d\n", queue_node_id);
         if (queue_node_id < 0) { ERROR_EXIT_SEQUENCE_NODE("IMPOSSIBLE TO CREATE THE MESSAGE QUEUE"); }
 
         /************************************
@@ -104,7 +107,7 @@ int main(int argc, char const *argv[]) {
          * ------------------------------------------*/
 
         if (queue_node_id == -1 && msgrcv(queue_node_id, &msg_rep, sizeof(msg_rep) - sizeof(msg_rep.type),
-                                          current_node.pid - MSG_NODE_ORIGIN_TYPE, 0) < 0 &&
+                                          node_id - MSG_NODE_ORIGIN_TYPE, 0) < 0 &&
             errno == EINTR) {
             ERROR_EXIT_SEQUENCE_NODE("MISSED CONFIG ON MESSAGE QUEUE");
         }
@@ -148,6 +151,12 @@ Bool read_conf_node(struct conf *simulation_conf) {
  * @return the value of the balance
  */
 Bool check_arguments(int argc, char const *argv) {
+    DEBUG_NOTIFY_ACTIVITY_RUNNING("CHECKING ARGC AND ARGV...");
+    if (argc < 2) {
+        ERROR_EXIT_SEQUENCE_NODE("MISSING ARGUMENT");
+    }
+    node_id = atoi(argv[1]);
+    DEBUG_NOTIFY_ACTIVITY_DONE("CHECKING ARGC AND ARGV DONE");
     return TRUE;
 }
 
