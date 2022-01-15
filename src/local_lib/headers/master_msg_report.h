@@ -1,7 +1,6 @@
 
 #ifndef DGT_SO_PROJECT_21_22_MASTER_MSG_REPORT_H
 #define DGT_SO_PROJECT_21_22_MASTER_MSG_REPORT_H
-#define _GNU_SOURCE
 #include <unistd.h>
 #define PROC_STATE_INIT 0
 #define PROC_STATE_RUNNING 1

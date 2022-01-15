@@ -1,12 +1,11 @@
-#define _GNU_SOURCE
 /*  Standard    */
 #include <stdio.h>
 #include <stdlib.h>
 #include <math.h>
 #include <unistd.h>
-#include <time.h>
 /*  Local   */
 #include "headers/user_transaction.h"
+#include "headers/simulation_errors.h"
 
 #ifdef DEBUG
 
@@ -24,7 +23,7 @@ pid_t extract_node(int nodes_num);
 
 /**
  * Select a user pid from the vector pointer users_num randomly
- * @param users_num the pointer to the vector of users_id_to_pid
+ * @param users_num the pointer to the vector of users_pids
  * @return the pid_t of the user selected randomly
  */
 pid_t extract_user(int *users_num);
@@ -78,23 +77,14 @@ int update_cash_flow(struct user_transaction *self, struct Transaction *t) {
 
 int generate_transaction(struct user_transaction *self, pid_t user_proc_pid, int *nodes_num, int *users_num) {
     struct Transaction t;
-    struct timespec timestamp;
-
-    if (clock_gettime(CLOCK_REALTIME, &timestamp) < 0 || check_balance(self) == FALSE) {
-        DEBUG_MESSAGE("IMPOSSIBLE TO RETRIEVE CLOCK_TIME");
-        return -1;
+    if (check_balance(self) == TRUE) {
+        create_transaction(&t,user_proc_pid, extract_user(users_num), gen_amount(self));
+        queue_append(self->in_process, t);
+        self->update_cash_flow(self, &t);
+        printf("\n ----------------- timestamp: %lf", t.timestamp.tv_nsec);
+        return 0;
     }
-    t.t_type = TRANSACTION_WAITING;
-    t.hops = 0;
-    t.sender = user_proc_pid;
-    t.reciver = extract_user(users_num);
-    t.timestamp = timestamp.tv_nsec;
-    t.amount = gen_amount(self);
-    t.reward = 0; /* Is not responsible*/
-    queue_append(self->in_process, t);
-    self->update_cash_flow(self, &t);
-    printf("\n ----------------- timestamp: %lf", t.timestamp);
-    return 0;
+    return -1;
 }
 
 pid_t extract_user(int *users_num) {

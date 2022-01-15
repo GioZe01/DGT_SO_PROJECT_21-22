@@ -1,4 +1,3 @@
-#define _GNU_SOURCE
 /*  Standard Library  */
 #include <stdio.h>
 #include <stdlib.h>
@@ -19,6 +18,7 @@
 #include "local_lib/headers/semaphore.h"
 #include "local_lib/headers/conf_file.h"
 #include "local_lib/headers/user_msg_report.h"
+#include "local_lib/headers/node_msg_report.h"
 
 #define EXIT_PROCEDURE_USER(exit_value) free_mem_user();         \
                                 free_sysVar_user();      \
@@ -42,12 +42,16 @@
 /*  Function def. */
 void signals_handler(int signum);
 
+int aknowledge_data(struct user_msg msg);
+
 /*  Helper  */
 Bool check_argument(int arc, char const *argv[]);
 
 Bool set_signal_handler(struct sigaction sa, sigset_t sigmask);
 
 Bool read_conf(struct conf *simulation_conf);
+
+int send_to_node(void);
 
 void configure_shm();
 
@@ -57,8 +61,9 @@ int state;
 int semaphore_start_id = -1;
 int queue_report_id = -1; /* -1 is the value if it is not initialized */
 int my_id = -1;
-int *users_id_to_pid;
-int *nodes_id_to_pid;
+int *users_pids;
+int *users_queues_ids;
+int *nodes_queues_ids;
 struct user_transaction current_user;
 struct conf configuration;
 
@@ -78,8 +83,6 @@ int main(int arc, char const *argv[]) {
 
     if (check_argument(arc, argv) && set_signal_handler(sa, sigmask)) {
         /*  VARIABLE INITIALIZATION */
-        int semaphore_start_value = -1;
-        char *buffer[sizeof(int) * 8 + 1];
         read_conf(&configuration);
         user_create(&current_user, configuration.so_buget_init, getpid(), calc_balance, update_cash_flow);
         gen_sleep.tv_sec = 0;
@@ -122,29 +125,38 @@ int main(int arc, char const *argv[]) {
          * ------------------------------------------*/
 
         if (queue_report_id == -1 && msgrcv(queue_report_id, &msg_rep, sizeof(msg_rep) - sizeof(msg_rep.type),
-                   my_id-MSG_TRANSACTION_FAILED_TYPE, 0) < 0 &&
+                                            my_id - MSG_TRANSACTION_FAILED_TYPE, 0) < 0 &&
             errno == EINTR) {
             ERROR_EXIT_SEQUENCE_USER("MISSED CONFIG ON MESSAGE QUEUE");
         }
 #ifdef DEBUG
-        printf("\nCONFIGURATION RECEIVED: %d\n", msg_rep.data.users_id_to_pid[0]);
+        printf("\nCONFIGURATION RECEIVED: %d\n", msg_rep.data.conf_data.users_pids[0]);
 #endif
-        users_id_to_pid = msg_rep.data.users_id_to_pid;
+        aknowledge_data(msg_rep);
+
         /****************************************
          *      GENERATION OF TRANSACTION FASE *
          * **************************************/
         raise(SIGALRM);
         while (current_user.u_balance > 2) {
-            if (generate_transaction(&current_user, current_user.pid, NULL, users_id_to_pid) < 0) {
+            if (generate_transaction(&current_user, current_user.pid, NULL, users_pids) < 0) {
                 ERROR_EXIT_SEQUENCE_USER("IMPOSSIBLE TO GENERATE TRANSACTION");
             }
             gen_sleep.tv_nsec =
                     (rand() % (configuration.so_max_trans_gen_nsec - configuration.so_min_trans_gen_nsec + 1)) +
                     configuration.so_min_trans_gen_nsec;
 #ifdef U_CASHING
-#else
-            /*SENDING TRANSACTION TO THE NODE*/
+            /*TODO: make cashing*/
 #endif
+
+            /*SENDING TRANSACTION TO THE NODE*/
+
+            if (send_to_node() < 0) {
+                ERROR_MESSAGE("IMPOSSIBLE TO SEND TO THE NODE");
+            }
+            /*
+             * TODO: check for the retry to send : cand do with while then abort and notify master
+             * */
             nanosleep(&gen_sleep, (void *) NULL);
         }
 
@@ -164,7 +176,7 @@ int main(int arc, char const *argv[]) {
 Bool check_argument(int arc, char const *argv[]) {
     /*TODO: controllo dell arc*/
     DEBUG_NOTIFY_ACTIVITY_RUNNING("CHECKING ARGC AND ARGV...");
-    if(arc<2){
+    if (arc < 2) {
         ERROR_EXIT_SEQUENCE_USER("MISSING ARGUMENT");
     }
     my_id = atoi(argv[1]);
@@ -220,10 +232,12 @@ void signals_handler(int signum) {
             EXIT_PROCEDURE_USER(0);
         case SIGALRM: /*    Generate a new transaction  */
             DEBUG_NOTIFY_ACTIVITY_RUNNING("GENERATING A NEW TRANSACTION FROM SIG...");
-            if (generate_transaction(&current_user, current_user.pid, NULL, users_id_to_pid) < 0) {
+            if (generate_transaction(&current_user, current_user.pid, NULL, users_pids) < 0) {
                 ERROR_EXIT_SEQUENCE_USER("IMPOSSIBLE TO GENERATE TRANSACTION");
             }
             DEBUG_NOTIFY_ACTIVITY_DONE("GENERATING A NEW TRANSACTION FROM SIG DONE");
+        default:
+            break;
     }
 }
 
@@ -271,4 +285,36 @@ Bool read_conf(struct conf *simulation_conf) {
     }
     DEBUG_NOTIFY_ACTIVITY_DONE("CONFIGURATION LOADED");
     return TRUE;
+}
+
+int aknowledge_data(struct user_msg msg) {
+    switch (msg.type) {
+        case MSG_CONFIG_TYPE:
+            users_pids = msg.data.conf_data.users_pids;
+            users_queues_ids = msg.data.conf_data.users_queues_ids;
+            nodes_queues_ids = msg.data.conf_data.nodes_queues_ids;
+            if (users_pids[0] != users_queues_ids[0]) return -1;
+            if (nodes_queues_ids[0] == 0) {
+                ERROR_EXIT_SEQUENCE_USER("NO NODES TO SEND TRANSACTION");
+            }
+            if (users_pids[0] != users_queues_ids[0]) return -1;
+            if (nodes_queues_ids[0] == 0) {
+                ERROR_EXIT_SEQUENCE_USER("NO NODES TO SEND TRANSACTION");
+            }
+            break;
+    }
+    return 0;
+}
+
+int send_to_node(void) {
+    int node_num = (rand() % (nodes_queues_ids[0])) + 1;
+    struct node_msg msg;
+    struct Transaction t = queue_last(current_user.in_process);
+    if (node_msg_snd(NODES_QUEUE_KEY, &msg, nodes_queues_ids[node_num], &t,
+                     current_user.pid, TRUE) < 0) { return -1; }
+#ifdef DEBUG
+    node_msg_print(&msg);
+#endif
+    return 0;
+
 }

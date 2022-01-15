@@ -40,10 +40,16 @@ void free_node(struct node *self) {
 int update_budget(struct node *self) {
     float budget = 0;
     struct Transaction t_reward;
+    struct timespec timestamp;
+
+    if (clock_gettime(CLOCK_REALTIME, &timestamp) < 0 ) {
+        ERROR_MESSAGE("IMPOSSIBLE TO RETRIEVE CLOCK_TIME");
+        return -1;
+    }
     t_reward.sender = -1;
     t_reward.reward = 0;
     t_reward.amount = queue_get_reward(self->transaction_block);
-    t_reward.timestamp =
+    t_reward.timestamp = timestamp;
     self->budget+=t_reward.amount;
     return 0;
 }

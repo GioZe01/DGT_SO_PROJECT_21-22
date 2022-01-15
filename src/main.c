@@ -1,4 +1,3 @@
-#define _GNU_SOURCE
 /* Std  */
 #include <stdio.h>
 #include <stdlib.h>
@@ -44,7 +43,7 @@
 
 /* Funzioni di supporto al main */
 
-int check_msg_report(struct master_msg_report *msgReport);
+int check_msg_report(struct master_msg_report *msg_report);
 
 void create_masterbook(void);
 
@@ -71,8 +70,10 @@ void set_signal_handlers(struct sigaction sa);
 void signals_handler(int signum);
 /* Variabili */
 struct conf simulation_conf;
-int *users_id_to_pid; /*in 0 position is saved the actual size of the array of id saved in the pointer*/
-int *nodes_id_to_pid; /*in 0 position is saved the actual size */
+int *users_pids; /*in 0 position is saved the actual size of the array of pids saved in the pointer*/
+int *nodes_pids; /*in 0 position is saved the actual size of the array of pids saved in the pointer*/
+int *users_queues_ids;/*in 0 position is saved the actual size of the array of ids saved in the pointer*/
+int *nodes_queues_ids;/*in 0 position is saved the actual size of the array of ids saved in the pointer*/
 struct processes_info_list *proc_list;
 
 int simulation_end = 0;
@@ -87,12 +88,13 @@ int main() {
     main_pid = getpid();
     if (read_conf() == TRUE) {
         /*  Local Var Declaration   */
-        int i; /*  utility index */
         struct sigaction sa; /*Structure for handling signals */
         struct master_msg_report msg_repo;
         /* Pointers allocation  */
-        users_id_to_pid = (int *) malloc(sizeof(int) * simulation_conf.so_user_num);
-        nodes_id_to_pid = (int *) malloc(sizeof(int) * simulation_conf.so_nodes_num);
+        users_pids = (int *) malloc(sizeof(int) * simulation_conf.so_user_num);
+        nodes_pids = (int *) malloc(sizeof(int) * simulation_conf.so_nodes_num);
+        users_queues_ids= (int *) malloc(sizeof(int) * simulation_conf.so_user_num);
+        nodes_queues_ids = (int *) malloc(sizeof(int) * simulation_conf.so_nodes_num);
         /************************************
          *      CONFIGURATION FASE
          * ***********************************/
@@ -123,18 +125,24 @@ int main() {
         DEBUG_BLOCK_ACTION_END();
 
         DEBUG_NOTIFY_ACTIVITY_RUNNING("SHRINKING ID_TO_PID REF...");
-        if (users_id_to_pid[0] < (simulation_conf.so_user_num - REALLOC_MARGIN)) {
-            users_id_to_pid = realloc(users_id_to_pid, sizeof(int) * users_id_to_pid[0]);
+        if (users_pids[0] < (simulation_conf.so_user_num - REALLOC_MARGIN)) {
+            users_pids = realloc(users_pids, sizeof(int) * (users_pids[0]+1));
         }
-        if (nodes_id_to_pid[0] < (simulation_conf.so_nodes_num - REALLOC_MARGIN)) {
-            nodes_id_to_pid = realloc(nodes_id_to_pid, sizeof(int) * users_id_to_pid[0]);
+        if (nodes_pids[0] < (simulation_conf.so_nodes_num - REALLOC_MARGIN)) {
+            nodes_pids = realloc(nodes_pids, sizeof(int) * (users_pids[0]+1));
+        }
+        if (users_queues_ids[0] < (simulation_conf.so_user_num - REALLOC_MARGIN)) {
+            users_queues_ids = realloc(users_queues_ids, sizeof(int) * (users_queues_ids[0]+1));
+        }
+        if (nodes_queues_ids[0] < (simulation_conf.so_nodes_num - REALLOC_MARGIN)) {
+            nodes_queues_ids = realloc(nodes_queues_ids, sizeof(int) * (nodes_queues_ids[0]+1));
         }
         DEBUG_NOTIFY_ACTIVITY_DONE("SHRINKING ID_TO_PID REF DONE");
 
 #ifdef DEBUG
         printf("\n==========DEBUG INFO TABLE==========\n");
-        printf("# Users generated: %d\n", users_id_to_pid[0]);
-        printf("# Nodes generated: %d\n", nodes_id_to_pid[0]);
+        printf("# Users generated: %d\n", users_pids[0]);
+        printf("# Nodes generated: %d\n", nodes_pids[0]);
         printf("======================================\n");
 #endif
         DEBUG_MESSAGE("PROCESSES USERS GENERATED");
@@ -175,7 +183,8 @@ int create_users_proc(void) {
     char *argv_user[] = {PATH_TO_USER, -1, NULL}; /*Future addon*/
     pid_t user_pid;
     int i, queue_id = DELTA_USER_MSG_TYPE;
-    users_id_to_pid[0] = 0;
+    users_pids[0] = 0;
+    users_queues_ids[0]=0;
     for (i = 0; i < simulation_conf.so_user_num; i++) {
         switch (user_pid = fork()) {
             case -1:
@@ -186,8 +195,10 @@ int create_users_proc(void) {
                 ERROR_MESSAGE("IMPOSSIBLE TO CREATE A USER");
                 return -1;
             default: /*father*/
-                users_id_to_pid[i + 1] = queue_id;
-                users_id_to_pid[0] += 1;
+                users_queues_ids[i + 1] = queue_id;
+                users_pids [i+1] = user_pid;
+                users_pids[0] += 1;
+                users_queues_ids[0]+=1;
                 proc_list = insert_in_list(proc_list, user_pid, PROC_TYPE_USER, queue_id);
                 /*Free if utilized pointers to argv*/
                 if (argv_user[1] != NULL) free(argv_user[1]);
@@ -208,7 +219,8 @@ int create_nodes_proc(void) {
     char *argv_node[] = {PATH_TO_NODE, -1, NULL}; /*Future addon*/
     pid_t node_pid;
     int i, queue_id = DELTA_NODE_MSG_TYPE;
-    nodes_id_to_pid[0] = 0;
+    nodes_pids[0] = 0;
+    nodes_queues_ids[0] = 0;
     for (i = 0; i < simulation_conf.so_user_num; i++) {
         switch (node_pid = fork()) {
             case -1:
@@ -219,8 +231,10 @@ int create_nodes_proc(void) {
                 ERROR_MESSAGE("IMPOSSIBLE TO CREATE A USER");
                 return -1;
             default: /*father*/
-                nodes_id_to_pid[i + 1] = queue_id;
-                nodes_id_to_pid[0] += 1;
+                nodes_queues_ids[i+1] = queue_id;
+                nodes_pids[i + 1] = node_pid;
+                nodes_pids[0] += 1;
+                nodes_queues_ids[0]+=1;
                 proc_list = insert_in_list(proc_list, node_pid, PROC_TYPE_NODE, queue_id);
                 /*Free if utilized pointers to argv*/
                 if (argv_node[1] != NULL) free(argv_node[1]);
@@ -237,12 +251,16 @@ void notify_users_of_pid_to_id(void) {
     DEBUG_NOTIFY_ACTIVITY_RUNNING("SENDING INFORMATION TO USERS...");
     struct processes_info_list *list = proc_list;
     struct user_msg msg;
+    struct UserConfigurationData data;
+    data.nodes_queues_ids = nodes_queues_ids;
+    data.users_queues_ids = users_queues_ids;
+    data.users_pids = users_pids;
     for (; list != NULL; list = list->next) {
         if (list->proc_type == PROC_TYPE_USER) {
             if (msg_report_id_users < 0) {
                 ERROR_EXIT_SEQUENCE_MAIN("IMPOSSIBLE TO RETRIEVE QUEUE");
             }
-            if (user_msg_snd(msg_report_id_users, &msg, (list->id_queue - MSG_TRANSACTION_FAILED_TYPE), users_id_to_pid,
+            if (user_msg_snd(msg_report_id_users, &msg, (list->id_queue - MSG_TRANSACTION_FAILED_TYPE), &data,
                              main_pid, TRUE) < 0) {
                 ERROR_EXIT_SEQUENCE_MAIN("IMPOSSIBLE TO SEND MESSAGE ERROR");
             }
@@ -255,28 +273,24 @@ void notify_users_of_pid_to_id(void) {
 }
 
 void notify_nodes_pid_to_id(void) {
-    DEBUG_NOTIFY_ACTIVITY_RUNNING("SENDING INFORMATION TO USERS...");
+    DEBUG_NOTIFY_ACTIVITY_RUNNING("SENDING INFORMATION TO NODES...");
     struct processes_info_list *list = proc_list;
-    struct user_msg msg;
-    int user_queue_id;
-    if (user_msg_create(&msg, MSG_CONFIG_TYPE, main_pid, users_id_to_pid) < 0) {
-        ERROR_EXIT_SEQUENCE_MAIN("IMPOSSIBLE TO CREATE THE MESSAGE");
-    }
-#ifdef DEBUG
-    user_msg_print(&msg);
-#endif
+    struct node_msg msg;
     for (; list != NULL; list = list->next) {
         if (list->proc_type == PROC_TYPE_NODE) {
-            user_queue_id = msgget(proc_list->pid, 0600);
-            if (user_queue_id < 0) {
+            if (msg_report_id_nodes< 0) {
                 ERROR_EXIT_SEQUENCE_MAIN("IMPOSSIBLE TO RETRIEVE QUEUE");
             }
-            if (user_msg_snd(user_queue_id, &msg, MSG_CONFIG_TYPE, users_id_to_pid, main_pid, FALSE) < 0) {
+            if (node_msg_snd(msg_report_id_nodes, &msg, (list->id_queue - MSG_TRANSACTION_FAILED_TYPE), nodes_pids,
+                             main_pid, TRUE) < 0) {
                 ERROR_EXIT_SEQUENCE_MAIN("IMPOSSIBLE TO SEND MESSAGE ERROR");
             }
+#ifdef DEBUG
+            node_msg_print(&msg);
+#endif
         }
     }
-    DEBUG_NOTIFY_ACTIVITY_DONE("SENDING INFORMATION TO USERS DONE");
+    DEBUG_NOTIFY_ACTIVITY_DONE("SENDING INFORMATION TO NODES DONE");
 }
 
 void set_signal_handlers(struct sigaction sa) {
@@ -288,7 +302,7 @@ void set_signal_handlers(struct sigaction sa) {
         sigaction(SIGINT, &sa, NULL) < 0 ||
         sigaction(SIGTERM, &sa, NULL) < 0 ||
         sigaction(SIGALRM, &sa, NULL) < 0) {
-        ERROR_MESSAGE("ERRORE SETTING SIGNAL HANDLERS");
+        ERROR_MESSAGE("ERROR SETTING SIGNAL HANDLERS");
         EXIT_PROCEDURE_MAIN(EXIT_FAILURE);
     }
     DEBUG_NOTIFY_ACTIVITY_DONE("SETTING HANDLERS DONE");
@@ -382,6 +396,10 @@ void kill_kids() {
 
 void free_mem() {
     list_free(proc_list);
+    free(users_pids);
+    free(nodes_queues_ids);
+    free(users_queues_ids);
+    free(nodes_pids);
 }
 
 void free_sysVar() {

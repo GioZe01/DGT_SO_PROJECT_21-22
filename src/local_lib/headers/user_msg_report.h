@@ -12,6 +12,7 @@
 struct UserConfigurationData{
     int *users_pids;
     int *users_queues_ids;
+    int *nodes_queues_ids;
 };
 typedef union {
     struct Transaction t;

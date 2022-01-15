@@ -1,4 +1,3 @@
-#define _GNU_SOURCE
 
 #include <stdio.h>
 #include <unistd.h>
@@ -10,7 +9,7 @@
 int user_msg_create(struct user_msg *self, long type, pid_t sender_pid, user_data *data) {
     switch (type) {
         case MSG_CONFIG_TYPE:
-            self->data.users_id_to_pid = data->users_id_to_pid;
+            self->data.conf_data= data->conf_data;
             break;
         case MSG_TRANSACTION_CONFIRMED_TYPE:
         case MSG_TRANSACTION_FAILED_TYPE:

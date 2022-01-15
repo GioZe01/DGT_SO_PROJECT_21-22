@@ -1,5 +1,4 @@
 #define _GNU_SOURCE
-#define _FORTIFY_SOURCE 2
 /*  Standard Library */
 #include <stdio.h>
 #include <stdlib.h>
@@ -70,7 +69,6 @@ int main(int argc, char const *argv[]) {
      *      CONFIGURATION FASE          *
      * **********************************/
     if (check_arguments(argc, argv) && set_signal_handler(sa, sigmask)) {
-        int semaphore_start_value = -1;
         struct node_msg msg_rep;
         read_conf_node(&configuration);
         node_create(&current_node, getpid(), 0, configuration.so_tp_size, configuration.so_block_size,
@@ -83,8 +81,13 @@ int main(int argc, char const *argv[]) {
         queue_node_id = msgget(NODES_QUEUE_KEY, 0600);
         printf("----------------USER_QUEUE ID: %d\n", queue_node_id);
         if (queue_node_id < 0) { ERROR_EXIT_SEQUENCE_USER("IMPOSSIBLE TO CREATE THE MESSAGE QUEUE"); }
+
+        /************************************
+         *      SINC AND WAITING FASE       *
+         * **********************************/
+
         /*---------------------------*/
-        /*  SEMAPHORES CREATION FASE *
+        /*  SEMAPHORES CREATION      *
         /*---------------------------*/
         semaphore_start_id = semget(SEMAPHORE_SINC_KEY_START, 1, 0);
         if (semaphore_lock(semaphore_start_id, 0) < 0) {

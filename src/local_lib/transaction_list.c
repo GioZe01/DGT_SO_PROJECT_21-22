@@ -3,6 +3,7 @@
 #include <errno.h>
 #include <unistd.h>
 #include <string.h>
+#include <time.h>
 /*Local import */
 #include "headers/transaction_list.h"
 #include "headers/simulation_errors.h"
@@ -35,6 +36,24 @@ struct transaction_list {
     struct node *last;
     int transactions; /*number of transaction in the list*/
 };
+
+int create_transaction(struct Transaction *t, pid_t sender, pid_t receiver, float amount) {
+
+    struct timespec timestamp;
+
+    if (clock_gettime(CLOCK_REALTIME, &timestamp) < 0) {
+        ERROR_MESSAGE("IMPOSSIBLE TO RETRIEVE CLOCK_TIME");
+        return -1;
+    }
+    t->t_type = TRANSACTION_WAITING;
+    t->hops = 0;
+    t->sender = sender;
+    t->reciver = receiver;
+    t->timestamp = timestamp;
+    t->amount = amount;
+    t->reward = 0; /* Is not responsible*/
+    return 0;
+}
 
 Queue queue_create() {
     Queue q = malloc(sizeof(struct transaction_list));
@@ -125,15 +144,15 @@ static void queue_underflow(void) {
 }
 
 int queue_apt_amount_reward(Queue q, int percentage) {
-    if(queue_is_empty(q)== TRUE){
+    if (queue_is_empty(q) == TRUE) {
         ERROR_MESSAGE("CALL APT AMOUNT-REWARD ON EMPTY QUEUE");
         return -1;
     }
     struct node *first = q->first;
 
     for (; first != NULL; first = first->next) {
-        first->t.reward = (float) (first->t.amount * percentage) / 100;
-        if (first->t.reward<0){
+        first->t.reward = (float) (first->t.amount * ((float) percentage)) / 100;
+        if (first->t.reward < 0) {
             ERROR_MESSAGE("NEGATIVE REWARD, CHECK VALUES");
             return -1;
         }
@@ -142,16 +161,16 @@ int queue_apt_amount_reward(Queue q, int percentage) {
     return 0;
 }
 
-float queue_get_reward(Queue q){
-    if(queue_is_empty(q)== TRUE){
+float queue_get_reward(Queue q) {
+    if (queue_is_empty(q) == TRUE) {
         ERROR_MESSAGE("CALL GET REWARD ON EMPTY QUEUE");
         return -1;
     }
-    float tot=0;
+    float tot = 0;
     struct node *first = q->first;
 
     for (; first != NULL; first = first->next) {
-        tot+=first->t.reward;
+        tot += first->t.reward;
     }
     return 0;
 }

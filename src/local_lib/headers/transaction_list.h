@@ -1,4 +1,3 @@
-#define _GNU_SOURCE
 #ifndef DGT_SO_PROJECT_21_22_TRANSACTION_LIST_H
 #define DGT_SO_PROJECT_21_22_TRANSACTION_LIST_H
 /*TODO: Implementare transaction -> ogni user_transaction avra una transaction list per quelli processati e quelli da fare*/
@@ -21,7 +20,7 @@ struct Transaction{
 };
 typedef struct transaction_list *Queue;/*Real impl in transaction_list.c*/
 /*Functionality*/
-struct Transaction create_transaction(short int t_type, struct timespec timestamp, pid_t sender, pid_t receiver, );
+int create_transaction(struct Transaction *t,pid_t sender, pid_t receiver, float amount);
 /**
  * Initialize the queue;
  * @return the queue initialized
