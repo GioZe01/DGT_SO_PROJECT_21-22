@@ -59,7 +59,7 @@ Queue queue_create() {
     Queue q = malloc(sizeof(struct transaction_list));
     if (q == NULL) {
         ERROR_MESSAGE("Malloc failed in the creation of quque_t");
-        EXIT_PROCEDURE_USER(EXIT_FAILURE);
+        return NULL;
     }
     q->first = NULL;
     q->last = NULL;
@@ -86,7 +86,7 @@ void queue_append(Queue q, struct Transaction t) {
     if ((new_node = malloc(sizeof(struct node)) == NULL)) {
         DEBUG_ERROR_MESSAGE("MALLOC ON NODE STRUCT IS NULL");
         ERROR_MESSAGE("Malloc failed in queue append");
-        EXIT_PROCEDURE_USER(EXIT_FAILURE);
+        return;
     }
     new_node->t = t;
     new_node->next = NULL;
@@ -140,7 +140,7 @@ Bool queue_is_empty(Queue q) {
 static void queue_underflow(void) {
     DEBUG_ERROR_MESSAGE("queue_underflow has been called");
     ERROR_MESSAGE("Invalid Operation on Queue empty");
-    EXIT_PROCEDURE_USER(EXIT_FAILURE);
+    return;
 }
 
 int queue_apt_amount_reward(Queue q, int percentage) {

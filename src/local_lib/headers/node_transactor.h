@@ -65,4 +65,4 @@ int add_to_block(struct node *self, struct Transaction *t);
  * @return -1 in case of FAILURE. 0 otherwise
  */
 int calc_reward(struct node * self, int percentage, Bool use_default);
-#endif //DGT_SO_PROJECT_21_22_NODE_TRANSACTOR_H
+#endif /*DGT_SO_PROJECT_21_22_NODE_TRANSACTOR_H*/

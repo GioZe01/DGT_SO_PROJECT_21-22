@@ -5,12 +5,10 @@
 #include <signal.h>
 #include <errno.h>
 #include <unistd.h>
-#include <math.h>
 #include <time.h>
 /*  Sys Library */
 #include <sys/sem.h>
 #include <sys/msg.h>
-#include <sys/shm.h>
 /*  Local Library */
 #include "local_lib/headers/simulation_errors.h"
 #include "local_lib/headers/transaction_list.h"
@@ -19,7 +17,8 @@
 #include "local_lib/headers/conf_file.h"
 #include "local_lib/headers/user_msg_report.h"
 #include "local_lib/headers/node_msg_report.h"
-
+#include "local_lib/headers/master_msg_report.h"
+#include "local_lib/headers/boolean.h"
 #define EXIT_PROCEDURE_USER(exit_value) free_mem_user();         \
                                 free_sysVar_user();      \
                                 exit(exit_value)
@@ -47,7 +46,7 @@ int aknowledge_data(struct user_msg msg);
 /*  Helper  */
 Bool check_argument(int arc, char const *argv[]);
 
-Bool set_signal_handler(struct sigaction sa, sigset_t sigmask);
+Bool set_signal_handler_user(struct sigaction sa, sigset_t sigmask);
 
 Bool read_conf(struct conf *simulation_conf);
 
@@ -81,7 +80,7 @@ int main(int arc, char const *argv[]) {
     DEBUG_MESSAGE("USER STATE IS SET TO INIT");
     state = INIT_STATE;
 
-    if (check_argument(arc, argv) && set_signal_handler(sa, sigmask)) {
+    if (check_argument(arc, argv) && set_signal_handler_user(sa, sigmask)) {
         /*  VARIABLE INITIALIZATION */
         read_conf(&configuration);
         user_create(&current_user, configuration.so_buget_init, getpid(), calc_balance, update_cash_flow);
@@ -188,7 +187,7 @@ Bool check_argument(int arc, char const *argv[]) {
  * Set the signal handler and signal mask for the user_proc
  * @return TRUE if success, FALSE otherwise.
  */
-Bool set_signal_handler(struct sigaction sa, sigset_t sigmask) {
+Bool set_signal_handler_user(struct sigaction sa, sigset_t sigmask) {
 
     DEBUG_NOTIFY_ACTIVITY_RUNNING("SETTING SIGNAL MASK...");
     sigemptyset(&sigmask);/*Creating an empty mask*/
@@ -244,6 +243,9 @@ void signals_handler(int signum) {
 
 void free_mem_user() {
     free_user(&current_user);
+    free(users_pids);
+    free(users_queues_ids);
+    free(nodes_queues_ids);
 }
 
 void free_sysVar_user() {

@@ -24,6 +24,7 @@
 #include "local_lib/headers/user_msg_report.h"
 #include "local_lib/headers/master_msg_report.h"
 #include "local_lib/headers/node_msg_report.h"
+#include "local_lib/headers/process_info_list.h"
 
 #ifdef DEBUG
 
@@ -39,7 +40,6 @@
 #define DEBUG_BLOCK_ACTION_END()
 #endif
 
-#include "local_lib/headers/process_info_list.h"
 
 /* Funzioni di supporto al main */
 
@@ -84,7 +84,7 @@ int semaphore_start_id = -1;
 pid_t main_pid;
 
 int main() {
-    /*   semctl(3, 0, IPC_RMID); TODO: Remove*/
+       semctl(0, 0, IPC_RMID); /*TODO: Remove*/
     main_pid = getpid();
     if (read_conf() == TRUE) {
         /*  Local Var Declaration   */
@@ -180,11 +180,13 @@ int main() {
  * @return -1 if fail. 0 otherwise
  */
 int create_users_proc(void) {
-    char *argv_user[] = {PATH_TO_USER, -1, NULL}; /*Future addon*/
+    char *argv_user[] = {PATH_TO_USER, NULL, NULL}; /*Future addon*/
     pid_t user_pid;
     int i, queue_id = DELTA_USER_MSG_TYPE;
     users_pids[0] = 0;
     users_queues_ids[0]=0;
+    nodes_queues_ids[0] = 0;
+    argv_user[1] = malloc(sizeof (int));
     for (i = 0; i < simulation_conf.so_user_num; i++) {
         switch (user_pid = fork()) {
             case -1:
@@ -216,11 +218,12 @@ int create_users_proc(void) {
  * @return -1 if fail. 0 otherwise
  */
 int create_nodes_proc(void) {
-    char *argv_node[] = {PATH_TO_NODE, -1, NULL}; /*Future addon*/
+    char *argv_node[] = {PATH_TO_NODE, NULL, NULL}; /*Future addon*/
     pid_t node_pid;
     int i, queue_id = DELTA_NODE_MSG_TYPE;
     nodes_pids[0] = 0;
     nodes_queues_ids[0] = 0;
+    argv_node[1] = malloc(sizeof (int));
     for (i = 0; i < simulation_conf.so_user_num; i++) {
         switch (node_pid = fork()) {
             case -1:
@@ -228,7 +231,7 @@ int create_nodes_proc(void) {
             case 0: /*kid*/
                 argv_node[1] = queue_id; /*Let the user know is position*/
                 execve(argv_node[0], argv_node, NULL);
-                ERROR_MESSAGE("IMPOSSIBLE TO CREATE A USER");
+                ERROR_MESSAGE("IMPOSSIBLE TO CREATE A NODE");
                 return -1;
             default: /*father*/
                 nodes_queues_ids[i+1] = queue_id;
@@ -240,7 +243,7 @@ int create_nodes_proc(void) {
                 if (argv_node[1] != NULL) free(argv_node[1]);
                 if (argv_node[2] != NULL) free(argv_node[2]);
                 queue_id += DELTA_NODE_MSG_TYPE;
-                DEBUG_MESSAGE("USER CREATED");
+                DEBUG_MESSAGE("NODE CREATED");
                 break;
         }
     }
@@ -475,7 +478,7 @@ void create_users_msg_queue(void) {
 void create_nodes_msg_queue(void){
     DEBUG_NOTIFY_ACTIVITY_RUNNING("CREATING MSG REPORT QUEUE FOR NODES...");
     msg_report_id_nodes = msgget(NODES_QUEUE_KEY, IPC_CREAT | IPC_CREAT | 0600);
-    printf("------------------NODE_QUEUE ID: %d\n", msg_report_id_users);
+    printf("------------------NODE_QUEUE ID: %d\n", msg_report_id_nodes);
     if(msg_report_id_nodes<0){ ERROR_EXIT_SEQUENCE_MAIN("IMPOSSIBLE TO CREATE THE NODES MESSAGE QUEUE");}
     DEBUG_NOTIFY_ACTIVITY_DONE("CREATING MSG REPORT QUEUE FOR NODES DONE");
 }
