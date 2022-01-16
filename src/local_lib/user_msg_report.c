@@ -6,14 +6,11 @@
 #include "headers/simulation_errors.h"
 #include "headers/glob.h"
 #include "headers/boolean.h"
-int user_msg_create(struct user_msg *self, long type, pid_t sender_pid, user_data *data) {
+int user_msg_create(struct user_msg *self, long type, pid_t sender_pid, struct Transaction t) {
     switch (type) {
-        case MSG_CONFIG_TYPE:
-            self->data.conf_data= data->conf_data;
-            break;
         case MSG_TRANSACTION_CONFIRMED_TYPE:
         case MSG_TRANSACTION_FAILED_TYPE:
-            self->data.t = data->t;
+            self->t = t;
             break;
         default:
             ERROR_MESSAGE("WRONG TYPE");
@@ -33,20 +30,20 @@ void user_msg_print(struct user_msg *self) {
             printf("~ USER_MSG | type: TRANSACTION | %s%s status: CONFIRMED %s | sender_pid: %d | amount: %f "
                    "| t_sender: %d | t_receiver : %d ~\n",
                    COLOR_RESET_ANSI_CODE, COLOR_GREEN_ANSI_CODE, COLOR_RESET_ANSI_CODE, self->sender_pid,
-                   self->data.t.amount, self->data.t.sender, self->data.t
+                   self->t.amount, self->t.sender, self->t
                            .reciver);
             break;
         case MSG_TRANSACTION_FAILED_TYPE:
             printf("~ USER_MSG | type: TRANSACTION | %s%s status: CONFIRMED %s | sender_pid: %d | amount: %f "
                    "| t_sender: %d | t_receiver : %d ~\n",
                    COLOR_RESET_ANSI_CODE, COLOR_RED_ANSI_CODE, COLOR_RESET_ANSI_CODE, self->sender_pid,
-                   self->data.t.amount, self->data.t.sender, self->data.t
+                   self->t.amount, self->t.sender, self->t
                            .reciver);
             break;
     }
 }
-int user_msg_snd(int id, struct user_msg *msg, long type, user_data *data, pid_t sender, Bool create){
-    if (create == TRUE){user_msg_create(msg, type, sender, data);}
+int user_msg_snd(int id, struct user_msg *msg, long type, struct Transaction t, pid_t sender, Bool create){
+    if (create == TRUE){user_msg_create(msg, type, sender, t);}
     printf("ID RECEIVED: %d\n", id);
     while(msgsnd(id, msg, sizeof (*msg)-sizeof (long), 0)<0){
         if (errno!=EINTR) return -1;

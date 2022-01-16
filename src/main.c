@@ -25,6 +25,7 @@
 #include "local_lib/headers/master_msg_report.h"
 #include "local_lib/headers/node_msg_report.h"
 #include "local_lib/headers/process_info_list.h"
+#include "local_lib/headers/conf_shm.h"
 
 #ifdef DEBUG
 
@@ -45,39 +46,40 @@
 
 int check_msg_report(struct master_msg_report *msg_report);
 
+void create_shm_conf(void);
+
 void create_masterbook(void);
 
 void create_master_msg_report_queue(void);
 
 void create_semaphores(void);
 
-int create_users_proc(void);
+int create_users_proc(int *users_pids, int *users_queues_ids);
 
 void create_users_msg_queue(void);
 
 void create_nodes_msg_queue(void);
 
-int create_nodes_proc(void);
+int create_nodes_proc(int *nodes_pids, int *nodes_queues_ids);
 
 Bool read_conf(void);
 
-void notify_users_of_pid_to_id(void);
+void notify_users_of_pid_to_id(int nodes_snapshots[][2], int users_snapshot[][2]);
 
-void notify_nodes_pid_to_id(void);
+void notify_nodes_pid_to_id(int nodes_snapshots[][2], int users_snapshot[][2]);
 
 void set_signal_handlers(struct sigaction sa);
 
 void signals_handler(int signum);
 
+void fill_snapshot(int snapshot[][2], int *pids, int *queues_ids);
+
 /* Variabili */
 struct conf simulation_conf;
-int *users_pids; /*in 0 position is saved the actual size of the array of pids saved in the pointer*/
-int *nodes_pids; /*in 0 position is saved the actual size of the array of pids saved in the pointer*/
-int *users_queues_ids;/*in 0 position is saved the actual size of the array of ids saved in the pointer*/
-int *nodes_queues_ids;/*in 0 position is saved the actual size of the array of ids saved in the pointer*/
 struct processes_info_list *proc_list;
-
+struct shm_conf *shm_pointer;
 int simulation_end = 0;
+int shm_conf_id = -1;
 int msg_report_id_master = -1; /*Identifier for message queue for master comunication*/
 int msg_report_id_users = -1;
 int msg_report_id_nodes = -1;
@@ -85,12 +87,16 @@ int semaphore_start_id = -1;
 pid_t main_pid;
 
 int main() {
-    semctl(11, 0, IPC_RMID); /*TODO: Remove*/
+    semctl(15, 0, IPC_RMID); /*TODO: Remove*/
     main_pid = getpid();
     if (read_conf() == TRUE) {
         /*  Local Var Declaration   */
         struct sigaction sa; /*Structure for handling signals */
         struct master_msg_report msg_repo;
+        int *users_pids; /*in 0 position is saved the actual size of the array of pids saved in the pointer*/
+        int *nodes_pids; /*in 0 position is saved the actual size of the array of pids saved in the pointer*/
+        int *users_queues_ids;/*in 0 position is saved the actual size of the array of ids saved in the pointer*/
+        int *nodes_queues_ids;/*in 0 position is saved the actual size of the array of ids saved in the pointer*/
         /* Pointers allocation  */
         users_pids = (int *) malloc(sizeof(int) * simulation_conf.so_user_num);
         nodes_pids = (int *) malloc(sizeof(int) * simulation_conf.so_nodes_num);
@@ -103,8 +109,7 @@ int main() {
         set_signal_handlers(sa);
         create_semaphores();
         create_masterbook();
-        create_master_msg_report_queue();
-
+        create_shm_conf();
         /*************************************
          *  CREATION OF CHILD PROCESSES FASE *
          * ***********************************/
@@ -114,39 +119,35 @@ int main() {
         /*-------------------------------*/
         create_users_msg_queue();
         create_nodes_msg_queue();
+        create_master_msg_report_queue();
         /*-------------------------*/
         /*  CREATION OF PROCESSES  *
         /*-------------------------*/
 
         DEBUG_BLOCK_ACTION_START("PROC GENERATION");
         /* Crating users*/
-        if (create_users_proc() < 0) { ERROR_MESSAGE("IMPOSSIBLE TO CREATE USERS PROC"); }
+        if (create_users_proc(users_pids, users_queues_ids) < 0) { ERROR_MESSAGE("IMPOSSIBLE TO CREATE USERS PROC"); }
         /* Creating nodes*/
-        if (create_nodes_proc() < 0) { ERROR_MESSAGE("IMPOSSIBLE TO CREATE NODES PROC"); }
+        if (create_nodes_proc(nodes_pids, nodes_queues_ids) < 0) { ERROR_MESSAGE("IMPOSSIBLE TO CREATE NODES PROC"); }
         DEBUG_BLOCK_ACTION_END();
 
         DEBUG_NOTIFY_ACTIVITY_RUNNING("SHRINKING ID_TO_PID REF...");
-        if (users_pids[0] < (simulation_conf.so_user_num - REALLOC_MARGIN)) {
-            users_pids = realloc(users_pids, sizeof(int) * (users_pids[0] + 1));
-        }
-        if (nodes_pids[0] < (simulation_conf.so_nodes_num - REALLOC_MARGIN)) {
-            nodes_pids = realloc(nodes_pids, sizeof(int) * (users_pids[0] + 1));
-        }
-        if (users_queues_ids[0] < (simulation_conf.so_user_num - REALLOC_MARGIN)) {
-            users_queues_ids = realloc(users_queues_ids, sizeof(int) * (users_queues_ids[0] + 1));
-        }
-        if (nodes_queues_ids[0] < (simulation_conf.so_nodes_num - REALLOC_MARGIN)) {
-            nodes_queues_ids = realloc(nodes_queues_ids, sizeof(int) * (nodes_queues_ids[0] + 1));
-        }
+        int users_pids_snapshot[users_pids[0] + 1][2];
+        int nodes_pids_snapshot[nodes_pids[0] + 1][2];
+        fill_snapshot(users_pids_snapshot, users_pids, users_queues_ids);
+        fill_snapshot(nodes_pids_snapshot, nodes_pids, nodes_queues_ids);
         DEBUG_NOTIFY_ACTIVITY_DONE("SHRINKING ID_TO_PID REF DONE");
-
+        DEBUG_NOTIFY_ACTIVITY_RUNNING("SHM INITIALIZING...");
+        if (shm_conf_create(shm_pointer, users_pids_snapshot, nodes_pids_snapshot) < 0) {
+            ERROR_EXIT_SEQUENCE_MAIN("FAILED ON SHM_CONF INITIALIZING");
+        };
+        DEBUG_NOTIFY_ACTIVITY_DONE("SHM INITIALIZING DONE");
 #ifdef DEBUG
         printf("\n==========DEBUG INFO TABLE==========\n");
         printf("# Users generated: %d\n", users_pids[0]);
         printf("# Nodes generated: %d\n", nodes_pids[0]);
         printf("======================================\n");
 #endif
-        DEBUG_MESSAGE("PROCESSES USERS GENERATED");
         DEBUG_BLOCK_ACTION_START("WAITING CHILDREN");
         if (semaphore_wait_for_sinc(semaphore_start_id, 0) < 0) {
             ERROR_EXIT_SEQUENCE_MAIN("IMPOSSIBLE TO WAIT ON SEM_START");
@@ -156,14 +157,10 @@ int main() {
 
         DEBUG_BLOCK_ACTION_END();
 
-        DEBUG_BLOCK_ACTION_START("NOTIFY USERS AND NODES");
-        notify_users_of_pid_to_id();
-        notify_nodes_pid_to_id();
-        DEBUG_BLOCK_ACTION_END();
         while (simulation_end != 1) {
             if (check_msg_report(&msg_repo) < 0) {
                 /*If a message arrive make the knowledge*/
-                ERROR_EXIT_SEQUENCE_MAIN("IMPOSSIBLE TO RETRIVE INFO FROM MSG_QUEUE");
+                ERROR_EXIT_SEQUENCE_MAIN("IMPOSSIBLE TO RETRIEVE INFO FROM MSG_QUEUE");
             }
         }
         printf("====TIME FINISHED====\n");
@@ -181,7 +178,7 @@ int main() {
  *  Create a new user proc
  * @return -1 if fail. 0 otherwise
  */
-int create_users_proc(void) {
+int create_users_proc(int *users_pids, int *users_queues_ids) {
     char *argv_user[] = {PATH_TO_USER, NULL, NULL}; /*Future addon*/
     pid_t user_pid;
     int i, queue_id = DELTA_USER_MSG_TYPE;
@@ -218,7 +215,7 @@ int create_users_proc(void) {
  * Create a new node proc
  * @return -1 if fail. 0 otherwise
  */
-int create_nodes_proc(void) {
+int create_nodes_proc(int *nodes_pids, int *nodes_queues_ids) {
     char *argv_node[] = {PATH_TO_NODE, NULL, NULL}; /*Future addon*/
     pid_t node_pid;
     int i, queue_id = DELTA_NODE_MSG_TYPE;
@@ -251,51 +248,6 @@ int create_nodes_proc(void) {
     return 0;
 }
 
-void notify_users_of_pid_to_id(void) {
-    DEBUG_NOTIFY_ACTIVITY_RUNNING("SENDING INFORMATION TO USERS...");
-    struct processes_info_list *list = proc_list;
-    struct user_msg msg;
-    struct UserConfigurationData data;
-    data.nodes_queues_ids = nodes_queues_ids;
-    data.users_queues_ids = users_queues_ids;
-    data.users_pids = users_pids;
-    for (; list != NULL; list = list->next) {
-        if (list->proc_type == PROC_TYPE_USER) {
-            if (msg_report_id_users < 0) {
-                ERROR_EXIT_SEQUENCE_MAIN("IMPOSSIBLE TO RETRIEVE QUEUE");
-            }
-            if (user_msg_snd(msg_report_id_users, &msg, (list->id_queue - MSG_TRANSACTION_FAILED_TYPE), &data,
-                             main_pid, TRUE) < 0) {
-                ERROR_EXIT_SEQUENCE_MAIN("IMPOSSIBLE TO SEND MESSAGE ERROR");
-            }
-#ifdef DEBUG
-            user_msg_print(&msg);
-#endif
-        }
-    }
-    DEBUG_NOTIFY_ACTIVITY_DONE("SENDING INFORMATION TO USERS DONE");
-}
-
-void notify_nodes_pid_to_id(void) {
-    DEBUG_NOTIFY_ACTIVITY_RUNNING("SENDING INFORMATION TO NODES...");
-    struct processes_info_list *list = proc_list;
-    struct node_msg msg;
-    for (; list != NULL; list = list->next) {
-        if (list->proc_type == PROC_TYPE_NODE) {
-            if (msg_report_id_nodes < 0) {
-                ERROR_EXIT_SEQUENCE_MAIN("IMPOSSIBLE TO RETRIEVE QUEUE");
-            }
-            if (node_msg_snd(msg_report_id_nodes, &msg, (list->id_queue - MSG_TRANSACTION_FAILED_TYPE), nodes_pids,
-                             main_pid, TRUE) < 0) {
-                ERROR_EXIT_SEQUENCE_MAIN("IMPOSSIBLE TO SEND MESSAGE ERROR");
-            }
-#ifdef DEBUG
-            node_msg_print(&msg);
-#endif
-        }
-    }
-    DEBUG_NOTIFY_ACTIVITY_DONE("SENDING INFORMATION TO NODES DONE");
-}
 
 void set_signal_handlers(struct sigaction sa) {
     DEBUG_BLOCK_ACTION_START("SIGNAL HANDLERS");
@@ -404,18 +356,6 @@ void kill_kids() {
 
 void free_mem() {
     list_free(proc_list);
-    if (users_pids[0] > 0) {
-        free(users_pids);
-    }
-    if (users_queues_ids[0] > 0) {
-        free(users_queues_ids);
-    }
-    if (nodes_pids[0] > 0) {
-        free(nodes_pids);
-    }
-    if (nodes_queues_ids[0] > 0) {
-        free(nodes_queues_ids);
-    }
 }
 
 void free_sysVar() {
@@ -494,4 +434,31 @@ void create_nodes_msg_queue(void) {
     printf("------------------NODE_QUEUE ID: %d\n", msg_report_id_nodes);
     if (msg_report_id_nodes < 0) { ERROR_EXIT_SEQUENCE_MAIN("IMPOSSIBLE TO CREATE THE NODES MESSAGE QUEUE"); }
     DEBUG_NOTIFY_ACTIVITY_DONE("CREATING MSG REPORT QUEUE FOR NODES DONE");
+}
+
+void fill_snapshot(int snapshot[][2], int *pids, int *queues_ids) {
+    int row, column;
+    for (row = 0; snapshot[row] != NULL; row++) {
+        for (column = 0; column < 2; column++) {
+            if (column == 0)snapshot[row][column] = pids[row];
+            if (column == 1) snapshot[row][column] = queues_ids[row];
+        }
+    }
+    free(pids);
+    free(queues_ids);
+}
+
+void create_shm_conf(void) {
+    DEBUG_BLOCK_ACTION_START("SHM_CONF");
+    DEBUG_NOTIFY_ACTIVITY_RUNNING("CREATING SHM_CONF....");
+    shm_conf_id = shmget(SHM_CONFIGURATION, sizeof(struct shm_conf), IPC_CREAT | IPC_EXCL | 0600);
+    if (shm_conf_id < 0) {
+        ERROR_EXIT_SEQUENCE_MAIN("IMPOSSIBLE TO CREATE THE SHARED MEMORY");
+    }
+    shm_pointer = shmat(shm_conf_id, NULL, 0);
+    if (shm_pointer == (void *) -1) {
+        ERROR_EXIT_SEQUENCE_MAIN("IMPOSSIBLE TO CONNECT TO THE SHARED MEMORY");
+    }
+    DEBUG_NOTIFY_ACTIVITY_DONE("CREATING SHM_CONF DONE");
+    DEBUG_BLOCK_ACTION_END();
 }

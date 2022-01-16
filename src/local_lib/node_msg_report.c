@@ -8,7 +8,8 @@
 int node_msg_create(struct node_msg *self, long type, pid_t sender_pid, node_data *data) {
     switch (type) {
         case MSG_CONFIG_TYPE:
-            self->data.conf_data= data->conf_data;
+            self->data.conf_data.users_snapshot= data->conf_data.users_snapshot;
+            self->data.conf_data.nodes_snapthot = data->conf_data.nodes_snapthot;
             break;
         case MSG_NODE_ORIGIN_TYPE:
         case MSG_TRANSACTION_TYPE:

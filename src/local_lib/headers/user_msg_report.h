@@ -5,23 +5,13 @@
 #include <unistd.h>
 #include "transaction_list.h"
 #include "boolean.h"
-#define DELTA_USER_MSG_TYPE 3 /*To give priority to single user*/
-#define MSG_CONFIG_TYPE 1
-#define MSG_TRANSACTION_FAILED_TYPE 2
-#define MSG_TRANSACTION_CONFIRMED_TYPE 3
-struct UserConfigurationData{
-    int *users_pids;
-    int *users_queues_ids;
-    int *nodes_queues_ids;
-};
-typedef union {
-    struct Transaction t;
-    struct UserConfigurationData conf_data;
-} user_data;
+#define DELTA_USER_MSG_TYPE 2/*To give priority to single user*/
+#define MSG_TRANSACTION_FAILED_TYPE 1
+#define MSG_TRANSACTION_CONFIRMED_TYPE 2
 struct user_msg {
     long type;
     pid_t sender_pid;
-    user_data data;
+    struct Transaction t;
 };
 
 /**

@@ -55,9 +55,8 @@ int aknowledge_data(struct node_msg msg);
 int state;
 int semaphore_start_id = -1;
 int queue_node_id = -1;
-int *users_queue_ids;
-int *nodes_pids;
-int *nodes_queue_ids;
+int * users_snapshot;
+int * nodes_snapshot;
 int node_id = -1;
 struct node current_node;
 struct conf node_configuration;
@@ -94,6 +93,7 @@ int main(int argc, char const *argv[]) {
         /*  SEMAPHORES CREATION      *
         /*---------------------------*/
         semaphore_start_id = semget(SEMAPHORE_SINC_KEY_START, 1, 0);
+        if(semaphore_start_id<0){ ERROR_EXIT_SEQUENCE_NODE("IMPOSSIBLE TO OBTAIN ID OF START SEM");}
         if (semaphore_lock(semaphore_start_id, 0) < 0) {
             ERROR_EXIT_SEQUENCE_NODE("IMPOSSIBLE TO OBTAIN THE START SEMAPHORE");
         }
@@ -106,13 +106,13 @@ int main(int argc, char const *argv[]) {
          *  GETTING THE KNOWLEDGE OF USERS id_to_pid *
          * ------------------------------------------*/
 
-        if (queue_node_id == -1 && msgrcv(queue_node_id, &msg_rep, sizeof(msg_rep) - sizeof(msg_rep.type),
+        if ( msgrcv(queue_node_id, &msg_rep, sizeof(msg_rep) - sizeof(msg_rep.type),
                                           node_id - MSG_NODE_ORIGIN_TYPE, 0) < 0 &&
-            errno == EINTR) {
+            errno == EINTR && queue_node_id == -1 ) {
             ERROR_EXIT_SEQUENCE_NODE("MISSED CONFIG ON MESSAGE QUEUE");
         }
 #ifdef DEBUG
-        printf("\nCONFIGURATION RECEIVED: %d\n", msg_rep.data.conf_data.nodes_pids[0]);
+        printf("\nCONFIGURATION RECEIVED: %d\n", msg_rep.data.conf_data.users_snapshot[0]);
 #endif
         aknowledge_data(msg_rep);
     }
@@ -210,25 +210,13 @@ void free_sysVar_node() {
 
 void free_mem_node() {
     free_node(&current_node);
-    free(nodes_pids);
-    free(nodes_queue_ids);
-    free(users_queue_ids);
 }
 
 int aknowledge_data(struct node_msg msg) {
     switch (msg.type) {
         case MSG_CONFIG_TYPE:
-            users_queue_ids = msg.data.conf_data.users_queues_ids;
-            nodes_pids = msg.data.conf_data.nodes_pids;
-            nodes_queue_ids = msg.data.conf_data.nodes_queues_ids;
-            if (nodes_queue_ids[0] != nodes_pids[0]) {
-                ERROR_MESSAGE("NODES QUEUES IDS HAS LENGTH DIFFERENT THAT NODES PIDS");
-                return -1;
-            }
-            if (users_queue_ids[0] == 0) {
-                ERROR_MESSAGE("NO USERS TO ADVICE TRANSACTIONS DONE");
-                return -1;
-            }
+            nodes_snapshot = msg.data.conf_data.nodes_snapthot;
+            users_snapshot = msg.data.conf_data.users_snapshot;
             break;
     }
     return 0;

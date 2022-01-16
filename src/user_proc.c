@@ -61,9 +61,8 @@ int state;
 int semaphore_start_id = -1;
 int queue_report_id = -1; /* -1 is the value if it is not initialized */
 int my_id = -1;
-int *users_pids;
-int *users_queues_ids;
-int *nodes_queues_ids;
+int users_snapshot [][2];
+int nodes_snapshot [][2];
 struct user_transaction current_user;
 struct conf configuration;
 
@@ -92,7 +91,6 @@ int main(int arc, char const *argv[]) {
         /*--------------------------------------*/
         /*TODO: Aggiungerla come optional alla compilazione*/
         queue_report_id = msgget(USERS_QUEUE_KEY, 0600);
-        printf("----------------USER_QUEUE ID: %d\n", queue_report_id);
         if (queue_report_id < 0) { ERROR_EXIT_SEQUENCE_USER("IMPOSSIBLE TO CREATE THE MESSAGE QUEUE"); }
 
         /*-------------------------*/
@@ -117,7 +115,7 @@ int main(int arc, char const *argv[]) {
         }
         start_sem_value = semctl(semaphore_start_id, 0, GETVAL);
         if (start_sem_value < 0) { ERROR_EXIT_SEQUENCE_USER("IMPOSSIBLE TO OBTAIN INFO FROM START SEM."); }
-        if (start_sem_value != 0 && semaphore_lock(semaphore_start_id, 0) < 0) {
+        if (start_sem_value != 0 && (semaphore_lock(semaphore_start_id, 0) < 0)) {
             ERROR_EXIT_SEQUENCE_USER("IMPOSSIBLE TO OBTAIN THE START SEMAPHORE");
         }
         DEBUG_MESSAGE("USER READY, WAITING FOR SEMAPHORE TO FREE");
@@ -129,14 +127,17 @@ int main(int arc, char const *argv[]) {
         /*-------------------------------------------*
          *  GETTING THE KNOWLEDGE OF USERS id_to_pid *
          * ------------------------------------------*/
-
-        if (queue_report_id == -1 && msgrcv(queue_report_id, &msg_rep, sizeof(msg_rep) - sizeof(msg_rep.type),
-                                            my_id - MSG_TRANSACTION_FAILED_TYPE, 0) < 0 &&
-            errno == EINTR) {
-            ERROR_EXIT_SEQUENCE_USER("MISSED CONFIG ON MESSAGE QUEUE");
+        printf("USER_ID_IN_QUEUE: %d\n", my_id);
+        if ((msgrcv(queue_report_id, &msg_rep, sizeof(msg_rep) - sizeof(long),
+                    (my_id - MSG_TRANSACTION_FAILED_TYPE), 0) < 0)) {
+            printf("%s\n", strerror(errno));
+            if (errno == EINTR && queue_report_id == -1) {
+                ERROR_EXIT_SEQUENCE_USER("MISSED CONFIG ON MESSAGE QUEUE");
+            }
         }
+
 #ifdef DEBUG
-        printf("\nCONFIGURATION RECEIVED: %d\n", msg_rep.data.conf_data.users_pids[0]);
+        printf("\nCONFIGURATION RECEIVED: %d\n", msg_rep.data.conf_data.users_snapshot[0]);
 #endif
         aknowledge_data(msg_rep);
 
@@ -250,9 +251,6 @@ void signals_handler(int signum) {
 
 void free_mem_user() {
     free_user(&current_user);
-    free(users_pids);
-    free(users_queues_ids);
-    free(nodes_queues_ids);
 }
 
 void free_sysVar_user() {
@@ -299,24 +297,15 @@ Bool read_conf(struct conf *simulation_conf) {
 int aknowledge_data(struct user_msg msg) {
     switch (msg.type) {
         case MSG_CONFIG_TYPE:
-            users_pids = msg.data.conf_data.users_pids;
-            users_queues_ids = msg.data.conf_data.users_queues_ids;
-            nodes_queues_ids = msg.data.conf_data.nodes_queues_ids;
-            if (users_pids[0] != users_queues_ids[0]) return -1;
-            if (nodes_queues_ids[0] == 0) {
-                ERROR_EXIT_SEQUENCE_USER("NO NODES TO SEND TRANSACTION");
-            }
-            if (users_pids[0] != users_queues_ids[0]) return -1;
-            if (nodes_queues_ids[0] == 0) {
-                ERROR_EXIT_SEQUENCE_USER("NO NODES TO SEND TRANSACTION");
-            }
+            users_snapshot = msg.data.conf_data.users_snapshot;
+            nodes_snapshot = msg.data.conf_data.nodes_snapthot;
             break;
     }
     return 0;
 }
 
 int send_to_node(void) {
-    int node_num = (rand() % (nodes_queues_ids[0])) + 1;
+    int node_num = (rand() % (nodes_snapshot[0])) + 1;
     struct node_msg msg;
     struct Transaction t = queue_last(current_user.in_process);
     if (node_msg_snd(NODES_QUEUE_KEY, &msg, nodes_queues_ids[node_num], &t,

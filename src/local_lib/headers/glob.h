@@ -8,6 +8,9 @@
 /*  EXCVE PATH   */
 #define PATH_TO_USER "build/bin/user"
 #define PATH_TO_NODE "build/bin/node"
+/*  NUM LIMIT OF PROCS */
+#define USERS_MAX 1000 /*Max users that can be saved in shm*/
+#define NODES_MAX 100    /*Max nodes that can be saved in shm*/
 /*  SINCRONIZATION KEY  */
 #define SEMAPHORE_SINC_KEY_START 0x76
 /*  QUEUE ID    */
@@ -15,6 +18,7 @@
 #define USERS_QUEUE_KEY 0x78
 #define NODES_QUEUE_KEY 0x79
 /*  SHARED MEM. */
+#define SHM_CONFIGURATION 0x74
 #define MASTER_BOOK_SHM_KEY 0x75
 /*  COLOR DEFINITION    */
 #define COLOR_RED_ANSI_CODE "\x1b[31m"
