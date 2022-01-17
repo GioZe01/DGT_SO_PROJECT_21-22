@@ -77,11 +77,10 @@ int update_cash_flow(struct user_transaction *self, struct Transaction *t);
  * Generate a new transaction for the self user and add it to in_progress queue of the transaction
  * @param self pointer to the transaction to be generated
  * @param user_proc_pid  pid of the user generating the transaction
- * @param nodes_num pointer to a list of nodes available
- * @param users_num pointer to a list of users available
+ * @param users_num pointer to a vector of users available
  * @return -1 in case o failure. 0 otherwise.
  */
-int generate_transaction(struct user_transaction *self, pid_t user_proc_pid, int *nodes_num, int *users_num);
+int generate_transaction(struct user_transaction *self, pid_t user_proc_pid, int users_num[][2]);
 
 
 /*

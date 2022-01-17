@@ -5,6 +5,7 @@
 #include <unistd.h>
 #include "transaction_list.h"
 #include "boolean.h"
+
 #define DELTA_USER_MSG_TYPE 2/*To give priority to single user*/
 #define MSG_TRANSACTION_FAILED_TYPE 1
 #define MSG_TRANSACTION_CONFIRMED_TYPE 2
@@ -23,13 +24,14 @@ struct user_msg {
  * @param data user_data to send
  * @return 0 if success. -1 in case of failure
  */
-int user_msg_create(struct user_msg *self, long type, pid_t sender_pid, user_data *data);
+int user_msg_create(struct user_msg *self, long type, pid_t sender_pid, struct Transaction *t);
 
 /**
  * Print the msg based on his type
  * @param self the message to be printed
  */
 void user_msg_print(struct user_msg *self);
+
 /**
 * (Create if selected) and Send the message on ipc user_queue with the key as specified
  * @param id of the message queue
@@ -39,7 +41,8 @@ void user_msg_print(struct user_msg *self);
  * @param crete TRUE if u want to create it before sending.
  * @return -1 in case of failure, -1 otherwise
  */
-int user_msg_snd(int id, struct user_msg *msg, long type, user_data *data, pid_t sender, Bool crete);
+int user_msg_snd(int id, struct user_msg *msg, long type, struct Transaction *t, pid_t sender, Bool crete);
+
 /**
  * Retrieve the message_user_report on the specified message queue
  * @warning send is repeated until it succeed or errno != EINTR
@@ -49,6 +52,6 @@ int user_msg_snd(int id, struct user_msg *msg, long type, user_data *data, pid_t
  * @param type of message expected
  * @return -2 if no message on queue, -1 in case of failure. 0 otherwise.
  */
-int user_msg_receive(int id, struct user_msg * msg, long type);
+int user_msg_receive(int id, struct user_msg *msg, long type);
 
 #endif /*DGT_SO_PROJECT_21_22_USER_MSG_REPORT_H*/

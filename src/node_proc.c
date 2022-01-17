@@ -23,7 +23,7 @@
 #include "local_lib/headers/semaphore.h"
 #include "local_lib/headers/node_transactor.h"
 #include "local_lib/headers/node_msg_report.h"
-
+#include "local_lib/headers/conf_shm.h"
 #ifdef DEBUG
 
 #include "local_lib/headers/debug_utility.h"
@@ -49,18 +49,18 @@ Bool set_signal_handler_node(struct sigaction sa, sigset_t sigmask);
 
 Bool check_arguments(int argc, char const *argv);
 
-int aknowledge_data(struct node_msg msg);
+void attach_to_shm_conf(void);
 
 /* SysVar */
 int state;
 int semaphore_start_id = -1;
 int queue_node_id = -1;
-int * users_snapshot;
-int * nodes_snapshot;
+int *users_snapshot;
+int *nodes_snapshot;
 int node_id = -1;
 struct node current_node;
 struct conf node_configuration;
-
+struct shm_conf * shm_conf_pointer_node;
 /*struct node node;*/
 int main(int argc, char const *argv[]) {
     DEBUG_MESSAGE("NODE PROCESS STARTED");
@@ -85,6 +85,10 @@ int main(int argc, char const *argv[]) {
         printf("----------------NODE QUEUE ID: %d\n", queue_node_id);
         if (queue_node_id < 0) { ERROR_EXIT_SEQUENCE_NODE("IMPOSSIBLE TO CREATE THE MESSAGE QUEUE"); }
 
+        /*-------------------------*/
+        /*  SHARED MEM  CONFIG     *
+        /*-------------------------*/
+        attach_to_shm_conf();
         /************************************
          *      SINC AND WAITING FASE       *
          * **********************************/
@@ -93,7 +97,7 @@ int main(int argc, char const *argv[]) {
         /*  SEMAPHORES CREATION      *
         /*---------------------------*/
         semaphore_start_id = semget(SEMAPHORE_SINC_KEY_START, 1, 0);
-        if(semaphore_start_id<0){ ERROR_EXIT_SEQUENCE_NODE("IMPOSSIBLE TO OBTAIN ID OF START SEM");}
+        if (semaphore_start_id < 0) { ERROR_EXIT_SEQUENCE_NODE("IMPOSSIBLE TO OBTAIN ID OF START SEM"); }
         if (semaphore_lock(semaphore_start_id, 0) < 0) {
             ERROR_EXIT_SEQUENCE_NODE("IMPOSSIBLE TO OBTAIN THE START SEMAPHORE");
         }
@@ -106,15 +110,9 @@ int main(int argc, char const *argv[]) {
          *  GETTING THE KNOWLEDGE OF USERS id_to_pid *
          * ------------------------------------------*/
 
-        if ( msgrcv(queue_node_id, &msg_rep, sizeof(msg_rep) - sizeof(msg_rep.type),
-                                          node_id - MSG_NODE_ORIGIN_TYPE, 0) < 0 &&
-            errno == EINTR && queue_node_id == -1 ) {
-            ERROR_EXIT_SEQUENCE_NODE("MISSED CONFIG ON MESSAGE QUEUE");
-        }
 #ifdef DEBUG
-        printf("\nCONFIGURATION RECEIVED: %d\n", msg_rep.data.conf_data.users_snapshot[0]);
+        /*TODO: Leggere da shm*/
 #endif
-        aknowledge_data(msg_rep);
     }
     EXIT_PROCEDURE_NODE(0);
 }
@@ -212,12 +210,12 @@ void free_mem_node() {
     free_node(&current_node);
 }
 
-int aknowledge_data(struct node_msg msg) {
-    switch (msg.type) {
-        case MSG_CONFIG_TYPE:
-            nodes_snapshot = msg.data.conf_data.nodes_snapthot;
-            users_snapshot = msg.data.conf_data.users_snapshot;
-            break;
-    }
-    return 0;
+void attach_to_shm_conf(void) {
+    DEBUG_NOTIFY_ACTIVITY_RUNNING("ATTACHING TO SHM...");
+    int shm_conf_id = -1;/* id to the shm_conf*/
+    shm_conf_id = shmget(SHM_CONFIGURATION, sizeof(struct shm_conf), 0600);
+    if (shm_conf_id < 0) { ERROR_EXIT_SEQUENCE_NODE("IMPOSSIBLE TO ACCESS SHM CONF"); }
+    shm_conf_pointer_node = shmat(shm_conf_id, NULL, 0);
+    if (shm_conf_pointer_node == (void *) -1) { ERROR_EXIT_SEQUENCE_NODE("IMPOSSIBLE TO CONNECT TO SHM CONF"); }
+    DEBUG_NOTIFY_ACTIVITY_DONE("ATTACHING TO SHM DONE");
 }

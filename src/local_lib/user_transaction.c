@@ -26,7 +26,7 @@ pid_t extract_node(int nodes_num);
  * @param users_num the pointer to the vector of users_pids
  * @return the pid_t of the user selected randomly
  */
-pid_t extract_user(int *users_num);
+pid_t extract_user(int users_num[][2]);
 
 float gen_amount(struct user_transaction *user);
 
@@ -75,7 +75,7 @@ int update_cash_flow(struct user_transaction *self, struct Transaction *t) {
     return -1;
 }
 
-int generate_transaction(struct user_transaction *self, pid_t user_proc_pid, int *nodes_num, int *users_num) {
+int generate_transaction(struct user_transaction *self, pid_t user_proc_pid, int users_num[][2]) {
     struct Transaction t;
     if (check_balance(self) == TRUE) {
         create_transaction(&t,user_proc_pid, extract_user(users_num), gen_amount(self));
@@ -87,13 +87,13 @@ int generate_transaction(struct user_transaction *self, pid_t user_proc_pid, int
     return -1;
 }
 
-pid_t extract_user(int *users_num) {
-    int max = users_num[0];
+pid_t extract_user(int users_num [][2]) {
+    int max = users_num[0][0];
     int e = (rand() % (max)) + 1;
-    while (users_num[e] != NULL && users_num[e] <= 0) {
+    while (users_num[e+1][0] == NULL) {
         e = (rand() % (max)) + 1;
     }
-    return users_num[e];
+    return users_num[e][0];
 }
 
 pid_t extract_node(int nodes_num) {

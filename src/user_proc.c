@@ -9,6 +9,7 @@
 /*  Sys Library */
 #include <sys/sem.h>
 #include <sys/msg.h>
+#include <sys/shm.h>
 /*  Local Library */
 #include "local_lib/headers/simulation_errors.h"
 #include "local_lib/headers/transaction_list.h"
@@ -19,6 +20,7 @@
 #include "local_lib/headers/node_msg_report.h"
 #include "local_lib/headers/master_msg_report.h"
 #include "local_lib/headers/boolean.h"
+#include "local_lib/headers/conf_shm.h"
 
 #define EXIT_PROCEDURE_USER(exit_value) free_mem_user();         \
                                 free_sysVar_user();      \
@@ -42,8 +44,6 @@
 /*  Function def. */
 void signals_handler(int signum);
 
-int aknowledge_data(struct user_msg msg);
-
 /*  Helper  */
 Bool check_argument(int arc, char const *argv[]);
 
@@ -53,7 +53,7 @@ Bool read_conf(struct conf *simulation_conf);
 
 int send_to_node(void);
 
-void configure_shm();
+void attach_to_shm_conf(void);
 
 /*  SysV  */
 
@@ -61,10 +61,11 @@ int state;
 int semaphore_start_id = -1;
 int queue_report_id = -1; /* -1 is the value if it is not initialized */
 int my_id = -1;
-int users_snapshot [][2];
-int nodes_snapshot [][2];
+int users_snapshot[][2];
+int nodes_snapshot[][2];
 struct user_transaction current_user;
 struct conf configuration;
+struct shm_conf *shm_conf_pointer;
 
 int main(int arc, char const *argv[]) {
     DEBUG_MESSAGE("USER PROCESS STARTED");
@@ -96,7 +97,8 @@ int main(int arc, char const *argv[]) {
         /*-------------------------*/
         /*  SHARED MEM  CONFIG     *
         /*-------------------------*/
-        /*configure_shm(); TODO: convert*/
+        attach_to_shm_conf();
+
         /************************************
          *      SINC AND WAITING FASE       *
          * **********************************/
@@ -127,26 +129,18 @@ int main(int arc, char const *argv[]) {
         /*-------------------------------------------*
          *  GETTING THE KNOWLEDGE OF USERS id_to_pid *
          * ------------------------------------------*/
-        printf("USER_ID_IN_QUEUE: %d\n", my_id);
-        if ((msgrcv(queue_report_id, &msg_rep, sizeof(msg_rep) - sizeof(long),
-                    (my_id - MSG_TRANSACTION_FAILED_TYPE), 0) < 0)) {
-            printf("%s\n", strerror(errno));
-            if (errno == EINTR && queue_report_id == -1) {
-                ERROR_EXIT_SEQUENCE_USER("MISSED CONFIG ON MESSAGE QUEUE");
-            }
-        }
 
 #ifdef DEBUG
-        printf("\nCONFIGURATION RECEIVED: %d\n", msg_rep.data.conf_data.users_snapshot[0]);
+        DEBUG_BLOCK_ACTION_START("USER CONF ATTACHED");
+        shm_conf_print(shm_conf_pointer);
+        DEBUG_BLOCK_ACTION_END();
 #endif
-        aknowledge_data(msg_rep);
-
         /****************************************
          *      GENERATION OF TRANSACTION FASE *
          * **************************************/
-        raise(SIGALRM);
         while (current_user.u_balance > 2) {
-            if (generate_transaction(&current_user, current_user.pid, NULL, users_pids) < 0) {
+            DEBUG_MESSAGE("TRANSACTION ALLOWED");
+            if (generate_transaction(&current_user, current_user.pid, users_snapshot) < 0) {
                 ERROR_EXIT_SEQUENCE_USER("IMPOSSIBLE TO GENERATE TRANSACTION");
             }
             gen_sleep.tv_nsec =
@@ -213,24 +207,6 @@ Bool set_signal_handler_user(struct sigaction sa, sigset_t sigmask) {
     return TRUE;
 }
 
-/* TODO: Convert or remove
-void configure_shm() {
-    int shm_user_id = -1;
-    DEBUG_NOTIFY_ACTIVITY_RUNNING("RETRIEVING SHM ID...");
-    shm_user_id = shmget(SHM_USERS_PROC_KEY, sizeof(struct user_snapshot), 0);
-    if (shm_user_id < 0) {
-        ERROR_EXIT_SEQUENCE_USER("IMPOSSIBLE TO GET THE USER PROC SHARED MEMORY ");
-    }
-    DEBUG_NOTIFY_ACTIVITY_DONE("RETRIEVING SHM ID DONE");
-
-    DEBUG_NOTIFY_ACTIVITY_RUNNING("ATTACHING TO THE SHM...");
-    users = (struct user_snapshot *) shmat(shm_user_id, NULL, 0);
-    if (users == (void *) -1) {
-        ERROR_EXIT_SEQUENCE_USER("IMPOSSIBLE TO CONNECT TO THE SHARED MEMORY ");
-    }
-    DEBUG_NOTIFY_ACTIVITY_DONE("ATTACHING TO THE SHM DONE");
-}
-*/
 void signals_handler(int signum) {
     DEBUG_SIGNAL("SIGNAL RECEIVED", signum);
     switch (signum) {
@@ -239,7 +215,7 @@ void signals_handler(int signum) {
             EXIT_PROCEDURE_USER(0);
         case SIGALRM: /*    Generate a new transaction  */
             DEBUG_NOTIFY_ACTIVITY_RUNNING("GENERATING A NEW TRANSACTION FROM SIG...");
-            if (generate_transaction(&current_user, current_user.pid, NULL, users_pids) < 0) {
+            if (generate_transaction(&current_user, current_user.pid, users_snapshot) < 0) {
                 ERROR_EXIT_SEQUENCE_USER("IMPOSSIBLE TO GENERATE TRANSACTION");
             }
             DEBUG_NOTIFY_ACTIVITY_DONE("GENERATING A NEW TRANSACTION FROM SIG DONE");
@@ -294,25 +270,25 @@ Bool read_conf(struct conf *simulation_conf) {
     return TRUE;
 }
 
-int aknowledge_data(struct user_msg msg) {
-    switch (msg.type) {
-        case MSG_CONFIG_TYPE:
-            users_snapshot = msg.data.conf_data.users_snapshot;
-            nodes_snapshot = msg.data.conf_data.nodes_snapthot;
-            break;
-    }
-    return 0;
-}
-
 int send_to_node(void) {
-    int node_num = (rand() % (nodes_snapshot[0])) + 1;
+    int node_num = (rand() % (nodes_snapshot[0][0])) + 1;
     struct node_msg msg;
     struct Transaction t = queue_last(current_user.in_process);
-    if (node_msg_snd(NODES_QUEUE_KEY, &msg, nodes_queues_ids[node_num], &t,
+    if (node_msg_snd(NODES_QUEUE_KEY, &msg, nodes_snapshot[node_num][2], &t,
                      current_user.pid, TRUE) < 0) { return -1; }
 #ifdef DEBUG
     node_msg_print(&msg);
 #endif
     return 0;
 
+}
+
+void attach_to_shm_conf(void) {
+    DEBUG_NOTIFY_ACTIVITY_RUNNING("ATTACHING TO SHM...");
+    int shm_conf_id = -1;/* id to the shm_conf*/
+    shm_conf_id = shmget(SHM_CONFIGURATION, sizeof(struct shm_conf), 0600);
+    if (shm_conf_id < 0) { ERROR_EXIT_SEQUENCE_USER("IMPOSSIBLE TO ACCESS SHM CONF"); }
+    shm_conf_pointer = shmat(shm_conf_id, NULL, 0);
+    if (shm_conf_pointer == (void *) -1) { ERROR_EXIT_SEQUENCE_USER("IMPOSSIBLE TO CONNECT TO SHM CONF"); }
+    DEBUG_NOTIFY_ACTIVITY_DONE("ATTACHING TO SHM DONE");
 }

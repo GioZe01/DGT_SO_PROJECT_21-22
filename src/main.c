@@ -64,15 +64,10 @@ int create_nodes_proc(int *nodes_pids, int *nodes_queues_ids);
 
 Bool read_conf(void);
 
-void notify_users_of_pid_to_id(int nodes_snapshots[][2], int users_snapshot[][2]);
-
-void notify_nodes_pid_to_id(int nodes_snapshots[][2], int users_snapshot[][2]);
-
 void set_signal_handlers(struct sigaction sa);
 
 void signals_handler(int signum);
 
-void fill_snapshot(int snapshot[][2], int *pids, int *queues_ids);
 
 /* Variabili */
 struct conf simulation_conf;
@@ -87,7 +82,7 @@ int semaphore_start_id = -1;
 pid_t main_pid;
 
 int main() {
-    semctl(15, 0, IPC_RMID); /*TODO: Remove*/
+    semctl(8, 0, IPC_RMID); /*TODO: Remove*/
     main_pid = getpid();
     if (read_conf() == TRUE) {
         /*  Local Var Declaration   */
@@ -131,28 +126,19 @@ int main() {
         if (create_nodes_proc(nodes_pids, nodes_queues_ids) < 0) { ERROR_MESSAGE("IMPOSSIBLE TO CREATE NODES PROC"); }
         DEBUG_BLOCK_ACTION_END();
 
-        DEBUG_NOTIFY_ACTIVITY_RUNNING("SHRINKING ID_TO_PID REF...");
-        int users_pids_snapshot[users_pids[0] + 1][2];
-        int nodes_pids_snapshot[nodes_pids[0] + 1][2];
-        fill_snapshot(users_pids_snapshot, users_pids, users_queues_ids);
-        fill_snapshot(nodes_pids_snapshot, nodes_pids, nodes_queues_ids);
-        DEBUG_NOTIFY_ACTIVITY_DONE("SHRINKING ID_TO_PID REF DONE");
         DEBUG_NOTIFY_ACTIVITY_RUNNING("SHM INITIALIZING...");
-        if (shm_conf_create(shm_pointer, users_pids_snapshot, nodes_pids_snapshot) < 0) {
+        if (shm_conf_create(shm_pointer, users_pids, users_queues_ids, nodes_pids, nodes_queues_ids) < 0) {
             ERROR_EXIT_SEQUENCE_MAIN("FAILED ON SHM_CONF INITIALIZING");
         };
         DEBUG_NOTIFY_ACTIVITY_DONE("SHM INITIALIZING DONE");
+
 #ifdef DEBUG
-        printf("\n==========DEBUG INFO TABLE==========\n");
-        printf("# Users generated: %d\n", users_pids[0]);
-        printf("# Nodes generated: %d\n", nodes_pids[0]);
-        printf("======================================\n");
+        shm_conf_print(shm_pointer);
 #endif
         DEBUG_BLOCK_ACTION_START("WAITING CHILDREN");
         if (semaphore_wait_for_sinc(semaphore_start_id, 0) < 0) {
             ERROR_EXIT_SEQUENCE_MAIN("IMPOSSIBLE TO WAIT ON SEM_START");
         }
-
         DEBUG_MESSAGE("WAITING DONE");
 
         DEBUG_BLOCK_ACTION_END();
@@ -363,7 +349,11 @@ void free_sysVar() {
     if (semaphore_start_id >= 0 && semctl(semaphore_start_id, 0, IPC_RMID) < 0)
         ERROR_MESSAGE("REMOVING PROCEDURE FOR START_SEM HAS FAILED");
     DEBUG_NOTIFY_ACTIVITY_DONE("REMOVING STARTING SEMAPHORE DONE");
-
+    DEBUG_NOTIFY_ACTIVITY_RUNNING("REMOVING SHM CONF...");
+    if (shm_conf_id >= 0 && shmctl(shm_conf_id, IPC_RMID, NULL) < 0) {
+        ERROR_MESSAGE("REMOVING PROCEDURE FOR SHM_CONF FAILED");
+    }
+    DEBUG_NOTIFY_ACTIVITY_DONE("REMOVING SHM CONF DONE");
 }
 
 /**
@@ -434,18 +424,6 @@ void create_nodes_msg_queue(void) {
     printf("------------------NODE_QUEUE ID: %d\n", msg_report_id_nodes);
     if (msg_report_id_nodes < 0) { ERROR_EXIT_SEQUENCE_MAIN("IMPOSSIBLE TO CREATE THE NODES MESSAGE QUEUE"); }
     DEBUG_NOTIFY_ACTIVITY_DONE("CREATING MSG REPORT QUEUE FOR NODES DONE");
-}
-
-void fill_snapshot(int snapshot[][2], int *pids, int *queues_ids) {
-    int row, column;
-    for (row = 0; snapshot[row] != NULL; row++) {
-        for (column = 0; column < 2; column++) {
-            if (column == 0)snapshot[row][column] = pids[row];
-            if (column == 1) snapshot[row][column] = queues_ids[row];
-        }
-    }
-    free(pids);
-    free(queues_ids);
 }
 
 void create_shm_conf(void) {
