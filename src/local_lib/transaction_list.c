@@ -1,3 +1,4 @@
+/* Sys import*/
 #include <stdio.h>
 #include <stdlib.h>
 #include <errno.h>
@@ -24,6 +25,8 @@
 
 static void queue_underflow(void);
 
+char *get_status(int t_type);
+
 static void empty_queue(Queue q);
 
 struct node {
@@ -40,7 +43,7 @@ struct transaction_list {
 int create_transaction(struct Transaction *t, pid_t sender, pid_t receiver, float amount) {
 
     struct timespec timestamp;
-
+    DEBUG_NOTIFY_ACTIVITY_RUNNING("CREATING A TRANSACTION...");
     if (clock_gettime(CLOCK_REALTIME, &timestamp) < 0) {
         ERROR_MESSAGE("IMPOSSIBLE TO RETRIEVE CLOCK_TIME");
         return -1;
@@ -52,6 +55,7 @@ int create_transaction(struct Transaction *t, pid_t sender, pid_t receiver, floa
     t->timestamp = timestamp;
     t->amount = amount;
     t->reward = 0; /* Is not responsible*/
+    DEBUG_NOTIFY_ACTIVITY_DONE("CREATING A TRANSACTION DONE");
     return 0;
 }
 
@@ -175,3 +179,39 @@ float queue_get_reward(Queue q) {
     return 0;
 }
 
+void queue_print(Queue q) {
+    if (queue_is_empty(q) == TRUE) {
+        ERROR_MESSAGE("PRINTING AN EMPTY QUEUE");
+    }
+    struct node *iterable = q->first;
+    printf("--------- TRANSACTION LIST ---------\n");
+    printf("| Current # of transactions: %d", q->transactions);
+    printf("|--------------------------------");
+    for (; iterable != NULL; iterable = iterable->next) {
+        printf("| status: %s | sender: %d | receiver: %d | amount: %d | hops: %d | reward: %d | timestamp: %ld,%ld \n",
+               get_status(iterable->t.t_type), iterable->t.sender, iterable->t.reciver, iterable->t.amount,
+               iterable->t.hops, iterable->t.reward, iterable->t.timestamp.tv_nsec, iterable->t.timestamp.tv_nsec);
+    }
+    printf("------------------------------------\n");
+}
+
+char *get_status(int t_type) {
+    char *char_type;
+    switch (t_type) {
+        case TRANSACTION_WAITING:
+            char_type = "WAITING";
+            strcat(strcat(strcat(COLOR_RESET_ANSI_CODE, COLOR_YELLOW_ANSI_CODE), char_type), COLOR_RESET_ANSI_CODE);
+            break;
+        case TRANSACTION_FAILED:
+            char_type = "FAILED";
+            strcat(strcat(strcat(COLOR_RESET_ANSI_CODE, COLOR_RED_ANSI_CODE), char_type), COLOR_RESET_ANSI_CODE);
+            break;
+        case TRANSACTION_SUCCES:
+            char_type = "SUCCESS";
+            strcat(strcat(strcat(COLOR_RESET_ANSI_CODE, COLOR_GREEN_ANSI_CODE), char_type), COLOR_RESET_ANSI_CODE);
+            break;
+        default:
+            char_type = "NO INFO";
+    }
+    return char_type;
+}

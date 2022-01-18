@@ -24,6 +24,7 @@
 #include "local_lib/headers/node_transactor.h"
 #include "local_lib/headers/node_msg_report.h"
 #include "local_lib/headers/conf_shm.h"
+
 #ifdef DEBUG
 
 #include "local_lib/headers/debug_utility.h"
@@ -47,7 +48,7 @@ Bool read_conf_node(struct conf *simulation_conf);
 
 Bool set_signal_handler_node(struct sigaction sa, sigset_t sigmask);
 
-Bool check_arguments(int argc, char const *argv);
+Bool check_arguments(int argc, char const *argv[]);
 
 void attach_to_shm_conf(void);
 
@@ -60,7 +61,8 @@ int *nodes_snapshot;
 int node_id = -1;
 struct node current_node;
 struct conf node_configuration;
-struct shm_conf * shm_conf_pointer_node;
+struct shm_conf *shm_conf_pointer_node;
+
 /*struct node node;*/
 int main(int argc, char const *argv[]) {
     DEBUG_MESSAGE("NODE PROCESS STARTED");
@@ -73,9 +75,11 @@ int main(int argc, char const *argv[]) {
      * **********************************/
     if (check_arguments(argc, argv) && set_signal_handler_node(sa, sigmask)) {
         struct node_msg msg_rep;
+        DEBUG_MESSAGE("DIO CANE");
         read_conf_node(&node_configuration);
+        DEBUG_MESSAGE("MADONNA PUTTANA");
         node_create(&current_node, getpid(), 0, node_configuration.so_tp_size, node_configuration.so_block_size,
-                    node_configuration.so_reward, calc_reward);
+                    node_configuration.so_reward, &calc_reward);
 
         /*-----------------------------------*/
         /*  CONNECTING TO NODE REPORT QUEUE  *
@@ -114,6 +118,7 @@ int main(int argc, char const *argv[]) {
         /*TODO: Leggere da shm*/
 #endif
     }
+    DEBUG_MESSAGE("DEAD NODE");
     EXIT_PROCEDURE_NODE(0);
 }
 
@@ -123,7 +128,7 @@ int main(int argc, char const *argv[]) {
  */
 Bool read_conf_node(struct conf *simulation_conf) {
     DEBUG_NOTIFY_ACTIVITY_RUNNING("LOADING CONFIGURATION...");
-    switch (load_configuration(&simulation_conf)) {
+    switch (load_configuration(simulation_conf)) {
         case 0:
             break;
         case -1:
@@ -148,7 +153,7 @@ Bool read_conf_node(struct conf *simulation_conf) {
  * @param budget the current budget that is available for the user_proc;
  * @return the value of the balance
  */
-Bool check_arguments(int argc, char const *argv) {
+Bool check_arguments(int argc, char const *argv[]) {
     DEBUG_NOTIFY_ACTIVITY_RUNNING("CHECKING ARGC AND ARGV...");
     if (argc < 2) {
         ERROR_EXIT_SEQUENCE_NODE("MISSING ARGUMENT");

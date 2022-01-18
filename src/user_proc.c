@@ -85,7 +85,7 @@ int main(int arc, char const *argv[]) {
     if (check_argument(arc, argv) && set_signal_handler_user(sa, sigmask)) {
         /*  VARIABLE INITIALIZATION */
         read_conf(&configuration);
-        user_create(&current_user, configuration.so_buget_init, getpid(), calc_balance, update_cash_flow);
+        user_create(&current_user, configuration.so_buget_init, getpid(), &calc_balance, update_cash_flow);
         gen_sleep.tv_sec = 0;
         /*--------------------------------------*/
         /*  CONNECTING TO THE USER REPORT QUEUE *
@@ -117,7 +117,8 @@ int main(int arc, char const *argv[]) {
         }
         start_sem_value = semctl(semaphore_start_id, 0, GETVAL);
         if (start_sem_value < 0) { ERROR_EXIT_SEQUENCE_USER("IMPOSSIBLE TO OBTAIN INFO FROM START SEM."); }
-        if (start_sem_value != 0 && (semaphore_lock(semaphore_start_id, 0) < 0)) {
+        printf("------------SEMAPHORE START VALUE: %d\n", start_sem_value);
+        if (start_sem_value != 0 && semaphore_lock(semaphore_start_id, 0) < 0) {
             ERROR_EXIT_SEQUENCE_USER("IMPOSSIBLE TO OBTAIN THE START SEMAPHORE");
         }
         DEBUG_MESSAGE("USER READY, WAITING FOR SEMAPHORE TO FREE");
@@ -129,12 +130,6 @@ int main(int arc, char const *argv[]) {
         /*-------------------------------------------*
          *  GETTING THE KNOWLEDGE OF USERS id_to_pid *
          * ------------------------------------------*/
-
-#ifdef DEBUG
-        DEBUG_BLOCK_ACTION_START("USER CONF ATTACHED");
-        shm_conf_print(shm_conf_pointer);
-        DEBUG_BLOCK_ACTION_END();
-#endif
         /****************************************
          *      GENERATION OF TRANSACTION FASE *
          * **************************************/
@@ -143,6 +138,9 @@ int main(int arc, char const *argv[]) {
             if (generate_transaction(&current_user, current_user.pid, users_snapshot) < 0) {
                 ERROR_EXIT_SEQUENCE_USER("IMPOSSIBLE TO GENERATE TRANSACTION");
             }
+#ifdef DEBUG
+            queue_print(current_user.in_process);
+#endif
             gen_sleep.tv_nsec =
                     (rand() % (configuration.so_max_trans_gen_nsec - configuration.so_min_trans_gen_nsec + 1)) +
                     configuration.so_min_trans_gen_nsec;
@@ -271,6 +269,7 @@ Bool read_conf(struct conf *simulation_conf) {
 }
 
 int send_to_node(void) {
+    DEBUG_NOTIFY_ACTIVITY_RUNNING("SENDING TRANSACTION TO THE NODE...");
     int node_num = (rand() % (nodes_snapshot[0][0])) + 1;
     struct node_msg msg;
     struct Transaction t = queue_last(current_user.in_process);

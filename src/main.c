@@ -82,7 +82,7 @@ int semaphore_start_id = -1;
 pid_t main_pid;
 
 int main() {
-    semctl(8, 0, IPC_RMID); /*TODO: Remove*/
+    semctl(13, 0, IPC_RMID); /*TODO: Remove*/
     main_pid = getpid();
     if (read_conf() == TRUE) {
         /*  Local Var Declaration   */
@@ -157,7 +157,7 @@ int main() {
     }
     free_sysVar();
     free_mem();
-    return 0;
+    exit(0);
 }
 
 /**
@@ -293,7 +293,7 @@ void create_semaphores(void) {
     DEBUG_NOTIFY_ACTIVITY_DONE("CREATION OF START_SEMAPHORE CHILDREN DONE");
 
     DEBUG_NOTIFY_ACTIVITY_RUNNING("INITIALIZATION OF START_SEMAPHORE CHILDREN....");
-    if (semctl(semaphore_start_id, 0, SETVAL, simulation_conf.so_user_num /*TODO+ simulation_conf.so_nodes_num*/) <
+    if (semctl(semaphore_start_id, 0, SETVAL, simulation_conf.so_user_num + simulation_conf.so_nodes_num) <
         0) {
         ERROR_EXIT_SEQUENCE_MAIN("IMPOSSIBLE TO INITIALISE SEMAPHORE START CHILDREN");
     }
@@ -411,9 +411,7 @@ int check_msg_report(struct master_msg_report *msg_report) {
 
 void create_users_msg_queue(void) {
     DEBUG_NOTIFY_ACTIVITY_RUNNING("CREATING MSG REPORT QUEUE FOR USERS....");
-    /*TODO: Aggiungerla come optional alla compilazione*/
     msg_report_id_users = msgget(USERS_QUEUE_KEY, IPC_CREAT | IPC_EXCL | 0600);
-    printf("----------------USER_QUEUE ID: %d\n", msg_report_id_users);
     if (msg_report_id_users < 0) { ERROR_EXIT_SEQUENCE_MAIN("IMPOSSIBLE TO CREATE THE USER MESSAGE QUEUE"); }
     DEBUG_NOTIFY_ACTIVITY_DONE("CREATING MSG REPORT QUEUE FOR USERS DONE");
 }
@@ -421,7 +419,6 @@ void create_users_msg_queue(void) {
 void create_nodes_msg_queue(void) {
     DEBUG_NOTIFY_ACTIVITY_RUNNING("CREATING MSG REPORT QUEUE FOR NODES...");
     msg_report_id_nodes = msgget(NODES_QUEUE_KEY, IPC_CREAT | IPC_CREAT | 0600);
-    printf("------------------NODE_QUEUE ID: %d\n", msg_report_id_nodes);
     if (msg_report_id_nodes < 0) { ERROR_EXIT_SEQUENCE_MAIN("IMPOSSIBLE TO CREATE THE NODES MESSAGE QUEUE"); }
     DEBUG_NOTIFY_ACTIVITY_DONE("CREATING MSG REPORT QUEUE FOR NODES DONE");
 }

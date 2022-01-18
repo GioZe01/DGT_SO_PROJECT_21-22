@@ -73,7 +73,10 @@ int queue_apt_amount_reward(Queue q, int percentage);
  * @return -1 in case of FAILURE, the total reward amount otherwise
  */
 float queue_get_reward(Queue q);
-
-
+/**
+ * Print the queue in a prettify kinda way
+ * @param q the queue to be printed
+ */
+void queue_print(Queue q);
 
 #endif /*DGT_SO_PROJECT_21_22_TRANSACTION_LIST_H*/
