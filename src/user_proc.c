@@ -58,7 +58,7 @@ void attach_to_shm_conf(void);
 /*  SysV  */
 
 int state; /* Current state of the user proc*/
-int semaphore_start_id = -1; /**/
+int semaphore_start_id = -1; /*Id of the start semaphore arrays for sinc*/
 int queue_report_id = -1; /* Identifier of the user queue id*/
 int users_snapshot[][2];/* Contains the ref to the pid_t of the users and the queue id*/
 int nodes_snapshot[][2];/* Contains the ref to the pid_t of the nodes and the queue id*/

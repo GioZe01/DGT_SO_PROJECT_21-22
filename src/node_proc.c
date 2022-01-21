@@ -54,7 +54,8 @@ void attach_to_shm_conf(void);
 
 /* SysVar */
 int state; /* Current state of the node proc*/
-int semaphore_start_id = -1; /*Id of the start semaphore*/
+int semaphore_start_id = -1; /*Id of the start semaphore arrays for sinc*/
+
 int queue_node_id = -1;/* Identifier of the node queue id */
 int node_end = 0; /* For value different from 0 the node proc must end*/
 int users_snapshot[][2];/* Contains the ref to the pid_t of the users and the queue id*/
@@ -112,14 +113,21 @@ int main(int argc, char const *argv[]) {
         state = RUNNING_STATE;
 
         /****************************************
-         *      GENERATION OF TRANSACTION FASE *
+         *      PROCESSING OF TRANSACTION FASE  *
          * **************************************/
          while(node_end != 1){
+             /*TODO: verificare*/
+             if(node_msg_receive(queue_node_id, &msg_rep, node_id)<0){
+                 /*Checking for transaction coming from node*/
 
-         }
+             } else if(node_msg_receive(queue_node_id,&msg_rep,node_id-MSG_NODE_ORIGIN_TYPE)<0){
+                 /*Checking for transaction type*/
+
+             }
+        }
 
     }
-    DEBUG_MESSAGE("DEAD NODE");
+    DEBUG_MESSAGE("NODE ENDED -----------------------------");
     EXIT_PROCEDURE_NODE(0);
 }
 

@@ -49,7 +49,6 @@ int node_msg_receive(int id, struct node_msg *msg, long type) {
             return -2;
         }
         return -1;
-
     }
     return 0;
 }
