@@ -53,17 +53,17 @@ Bool check_arguments(int argc, char const *argv[]);
 void attach_to_shm_conf(void);
 
 /* SysVar */
-int state;
-int semaphore_start_id = -1;
-int queue_node_id = -1;
-int *users_snapshot;
-int *nodes_snapshot;
-int node_id = -1;
-struct node current_node;
-struct conf node_configuration;
-struct shm_conf *shm_conf_pointer_node;
+int state; /* Current state of the node proc*/
+int semaphore_start_id = -1; /*Id of the start semaphore*/
+int queue_node_id = -1;/* Identifier of the node queue id */
+int node_end = 0; /* For value different from 0 the node proc must end*/
+int users_snapshot[][2];/* Contains the ref to the pid_t of the users and the queue id*/
+int nodes_snapshot[][2];/* Contains the ref to the pid_t of the nodes and the queue id*/
+int node_id = -1; /* Id of the current node into the snapshots vector*/
+struct node current_node; /* Current representation of the node*/
+struct conf node_configuration; /* Configuration File representation*/
+struct shm_conf *shm_conf_pointer_node; /* Ref to the shm for configuration of the node*/
 
-/*struct node node;*/
 int main(int argc, char const *argv[]) {
     DEBUG_MESSAGE("NODE PROCESS STARTED");
     struct sigaction sa;
@@ -110,13 +110,14 @@ int main(int argc, char const *argv[]) {
             ERROR_EXIT_SEQUENCE_NODE("IMPOSSIBLE TO WAIT FOR START");
         }
         state = RUNNING_STATE;
-        /*-------------------------------------------*
-         *  GETTING THE KNOWLEDGE OF USERS id_to_pid *
-         * ------------------------------------------*/
 
-#ifdef DEBUG
-        /*TODO: Leggere da shm*/
-#endif
+        /****************************************
+         *      GENERATION OF TRANSACTION FASE *
+         * **************************************/
+         while(node_end != 1){
+
+         }
+
     }
     DEBUG_MESSAGE("DEAD NODE");
     EXIT_PROCEDURE_NODE(0);

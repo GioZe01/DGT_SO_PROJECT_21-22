@@ -73,13 +73,13 @@ void signals_handler(int signum);
 struct conf simulation_conf;
 struct processes_info_list *proc_list;
 struct shm_conf *shm_pointer;
-int simulation_end = 0;
-int shm_conf_id = -1;
-int msg_report_id_master = -1; /*Identifier for message queue for master comunication*/
-int msg_report_id_users = -1;
-int msg_report_id_nodes = -1;
-int semaphore_start_id = -1;
-pid_t main_pid;
+int simulation_end = 0; /* For value different from 0 the simulation must end*/
+int shm_conf_id = -1; /* Id of the shm for the configuration of the node*/
+int msg_report_id_master = -1;/* Identifier for message queue for master communication*/
+int msg_report_id_users = -1; /* Identifier for message queue for users communication*/
+int msg_report_id_nodes = -1; /* Identifier for message queue for nodes communication*/
+int semaphore_start_id = -1; /* Identifier of the start semaphore for proc sinc*/
+pid_t main_pid; /*pid of the current proc*/
 
 int main() {
     semctl(13, 0, IPC_RMID); /*TODO: Remove*/

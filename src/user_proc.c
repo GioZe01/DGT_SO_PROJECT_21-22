@@ -57,15 +57,15 @@ void attach_to_shm_conf(void);
 
 /*  SysV  */
 
-int state;
-int semaphore_start_id = -1;
-int queue_report_id = -1; /* -1 is the value if it is not initialized */
-int my_id = -1;
-int users_snapshot[][2];
-int nodes_snapshot[][2];
-struct user_transaction current_user;
-struct conf configuration;
-struct shm_conf *shm_conf_pointer;
+int state; /* Current state of the user proc*/
+int semaphore_start_id = -1; /**/
+int queue_report_id = -1; /* Identifier of the user queue id*/
+int users_snapshot[][2];/* Contains the ref to the pid_t of the users and the queue id*/
+int nodes_snapshot[][2];/* Contains the ref to the pid_t of the nodes and the queue id*/
+int user_id = -1; /*Id of the current user into the snapshots vectors*/
+struct user_transaction current_user; /* Current representation of the user*/
+struct conf configuration; /* Configuration File representation */
+struct shm_conf *shm_conf_pointer; /* Ref to the shm fir configuration of the user*/
 
 int main(int arc, char const *argv[]) {
     DEBUG_MESSAGE("USER PROCESS STARTED");
@@ -127,9 +127,6 @@ int main(int arc, char const *argv[]) {
         }
         state = RUNNING_STATE;
 
-        /*-------------------------------------------*
-         *  GETTING THE KNOWLEDGE OF USERS id_to_pid *
-         * ------------------------------------------*/
         /****************************************
          *      GENERATION OF TRANSACTION FASE *
          * **************************************/
@@ -178,7 +175,7 @@ Bool check_argument(int arc, char const *argv[]) {
     if (arc < 2) {
         ERROR_EXIT_SEQUENCE_USER("MISSING ARGUMENT");
     }
-    my_id = atoi(argv[1]);
+    user_id = atoi(argv[1]);
     DEBUG_NOTIFY_ACTIVITY_DONE("CHECKING ARGC AND ARGV DONE");
     return TRUE;
 }
