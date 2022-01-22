@@ -60,8 +60,6 @@ void attach_to_shm_conf(void);
 int state; /* Current state of the user proc*/
 int semaphore_start_id = -1; /*Id of the start semaphore arrays for sinc*/
 int queue_report_id = -1; /* Identifier of the user queue id*/
-int users_snapshot[][2];/* Contains the ref to the pid_t of the users and the queue id*/
-int nodes_snapshot[][2];/* Contains the ref to the pid_t of the nodes and the queue id*/
 int user_id = -1; /*Id of the current user into the snapshots vectors*/
 struct user_transaction current_user; /* Current representation of the user*/
 struct conf configuration; /* Configuration File representation */
@@ -85,7 +83,7 @@ int main(int arc, char const *argv[]) {
     if (check_argument(arc, argv) && set_signal_handler_user(sa, sigmask)) {
         /*  VARIABLE INITIALIZATION */
         read_conf(&configuration);
-        user_create(&current_user, configuration.so_buget_init, getpid(), &calc_balance, update_cash_flow);
+        user_create(&current_user, configuration.so_buget_init, getpid(), &calc_balance, &update_cash_flow);
         gen_sleep.tv_sec = 0;
         /*--------------------------------------*/
         /*  CONNECTING TO THE USER REPORT QUEUE *
@@ -117,7 +115,6 @@ int main(int arc, char const *argv[]) {
         }
         start_sem_value = semctl(semaphore_start_id, 0, GETVAL);
         if (start_sem_value < 0) { ERROR_EXIT_SEQUENCE_USER("IMPOSSIBLE TO OBTAIN INFO FROM START SEM."); }
-        printf("------------SEMAPHORE START VALUE: %d\n", start_sem_value);
         if (start_sem_value != 0 && semaphore_lock(semaphore_start_id, 0) < 0) {
             ERROR_EXIT_SEQUENCE_USER("IMPOSSIBLE TO OBTAIN THE START SEMAPHORE");
         }
@@ -132,7 +129,7 @@ int main(int arc, char const *argv[]) {
          * **************************************/
         while (current_user.u_balance > 2) {
             DEBUG_MESSAGE("TRANSACTION ALLOWED");
-            if (generate_transaction(&current_user, current_user.pid, users_snapshot) < 0) {
+            if (generate_transaction(&current_user, current_user.pid, shm_conf_pointer) < 0) {
                 ERROR_EXIT_SEQUENCE_USER("IMPOSSIBLE TO GENERATE TRANSACTION");
             }
 #ifdef DEBUG
@@ -206,11 +203,11 @@ void signals_handler(int signum) {
     DEBUG_SIGNAL("SIGNAL RECEIVED", signum);
     switch (signum) {
         case SIGINT:
-            alarm(0);/* pending alarm canceld*/
+            alarm(0);/* pending alarm removed*/
             EXIT_PROCEDURE_USER(0);
         case SIGALRM: /*    Generate a new transaction  */
             DEBUG_NOTIFY_ACTIVITY_RUNNING("GENERATING A NEW TRANSACTION FROM SIG...");
-            if (generate_transaction(&current_user, current_user.pid, users_snapshot) < 0) {
+            if (generate_transaction(&current_user, current_user.pid, shm_conf_pointer) < 0) {
                 ERROR_EXIT_SEQUENCE_USER("IMPOSSIBLE TO GENERATE TRANSACTION");
             }
             DEBUG_NOTIFY_ACTIVITY_DONE("GENERATING A NEW TRANSACTION FROM SIG DONE");
@@ -267,10 +264,10 @@ Bool read_conf(struct conf *simulation_conf) {
 
 int send_to_node(void) {
     DEBUG_NOTIFY_ACTIVITY_RUNNING("SENDING TRANSACTION TO THE NODE...");
-    int node_num = (rand() % (nodes_snapshot[0][0])) + 1;
+    int node_num = (rand() % (shm_conf_pointer->nodes_snapshots[0][0])) + 1;
     struct node_msg msg;
     struct Transaction t = queue_last(current_user.in_process);
-    if (node_msg_snd(NODES_QUEUE_KEY, &msg, nodes_snapshot[node_num][2], &t,
+    if (node_msg_snd(NODES_QUEUE_KEY, &msg, shm_conf_pointer->nodes_snapshots[node_num][1], &t,
                      current_user.pid, TRUE) < 0) { return -1; }
 #ifdef DEBUG
     node_msg_print(&msg);
@@ -281,7 +278,7 @@ int send_to_node(void) {
 
 void attach_to_shm_conf(void) {
     DEBUG_NOTIFY_ACTIVITY_RUNNING("ATTACHING TO SHM...");
-    int shm_conf_id = -1;/* id to the shm_conf*/
+    int shm_conf_id;/* id to the shm_conf*/
     shm_conf_id = shmget(SHM_CONFIGURATION, sizeof(struct shm_conf), 0600);
     if (shm_conf_id < 0) { ERROR_EXIT_SEQUENCE_USER("IMPOSSIBLE TO ACCESS SHM CONF"); }
     shm_conf_pointer = shmat(shm_conf_id, NULL, 0);

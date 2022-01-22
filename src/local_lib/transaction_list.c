@@ -55,6 +55,7 @@ int create_transaction(struct Transaction *t, pid_t sender, pid_t receiver, floa
     t->timestamp = timestamp;
     t->amount = amount;
     t->reward = 0; /* Is not responsible*/
+    printf("AMOUNT: %d\n", t->amount);
     DEBUG_NOTIFY_ACTIVITY_DONE("CREATING A TRANSACTION DONE");
     return 0;
 }
@@ -94,12 +95,14 @@ void queue_append(Queue q, struct Transaction t) {
     }
     new_node->t = t;
     new_node->next = NULL;
+    printf("DIO PORCO 3\n");
     if (queue_is_empty(q) == TRUE) /*adding the first ever node to the list*/
         q->first = q->last = new_node;
     else /*is not the first node*/
         q->last->next = new_node;
+    printf("DIO PORCO 4\n");
     q->last = new_node;
-    q->transactions++;
+    q->transactions += 1;
 
     DEBUG_NOTIFY_ACTIVITY_RUNNING("APPENDING TO TRANSACTION QUEUE A NEW TRANSACTION DONE");
 }
@@ -188,9 +191,7 @@ void queue_print(Queue q) {
     printf("| Current # of transactions: %d", q->transactions);
     printf("|--------------------------------");
     for (; iterable != NULL; iterable = iterable->next) {
-        printf("| status: %s | sender: %d | receiver: %d | amount: %d | hops: %d | reward: %d | timestamp: %ld,%ld \n",
-               get_status(iterable->t.t_type), iterable->t.sender, iterable->t.reciver, iterable->t.amount,
-               iterable->t.hops, iterable->t.reward, iterable->t.timestamp.tv_nsec, iterable->t.timestamp.tv_nsec);
+        transaction_print(iterable->t);
     }
     printf("------------------------------------\n");
 }
@@ -214,4 +215,10 @@ char *get_status(int t_type) {
             char_type = "NO INFO";
     }
     return char_type;
+}
+
+void transaction_print(struct Transaction t) {
+    printf("| status: %s | sender: %d | receiver: %d | amount: %d | hops: %d | reward: %d | timestamp: %ld,%ld \n",
+           get_status(t.t_type), t.sender, t.reciver, t.amount,
+           t.hops, t.reward, t.timestamp.tv_nsec, t.timestamp.tv_nsec);
 }

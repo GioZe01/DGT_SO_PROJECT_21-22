@@ -78,5 +78,9 @@ float queue_get_reward(Queue q);
  * @param q the queue to be printed
  */
 void queue_print(Queue q);
-
+/**
+ * Print the transaction given
+ * @param t the transaction to be printed
+ */
+void transaction_print(struct Transaction t);
 #endif /*DGT_SO_PROJECT_21_22_TRANSACTION_LIST_H*/

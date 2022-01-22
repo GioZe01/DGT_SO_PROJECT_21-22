@@ -124,6 +124,7 @@ int main(int argc, char const *argv[]) {
                  /*Checking for transaction type*/
 
              }
+             node_msg_print(&msg_rep);
         }
 
     }
@@ -197,7 +198,8 @@ void signals_handler(int signum) {
     DEBUG_SIGNAL("SIGNAL RECEIVED ", signum);
     switch (signum) {
         case SIGINT:
-            break;
+            alarm(0);/*pending alarm removed*/
+            EXIT_PROCEDURE_NODE(0);
         case SIGALRM:
             break;
 

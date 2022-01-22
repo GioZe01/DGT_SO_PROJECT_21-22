@@ -82,7 +82,7 @@ int semaphore_start_id = -1;  /*Id of the start semaphore arrays for sinc*/
 pid_t main_pid; /*pid of the current proc*/
 
 int main() {
-    semctl(13, 0, IPC_RMID); /*TODO: Remove*/
+    semctl(15, 0, IPC_RMID); /*TODO: Remove*/
     main_pid = getpid();
     if (read_conf() == TRUE) {
         /*  Local Var Declaration   */
@@ -140,7 +140,6 @@ int main() {
             ERROR_EXIT_SEQUENCE_MAIN("IMPOSSIBLE TO WAIT ON SEM_START");
         }
         DEBUG_MESSAGE("WAITING DONE");
-
         DEBUG_BLOCK_ACTION_END();
 
         while (simulation_end != 1) {

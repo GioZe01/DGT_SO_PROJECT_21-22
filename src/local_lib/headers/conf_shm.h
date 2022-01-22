@@ -3,7 +3,7 @@
 #define DGT_SO_PROJECT_21_22_CONF_SHM_H
 
 #include "glob.h"
-
+#include "boolean.h"
 struct shm_conf {
     int users_snapshots[USERS_MAX][2];
     int nodes_snapshots[NODES_MAX][2];
@@ -25,4 +25,11 @@ shm_conf_create(struct shm_conf *self, int *users_pids, int *users_queues_ids, i
  */
 void shm_conf_print(struct shm_conf *self);
 
+/**
+ * Copy the content of a pointer into another
+ * @param where to be stored
+ * @param to_copy array to be copied
+ * @param to_free if u want to free() pids and queues_ids
+ */
+void shm_copy_snapshots(int snapshot[][2], int *pids, int *queues_ids, Bool to_free);
 #endif /*DGT_SO_PROJECT_21_22_CONF_SHM_H*/

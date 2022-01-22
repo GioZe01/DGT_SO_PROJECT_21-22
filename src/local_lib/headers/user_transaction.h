@@ -4,7 +4,7 @@
 
 #include "boolean.h"
 #include "transaction_list.h"
-
+#include "conf_shm.h"
 typedef float(*Balance)(struct user_transaction* self);
 
 typedef int (*CalcCashFlow)(struct user_transaction *self, struct Transaction *t);
@@ -80,7 +80,7 @@ int update_cash_flow(struct user_transaction *self, struct Transaction *t);
  * @param users_num pointer to a vector of users available
  * @return -1 in case o failure. 0 otherwise.
  */
-int generate_transaction(struct user_transaction *self, pid_t user_proc_pid, int users_num[][2]);
+int generate_transaction(struct user_transaction *self, pid_t user_proc_pid,struct shm_conf *shm_conf);
 
 
 /*

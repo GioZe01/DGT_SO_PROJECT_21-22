@@ -6,6 +6,7 @@
 /*  Local   */
 #include "headers/user_transaction.h"
 #include "headers/simulation_errors.h"
+#include "headers/conf_shm.h"
 
 #ifdef DEBUG
 
@@ -75,11 +76,13 @@ int update_cash_flow(struct user_transaction *self, struct Transaction *t) {
     return -1;
 }
 
-int generate_transaction(struct user_transaction *self, pid_t user_proc_pid, int users_num[][2]) {
+int generate_transaction(struct user_transaction *self, pid_t user_proc_pid, struct shm_conf *shm_conf) {
     DEBUG_NOTIFY_ACTIVITY_RUNNING("GENERATING THE TRANSACTION...");
     struct Transaction t;
     if (check_balance(self) == TRUE) {
-        create_transaction(&t, user_proc_pid, extract_user(users_num), gen_amount(self));
+        if (create_transaction(&t, user_proc_pid, extract_user(shm_conf->users_snapshots), gen_amount(self)) <
+            0) { ERROR_MESSAGE("FAILED ON TRANSACTION CREATION"); }
+        transaction_print(t);
         queue_append(self->in_process, t);
         self->update_cash_flow(self, &t);
         printf("\n ----------------- timestamp: %lf", t.timestamp.tv_nsec);
@@ -90,11 +93,13 @@ int generate_transaction(struct user_transaction *self, pid_t user_proc_pid, int
 }
 
 pid_t extract_user(int users_num[][2]) {
+    DEBUG_NOTIFY_ACTIVITY_RUNNING("EXTRACTING USER INFO FROM SNAPSHOTS...");
     int max = users_num[0][0];
     int e = (rand() % (max)) + 1;
     while (users_num[e + 1][0] == NULL) {
         e = (rand() % (max)) + 1;
     }
+    DEBUG_NOTIFY_ACTIVITY_DONE("EXTRACTING USER INFO FROM SNAPSHOTS DONE");
     return users_num[e][0];
 }
 
@@ -105,5 +110,6 @@ pid_t extract_node(int nodes_num) {
 
 float gen_amount(struct user_transaction *user) {
     /* TODO: Possible bug*/
-    return (rand() % ((int) user->budget - 2 + 1)) + 2;
+    DEBUG_MESSAGE("GENERATING AMOUNT");
+    return (float) (rand() % (((int)user->budget) - 2 + 1)) + 2;
 }
