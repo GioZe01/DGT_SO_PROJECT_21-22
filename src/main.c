@@ -42,37 +42,81 @@
 #endif
 
 
-/* Funzioni di supporto al main */
-
+/* Support functions*/
+/*  ! All the following functions are capable of EXIT_PROCEDURE*/
+/**
+ * Check for messages in the master msg_queue
+ * @param msg_report pointer to the struct representing the msg in the master msg queue
+ * @return -1 in case of FAILURE. 0 otherwise
+ */
 int check_msg_report(struct master_msg_report *msg_report);
 
+/**
+ * Create the shared memory for configuration purposes of kid processes
+ */
 void create_shm_conf(void);
 
+/**
+ * Create the shared memory for the master-book
+ */
 void create_masterbook(void);
 
+/**
+ * Create the message queue for kid to master communication
+ */
 void create_master_msg_report_queue(void);
 
+/**
+ * Create the semaphores needed for the access regulation for this specific program
+ */
 void create_semaphores(void);
 
+/**
+ * \brief Create the users processes and lunch them with execve
+ * utilize simulation configuration in the file conf for generating the exact number of users
+ * @param users_pids pointer to an array of pids to be filled with the generated once
+ * @param users_queues_ids pointer to an array of pids to be filled with the generated once
+ * @return -1 in case of FAILURE. 0 otherwise
+ */
 int create_users_proc(int *users_pids, int *users_queues_ids);
 
+/**
+ * Create the users message queues for processes to users communication
+ */
 void create_users_msg_queue(void);
-
+/**
+ * Create the nodes message queues for processes to nodes communication
+ */
 void create_nodes_msg_queue(void);
-
+/**
+ * \brief Create the nodes processes and lunch the with execve
+ * utilize simulation configuration in the file conf for generating the exact number of nodes
+ * @param nodes_pids pointer to an array of pids to be filled with the generated once
+ * @param nodes_queues_ids pointer to an array of pids to be filled with the generate once
+ * @return -1 in case of FAILURE. 0 otherwise
+ */
 int create_nodes_proc(int *nodes_pids, int *nodes_queues_ids);
-
+/**
+ * Read the conf file present in the project dir
+ * @return False in case of FAILURE, TRUE otherwise
+ */
 Bool read_conf(void);
-
+/**
+ * Set the handler for signals of the current main_proc
+ * @param sa the mask to be applied
+ */
 void set_signal_handlers(struct sigaction sa);
-
+/**
+ * handler of the signal
+ * @param signum type of signal to be handled
+ */
 void signals_handler(int signum);
 
 
-/* Variabili */
-struct conf simulation_conf;
-struct processes_info_list *proc_list;
-struct shm_conf *shm_pointer;
+/* Variables*/
+struct conf simulation_conf; /*Structure representing the configuration present in the conf file*/
+struct processes_info_list *proc_list; /* Pointer to a linked list of all proc generated*/
+struct shm_conf *shm_pointer; /* Pointer to the shm_conf structure in shared memory*/
 int simulation_end = 0; /* For value different from 0 the simulation must end*/
 int shm_conf_id = -1; /* Id of the shm for the configuration of the node*/
 int msg_report_id_master = -1;/* Identifier for message queue for master communication*/
@@ -82,7 +126,7 @@ int semaphore_start_id = -1;  /*Id of the start semaphore arrays for sinc*/
 pid_t main_pid; /*pid of the current proc*/
 
 int main() {
-    semctl(15, 0, IPC_RMID); /*TODO: Remove*/
+    /* semctl(15, 0, IPC_RMID); TODO: Remove*/
     main_pid = getpid();
     if (read_conf() == TRUE) {
         /*  Local Var Declaration   */

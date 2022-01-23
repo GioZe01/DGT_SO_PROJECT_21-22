@@ -76,9 +76,7 @@ int main(int argc, char const *argv[]) {
      * **********************************/
     if (check_arguments(argc, argv) && set_signal_handler_node(sa, sigmask)) {
         struct node_msg msg_rep;
-        DEBUG_MESSAGE("DIO CANE");
         read_conf_node(&node_configuration);
-        DEBUG_MESSAGE("MADONNA PUTTANA");
         node_create(&current_node, getpid(), 0, node_configuration.so_tp_size, node_configuration.so_block_size,
                     node_configuration.so_reward, &calc_reward);
 

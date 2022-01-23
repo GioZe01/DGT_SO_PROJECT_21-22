@@ -25,7 +25,7 @@
 
 static void queue_underflow(void);
 
-char *get_status(int t_type);
+void get_status(char char_type[80], int t_type);
 
 static void empty_queue(Queue q);
 
@@ -55,7 +55,6 @@ int create_transaction(struct Transaction *t, pid_t sender, pid_t receiver, floa
     t->timestamp = timestamp;
     t->amount = amount;
     t->reward = 0; /* Is not responsible*/
-    printf("AMOUNT: %d\n", t->amount);
     DEBUG_NOTIFY_ACTIVITY_DONE("CREATING A TRANSACTION DONE");
     return 0;
 }
@@ -95,15 +94,13 @@ void queue_append(Queue q, struct Transaction t) {
     }
     new_node->t = t;
     new_node->next = NULL;
-    printf("DIO PORCO 3\n");
     if (queue_is_empty(q) == TRUE) /*adding the first ever node to the list*/
         q->first = q->last = new_node;
-    else /*is not the first node*/
+    else {/*is not the first node*/
         q->last->next = new_node;
-    printf("DIO PORCO 4\n");
-    q->last = new_node;
-    q->transactions += 1;
-
+        q->last = new_node;
+    }
+    q->transactions++;
     DEBUG_NOTIFY_ACTIVITY_RUNNING("APPENDING TO TRANSACTION QUEUE A NEW TRANSACTION DONE");
 }
 
@@ -196,29 +193,31 @@ void queue_print(Queue q) {
     printf("------------------------------------\n");
 }
 
-char *get_status(int t_type) {
-    char *char_type;
+void get_status(char char_type[80], int t_type) {
+    strcpy(char_type, COLOR_RESET_ANSI_CODE);
     switch (t_type) {
         case TRANSACTION_WAITING:
-            char_type = "WAITING";
-            strcat(strcat(strcat(COLOR_RESET_ANSI_CODE, COLOR_YELLOW_ANSI_CODE), char_type), COLOR_RESET_ANSI_CODE);
+            strcat(char_type, COLOR_YELLOW_ANSI_CODE);
+            strcat(char_type, "WAITING");
             break;
         case TRANSACTION_FAILED:
-            char_type = "FAILED";
-            strcat(strcat(strcat(COLOR_RESET_ANSI_CODE, COLOR_RED_ANSI_CODE), char_type), COLOR_RESET_ANSI_CODE);
+            strcat(char_type, COLOR_RED_ANSI_CODE);
+            strcat(char_type, "FAILED");
             break;
         case TRANSACTION_SUCCES:
-            char_type = "SUCCESS";
-            strcat(strcat(strcat(COLOR_RESET_ANSI_CODE, COLOR_GREEN_ANSI_CODE), char_type), COLOR_RESET_ANSI_CODE);
+            strcat(char_type, COLOR_GREEN_ANSI_CODE);
+            strcat(char_type, "SUCCESS");
             break;
         default:
-            char_type = "NO INFO";
+            strcpy(char_type, "NO INFO");
     }
-    return char_type;
+    strcat(char_type, COLOR_RESET_ANSI_CODE);
 }
 
 void transaction_print(struct Transaction t) {
-    printf("| status: %s | sender: %d | receiver: %d | amount: %d | hops: %d | reward: %d | timestamp: %ld,%ld \n",
-           get_status(t.t_type), t.sender, t.reciver, t.amount,
-           t.hops, t.reward, t.timestamp.tv_nsec, t.timestamp.tv_nsec);
+    char *char_type;
+    get_status(char_type, t.t_type);
+    printf("| status: %s | sender: %d | receiver: %d | amount: %f | hops: %d | reward: %f | timestamp: %ld,%ld \n",
+           char_type, t.sender, t.reciver, t.amount,
+           t.hops, t.reward, t.timestamp.tv_sec, t.timestamp.tv_nsec);
 }

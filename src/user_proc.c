@@ -148,7 +148,7 @@ int main(int arc, char const *argv[]) {
                 ERROR_MESSAGE("IMPOSSIBLE TO SEND TO THE NODE");
             }
             /*
-             * TODO: check for the retry to send : cand do with while then abort and notify master
+             * TODO: check for the retry to send : can do with while then abort and notify master
              * */
             nanosleep(&gen_sleep, (void *) NULL);
         }

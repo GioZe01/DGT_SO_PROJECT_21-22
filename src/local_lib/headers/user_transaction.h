@@ -7,7 +7,7 @@
 #include "conf_shm.h"
 typedef float(*Balance)(struct user_transaction* self);
 
-typedef int (*CalcCashFlow)(struct user_transaction *self, struct Transaction *t);
+typedef int (*CalcCashFlow)(struct user_transaction*self, struct Transaction *t);
 
 typedef struct UCashFlow {
     float entries;

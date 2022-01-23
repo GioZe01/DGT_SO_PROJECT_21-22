@@ -19,8 +19,12 @@
 #define DEBUG_SIGNAL(mex, signum)
 #define DEBUG_ERROR_MESSAGE(mex)
 #endif
-
-pid_t extract_node(int nodes_num);
+/**
+ * Extract randomly a node id from 0 up to nodes_num
+ * @param nodes_num limit for random extraction
+ * @return the random id extracted
+ */
+int extract_node(int nodes_num);
 
 /**
  * Select a user pid from the vector pointer users_num randomly
@@ -28,7 +32,12 @@ pid_t extract_node(int nodes_num);
  * @return the pid_t of the user selected randomly
  */
 pid_t extract_user(int users_num[][2]);
-
+/**
+ * \brief Generate a random float number,
+ * representing the amount of a transaction with srand() level with getpid
+ * @param user the adt of the user to extract the random amount from
+ * @return the amount generated randomly
+ */
 float gen_amount(struct user_transaction *user);
 
 void user_create(struct user_transaction *self, float budget, int pid, Balance balance, CalcCashFlow update_cash_flow) {
@@ -82,10 +91,12 @@ int generate_transaction(struct user_transaction *self, pid_t user_proc_pid, str
     if (check_balance(self) == TRUE) {
         if (create_transaction(&t, user_proc_pid, extract_user(shm_conf->users_snapshots), gen_amount(self)) <
             0) { ERROR_MESSAGE("FAILED ON TRANSACTION CREATION"); }
+#ifdef DEBUG
         transaction_print(t);
+#endif
         queue_append(self->in_process, t);
         self->update_cash_flow(self, &t);
-        printf("\n ----------------- timestamp: %lf", t.timestamp.tv_nsec);
+        printf("\n ----------------- timestamp: %ld", t.timestamp.tv_nsec);
         DEBUG_NOTIFY_ACTIVITY_DONE("GENERATING THE TRANSACTION DONE");
         return 0;
     }
@@ -93,6 +104,7 @@ int generate_transaction(struct user_transaction *self, pid_t user_proc_pid, str
 }
 
 pid_t extract_user(int users_num[][2]) {
+    srand(getpid());
     DEBUG_NOTIFY_ACTIVITY_RUNNING("EXTRACTING USER INFO FROM SNAPSHOTS...");
     int max = users_num[0][0];
     int e = (rand() % (max)) + 1;
@@ -103,13 +115,13 @@ pid_t extract_user(int users_num[][2]) {
     return users_num[e][0];
 }
 
-pid_t extract_node(int nodes_num) {
+int extract_node(int nodes_num) {
 
 }
 
 
 float gen_amount(struct user_transaction *user) {
+    srand(getpid());
     /* TODO: Possible bug*/
-    DEBUG_MESSAGE("GENERATING AMOUNT");
     return (float) (rand() % (((int)user->budget) - 2 + 1)) + 2;
 }
