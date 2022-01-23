@@ -40,16 +40,40 @@
 #define INIT_STATE 0
 #define RUNNING_STATE 1
 
-/* Function def. */
+/* Support Function*/
 
+/**
+ * handler of the signal
+ * @param signum type of signal to be handled
+ */
 void signals_handler(int signum);
 
-Bool read_conf_node(struct conf *simulation_conf);
+/**
+ * \brief Read the conf file present in te project dir
+ * load the configuration directly in the struct conf node_configuration that is a SysVar
+ * @return FALSE in case of FAILURE, TRUE otherwise
+ */
+Bool read_conf_node();
 
+/**
+ * Set the handler for signals of the current node_proc
+ * @param sa describe the type of action to be performed when a signal arrive
+ * @param sigmask the mask to be applied
+ * @return FALSE in case of FAILURE, TRUE otherwise
+ */
 Bool set_signal_handler_node(struct sigaction sa, sigset_t sigmask);
 
+/**
+ * Check the argc and argv to match with project specification
+ * @param argc number of argument given
+ * @param argv pointer to a char list of params given
+ * @return FALSE in case of FAILURE, TRUE otherwise
+ */
 Bool check_arguments(int argc, char const *argv[]);
 
+/**
+ * Make the shm_conf_pointer points to the correct conf shm
+ */
 void attach_to_shm_conf(void);
 
 /* SysVar */
@@ -58,8 +82,6 @@ int semaphore_start_id = -1; /*Id of the start semaphore arrays for sinc*/
 
 int queue_node_id = -1;/* Identifier of the node queue id */
 int node_end = 0; /* For value different from 0 the node proc must end*/
-int users_snapshot[][2];/* Contains the ref to the pid_t of the users and the queue id*/
-int nodes_snapshot[][2];/* Contains the ref to the pid_t of the nodes and the queue id*/
 int node_id = -1; /* Id of the current node into the snapshots vector*/
 struct node current_node; /* Current representation of the node*/
 struct conf node_configuration; /* Configuration File representation*/
@@ -130,13 +152,9 @@ int main(int argc, char const *argv[]) {
     EXIT_PROCEDURE_NODE(0);
 }
 
-/**
- * Load and read the configuration, in case of error during loading close the proc. with EXIT_FAILURE
- * @return TRUE if ALL OK
- */
-Bool read_conf_node(struct conf *simulation_conf) {
+Bool read_conf_node() {
     DEBUG_NOTIFY_ACTIVITY_RUNNING("LOADING CONFIGURATION...");
-    switch (load_configuration(simulation_conf)) {
+    switch (load_configuration(&node_configuration)) {
         case 0:
             break;
         case -1:
