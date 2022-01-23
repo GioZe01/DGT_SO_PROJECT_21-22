@@ -41,22 +41,44 @@
 #define INIT_STATE 0
 #define RUNNING_STATE 1
 
-/*  Function def. */
+/*  Support functions*/
+/**
+ * handler of the signal
+ * @param signum type of signal to be handled
+ */
 void signals_handler(int signum);
-
-/*  Helper  */
-Bool check_argument(int arc, char const *argv[]);
-
+/**
+ * Check the argc and argv to match with project specification
+ * @param argc number of argument given
+ * @param argv pointer to a char list of params given
+ * @return FALSE in case of FAILURE, TRUE otherwise
+ */
+Bool check_argument(int argc, char const *argv[]);
+/**
+ * Set the handler for signals of the current user_proc
+ * @param sa describe the type of action to be performed when a signal arrive
+ * @param sigmask the mask to be applied
+ * @return FALSE in case of FAILURE, TRUE otherwise
+ */
 Bool set_signal_handler_user(struct sigaction sa, sigset_t sigmask);
-
-Bool read_conf(struct conf *simulation_conf);
-
+/**
+ * \brief Read the conf file present in te project dir
+ * load the configuration directly in the struct conf configuration that is a SysVar
+ * @return FALSE in case of FAILURE, TRUE otherwise
+ */
+Bool read_conf();
+/**
+ * \brief Send to the node all the transaction that still need to be processed
+ * with range block size if cashing is active
+ * @return -1 in case of FAILURE. 0 otherwise
+ */
 int send_to_node(void);
-
+/**
+ * Make the shm_conf_pointer points to the correct conf shm
+ */
 void attach_to_shm_conf(void);
 
 /*  SysV  */
-
 int state; /* Current state of the user proc*/
 int semaphore_start_id = -1; /*Id of the start semaphore arrays for sinc*/
 int queue_report_id = -1; /* Identifier of the user queue id*/
@@ -82,7 +104,7 @@ int main(int arc, char const *argv[]) {
 
     if (check_argument(arc, argv) && set_signal_handler_user(sa, sigmask)) {
         /*  VARIABLE INITIALIZATION */
-        read_conf(&configuration);
+        read_conf();
         user_create(&current_user, configuration.so_buget_init, getpid(), &calc_balance, &update_cash_flow);
         gen_sleep.tv_sec = 0;
         /*--------------------------------------*/
@@ -162,14 +184,14 @@ int main(int arc, char const *argv[]) {
 
 /**
  * Check if the argument respect initialization value for the user_proc
- * @param arc number of value in argv
+ * @param argc number of value in argv
  * @param argv argument pass in the main function
  * @return  TRUE if all OK, otherwise FALSE
  */
-Bool check_argument(int arc, char const *argv[]) {
-    /*TODO: controllo dell arc*/
+Bool check_argument(int argc, char const *argv[]) {
+    /*TODO: controllo dell argc*/
     DEBUG_NOTIFY_ACTIVITY_RUNNING("CHECKING ARGC AND ARGV...");
-    if (arc < 2) {
+    if (argc < 2) {
         ERROR_EXIT_SEQUENCE_USER("MISSING ARGUMENT");
     }
     user_id = atoi(argv[1]);
@@ -238,13 +260,9 @@ void free_sysVar_user() {
     }
 }
 
-/**
- * Load and read the configuration, in case of error during loading close the proc. with EXIT_FAILURE
- * @return TRUE if ALL OK
- */
-Bool read_conf(struct conf *simulation_conf) {
+Bool read_conf() {
     DEBUG_NOTIFY_ACTIVITY_RUNNING("LOADING CONFIGURATION...");
-    switch (load_configuration(simulation_conf)) {
+    switch (load_configuration(&configuration)){
         case 0:
             break;
         case -1:

@@ -97,13 +97,13 @@ void create_nodes_msg_queue(void);
  */
 int create_nodes_proc(int *nodes_pids, int *nodes_queues_ids);
 /**
- * Read the conf file present in the project dir
- * @return False in case of FAILURE, TRUE otherwise
+ * \brief Read the conf file present in te project dir
+ * load the configuration directly in the struct conf configuration that is a SysVar
  */
 Bool read_conf(void);
 /**
  * Set the handler for signals of the current main_proc
- * @param sa the mask to be applied
+ * @param sa  describe the type of action to performed when a signal arrive
  */
 void set_signal_handlers(struct sigaction sa);
 /**
@@ -399,10 +399,6 @@ void free_sysVar() {
     DEBUG_NOTIFY_ACTIVITY_DONE("REMOVING SHM CONF DONE");
 }
 
-/**
- * Load and read the configuration, in case of error during loading close the proc. with EXIT_FAILURE
- * @return TRUE if ALL OK
- */
 Bool read_conf(void) {
     DEBUG_BLOCK_ACTION_START("READING CONF")
     DEBUG_NOTIFY_ACTIVITY_RUNNING("READING CONFIGURATION...");
