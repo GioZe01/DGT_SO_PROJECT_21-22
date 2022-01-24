@@ -96,7 +96,6 @@ int generate_transaction(struct user_transaction *self, pid_t user_proc_pid, str
 #endif
         queue_append(self->in_process, t);
         self->update_cash_flow(self, &t);
-        printf("\n ----------------- timestamp: %ld", t.timestamp.tv_nsec);
         DEBUG_NOTIFY_ACTIVITY_DONE("GENERATING THE TRANSACTION DONE");
         return 0;
     }

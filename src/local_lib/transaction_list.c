@@ -22,18 +22,32 @@
 #define DEBUG_SIGNAL(mex, signum)
 #define DEBUG_ERROR_MESSAGE(mex)
 #endif
-
+/* Local utility function*/
+/**
+ * Called when iterable action is called on empty queue to throw error
+ */
 static void queue_underflow(void);
 
+/**
+ * Transform the type given into a formatted char string
+ * @param char_type the string in which u want the char string to be saved
+ * @param t_type type of transaction to be transformed
+ */
 void get_status(char char_type[80], int t_type);
 
+/**
+ * Tells whether or not the given queue is empty or not
+ * @param q the queue to perform the check on
+ */
 static void empty_queue(Queue q);
 
+
+/* Struct definition*/
 struct node {
     struct Transaction t;
     struct node *next;
 };
-/*Implement the real queue structure*/
+/* ADT implementation*/
 struct transaction_list {
     struct node *first;
     struct node *last;
@@ -41,7 +55,6 @@ struct transaction_list {
 };
 
 int create_transaction(struct Transaction *t, pid_t sender, pid_t receiver, float amount) {
-
     struct timespec timestamp;
     DEBUG_NOTIFY_ACTIVITY_RUNNING("CREATING A TRANSACTION...");
     if (clock_gettime(CLOCK_REALTIME, &timestamp) < 0) {
@@ -87,7 +100,8 @@ static void empty_queue(Queue q) {
 void queue_append(Queue q, struct Transaction t) {
     DEBUG_NOTIFY_ACTIVITY_RUNNING("APPENDING TO TRANSACTION QUEUE A NEW TRANSACTION...");
     struct node *new_node;
-    if ((new_node = malloc(sizeof(struct node)) == NULL)) {
+    new_node = (struct node *) malloc(sizeof(struct node));
+    if (new_node == NULL) {
         DEBUG_ERROR_MESSAGE("MALLOC ON NODE STRUCT IS NULL");
         ERROR_MESSAGE("Malloc failed in queue append");
         return;
@@ -101,7 +115,7 @@ void queue_append(Queue q, struct Transaction t) {
         q->last = new_node;
     }
     q->transactions++;
-    DEBUG_NOTIFY_ACTIVITY_RUNNING("APPENDING TO TRANSACTION QUEUE A NEW TRANSACTION DONE");
+    DEBUG_NOTIFY_ACTIVITY_DONE("APPENDING TO TRANSACTION QUEUE A NEW TRANSACTION DONE");
 }
 
 void queue_remove_head(Queue q) {

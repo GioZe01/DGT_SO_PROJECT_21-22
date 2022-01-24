@@ -47,6 +47,7 @@
  * @param signum type of signal to be handled
  */
 void signals_handler(int signum);
+
 /**
  * Check the argc and argv to match with project specification
  * @param argc number of argument given
@@ -54,6 +55,7 @@ void signals_handler(int signum);
  * @return FALSE in case of FAILURE, TRUE otherwise
  */
 Bool check_argument(int argc, char const *argv[]);
+
 /**
  * Set the handler for signals of the current user_proc
  * @param sa describe the type of action to be performed when a signal arrive
@@ -61,18 +63,21 @@ Bool check_argument(int argc, char const *argv[]);
  * @return FALSE in case of FAILURE, TRUE otherwise
  */
 Bool set_signal_handler_user(struct sigaction sa, sigset_t sigmask);
+
 /**
  * \brief Read the conf file present in te project dir
  * load the configuration directly in the struct conf configuration that is a SysVar
  * @return FALSE in case of FAILURE, TRUE otherwise
  */
 Bool read_conf();
+
 /**
  * \brief Send to the node all the transaction that still need to be processed
  * with range block size if cashing is active
  * @return -1 in case of FAILURE. 0 otherwise
  */
 int send_to_node(void);
+
 /**
  * Make the shm_conf_pointer points to the correct conf shm
  */
@@ -182,14 +187,7 @@ int main(int arc, char const *argv[]) {
     ERROR_EXIT_SEQUENCE_USER("CREATION OF USER_PROC FAILED DUE TO: Arg or Signal handler creation failure");
 }
 
-/**
- * Check if the argument respect initialization value for the user_proc
- * @param argc number of value in argv
- * @param argv argument pass in the main function
- * @return  TRUE if all OK, otherwise FALSE
- */
 Bool check_argument(int argc, char const *argv[]) {
-    /*TODO: controllo dell argc*/
     DEBUG_NOTIFY_ACTIVITY_RUNNING("CHECKING ARGC AND ARGV...");
     if (argc < 2) {
         ERROR_EXIT_SEQUENCE_USER("MISSING ARGUMENT");
@@ -199,12 +197,7 @@ Bool check_argument(int argc, char const *argv[]) {
     return TRUE;
 }
 
-/**
- * Set the signal handler and signal mask for the user_proc
- * @return TRUE if success, FALSE otherwise.
- */
 Bool set_signal_handler_user(struct sigaction sa, sigset_t sigmask) {
-
     DEBUG_NOTIFY_ACTIVITY_RUNNING("SETTING SIGNAL MASK...");
     sigemptyset(&sigmask);/*Creating an empty mask*/
     sigaddset(&sigmask, SIGALRM);/*Adding signal to the mask*/
@@ -262,7 +255,7 @@ void free_sysVar_user() {
 
 Bool read_conf() {
     DEBUG_NOTIFY_ACTIVITY_RUNNING("LOADING CONFIGURATION...");
-    switch (load_configuration(&configuration)){
+    switch (load_configuration(&configuration)) {
         case 0:
             break;
         case -1:
