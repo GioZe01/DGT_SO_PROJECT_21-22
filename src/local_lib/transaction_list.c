@@ -197,14 +197,16 @@ void queue_print(Queue q) {
     if (queue_is_empty(q) == TRUE) {
         ERROR_MESSAGE("PRINTING AN EMPTY QUEUE");
     }
-    struct node *iterable = q->first;
-    printf("--------- TRANSACTION LIST ---------\n");
-    printf("| Current # of transactions: %d", q->transactions);
-    printf("|--------------------------------");
+    struct node * iterable ;
+    iterable = q->first;
+    printf("--------- TRANSACTION LIST %d ---------\n", getpid());
+    printf("| Current # of transactions: %d\n", q->transactions);
+    printf("|--------------------------------\n");
     for (; iterable != NULL; iterable = iterable->next) {
+        printf("DIO");
         transaction_print(iterable->t);
     }
-    printf("------------------------------------\n");
+    printf("----------------TRANSACTION LIST END--------------------\n");
 }
 
 void get_status(char char_type[80], int t_type) {
