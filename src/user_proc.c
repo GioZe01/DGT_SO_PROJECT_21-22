@@ -326,6 +326,7 @@ Bool check_for_transactions_confirmed(void) {
         /*Messagge found*/
         current_user.to_wait_transaction--;
         queue_remove(current_user.in_process,msg->t);
+        queue_append(current_user.transactions_done, msg->t);
     }
 }
 
