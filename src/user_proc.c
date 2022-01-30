@@ -298,9 +298,9 @@ void generating_transactions(void) {
         if (current_user.u_balance > 2 && generate_transaction(&current_user, current_user.pid, shm_conf_pointer) < 0) {
             ERROR_MESSAGE("IMPOSSIBLE TO GENERATE TRANSACTION");/*TODO: can be a simple advice, not a critical one*/
         }
-#ifdef DEBUG
+/*#ifdef DEBUG
         queue_print(current_user.in_process);
-#endif
+#endif*/
         gen_sleep.tv_nsec =
                 (rand() % (configuration.so_max_trans_gen_nsec - configuration.so_min_trans_gen_nsec + 1)) +
                 configuration.so_min_trans_gen_nsec;
