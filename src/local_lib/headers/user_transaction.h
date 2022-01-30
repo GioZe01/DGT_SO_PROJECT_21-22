@@ -82,8 +82,13 @@ int update_cash_flow(struct user_transaction *self, struct Transaction *t);
  * @return -1 in case o failure. 0 otherwise.
  */
 int generate_transaction(struct user_transaction *self, pid_t user_proc_pid,struct shm_conf *shm_conf);
-
-
+/**
+ * Remove the transaction from the list
+ * @param q the transaction list
+ * @param t the transaction to check for remove
+ * @return -1 in case of Failure, -2 in case of empty queue. 0 otherwise.
+ */
+int queue_remove(Queue q, struct Transaction t);
 /*
 struct user_snapshot *get_user_snapshot(struct user_transaction user) {
     TODO: implement get_user_snapshot

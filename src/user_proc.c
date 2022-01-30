@@ -55,16 +55,19 @@ void signals_handler(int signum);
  * @return FALSE in case of FAILURE, TRUE otherwise
  */
 Bool check_argument(int argc, char const *argv[]);
+
 /**
  * Check for the presence of a confirmed transaction and eventually handles it
  * @return
  */
-Bool check_for_transactions_confermed(void);
+Bool check_for_transactions_confirmed(void);
+
 /**
  * Check for the presence of a failed transaction and eventually handles it
  * @return
  */
 Bool check_for_transactions_failed(void);
+
 /**
  * Set the handler for signals of the current user_proc
  * @param sa describe the type of action to be performed when a signal arrive
@@ -166,10 +169,11 @@ int main(int arc, char const *argv[]) {
         /****************************************
          *      GENERATION OF TRANSACTION FASE *
          * **************************************/
-         generating_transactions();
+        generating_transactions();
 #ifdef U_CASHING
         /*TODO: wait for user in progress to empty with timeout*/
 #endif
+        /*TODO: check for remaining transaction confirmed*/
         DEBUG_MESSAGE("USER ENDED -----------------------------");
         EXIT_PROCEDURE_USER(0);
     }
@@ -287,9 +291,9 @@ void attach_to_shm_conf(void) {
 void generating_transactions(void) {
     struct timespec gen_sleep;
     while (current_user.budget >=
-           0) {/*Better than simply 1 because in case of negative profit u cannot do practically anything*/
+           0) {
         DEBUG_MESSAGE("TRANSACTION ALLOWED");
-        check_for_transactions_confermed();
+        check_for_transactions_confirmed();
         check_for_transactions_failed();
         if (current_user.u_balance > 2 && generate_transaction(&current_user, current_user.pid, shm_conf_pointer) < 0) {
             ERROR_MESSAGE("IMPOSSIBLE TO GENERATE TRANSACTION");/*TODO: can be a simple advice, not a critical one*/
@@ -314,4 +318,17 @@ void generating_transactions(void) {
 
         nanosleep(&gen_sleep, (void *) NULL);
     }
+}
+
+Bool check_for_transactions_confirmed(void) {
+    struct user_msg * msg;
+    if (user_msg_receive(queue_report_id, msg, user_id)==0){
+        /*Messagge found*/
+        current_user.to_wait_transaction--;
+        queue_remove(current_user.in_process,msg->t);
+    }
+}
+
+Bool check_for_transactions_failed(void) {
+
 }

@@ -50,6 +50,7 @@ void user_create(struct user_transaction *self, float budget, int pid, Balance b
     self->in_process = queue_create();
     self->cash_flow.entries = budget;
     self->cash_flow.outcomes = 0;
+    self->expected_out = 0;
     self->to_wait_transaction = 0;
     self->update_cash_flow = update_cash_flow;
 }
@@ -104,7 +105,8 @@ int generate_transaction(struct user_transaction *self, pid_t user_proc_pid, str
 #endif
  */
         queue_append(self->in_process, t);
-        self->update_cash_flow(self, &t);
+        if(self->update_cash_flow(self, &t)<0){ ERROR_EXIT_SEQUENCE_USER("IMPOSSIBLE TO UPDATE CASH FLOW");}
+        self->to_wait_transaction++;
         DEBUG_NOTIFY_ACTIVITY_DONE("GENERATING THE TRANSACTION DONE");
         return 0;
     }

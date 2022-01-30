@@ -22,6 +22,17 @@
 #define DEBUG_SIGNAL(mex, signum)
 #define DEBUG_ERROR_MESSAGE(mex)
 #endif
+/* Struct definition*/
+struct node {
+    struct Transaction t;
+    struct node *next;
+};
+/* ADT implementation*/
+struct transaction_list {
+    struct node *first;
+    struct node *last;
+    int transactions; /*number of transaction in the list*/
+};
 /* Local utility function*/
 /**
  * Called when iterable action is called on empty queue to throw error
@@ -41,18 +52,20 @@ void get_status(char char_type[80], int t_type);
  */
 static void empty_queue(Queue q);
 
+/**
+ * Compare to transaction
+ * @param t1 transaction 1
+ * @param t2 transaction 2
+ * @return TRUE if ==, FALSE otherwise
+ */
+Bool compare_transaction(struct Transaction t1, struct Transaction t2);
 
-/* Struct definition*/
-struct node {
-    struct Transaction t;
-    struct node *next;
-};
-/* ADT implementation*/
-struct transaction_list {
-    struct node *first;
-    struct node *last;
-    int transactions; /*number of transaction in the list*/
-};
+/**
+ * Append the corrend node to the next one
+ * @param where u want to append the node
+ * @param to_append the node to append to the previous
+ */
+void append_to_node(struct node *where, struct node *to_append);
 
 int create_transaction(struct Transaction *t, pid_t sender, pid_t receiver, float amount) {
     struct timespec timestamp;
@@ -129,6 +142,32 @@ void queue_remove_head(Queue q) {
         q->transactions--;
     } else
         queue_underflow();
+}
+
+int queue_remove(Queue q, struct Transaction t) {
+    if (queue_is_empty(q) == TRUE)
+        return -2;
+
+    struct node *iterable = q->first;
+    for (; compare_transaction(iterable->next->t, t) == TRUE; iterable = iterable->next);
+    append_to_node(iterable, iterable->next->next);
+    q->transactions--;
+}
+
+void append_to_node(struct node *where, struct node *to_append) {
+    where->next = to_append;
+}
+
+Bool compare_transaction(struct Transaction t1, struct Transaction t2) {
+    if (t1.reciver == t2.reciver &&
+        t1.amount == t2.amount &&
+        t1.sender == t2.sender &&
+        t1.reward == t2.reward &&
+        t1.hops == t2.hops &&
+        t1.t_type == t2.t_type) {
+        return TRUE;
+    }
+    return FALSE;
 }
 
 struct Transaction queue_head(Queue q) {
