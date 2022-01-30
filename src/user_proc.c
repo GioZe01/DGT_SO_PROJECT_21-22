@@ -248,9 +248,6 @@ void free_sysVar_user() {
         }
     }
 
-    if (queue_report_id >= 0 && msgctl(queue_report_id, IPC_RMID, NULL) < 0) {
-        ERROR_MESSAGE("IMPOSSIBLE TO DELETE MESSAGE QUEUE OF USER");
-    }
 }
 
 Bool read_conf() {

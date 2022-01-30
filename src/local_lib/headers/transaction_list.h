@@ -83,4 +83,10 @@ void queue_print(Queue q);
  * @param t the transaction to be printed
  */
 void transaction_print(struct Transaction t);
+/**
+ * Return the number of transactions in the linked list
+ * @param q the list to get the num of transactions
+ * @return the number of transaction. -1 in case of error.
+ */
+int get_num_transactions(Queue q);
 #endif /*DGT_SO_PROJECT_21_22_TRANSACTION_LIST_H*/

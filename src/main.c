@@ -84,10 +84,12 @@ int create_users_proc(int *users_pids, int *users_queues_ids);
  * Create the users message queues for processes to users communication
  */
 void create_users_msg_queue(void);
+
 /**
  * Create the nodes message queues for processes to nodes communication
  */
 void create_nodes_msg_queue(void);
+
 /**
  * \brief Create the nodes processes and lunch the with execve
  * utilize simulation configuration in the file conf for generating the exact number of nodes
@@ -96,16 +98,19 @@ void create_nodes_msg_queue(void);
  * @return -1 in case of FAILURE. 0 otherwise
  */
 int create_nodes_proc(int *nodes_pids, int *nodes_queues_ids);
+
 /**
  * \brief Read the conf file present in te project dir
  * load the configuration directly in the struct conf configuration that is a SysVar
  */
 Bool read_conf(void);
+
 /**
  * Set the handler for signals of the current main_proc
  * @param sa  describe the type of action to performed when a signal arrive
  */
 void set_signal_handlers(struct sigaction sa);
+
 /**
  * handler of the signal
  * @param signum type of signal to be handled
@@ -397,6 +402,9 @@ void free_sysVar() {
         ERROR_MESSAGE("REMOVING PROCEDURE FOR SHM_CONF FAILED");
     }
     DEBUG_NOTIFY_ACTIVITY_DONE("REMOVING SHM CONF DONE");
+    if (msg_report_id_users >= 0 && msgctl(msg_report_id_users, IPC_RMID, NULL) < 0) {
+        ERROR_MESSAGE("IMPOSSIBLE TO DELETE MESSAGE QUEUE OF USER");
+    }
 }
 
 Bool read_conf(void) {

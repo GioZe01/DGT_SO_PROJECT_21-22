@@ -91,11 +91,12 @@ int generate_transaction(struct user_transaction *self, pid_t user_proc_pid, str
     if (check_balance(self) == TRUE) {
         if (create_transaction(&t, user_proc_pid, extract_user(shm_conf->users_snapshots), gen_amount(self)) <
             0) { ERROR_MESSAGE("FAILED ON TRANSACTION CREATION"); }
+/*
 #ifdef DEBUG
         transaction_print(t);
 #endif
+ */
         queue_append(self->in_process, t);
-        self->update_cash_flow(self, &t);
         DEBUG_NOTIFY_ACTIVITY_DONE("GENERATING THE TRANSACTION DONE");
         return 0;
     }

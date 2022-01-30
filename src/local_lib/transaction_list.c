@@ -75,7 +75,7 @@ int create_transaction(struct Transaction *t, pid_t sender, pid_t receiver, floa
 Queue queue_create() {
     Queue q = malloc(sizeof(struct transaction_list));
     if (q == NULL) {
-        ERROR_MESSAGE("Malloc failed in the creation of quque_t");
+        ERROR_MESSAGE("MALLOC FAILED IN THE CREATION OF QUEUE_T");
         return NULL;
     }
     q->first = NULL;
@@ -197,13 +197,12 @@ void queue_print(Queue q) {
     if (queue_is_empty(q) == TRUE) {
         ERROR_MESSAGE("PRINTING AN EMPTY QUEUE");
     }
-    struct node * iterable ;
+    struct node *iterable;
     iterable = q->first;
     printf("--------- TRANSACTION LIST %d ---------\n", getpid());
     printf("| Current # of transactions: %d\n", q->transactions);
     printf("|--------------------------------\n");
     for (; iterable != NULL; iterable = iterable->next) {
-        printf("DIO");
         transaction_print(iterable->t);
     }
     printf("----------------TRANSACTION LIST END--------------------\n");
@@ -231,9 +230,15 @@ void get_status(char char_type[80], int t_type) {
 }
 
 void transaction_print(struct Transaction t) {
-    char *char_type;
+    char char_type[80];
     get_status(char_type, t.t_type);
     printf("| status: %s | sender: %d | receiver: %d | amount: %f | hops: %d | reward: %f | timestamp: %ld,%ld \n",
            char_type, t.sender, t.reciver, t.amount,
            t.hops, t.reward, t.timestamp.tv_sec, t.timestamp.tv_nsec);
+}
+
+int get_num_transactions(Queue q) {
+    if (queue_is_empty(q) == FALSE)
+        return q->transactions;
+    return -1;
 }
