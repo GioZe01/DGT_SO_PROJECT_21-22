@@ -21,7 +21,8 @@ struct user_transaction {
     Queue in_process;/*Validated, but still to be confirmed by the nodes_proc*/
     struct UCashFlow cash_flow;
     CalcCashFlow update_cash_flow; /*Can set the function u desire while implementing, consider the one already implemented below*/
-    float expected_out;/*Expected outcome that still have to be processed, abs value*/
+    float expected_out; /* Expected outcomes to still be processed*/
+    int to_wait_transaction;/*Num Transactions to waite on for the conformation of processing */
 };
 
 struct user_snapshot {

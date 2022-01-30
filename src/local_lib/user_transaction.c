@@ -19,6 +19,7 @@
 #define DEBUG_SIGNAL(mex, signum)
 #define DEBUG_ERROR_MESSAGE(mex)
 #endif
+
 /**
  * Extract randomly a node id from 0 up to nodes_num
  * @param nodes_num limit for random extraction
@@ -32,6 +33,7 @@ int extract_node(int nodes_num);
  * @return the pid_t of the user selected randomly
  */
 pid_t extract_user(int users_num[][2]);
+
 /**
  * \brief Generate a random float number,
  * representing the amount of a transaction with srand() level with getpid
@@ -48,7 +50,7 @@ void user_create(struct user_transaction *self, float budget, int pid, Balance b
     self->in_process = queue_create();
     self->cash_flow.entries = budget;
     self->cash_flow.outcomes = 0;
-    self->expected_out = 0;
+    self->to_wait_transaction = 0;
     self->update_cash_flow = update_cash_flow;
 }
 
@@ -69,17 +71,22 @@ float calc_balance(struct user_transaction *self) {
 }
 
 int update_cash_flow(struct user_transaction *self, struct Transaction *t) {
-    if (self->pid == t->reciver && t->t_type == TRANSACTION_SUCCES) { /*Getting Reacher*/
-        self->cash_flow.entries = t->amount;
+    if (self->pid == t->reciver && t->t_type == TRANSACTION_SUCCES) { /*Getting reaches*/
+        self->cash_flow.entries += t->amount;
         /* Already confirmed by the nodes*/
         self->budget += t->amount;
         return 0;
     } else if (self->pid == t->sender && t->t_type == TRANSACTION_SUCCES) {
-        /*outcomes is already updated -> check definition -_- (ricordati i return)*/
+        /*outcomes is already updated -> check definition*/
         self->budget -= t->amount;
+        self->cash_flow.outcomes += t->amount;
+        self->expected_out -= t->amount;
         return 0;
     } else if (self->pid == t->sender && t->t_type == TRANSACTION_FAILED) {
-        self->cash_flow.outcomes += t->amount;
+        self->cash_flow.outcomes -= t->amount;
+        return 0;
+    } else if (self->pid == t->sender && t->t_type == TRANSACTION_WAITING) {
+        self->expected_out += t->amount;
         return 0;
     }
     return -1;
@@ -97,6 +104,7 @@ int generate_transaction(struct user_transaction *self, pid_t user_proc_pid, str
 #endif
  */
         queue_append(self->in_process, t);
+        self->update_cash_flow(self, &t);
         DEBUG_NOTIFY_ACTIVITY_DONE("GENERATING THE TRANSACTION DONE");
         return 0;
     }
@@ -123,5 +131,5 @@ int extract_node(int nodes_num) {
 float gen_amount(struct user_transaction *user) {
     srand(getpid());
     /* TODO: Possible bug*/
-    return (float) (rand() % (((int)user->budget) - 2 + 1)) + 2;
+    return (float) (rand() % (((int) user->budget) - 2 + 1)) + 2;
 }

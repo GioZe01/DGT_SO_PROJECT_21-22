@@ -55,7 +55,16 @@ void signals_handler(int signum);
  * @return FALSE in case of FAILURE, TRUE otherwise
  */
 Bool check_argument(int argc, char const *argv[]);
-
+/**
+ * Check for the presence of a confirmed transaction and eventually handles it
+ * @return
+ */
+Bool check_for_transactions_confermed(void);
+/**
+ * Check for the presence of a failed transaction and eventually handles it
+ * @return
+ */
+Bool check_for_transactions_failed(void);
 /**
  * Set the handler for signals of the current user_proc
  * @param sa describe the type of action to be performed when a signal arrive
@@ -83,6 +92,11 @@ int send_to_node(void);
  */
 void attach_to_shm_conf(void);
 
+/**
+ * generate the transactions, and take knowledge of usr_msg int usr_msg_queue
+ */
+void generating_transactions(void);
+
 /*  SysV  */
 int state; /* Current state of the user proc*/
 int semaphore_start_id = -1; /*Id of the start semaphore arrays for sinc*/
@@ -96,7 +110,6 @@ int main(int arc, char const *argv[]) {
     DEBUG_MESSAGE("USER PROCESS STARTED");
     struct sigaction sa;
     struct user_msg msg_rep;
-    struct timespec gen_sleep;
     int start_sem_value;
     sigset_t sigmask; /* sinal mask */
 
@@ -111,7 +124,6 @@ int main(int arc, char const *argv[]) {
         /*  VARIABLE INITIALIZATION */
         read_conf();
         user_create(&current_user, configuration.so_buget_init, getpid(), &calc_balance, &update_cash_flow);
-        gen_sleep.tv_sec = 0;
         /*--------------------------------------*/
         /*  CONNECTING TO THE USER REPORT QUEUE *
         /*--------------------------------------*/
@@ -154,32 +166,10 @@ int main(int arc, char const *argv[]) {
         /****************************************
          *      GENERATION OF TRANSACTION FASE *
          * **************************************/
-        while (current_user.u_balance > 2) {
-            DEBUG_MESSAGE("TRANSACTION ALLOWED");
-            if (generate_transaction(&current_user, current_user.pid, shm_conf_pointer) < 0) {
-                ERROR_EXIT_SEQUENCE_USER("IMPOSSIBLE TO GENERATE TRANSACTION");
-            }
-#ifdef DEBUG
-            queue_print(current_user.in_process);
-#endif
-            gen_sleep.tv_nsec =
-                    (rand() % (configuration.so_max_trans_gen_nsec - configuration.so_min_trans_gen_nsec + 1)) +
-                    configuration.so_min_trans_gen_nsec;
+         generating_transactions();
 #ifdef U_CASHING
-            /*TODO: make cashing*/
+        /*TODO: wait for user in progress to empty with timeout*/
 #endif
-
-            /*SENDING TRANSACTION TO THE NODE*/
-
-            if (send_to_node() < 0) {
-                ERROR_MESSAGE("IMPOSSIBLE TO SEND TO THE NODE");
-            }
-            /*
-             * TODO: check for the retry to send : can do with while then abort and notify master
-             * */
-            nanosleep(&gen_sleep, (void *) NULL);
-        }
-
         DEBUG_MESSAGE("USER ENDED -----------------------------");
         EXIT_PROCEDURE_USER(0);
     }
@@ -292,4 +282,36 @@ void attach_to_shm_conf(void) {
     shm_conf_pointer = shmat(shm_conf_id, NULL, 0);
     if (shm_conf_pointer == (void *) -1) { ERROR_EXIT_SEQUENCE_USER("IMPOSSIBLE TO CONNECT TO SHM CONF"); }
     DEBUG_NOTIFY_ACTIVITY_DONE("ATTACHING TO SHM DONE");
+}
+
+void generating_transactions(void) {
+    struct timespec gen_sleep;
+    while (current_user.budget >=
+           0) {/*Better than simply 1 because in case of negative profit u cannot do practically anything*/
+        DEBUG_MESSAGE("TRANSACTION ALLOWED");
+        check_for_transactions_confermed();
+        check_for_transactions_failed();
+        if (current_user.u_balance > 2 && generate_transaction(&current_user, current_user.pid, shm_conf_pointer) < 0) {
+            ERROR_MESSAGE("IMPOSSIBLE TO GENERATE TRANSACTION");/*TODO: can be a simple advice, not a critical one*/
+        }
+#ifdef DEBUG
+        queue_print(current_user.in_process);
+#endif
+        gen_sleep.tv_nsec =
+                (rand() % (configuration.so_max_trans_gen_nsec - configuration.so_min_trans_gen_nsec + 1)) +
+                configuration.so_min_trans_gen_nsec;
+#ifdef U_CASHING
+        /*TODO: make cashing*/
+#else
+        /*SENDING TRANSACTION TO THE NODE*/
+        if (send_to_node() < 0) {
+            ERROR_MESSAGE("IMPOSSIBLE TO SEND TO THE NODE");
+        }
+        /*
+         * TODO: check for the retry to send : can do with while then abort and notify master
+         * */
+#endif
+
+        nanosleep(&gen_sleep, (void *) NULL);
+    }
 }
