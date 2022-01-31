@@ -22,6 +22,7 @@
 #include "local_lib/headers/simulation_errors.h"
 #include "local_lib/headers/semaphore.h"
 #include "local_lib/headers/node_transactor.h"
+#include "local_lib/headers/user_msg_report.h"
 #include "local_lib/headers/node_msg_report.h"
 #include "local_lib/headers/conf_shm.h"
 
@@ -76,11 +77,31 @@ Bool check_arguments(int argc, char const *argv[]);
  */
 void attach_to_shm_conf(void);
 
+/**
+ * If it finds node msg of type NODE_TRANSACTION it proccess them
+ * and make the aknowledgement
+ * @param msg_rep the messagge to be loaded if present in the queue
+ * */
+void process_node_transaction(struct node_msg *msg_rep);
+
+/**
+ * if it finds node msg of type TRANSACTION_TYPE it process them
+ * and make the aknowledgement
+ * @param msg_rep the messagge to be loaded if present in the queue
+ * */
+void process_simple_transaction_type(struct node_msg *msg_rep);
+
+/**
+ * Connects to the differents queues: master, node's and user's
+ * */
+void connect_to_queues(void);
+
 /* SysVar */
 int state; /* Current state of the node proc*/
 int semaphore_start_id = -1; /*Id of the start semaphore arrays for sinc*/
 
 int queue_node_id = -1;/* Identifier of the node queue id */
+int queue_user_id = -1; /* Identifier of the user queue id*/
 int node_end = 0; /* For value different from 0 the node proc must end*/
 int node_id = -1; /* Id of the current node into the snapshots vector*/
 struct node current_node; /* Current representation of the node*/
@@ -102,14 +123,10 @@ int main(int argc, char const *argv[]) {
         node_create(&current_node, getpid(), 0, node_configuration.so_tp_size, node_configuration.so_block_size,
                     node_configuration.so_reward, &calc_reward);
 
-        /*-----------------------------------*/
-        /*  CONNECTING TO NODE REPORT QUEUE  *
-        /*-----------------------------------*/
-        /*TODO: Aggiungerla come optional alla compilazione*/
-        queue_node_id = msgget(NODES_QUEUE_KEY, 0600);
-        printf("----------------NODE QUEUE ID: %d\n", queue_node_id);
-        if (queue_node_id < 0) { ERROR_EXIT_SEQUENCE_NODE("IMPOSSIBLE TO CREATE THE MESSAGE QUEUE"); }
-
+        /*-----------------------*/
+        /*  CONNECTING TO QUEUES *
+        /*-----------------------*/
+        connect_to_queues();
         /*-------------------------*/
         /*  SHARED MEM  CONFIG     *
         /*-------------------------*/
@@ -135,16 +152,11 @@ int main(int argc, char const *argv[]) {
         /****************************************
          *      PROCESSING OF TRANSACTION FASE  *
          * **************************************/
-         while(node_end != 1){
-             /*TODO: verificare*/
-             if(node_msg_receive(queue_node_id, &msg_rep, node_id)<0){
-                 /*Checking for transaction coming from node*/
-
-             } else if(node_msg_receive(queue_node_id,&msg_rep,node_id-MSG_NODE_ORIGIN_TYPE)<0){
-                 /*Checking for transaction type*/
-
-             }
-             node_msg_print(&msg_rep);
+        while (node_end != 1) {
+            /*TODO: verificare*/
+            process_node_transaction(&msg_rep);
+            process_simple_transaction_type(&msg_rep);
+            node_msg_print(&msg_rep);
         }
 
     }
@@ -250,4 +262,34 @@ void attach_to_shm_conf(void) {
     shm_conf_pointer_node = shmat(shm_conf_id, NULL, 0);
     if (shm_conf_pointer_node == (void *) -1) { ERROR_EXIT_SEQUENCE_NODE("IMPOSSIBLE TO CONNECT TO SHM CONF"); }
     DEBUG_NOTIFY_ACTIVITY_DONE("ATTACHING TO SHM DONE");
+}
+
+void process_node_transaction(struct node_msg *msg_rep) {
+    if (node_msg_receive(queue_node_id, msg_rep, node_id) == 0) {
+        /*Checking for transaction coming from node*/
+        DEBUG_MESSAGE("NODE TRANSACTION RECEIVED");
+
+    }
+}
+
+void process_simple_transaction_type(struct node_msg *msg_rep) {
+    struct user_msg *u_msg_rep;
+    if (node_msg_receive(queue_node_id, msg_rep, node_id - MSG_NODE_ORIGIN_TYPE) == 0) {
+        /*Checking for transaction type*/
+        DEBUG_MESSAGE("NODE TRANSACTION TYPE RECEIVED");
+        if (get_num_transactions(current_node.transaction_pool) < node_configuration.so_tp_size) {
+            queue_append(current_node.transaction_pool, msg_rep->t);
+        } else {
+            u_msg_rep->t.t_type = TRANSACTION_FAILED;
+            user_msg_snd(queue_user_id, u_msg_rep, MSG_TRANSACTION_FAILED_TYPE, &msg_rep->t, current_node.pid, TRUE);
+        }
+    }
+}
+
+void connect_to_queues(void) {
+    /*TODO: Aggiungerla come optional alla compilazione*/
+    queue_node_id = msgget(NODES_QUEUE_KEY, 0600);
+    if (queue_node_id < 0) { ERROR_EXIT_SEQUENCE_NODE("IMPOSSIBLE TO CONNECT TO NODE MESSAGE QUEUE"); }
+    queue_user_id = msgget(USERS_QUEUE_KEY, 0600);
+    if (queue_user_id < 0) { ERROR_EXIT_SEQUENCE_NODE("IMPOSSIBLE TO CONNECT TO USER QUEUE"); }
 }

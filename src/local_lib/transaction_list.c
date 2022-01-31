@@ -151,6 +151,7 @@ int queue_remove(Queue q, struct Transaction t) {
     struct node *iterable = q->first;
     for (; compare_transaction(iterable->next->t, t) == TRUE; iterable = iterable->next);
     append_to_node(iterable, iterable->next->next);
+    free(iterable->next);
     q->transactions--;
 }
 

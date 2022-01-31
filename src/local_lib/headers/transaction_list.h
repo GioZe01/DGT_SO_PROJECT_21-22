@@ -33,7 +33,7 @@ Queue queue_create(void);
 void queue_destroy(Queue q);
 /**
  * Insert a transaction in the given queue
- * @param q the queue to ooperate on
+ * @param q the queue to operate on
  * @param i transaction to be added
  */
 void queue_append(Queue q, struct Transaction i);

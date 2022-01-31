@@ -115,13 +115,13 @@ int generate_transaction(struct user_transaction *self, pid_t user_proc_pid, str
 
 pid_t extract_user(int users_num[][2]) {
     srand(getpid());
-    DEBUG_NOTIFY_ACTIVITY_RUNNING("EXTRACTING USER INFO FROM SNAPSHOTS...");
+    DEBUG_NOTIFY_ACTIVITY_RUNNING("EXTRACTING USER FROM SNAPSHOTS...");
     int max = users_num[0][0];
     int e = (rand() % (max)) + 1;
     while (users_num[e + 1][0] == NULL) {
         e = (rand() % (max)) + 1;
     }
-    DEBUG_NOTIFY_ACTIVITY_DONE("EXTRACTING USER INFO FROM SNAPSHOTS DONE");
+    DEBUG_NOTIFY_ACTIVITY_DONE("EXTRACTING USER FROM SNAPSHOTS DONE");
     return users_num[e][0];
 }
 

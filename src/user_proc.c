@@ -104,6 +104,7 @@ void generating_transactions(void);
 int state; /* Current state of the user proc*/
 int semaphore_start_id = -1; /*Id of the start semaphore arrays for sinc*/
 int queue_report_id = -1; /* Identifier of the user queue id*/
+int node_queue_report_id = -1; /*Identifier of the node queue id*/
 int user_id = -1; /*Id of the current user into the snapshots vectors*/
 struct user_transaction current_user; /* Current representation of the user*/
 struct conf configuration; /* Configuration File representation */
@@ -132,8 +133,9 @@ int main(int arc, char const *argv[]) {
         /*--------------------------------------*/
         /*TODO: Aggiungerla come optional alla compilazione*/
         queue_report_id = msgget(USERS_QUEUE_KEY, 0600);
-        if (queue_report_id < 0) { ERROR_EXIT_SEQUENCE_USER("IMPOSSIBLE TO CREATE THE MESSAGE QUEUE"); }
-
+        if (queue_report_id < 0) { ERROR_EXIT_SEQUENCE_USER("IMPOSSIBLE TO CONNECT TO USER QUEUE"); }
+        node_queue_report_id = msgget(NODES_QUEUE_KEY, 0600);
+        if (node_queue_report_id < 0) { ERROR_EXIT_SEQUENCE_USER("IMPOSSIBLE TO CONNECT TO NODE QUEUE"); }
         /*-------------------------*/
         /*  SHARED MEM  CONFIG     *
         /*-------------------------*/
@@ -269,7 +271,7 @@ int send_to_node(void) {
     int node_num = (rand() % (shm_conf_pointer->nodes_snapshots[0][0])) + 1;
     struct node_msg msg;
     struct Transaction t = queue_last(current_user.in_process);
-    if (node_msg_snd(NODES_QUEUE_KEY, &msg, shm_conf_pointer->nodes_snapshots[node_num][1], &t,
+    if (node_msg_snd(node_queue_report_id, &msg, shm_conf_pointer->nodes_snapshots[node_num][1], &t,
                      current_user.pid, TRUE) < 0) { return -1; }
 #ifdef DEBUG
     node_msg_print(&msg);
@@ -321,11 +323,11 @@ void generating_transactions(void) {
 }
 
 Bool check_for_transactions_confirmed(void) {
-    struct user_msg * msg;
-    if (user_msg_receive(queue_report_id, msg, user_id)==0){
+    struct user_msg *msg;
+    if (user_msg_receive(queue_report_id, msg, user_id) == 0) {
         /*Messagge found*/
         current_user.to_wait_transaction--;
-        queue_remove(current_user.in_process,msg->t);
+        queue_remove(current_user.in_process, msg->t);
         queue_append(current_user.transactions_done, msg->t);
     }
 }
