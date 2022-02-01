@@ -94,7 +94,7 @@ int update_cash_flow(struct user_transaction *self, struct Transaction *t) {
 }
 
 int generate_transaction(struct user_transaction *self, pid_t user_proc_pid, struct shm_conf *shm_conf) {
-    DEBUG_NOTIFY_ACTIVITY_RUNNING("GENERATING THE TRANSACTION...");
+    /* DEBUG_NOTIFY_ACTIVITY_RUNNING("GENERATING THE TRANSACTION..."); */
     struct Transaction t;
     if (check_balance(self) == TRUE) {
         if (create_transaction(&t, user_proc_pid, extract_user(shm_conf->users_snapshots), gen_amount(self)) <
@@ -107,7 +107,7 @@ int generate_transaction(struct user_transaction *self, pid_t user_proc_pid, str
         queue_append(self->in_process, t);
         if(self->update_cash_flow(self, &t)<0){ ERROR_EXIT_SEQUENCE_USER("IMPOSSIBLE TO UPDATE CASH FLOW");}
         self->to_wait_transaction++;
-        DEBUG_NOTIFY_ACTIVITY_DONE("GENERATING THE TRANSACTION DONE");
+        /* DEBUG_NOTIFY_ACTIVITY_DONE("GENERATING THE TRANSACTION DONE"); */
         return 0;
     }
     return -1;
@@ -115,13 +115,13 @@ int generate_transaction(struct user_transaction *self, pid_t user_proc_pid, str
 
 pid_t extract_user(int users_num[][2]) {
     srand(getpid());
-    DEBUG_NOTIFY_ACTIVITY_RUNNING("EXTRACTING USER FROM SNAPSHOTS...");
+   /* DEBUG_NOTIFY_ACTIVITY_RUNNING("EXTRACTING USER FROM SNAPSHOTS...");*/
     int max = users_num[0][0];
     int e = (rand() % (max)) + 1;
     while (users_num[e + 1][0] == NULL) {
         e = (rand() % (max)) + 1;
     }
-    DEBUG_NOTIFY_ACTIVITY_DONE("EXTRACTING USER FROM SNAPSHOTS DONE");
+    /*DEBUG_NOTIFY_ACTIVITY_DONE("EXTRACTING USER FROM SNAPSHOTS DONE");*/
     return users_num[e][0];
 }
 

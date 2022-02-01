@@ -156,11 +156,12 @@ int main(int argc, char const *argv[]) {
             /*TODO: verificare*/
             process_node_transaction(&msg_rep);
             process_simple_transaction_type(&msg_rep);
+#ifdef DEBUG
             node_msg_print(&msg_rep);
+#endif
         }
 
     }
-    DEBUG_MESSAGE("NODE ENDED -----------------------------");
     EXIT_PROCEDURE_NODE(0);
 }
 
@@ -280,6 +281,7 @@ void process_simple_transaction_type(struct node_msg *msg_rep) {
         if (get_num_transactions(current_node.transaction_pool) < node_configuration.so_tp_size) {
             queue_append(current_node.transaction_pool, msg_rep->t);
         } else {
+            DEBUG_ERROR_MESSAGE("NODE TRANSACTION FAILED");
             u_msg_rep->t.t_type = TRANSACTION_FAILED;
             user_msg_snd(queue_user_id, u_msg_rep, MSG_TRANSACTION_FAILED_TYPE, &msg_rep->t, current_node.pid, TRUE);
         }
