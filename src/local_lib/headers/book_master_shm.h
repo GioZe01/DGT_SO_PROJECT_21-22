@@ -1,0 +1,6 @@
+#ifndef DGT_SO_PROJECT_21_22_BOOK_MASTER_SHM_H
+#define DGT_SO_PROJECT_21_22_BOOK_MASTER_SHM_H
+struct shm_book_master{
+
+};
+#endif /*DGT_SO_PROJECT_21_22_BOOK_MASTER_SHM_H*/

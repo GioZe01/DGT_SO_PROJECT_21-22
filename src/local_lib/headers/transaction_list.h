@@ -9,6 +9,8 @@
 #define TRANSACTION_SUCCES 0
 #define TRANSACTION_FAILED -1
 #define TRANSACTION_WAITING 1
+/*Utility macro for node sender identification*/
+#define SENDER_NODE_TRANSACTION -1
 struct Transaction{
     short int t_type;
     struct timespec timestamp;
@@ -18,6 +20,7 @@ struct Transaction{
     float reward;
     int hops;
 };
+
 typedef struct transaction_list *Queue;/*Real impl in transaction_list.c*/
 /*Functionality*/
 int create_transaction(struct Transaction *t,pid_t sender, pid_t receiver, float amount);

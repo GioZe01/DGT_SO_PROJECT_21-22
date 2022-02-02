@@ -5,7 +5,7 @@
 
 #include "transaction_list.h"
 
-typedef float(*Reward)(struct node *self);
+typedef float(*Reward)(struct node *self, int percentage, Bool use_default);
 
 struct node {
     pid_t pid;

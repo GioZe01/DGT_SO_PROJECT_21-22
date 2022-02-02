@@ -92,9 +92,22 @@ void process_node_transaction(struct node_msg *msg_rep);
 void process_simple_transaction_type(struct node_msg *msg_rep);
 
 /**
+ * If node_transaction pool has at list node_block_size of transactions it load them in a transaction block
+ * and process them
+ * @return -1 in case of failure. 2 in case of pool_size<block_size. 0 otherwise
+ */
+int process_node_block();
+
+/**
  * Connects to the differents queues: master, node's and user's
  * */
 void connect_to_queues(void);
+
+/**
+ * load block_size transactions from transaction pool into transaction block of the current node
+ * @return
+ */
+Bool load_block();
 
 /* SysVar */
 int state; /* Current state of the node proc*/
@@ -159,6 +172,7 @@ int main(int argc, char const *argv[]) {
 #ifdef DEBUG
             node_msg_print(&msg_rep);
 #endif
+            if (process_node_block() < 0);
         }
 
     }
@@ -266,7 +280,7 @@ void process_node_transaction(struct node_msg *msg_rep) {
     if (node_msg_receive(queue_node_id, msg_rep, node_id) == 0) {
         /*Checking for transaction coming from node*/
         DEBUG_MESSAGE("NODE TRANSACTION RECEIVED");
-
+        /*TODO: Implement incoming transaction from other node*/
     }
 }
 
@@ -286,9 +300,30 @@ void process_simple_transaction_type(struct node_msg *msg_rep) {
 }
 
 void connect_to_queues(void) {
-    /*TODO: Aggiungerla come optional alla compilazione*/
     queue_node_id = msgget(NODES_QUEUE_KEY, 0600);
     if (queue_node_id < 0) { ERROR_EXIT_SEQUENCE_NODE("IMPOSSIBLE TO CONNECT TO NODE MESSAGE QUEUE"); }
     queue_user_id = msgget(USERS_QUEUE_KEY, 0600);
     if (queue_user_id < 0) { ERROR_EXIT_SEQUENCE_NODE("IMPOSSIBLE TO CONNECT TO USER QUEUE"); }
+}
+
+int process_node_block() {
+    if (get_num_transactions(current_node.transaction_pool) >= node_configuration.so_block_size) {
+        /*Loading them into the node_block_transactions*/
+        load_block();
+        current_node.calc_reward(&current_node, -1, TRUE);
+    }
+}
+
+Bool load_block() {
+    int i;
+    for (i = 0; i < current_node.block_size - 1; i++) {
+        queue_append(current_node.transaction_block, queue_head(current_node.transaction_pool));
+        queue_remove_head(current_node.transaction_pool);
+    }
+    if (i == current_node.block_size - 2) {
+        struct Transaction node_transaction;
+        create_transaction(&node_transaction, SENDER_NODE_TRANSACTION, current_node.pid,
+                           queue_get_reward(current_node.transaction_block));
+        queue_append(current_node.transaction_block, node_transaction);
+    }
 }

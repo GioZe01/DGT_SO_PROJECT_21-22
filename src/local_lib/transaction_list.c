@@ -230,7 +230,7 @@ float queue_get_reward(Queue q) {
     for (; first != NULL; first = first->next) {
         tot += first->t.reward;
     }
-    return 0;
+    return tot;
 }
 
 void queue_print(Queue q) {
