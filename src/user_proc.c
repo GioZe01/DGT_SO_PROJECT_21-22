@@ -214,6 +214,7 @@ void signals_handler(int signum) {
     DEBUG_SIGNAL("SIGNAL RECEIVED", signum);
     switch (signum) {
         case SIGINT:
+            /*TODO: Avvisare main chiusura*/
             alarm(0);/* pending alarm removed*/
             EXIT_PROCEDURE_USER(0);
         case SIGALRM: /*    Generate a new transaction  */
@@ -238,9 +239,8 @@ void free_sysVar_user() {
     if (state == INIT_STATE && semaphore_start_id >= 0) {
         semaphore_start_value = semctl(semaphore_start_id, 0, GETVAL);
         if (semaphore_start_value < 0) ERROR_MESSAGE("IMPOSSIBLE TO RETRIEVE INFORMATION ON STARTING SEMAPHORE");
-        else if (semaphore_start_value > 0) {
-            if (semaphore_lock(semaphore_start_id, 0) < 0)
-                ERROR_MESSAGE("IMPOSSIBLE TO EXECUTE THE FREE SYS VAR (prob. sem_lock not set so cannot be closed)");
+        else if (semaphore_start_value > 0 && (semaphore_lock(semaphore_start_id, 0) < 0)) {
+            ERROR_MESSAGE("IMPOSSIBLE TO EXECUTE THE FREE SYS VAR (prob. sem_lock not set so cannot be closed)");
         }
     }
 
@@ -261,6 +261,8 @@ Bool read_conf() {
         ERROR_EXIT_SEQUENCE_USER(" DURING CONF. LOADING: MIN MAX EXECUTION TIME WRONG");
         case -5:
         ERROR_EXIT_SEQUENCE_USER(" DURING CONF. LOADING: NODE REWARD IS OVER POSSIBILITIES OF USERS");
+        default:
+            return FALSE;
     }
     DEBUG_NOTIFY_ACTIVITY_DONE("CONFIGURATION LOADED");
     return TRUE;
@@ -323,15 +325,17 @@ void generating_transactions(void) {
 }
 
 Bool check_for_transactions_confirmed(void) {
-    struct user_msg *msg;
+    struct user_msg *msg = sizeof(struct user_msg) ;
     if (user_msg_receive(queue_report_id, msg, user_id) == 0) {
         /*Messagge found*/
         current_user.to_wait_transaction--;
         queue_remove(current_user.in_process, msg->t);
         queue_append(current_user.transactions_done, msg->t);
+        return TRUE;
     }
+   return FALSE;
 }
 
 Bool check_for_transactions_failed(void) {
-
+    return TRUE;
 }

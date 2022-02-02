@@ -24,12 +24,11 @@ shm_conf_create(struct shm_conf *self, int *users_pids, int *users_queues_ids, i
  * @param self
  */
 void shm_conf_print(struct shm_conf *self);
-
 /**
- * Copy the content of a pointer into another
- * @param where to be stored
- * @param to_copy array to be copied
- * @param to_free if u want to free() pids and queues_ids
+ * Copy the two pointers given into 2d pointer
+ * @param snapshot the 2d matrix
+ * @param pids the pointer that's gonna to fill column 0
+ * @param queues_ids  the pointer that's gonna fill column 1
  */
-void shm_copy_snapshots(int snapshot[][2], int *pids, int *queues_ids, Bool to_free);
+void shm_copy_snapshots(int snapshot[][2], int *pids, int *queues_ids);
 #endif /*DGT_SO_PROJECT_21_22_CONF_SHM_H*/

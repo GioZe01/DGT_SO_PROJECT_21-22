@@ -30,6 +30,9 @@ void node_msg_print(struct node_msg *self) {
         case MSG_TRANSACTION_TYPE:
             printf("~ NODE_MSG | type: TRANSACTION TYPE | sender: %d ~\n", self->sender_pid);
             break;
+        default:
+            ERROR_MESSAGE("NODE MESSAGE TYPE NOT RECONIZED");
+            break;
     }
 }
 

@@ -5,7 +5,7 @@
 #include "headers/semaphore.h"
 
 
-int semaphore_lock(int semaphore_id, int semaphore_index){
+int semaphore_lock(int semaphore_id,  unsigned short int semaphore_index){
     struct sembuf op_sem;
     op_sem.sem_op = -1;
     op_sem.sem_num = semaphore_index;
@@ -14,7 +14,7 @@ int semaphore_lock(int semaphore_id, int semaphore_index){
     return 0;
 }
 
-int semaphore_unlock(int semaphore_id, int sempahore_index){
+int semaphore_unlock(int semaphore_id,unsigned short int sempahore_index){
     struct sembuf op_sem;
     op_sem.sem_op = 1;
     op_sem.sem_num = sempahore_index;
@@ -23,7 +23,7 @@ int semaphore_unlock(int semaphore_id, int sempahore_index){
     return 0;
 }
 
-int semaphore_wait_for_sinc(int semaphore_id, int semphore_index){
+int semaphore_wait_for_sinc(int semaphore_id, unsigned short int semphore_index){
     struct sembuf op_sem;
     op_sem.sem_op = 0;
     op_sem.sem_num = semphore_index;

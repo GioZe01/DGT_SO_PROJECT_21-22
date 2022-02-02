@@ -189,7 +189,7 @@ Bool read_conf_node() {
 
 /**
  * Calculate the balance of the current user_proc
- * @param budget the current budget that is available for the user_proc;
+ * @param budget the current budget that is available for the user_proc
  * @return the value of the balance
  */
 Bool check_arguments(int argc, char const *argv[]) {
@@ -227,11 +227,13 @@ void signals_handler(int signum) {
     DEBUG_SIGNAL("SIGNAL RECEIVED ", signum);
     switch (signum) {
         case SIGINT:
+            /*TODO: avvisare main*/
             alarm(0);/*pending alarm removed*/
             EXIT_PROCEDURE_NODE(0);
         case SIGALRM:
             break;
-
+        default:
+            break;
     }
 }
 
@@ -240,14 +242,9 @@ void free_sysVar_node() {
     if (state == INIT_STATE && semaphore_start_id >= 0) {
         semaphore_start_value = semctl(semaphore_start_id, 0, GETVAL);
         if (semaphore_start_value < 0) ERROR_MESSAGE("IMPOSSIBLE TO RETRIEVE INFORMATION ON STARTING SEMAPHORE");
-        else if (semaphore_start_value > 0) {
-            if (semaphore_lock(semaphore_start_id, 0) < 0)
-                ERROR_MESSAGE("IMPOSSIBLE TO EXECUTE THE FREE SYS VAR (prob. sem_lock not set so cannot be closed)");
+        else if (semaphore_start_value > 0 && (semaphore_lock(semaphore_start_id, 0) < 0)) {
+            ERROR_MESSAGE("IMPOSSIBLE TO EXECUTE THE FREE SYS VAR (prob. sem_lock not set so cannot be closed)");
         }
-    }
-
-    if (queue_node_id >= 0 && msgctl(queue_node_id, IPC_RMID, NULL) < 0) {
-        ERROR_MESSAGE("IMPOSSIBLE TO DELETE MESSAGE QUEUE OF NODE");
     }
 }
 
@@ -274,13 +271,13 @@ void process_node_transaction(struct node_msg *msg_rep) {
 }
 
 void process_simple_transaction_type(struct node_msg *msg_rep) {
-    struct user_msg *u_msg_rep;
     if (node_msg_receive(queue_node_id, msg_rep, node_id - MSG_NODE_ORIGIN_TYPE) == 0) {
         /*Checking for transaction type*/
         DEBUG_MESSAGE("NODE TRANSACTION TYPE RECEIVED");
         if (get_num_transactions(current_node.transaction_pool) < node_configuration.so_tp_size) {
             queue_append(current_node.transaction_pool, msg_rep->t);
         } else {
+            struct user_msg *u_msg_rep;
             DEBUG_ERROR_MESSAGE("NODE TRANSACTION FAILED");
             u_msg_rep->t.t_type = TRANSACTION_FAILED;
             user_msg_snd(queue_user_id, u_msg_rep, MSG_TRANSACTION_FAILED_TYPE, &msg_rep->t, current_node.pid, TRUE);

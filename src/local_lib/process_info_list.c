@@ -79,12 +79,12 @@ void list_free(struct processes_info_list *self) {
     DEBUG_NOTIFY_ACTIVITY_RUNNING("PROCESSES INFO LIST FREE...");
     /*Recursive implementation*/
     if (self == NULL){
-        DEBUG_MESSAGE("LIST OF PROC WAS NULL");
+        /* DEBUG_MESSAGE("LIST OF PROC WAS NULL"); */
         return;
     }
     list_free(self->next);
     free(self);
-    DEBUG_NOTIFY_ACTIVITY_DONE("PROCESSES INFO LIST FEE DONE");
+    DEBUG_NOTIFY_ACTIVITY_DONE("PROCESSES INFO LIST FREE DONE");
 }
 
 void list_set_state(struct processes_info_list *self, pid_t pid, short int state) {

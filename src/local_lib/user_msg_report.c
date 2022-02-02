@@ -38,6 +38,9 @@ void user_msg_print(struct user_msg *self) {
                    self->t.amount, self->t.sender, self->t
                            .reciver);
             break;
+        default:
+            ERROR_MESSAGE("TRANSACTION TYPE NOT RECONIZED");
+            break;
     }
 }
 
@@ -50,8 +53,8 @@ int user_msg_snd(int id, struct user_msg *msg, long type, struct Transaction *t,
     return 0;
 }
 
-int user_msg_receive(int id, struct user_msg *msg, long type) {
-    if (msgrcv(id, msg, sizeof(struct user_msg) - sizeof(long), type, IPC_NOWAIT) < 0) {
+int user_msg_receive(int id, struct user_msg* msg, long type) {
+    if (msgrcv(id, msg, sizeof(*msg) - sizeof(long), type, IPC_NOWAIT) < 0) {
         if (errno == ENOMSG) {
             return -2;
         }

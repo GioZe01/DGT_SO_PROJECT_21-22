@@ -179,6 +179,10 @@ int main() {
         if (shm_conf_create(shm_pointer, users_pids, users_queues_ids, nodes_pids, nodes_queues_ids) < 0) {
             ERROR_EXIT_SEQUENCE_MAIN("FAILED ON SHM_CONF INITIALIZING");
         };
+        free(nodes_queues_ids);
+        free(nodes_pids);
+        free(users_pids);
+        free(users_queues_ids);
         DEBUG_NOTIFY_ACTIVITY_DONE("SHM INITIALIZING DONE");
 
 #ifdef DEBUG
@@ -190,7 +194,7 @@ int main() {
         }
         DEBUG_MESSAGE("WAITING DONE");
         DEBUG_BLOCK_ACTION_END();
-
+        alarm(1);
         while (simulation_end != 1) {
             if (check_msg_report(&msg_repo) < 0) {
                 /*If a message arrive make the knowledge*/
@@ -203,8 +207,6 @@ int main() {
         wait_kids();
         /*TODO: final printing*/
     }
-    free_sysVar();
-    free_mem();
     exit(0);
 }
 
@@ -218,10 +220,12 @@ int create_users_proc(int *users_pids, int *users_queues_ids) {
     int i, queue_id = DELTA_USER_MSG_TYPE;
     users_pids[0] = 0;
     users_queues_ids[0] = 0;
-    argv_user[1] = (char *) malloc(11 * sizeof(char));
     for (i = 0; i < simulation_conf.so_user_num; i++) {
+        argv_user[1] = (char *) malloc(11 * sizeof(char));
         switch (user_pid = fork()) {
             case -1:
+                if (argv_user[1] != NULL) free(argv_user[1]);
+                if (argv_user[2] != NULL) free(argv_user[2]);
                 return -1;
             case 0: /*kid*/
                 sprintf(argv_user[1], "%d", queue_id);/*Let the user know is position*/
@@ -255,10 +259,12 @@ int create_nodes_proc(int *nodes_pids, int *nodes_queues_ids) {
     int i, queue_id = DELTA_NODE_MSG_TYPE;
     nodes_pids[0] = 0;
     nodes_queues_ids[0] = 0;
-    argv_node[1] = (char *) malloc(11 * sizeof(char));
     for (i = 0; i < simulation_conf.so_nodes_num; i++) {
+        argv_node[1] = (char *) malloc(11 * sizeof(char));
         switch (node_pid = fork()) {
             case -1:
+                if (argv_node[1] != NULL) free(argv_node[1]);
+                if (argv_node[2] != NULL) free(argv_node[2]);
                 return -1;
             case 0: /*kid*/
                 sprintf(argv_node[1], "%d", queue_id);/*Let the user know is position*/
@@ -311,13 +317,13 @@ void signals_handler(int signum) { /*TODO: Scrivere implementazione*/
     DEBUG_SIGNAL("SIGNAL RECEIVED", signum);
     switch (signum) {
         case SIGINT:
-        case SIGTSTP:
         case SIGTERM:
             if (getpid() == main_pid) { EXIT_PROCEDURE_MAIN(0); }
             else { exit(0); }
         case SIGALRM:
             if (getpid() == main_pid) {
                 num_inv++;
+                printf("------------------------NUMERO DI INVOCAZIONI: %d\n", num_inv);
                 if (num_inv == simulation_conf.so_sim_sec) simulation_end = 1;
                 else alarm(1);
                 /*TODO: METTO IN PAUSA I NODI vedere se mettere anche in pausa i processi user*/
@@ -382,7 +388,7 @@ void kill_kids() {
                  */
                 DEBUG_MESSAGE("PROC KILLED");
             else {
-                if (errno == EINTR) continue;
+                if (errno == EINTR){continue;}
                 ERROR_MESSAGE("IMPOSSIBLE TO SEND TERMINATION SIGNAL TO KID");
             }
     DEBUG_NOTIFY_ACTIVITY_DONE("KILLING KIDS DONE");
@@ -402,11 +408,21 @@ void free_sysVar() {
         ERROR_MESSAGE("REMOVING PROCEDURE FOR SHM_CONF FAILED");
     }
     DEBUG_NOTIFY_ACTIVITY_DONE("REMOVING SHM CONF DONE");
+    DEBUG_NOTIFY_ACTIVITY_RUNNING("REMOVING MASTER QUEUE...");
+    if (msg_report_id_master>= 0 && msgctl(msg_report_id_master, IPC_RMID, NULL) < 0) {
+        ERROR_MESSAGE("IMPOSSIBLE TO DELETE MESSAGE QUEUE OF MASTER");
+    }
+    DEBUG_NOTIFY_ACTIVITY_DONE("REMOVING MASTER QUEUE DONE");
     DEBUG_NOTIFY_ACTIVITY_RUNNING("REMOVING USER QUEUE...");
     if (msg_report_id_users >= 0 && msgctl(msg_report_id_users, IPC_RMID, NULL) < 0) {
         ERROR_MESSAGE("IMPOSSIBLE TO DELETE MESSAGE QUEUE OF USER");
     }
     DEBUG_NOTIFY_ACTIVITY_DONE("REMOVING USER QUEUE DONE");
+    DEBUG_NOTIFY_ACTIVITY_RUNNING("REMOVING NODE QUEUE...");
+    if (msg_report_id_nodes >= 0 && msgctl(msg_report_id_nodes, IPC_RMID, NULL) < 0) {
+        ERROR_MESSAGE("IMPOSSIBLE TO DELETE MESSAGE QUEUE OF NODE");
+    }
+    DEBUG_NOTIFY_ACTIVITY_DONE("REMOVING NODE QUEUE DONE");
 }
 
 Bool read_conf(void) {
@@ -425,6 +441,8 @@ Bool read_conf(void) {
         ERROR_EXIT_SEQUENCE_MAIN("DURING CONF. LOADING: MIN MAX EXECUTION TIME WRONG");
         case -5:
         ERROR_EXIT_SEQUENCE_MAIN(" DURING CONF. LOADING: NODE REWARD IS OVER POSSIBILITIES OF USERS");
+        default:
+            return FALSE;
     }
     DEBUG_NOTIFY_ACTIVITY_DONE("READING CONFIGURATION DONE");
     DEBUG_BLOCK_ACTION_END();
