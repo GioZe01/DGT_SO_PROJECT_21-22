@@ -34,7 +34,6 @@ int load_configuration(struct conf *self) {
     if (fscanf(conf_file, "so_max_trans_gen_nsec=%ld ", &self->so_max_trans_gen_nsec) == EOF) return -1;
     if (fscanf(conf_file, "so_retry=%d ", &self->so_retry) == EOF) return -1;
     if (fscanf(conf_file, "so_tp_size=%d ", &self->so_tp_size) == EOF) return -1;
-    if (fscanf(conf_file, "so_block_size=%d ", &self->so_block_size) == EOF) return -1;
     if (fscanf(conf_file, "so_min_trans_proc_nsec=%ld ", &self->so_min_trans_proc_nsec) == EOF) return -1;
     if (fscanf(conf_file, "so_max_trans_proc_nsec=%ld ", &self->so_max_trans_proc_nsec) == EOF) return -1;
     if (fscanf(conf_file, "so_registry_size=%d ", &self->so_registry_size) == EOF) return -1;
@@ -50,7 +49,6 @@ int load_configuration(struct conf *self) {
         self->so_max_trans_gen_nsec <= 0 ||
         self->so_retry < 0 ||
         self->so_tp_size <= 0 ||
-        self->so_block_size <= 0 ||
         self->so_sim_sec <= 0 ||
         self->so_min_trans_proc_nsec <= 0 ||
         self->so_max_trans_proc_nsec <= 0 ||

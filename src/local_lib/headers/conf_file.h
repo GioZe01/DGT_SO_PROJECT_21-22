@@ -18,7 +18,6 @@ struct conf {
     long so_max_trans_gen_nsec;
     int so_retry;
     int so_tp_size;
-    int so_block_size;
     long so_min_trans_proc_nsec;
     long so_max_trans_proc_nsec;
     int so_registry_size;
