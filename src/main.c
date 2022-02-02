@@ -207,6 +207,8 @@ int main() {
         wait_kids();
         /*TODO: final printing*/
     }
+    free_mem();
+    free_sysVar();
     exit(0);
 }
 
@@ -323,7 +325,6 @@ void signals_handler(int signum) { /*TODO: Scrivere implementazione*/
         case SIGALRM:
             if (getpid() == main_pid) {
                 num_inv++;
-                printf("------------------------NUMERO DI INVOCAZIONI: %d\n", num_inv);
                 if (num_inv == simulation_conf.so_sim_sec) simulation_end = 1;
                 else alarm(1);
                 /*TODO: METTO IN PAUSA I NODI vedere se mettere anche in pausa i processi user*/
