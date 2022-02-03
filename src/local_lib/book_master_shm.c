@@ -31,5 +31,4 @@ void copy_trasaction_blocks(struct Transaction block1 [SO_BLOCK_SIZE], struct Tr
     for(i=0; i<SO_BLOCK_SIZE; i++){
         block1[i]=block2[i];
     }
-
 }

@@ -26,7 +26,7 @@
 #include "local_lib/headers/node_msg_report.h"
 #include "local_lib/headers/process_info_list.h"
 #include "local_lib/headers/conf_shm.h"
-
+#include "local_lib/headers/book_master_shm.h"
 #ifdef DEBUG
 
 #include "local_lib/headers/debug_utility.h"
@@ -121,13 +121,15 @@ void signals_handler(int signum);
 /* Variables*/
 struct conf simulation_conf; /*Structure representing the configuration present in the conf file*/
 struct processes_info_list *proc_list; /* Pointer to a linked list of all proc generated*/
-struct shm_conf *shm_pointer; /* Pointer to the shm_conf structure in shared memory*/
+struct shm_conf *shm_conf_pointer; /* Pointer to the shm_conf structure in shared memory*/
+struct shm_book_master * shm_masterbook_pointer; /* Pointer to the shm_masterbook structure in shared memory*/
 int simulation_end = 0; /* For value different from 0 the simulation must end*/
 int shm_conf_id = -1; /* Id of the shm for the configuration of the node*/
+int shm_masterbook_id = -1; /* Id of the shm for the master book */
 int msg_report_id_master = -1;/* Identifier for message queue for master communication*/
 int msg_report_id_users = -1; /* Identifier for message queue for users communication*/
 int msg_report_id_nodes = -1; /* Identifier for message queue for nodes communication*/
-int semaphore_start_id = -1;  /*Id of the start semaphore arrays for sinc*/
+int semaphore_start_id = -1;  /* Id of the start semaphore arrays for sinc*/
 pid_t main_pid; /*pid of the current proc*/
 
 int main() {
@@ -176,7 +178,7 @@ int main() {
         DEBUG_BLOCK_ACTION_END();
 
         DEBUG_NOTIFY_ACTIVITY_RUNNING("SHM INITIALIZING...");
-        if (shm_conf_create(shm_pointer, users_pids, users_queues_ids, nodes_pids, nodes_queues_ids) < 0) {
+        if (shm_conf_create(shm_conf_pointer, users_pids, users_queues_ids, nodes_pids, nodes_queues_ids) < 0) {
             ERROR_EXIT_SEQUENCE_MAIN("FAILED ON SHM_CONF INITIALIZING");
         };
         free(nodes_queues_ids);
@@ -186,7 +188,7 @@ int main() {
         DEBUG_NOTIFY_ACTIVITY_DONE("SHM INITIALIZING DONE");
 
 #ifdef DEBUG
-        shm_conf_print(shm_pointer);
+        shm_conf_print(shm_conf_pointer);
 #endif
         DEBUG_BLOCK_ACTION_START("WAITING CHILDREN");
         if (semaphore_wait_for_sinc(semaphore_start_id, 0) < 0) {
@@ -356,13 +358,6 @@ void create_semaphores(void) {
     DEBUG_BLOCK_ACTION_END();
 }
 
-void create_masterbook() {
-    DEBUG_BLOCK_ACTION_START("CREATE MASTERBOOK");
-    DEBUG_NOTIFY_ACTIVITY_RUNNING("CREATING THE MASTER_BOOK....");
-    /*TODO:da implementare create_masterbook*/
-    DEBUG_NOTIFY_ACTIVITY_DONE("CREATING THE MASTER BOOK DOONE");
-    DEBUG_BLOCK_ACTION_END();
-}
 
 /*  IMPLEMENTATION OF PROC_INFO_LIST METHOD*/
 void wait_kids() {
@@ -496,12 +491,26 @@ void create_shm_conf(void) {
     DEBUG_NOTIFY_ACTIVITY_RUNNING("CREATING SHM_CONF....");
     shm_conf_id = shmget(SHM_CONFIGURATION, sizeof(struct shm_conf), IPC_CREAT | IPC_EXCL | 0600);
     if (shm_conf_id < 0) {
-        ERROR_EXIT_SEQUENCE_MAIN("IMPOSSIBLE TO CREATE THE SHARED MEMORY");
+        ERROR_EXIT_SEQUENCE_MAIN("IMPOSSIBLE TO CREATE THE CONF SHARED MEMORY");
     }
-    shm_pointer = shmat(shm_conf_id, NULL, 0);
-    if (shm_pointer == (void *) -1) {
-        ERROR_EXIT_SEQUENCE_MAIN("IMPOSSIBLE TO CONNECT TO THE SHARED MEMORY");
+    shm_conf_pointer = shmat(shm_conf_id, NULL, 0);
+    if (shm_conf_pointer == (void *) -1) {
+        ERROR_EXIT_SEQUENCE_MAIN("IMPOSSIBLE TO CONNECT TO THE CONF SHARED MEMORY");
     }
     DEBUG_NOTIFY_ACTIVITY_DONE("CREATING SHM_CONF DONE");
+    DEBUG_BLOCK_ACTION_END();
+}
+void create_masterbook() {
+    DEBUG_BLOCK_ACTION_START("CREATE MASTERBOOK");
+    DEBUG_NOTIFY_ACTIVITY_RUNNING("CREATING THE MASTER_BOOK....");
+    shm_masterbook_id = shmget(MASTER_BOOK_SHM_KEY, sizeof (struct shm_book_master), IPC_CREAT | IPC_EXCL | 0600);
+    if(shm_masterbook_id<0){
+        ERROR_EXIT_SEQUENCE_MAIN("IMPOSSIBLE TO CREATE THE SHARED MEM FOR MASTERBOOK");
+    }
+    shm_masterbook_pointer = shmat(shm_masterbook_id, NULL, 0);
+    if(shm_masterbook_id == (void*)-1){
+        ERROR_EXIT_SEQUENCE_MAIN("IMPOSSIBLE TO CONNECT TO THE MASTERBOOK SHM");
+    }
+    DEBUG_NOTIFY_ACTIVITY_DONE("CREATING THE MASTER BOOK DOONE");
     DEBUG_BLOCK_ACTION_END();
 }
