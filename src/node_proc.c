@@ -307,10 +307,12 @@ void connect_to_queues(void) {
 }
 
 int process_node_block() {
-    if (get_num_transactions(current_node.transaction_pool) >= node_configuration.so_block_size) {
+    if (get_num_transactions(current_node.transaction_pool) >= SO_BLOCK_SIZE) {
         /*Loading them into the node_block_transactions*/
         load_block();
         current_node.calc_reward(&current_node, -1, TRUE);
+        struct Transaction t_vector [get_num_transactions(current_node.transaction_block)];
+        queue_to_array(current_node.transaction_block,&t_vector);
     }
 }
 

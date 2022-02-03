@@ -282,3 +282,16 @@ int get_num_transactions(Queue q) {
         return q->transactions;
     return -1;
 }
+
+int queue_to_array(Queue q, struct Transaction vector[]) {
+    if (vector != NULL) {
+        struct node *iterable = q->first;
+        int i;
+        for (i = 0; iterable != NULL; iterable = iterable->next) {
+            vector[i] = iterable->t;
+            i++;
+        }
+        return 0;
+    }
+    return -1;
+}

@@ -18,17 +18,17 @@ MKDIR_P = mkdir -p
 
 
 # DEFINITION AT COMP TIME
-_DEF_COMP_TIME = SO_BLOCK_SIZE=100 SO_REGISTRY_SIZE=20 DEBUG _FORTIFY_SOURCE=2 _GNU_SOURCE
+_DEF_COMP_TIME = SO_BLOCK_SIZE=100 SO_REGISTRY_SIZE=20 DEBUG _FORTIFY_SOURCE=2 -D_GNU_SOURCE
 DEF_COMP_TIME = $(patsubst %, -D%, $(_DEF_COMP_TIME))
 
 
 
 # Dipendenze
-_DEPENDENCIES_MAIN =  glob.h conf_file.h boolean.h simulation_errors.h debug_utility.h process_info_list.h semaphore.h user_msg_report.h master_msg_report.h node_msg_report.h shm_conf.h
+_DEPENDENCIES_MAIN =  glob.h conf_file.h boolean.h simulation_errors.h debug_utility.h process_info_list.h semaphore.h user_msg_report.h master_msg_report.h node_msg_report.h shm_conf.h book_master_shm.h
 DEPENDENCIES_MAIN = $(patsubst %, $(SOURCE_HEADERS_DIR)/%, $(_DEPENDENCIES_MAIN))
-_DEPENDENCIES_USER = conf_file.h boolean.h simulation_errors.h debug_utility.h semaphore.h transaction_list.h user_transaction.h user_msg_report.h glob.h master_msg_report.h node_msg_report.h shm_conf.h
+_DEPENDENCIES_USER = conf_file.h boolean.h simulation_errors.h debug_utility.h semaphore.h transaction_list.h user_transaction.h user_msg_report.h glob.h master_msg_report.h node_msg_report.h shm_conf.h book_master_shm.h
 DEPENDENCIES_USER = $(patsubst %, $(SOURCE_HEADERS_DIR)/%, $(_DEPENDENCIES_USER))
-_DEPENDENCIES_NODE = conf_file.h boolean.h simulation_errors.h debug_utility.h semaphore.h transaction_list.h node_transactor.h node_msg_report.h glob.h master_msg_report.h node_msg_report.h shm_conf.h
+_DEPENDENCIES_NODE = conf_file.h boolean.h simulation_errors.h debug_utility.h semaphore.h transaction_list.h node_transactor.h node_msg_report.h glob.h master_msg_report.h node_msg_report.h shm_conf.h book_master_shm.h
 DEPENDENCIES_NODE = $(patsubst %, $(SOURCE_HEADERS_DIR)/%, $(_DEPENDENCIES_NODE))
 # Objects
 _OBJECTS_MAIN = main.o conf_file.o process_info_list.o semaphore_wrap.o user_msg_report.o master_msg_report.o node_msg_report.o shm_conf.o

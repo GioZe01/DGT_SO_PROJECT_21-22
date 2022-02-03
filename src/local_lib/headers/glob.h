@@ -11,18 +11,19 @@
 /*  NUM LIMIT OF PROCS */
 #define USERS_MAX 1000 /*Max users that can be saved in shm*/
 #define NODES_MAX 100    /*Max nodes that can be saved in shm*/
-/*  SINCRONIZATION KEY  */
-#define SEMAPHORE_SINC_KEY_START 0x76
-/*  QUEUE KEY    */
-#define MASTER_QUEUE_KEY 0x77
-#define USERS_QUEUE_KEY 0x78
-#define NODES_QUEUE_KEY 0x79
-/*  SHARED MEM. KEY*/
-#define SHM_CONFIGURATION 0x74
-#define MASTER_BOOK_SHM_KEY 0x75
+/*  SINCRONIZATION KEY values from 60 to 70*/
+#define SEMAPHORE_SINC_KEY_START 0x60
+#define SEMAPHORE_MASTER_BOOK_ACCESS_KEY 0x61
+/*  QUEUE KEY  values from 71 to 80*/
+#define MASTER_QUEUE_KEY 0x71
+#define USERS_QUEUE_KEY 0x72
+#define NODES_QUEUE_KEY 0x73
+/*  SHARED MEM. KEY values from 81 to 90*/
+#define SHM_CONFIGURATION 0x81
+#define MASTER_BOOK_SHM_KEY 0x82
 /*  COLOR DEFINITION    */
 #define COLOR_RED_ANSI_CODE "\x1b[31m"
-#define COLOR_GREEN_ANSI_CODE "\x1b[32m" /* Usato per printing debugging mode per semafori*/
+#define COLOR_GREEN_ANSI_CODE "\x1b[32m"
 #define COLOR_YELLOW_ANSI_CODE "\x1b[33m"
 #define COLOR_BLUE_ANSI_CODE    "\x1b[34m"
 #define COLOR_WHITE_ANSI_CODE "\x1b[37m"

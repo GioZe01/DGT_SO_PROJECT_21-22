@@ -65,8 +65,8 @@ struct Transaction queue_last(Queue q);
 Bool queue_is_empty(Queue q);
 /**
  * Calculate the reward for each transaction with give perc and apt the amount
- * @param q
- * @param percentage
+ * @param q the queue from whom is calculated the reward
+ * @param percentage the percentage to calculate 4 each transaction
  * @return -1 in case of FAILURE. 0 otherwise
  */
 int queue_apt_amount_reward(Queue q, int percentage);
@@ -92,4 +92,11 @@ void transaction_print(struct Transaction t);
  * @return the number of transaction. -1 in case of error.
  */
 int get_num_transactions(Queue q);
+/**
+ * From the given queue load the data into a vector rather then a linked list
+ * @param q the queue to load the data from
+ * @param vector to be loaded
+ * @return -1 in case of failure. 0 otherwise
+ */
+int queue_to_array(Queue q, struct Transaction vector[]);
 #endif /*DGT_SO_PROJECT_21_22_TRANSACTION_LIST_H*/
