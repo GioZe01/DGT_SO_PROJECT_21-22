@@ -108,11 +108,17 @@ void connect_to_queues(void);
  * @return
  */
 Bool load_block();
-
+/**
+ * \brief Acquire the semaphore_id related to the node
+ * In particular:
+ * - semaphore_start_id
+ * - semaphore_masterbook_id
+ */
+void acquire_sempahores_ids(void);
 /* SysVar */
 int state; /* Current state of the node proc*/
 int semaphore_start_id = -1; /*Id of the start semaphore arrays for sinc*/
-
+int semaphore_masterbook_id = -1;
 int queue_node_id = -1;/* Identifier of the node queue id */
 int queue_user_id = -1; /* Identifier of the user queue id*/
 int node_end = 0; /* For value different from 0 the node proc must end*/
@@ -137,11 +143,11 @@ int main(int argc, char const *argv[]) {
                     node_configuration.so_reward, &calc_reward);
 
         /*-----------------------*/
-        /*  CONNECTING TO QUEUES *
+        /*  CONNECTING TO QUEUES */
         /*-----------------------*/
         connect_to_queues();
         /*-------------------------*/
-        /*  SHARED MEM  CONFIG     *
+        /*  SHARED MEM  CONFIG     */
         /*-------------------------*/
         attach_to_shm_conf();
         /************************************
@@ -149,13 +155,9 @@ int main(int argc, char const *argv[]) {
          * **********************************/
 
         /*---------------------------*/
-        /*  SEMAPHORES CREATION      *
+        /*  SEMAPHORES ACQUISITION   */
         /*---------------------------*/
-        semaphore_start_id = semget(SEMAPHORE_SINC_KEY_START, 1, 0);
-        if (semaphore_start_id < 0) { ERROR_EXIT_SEQUENCE_NODE("IMPOSSIBLE TO OBTAIN ID OF START SEM"); }
-        if (semaphore_lock(semaphore_start_id, 0) < 0) {
-            ERROR_EXIT_SEQUENCE_NODE("IMPOSSIBLE TO OBTAIN THE START SEMAPHORE");
-        }
+        acquire_sempahores_ids();
         DEBUG_MESSAGE("NODE READY, ON START_SEM");
         if (semaphore_wait_for_sinc(semaphore_start_id, 0) < 0) {
             ERROR_EXIT_SEQUENCE_NODE("IMPOSSIBLE TO WAIT FOR START");
@@ -309,14 +311,16 @@ void connect_to_queues(void) {
 int process_node_block() {
     if (get_num_transactions(current_node.transaction_pool) >= SO_BLOCK_SIZE) {
         /*Loading them into the node_block_transactions*/
-        load_block();
+        if (load_block()== FALSE) return -1;
         current_node.calc_reward(&current_node, -1, TRUE);
         struct Transaction t_vector [get_num_transactions(current_node.transaction_block)];
         queue_to_array(current_node.transaction_block,&t_vector);
     }
+    return 0;
 }
 
 Bool load_block() {
+    /*Finish check*/
     int i;
     for (i = 0; i < current_node.block_size - 1; i++) {
         queue_append(current_node.transaction_block, queue_head(current_node.transaction_pool));
@@ -327,5 +331,17 @@ Bool load_block() {
         create_transaction(&node_transaction, SENDER_NODE_TRANSACTION, current_node.pid,
                            queue_get_reward(current_node.transaction_block));
         queue_append(current_node.transaction_block, node_transaction);
+    }
+    return TRUE;
+}
+void acquire_semaphore_ids(){
+    semaphore_start_id = semget(SEMAPHORE_SINC_KEY_START, 1, 0);
+    if (semaphore_start_id < 0) { ERROR_EXIT_SEQUENCE_NODE("IMPOSSIBLE TO OBTAIN ID OF START SEM"); }
+    if (semaphore_lock(semaphore_start_id, 0) < 0) {
+        ERROR_EXIT_SEQUENCE_NODE("IMPOSSIBLE TO OBTAIN THE START SEMAPHORE");
+    }
+    semaphore_masterbook_id= semget(SEMAPHORE_MASTER_BOOK_ACCESS_KEY, 1, IPC_CREAT | IPC_EXCL | 0600);
+    if (semaphore_masterbook_id< 0) {
+        ERROR_EXIT_SEQUENCE_NODE("IMPOSSIBLE TO CREATE START_SEMAPHORE");
     }
 }
