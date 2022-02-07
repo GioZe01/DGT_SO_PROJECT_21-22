@@ -130,6 +130,7 @@ int msg_report_id_master = -1;/* Identifier for message queue for master communi
 int msg_report_id_users = -1; /* Identifier for message queue for users communication*/
 int msg_report_id_nodes = -1; /* Identifier for message queue for nodes communication*/
 int semaphore_start_id = -1;  /* Id of the start semaphore arrays for sinc*/
+int semaphore_masterbook_id = -1;
 pid_t main_pid; /*pid of the current proc*/
 
 int main() {
@@ -355,7 +356,21 @@ void create_semaphores(void) {
         ERROR_EXIT_SEQUENCE_MAIN("IMPOSSIBLE TO INITIALISE SEMAPHORE START CHILDREN");
     }
     DEBUG_NOTIFY_ACTIVITY_DONE("INITIALIZATION OF START_SEMAPHORE CHILDREN DONE");
+    DEBUG_NOTIFY_ACTIVITY_RUNNING("CREATION OF MASTEBOOK ACCESS SEM....");
+
+    semaphore_masterbook_id= semget(SEMAPHORE_MASTER_BOOK_ACCESS_KEY, 1, IPC_CREAT | IPC_EXCL | 0600);
+    if (semaphore_masterbook_id< 0) {
+        ERROR_EXIT_SEQUENCE_MAIN("IMPOSSIBLE TO CREATE START_SEMAPHORE");
+    }
+    DEBUG_NOTIFY_ACTIVITY_DONE("CREATION OF MASTEBOOK ACCESS SEM...");
+    DEBUG_NOTIFY_ACTIVITY_RUNNING("INITIALIZATION OF MASTERBOOK ACCESS SEM....");
+    if (semctl(semaphore_masterbook_id, 0, SETVAL, SO_REGISTRY_SIZE)<
+        0) {
+        ERROR_EXIT_SEQUENCE_MAIN("IMPOSSIBLE TO INITIALISE SEMAPHORE START CHILDREN");
+    }
+    DEBUG_NOTIFY_ACTIVITY_DONE("INITIALIZATION OF MASTEBOOK ACCESS SEM....");
     DEBUG_BLOCK_ACTION_END();
+
 }
 
 
