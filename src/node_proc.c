@@ -340,7 +340,7 @@ void acquire_semaphore_ids(){
     if (semaphore_lock(semaphore_start_id, 0) < 0) {
         ERROR_EXIT_SEQUENCE_NODE("IMPOSSIBLE TO OBTAIN THE START SEMAPHORE");
     }
-    semaphore_masterbook_id= semget(SEMAPHORE_MASTER_BOOK_ACCESS_KEY, 1, IPC_CREAT | IPC_EXCL | 0600);
+    semaphore_masterbook_id= semget(SEMAPHORE_MASTER_BOOK_ACCESS_KEY, 1, 0);
     if (semaphore_masterbook_id< 0) {
         ERROR_EXIT_SEQUENCE_NODE("IMPOSSIBLE TO CREATE START_SEMAPHORE");
     }

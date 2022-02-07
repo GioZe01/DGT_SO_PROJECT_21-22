@@ -36,7 +36,6 @@ int load_configuration(struct conf *self) {
     if (fscanf(conf_file, "so_tp_size=%d ", &self->so_tp_size) == EOF) return -1;
     if (fscanf(conf_file, "so_min_trans_proc_nsec=%ld ", &self->so_min_trans_proc_nsec) == EOF) return -1;
     if (fscanf(conf_file, "so_max_trans_proc_nsec=%ld ", &self->so_max_trans_proc_nsec) == EOF) return -1;
-    if (fscanf(conf_file, "so_registry_size=%d ", &self->so_registry_size) == EOF) return -1;
     if (fscanf(conf_file, "so_sim_sec=%ld ", &self->so_sim_sec) == EOF) return -1;
     DEBUG_NOTIFY_ACTIVITY_DONE("LOADING CONFIGURATION DONE");
     DEBUG_NOTIFY_ACTIVITY_RUNNING("CHECKING CONF VALUE....");
@@ -52,7 +51,6 @@ int load_configuration(struct conf *self) {
         self->so_sim_sec <= 0 ||
         self->so_min_trans_proc_nsec <= 0 ||
         self->so_max_trans_proc_nsec <= 0 ||
-        self->so_registry_size <= 0 ||
         self->so_sim_sec <= 0)
         return -2;
     /*Checks for -3*/

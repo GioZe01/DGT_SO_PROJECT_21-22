@@ -20,7 +20,6 @@ struct conf {
     int so_tp_size;
     long so_min_trans_proc_nsec;
     long so_max_trans_proc_nsec;
-    int so_registry_size;
     long so_sim_sec;
     /*TODO: aggiungere per versione max 30*/
 };
