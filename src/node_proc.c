@@ -118,7 +118,8 @@ void acquire_sempahores_ids(void);
 /* SysVar */
 int state; /* Current state of the node proc*/
 int semaphore_start_id = -1; /*Id of the start semaphore arrays for sinc*/
-int semaphore_masterbook_id = -1;
+int semaphore_masterbook_id = -1; /*Id of the masterbook semaphore for accessing the block matrix*/
+int semaphore_to_fill_id = -1; /* Id of the masterbook to_fill access semaphore*/
 int queue_node_id = -1;/* Identifier of the node queue id */
 int queue_user_id = -1; /* Identifier of the user queue id*/
 int node_end = 0; /* For value different from 0 the node proc must end*/
@@ -174,7 +175,9 @@ int main(int argc, char const *argv[]) {
 #ifdef DEBUG
             node_msg_print(&msg_rep);
 #endif
-            if (process_node_block() < 0);
+            if (process_node_block() < 0){
+
+            }
         }
 
     }
@@ -315,6 +318,8 @@ int process_node_block() {
         current_node.calc_reward(&current_node, -1, TRUE);
         struct Transaction t_vector [get_num_transactions(current_node.transaction_block)];
         queue_to_array(current_node.transaction_block,&t_vector);
+        /*TODO: insert it into the shm with sem_lock*/
+
     }
     return 0;
 }
@@ -342,6 +347,10 @@ void acquire_semaphore_ids(){
     }
     semaphore_masterbook_id= semget(SEMAPHORE_MASTER_BOOK_ACCESS_KEY, 1, 0);
     if (semaphore_masterbook_id< 0) {
-        ERROR_EXIT_SEQUENCE_NODE("IMPOSSIBLE TO CREATE START_SEMAPHORE");
+        ERROR_EXIT_SEQUENCE_NODE("IMPOSSIBLE TO OBTAIN THE MASTERBOOK SEM");
+    }
+    semaphore_to_fill_id= semget(SEMAPHORE_MASTER_BOOK_TO_FILL_KEY, 1, 0);
+    if(semaphore_to_fill_id<0){
+        ERROR_EXIT_SEQUENCE_NODE("IMPOSSIBLE TO OBTAIN MASTERBOOK_TO_FILL SEM");
     }
 }

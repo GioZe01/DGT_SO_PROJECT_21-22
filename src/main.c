@@ -7,7 +7,7 @@
 #include <sys/wait.h>
 #include <sys/msg.h>
 #include <sys/shm.h>
-
+/*ldfjlsjflsalfjlsdjf*/
 /*  General */
 #include <string.h>
 #include <errno.h>
@@ -130,7 +130,8 @@ int msg_report_id_master = -1;/* Identifier for message queue for master communi
 int msg_report_id_users = -1; /* Identifier for message queue for users communication*/
 int msg_report_id_nodes = -1; /* Identifier for message queue for nodes communication*/
 int semaphore_start_id = -1;  /* Id of the start semaphore arrays for sinc*/
-int semaphore_masterbook_id = -1;
+int semaphore_masterbook_id = -1; /* Id of the masterbook semaphore for accessing the block matrix */
+int semaphore_to_fill_id = -1; /* Id of the masterbook to_fill access semaphore*/
 pid_t main_pid; /*pid of the current proc*/
 
 int main() {
@@ -340,9 +341,8 @@ void signals_handler(int signum) { /*TODO: Scrivere implementazione*/
 }
 
 void create_semaphores(void) {
-    DEBUG_BLOCK_ACTION_START("CREATE START_SEM");
+    DEBUG_BLOCK_ACTION_START("CREATE SEM");
     DEBUG_NOTIFY_ACTIVITY_RUNNING("CREATION OF START_SEMAPHORE CHILDREN....");
-
     semaphore_start_id = semget(SEMAPHORE_SINC_KEY_START, 1, IPC_CREAT | IPC_EXCL | 0600);
     if (semaphore_start_id < 0) {
         ERROR_EXIT_SEQUENCE_MAIN("IMPOSSIBLE TO CREATE START_SEMAPHORE");
@@ -360,7 +360,7 @@ void create_semaphores(void) {
 
     semaphore_masterbook_id= semget(SEMAPHORE_MASTER_BOOK_ACCESS_KEY, 1, IPC_CREAT | IPC_EXCL | 0600);
     if (semaphore_masterbook_id< 0) {
-        ERROR_EXIT_SEQUENCE_MAIN("IMPOSSIBLE TO CREATE START_SEMAPHORE");
+        ERROR_EXIT_SEQUENCE_MAIN("IMPOSSIBLE TO CREATE MASTERBOOK SEM");
     }
     DEBUG_NOTIFY_ACTIVITY_DONE("CREATION OF MASTEBOOK ACCESS SEM...");
     DEBUG_NOTIFY_ACTIVITY_RUNNING("INITIALIZATION OF MASTERBOOK ACCESS SEM....");
@@ -371,10 +371,14 @@ void create_semaphores(void) {
     DEBUG_NOTIFY_ACTIVITY_DONE("INITIALIZATION OF MASTEBOOK ACCESS SEM....");
     DEBUG_BLOCK_ACTION_END();
 
+    DEBUG_NOTIFY_ACTIVITY_RUNNING("CREATION OF TO_FILL SEM....");
+    semaphore_to_fill_id= semget(SEMAPHORE_MASTER_BOOK_TO_FILL_KEY, 1, IPC_CREAT | IPC_EXCL | 0600);
+    if (semaphore_start_id < 0) {
+        ERROR_EXIT_SEQUENCE_MAIN("IMPOSSIBLE TO CREATE TO_FILL SEM");
+    }
+    DEBUG_NOTIFY_ACTIVITY_DONE("CREATION OF TO_FILL DONE")SEMAPHORE_MASTER_BOOK_TO_FILL_KEY;
 }
 
-
-/*  IMPLEMENTATION OF PROC_INFO_LIST METHOD*/
 void wait_kids() {
     DEBUG_NOTIFY_ACTIVITY_RUNNING("WAITING KIDS...");
     struct processes_info_list *proc = proc_list;

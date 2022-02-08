@@ -13,7 +13,8 @@
 #define NODES_MAX 100    /*Max nodes that can be saved in shm*/
 /*  SINCRONIZATION KEY values from 60 to 70*/
 #define SEMAPHORE_SINC_KEY_START 0x60
-#define SEMAPHORE_MASTER_BOOK_ACCESS_KEY 0x61
+#define SEMAPHORE_MASTER_BOOK_ACCESS_KEY 0x61 /*For single block access*/
+#define SEMAPHORE_MASTER_BOOK_TO_FILL_KEY 0X62 /*For to_fill shm param look for def into shm_masterbook*/
 /*  QUEUE KEY  values from 71 to 80*/
 #define MASTER_QUEUE_KEY 0x71
 #define USERS_QUEUE_KEY 0x72
