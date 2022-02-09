@@ -14,7 +14,6 @@
 #include <signal.h>
 
 /*  LOCAL IMPORT*/
-
 #include "local_lib/headers/glob.h"
 #include "local_lib/headers/conf_file.h"
 #include "local_lib/headers/boolean.h"
