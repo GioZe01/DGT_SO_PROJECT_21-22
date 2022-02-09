@@ -7,7 +7,6 @@
 #include <sys/wait.h>
 #include <sys/msg.h>
 #include <sys/shm.h>
-/*ldfjlsjflsalfjlsdjf*/
 /*  General */
 #include <string.h>
 #include <errno.h>
