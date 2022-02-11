@@ -31,3 +31,8 @@ ACTUALLY THERE ARE DIFFERENT CHOICES FOR ENDING USER PROC:
 4) MAKE IT END WITHOUT CONSIDERING INCOMING FLOW OF CASH
 
 - further implementation would be to resume the user (because can listen to the same ref into the message queue)
+# Transazioni
+    -> timestamp della transazione è caricato una prima volta dallo user per poi essere aggiornato dal
+    nodo
+    -> quando lo user la crea il reward non è ancora impostato sulla transazione
+

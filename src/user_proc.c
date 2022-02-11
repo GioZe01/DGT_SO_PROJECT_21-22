@@ -325,7 +325,7 @@ void generating_transactions(void) {
 }
 
 Bool check_for_transactions_confirmed(void) {
-    struct user_msg *msg = sizeof(struct user_msg) ;
+    struct user_msg *msg = sizeof(struct user_msg);
     if (user_msg_receive(queue_report_id, msg, user_id) == 0) {
         /*Messagge found*/
         current_user.to_wait_transaction--;
@@ -333,7 +333,7 @@ Bool check_for_transactions_confirmed(void) {
         queue_append(current_user.transactions_done, msg->t);
         return TRUE;
     }
-   return FALSE;
+    return FALSE;
 }
 
 Bool check_for_transactions_failed(void) {

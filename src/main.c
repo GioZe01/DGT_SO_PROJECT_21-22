@@ -1,3 +1,4 @@
+#define _GNU_SOURCE
 /* Std  */
 #include <stdio.h>
 #include <stdlib.h>
@@ -25,6 +26,7 @@
 #include "local_lib/headers/process_info_list.h"
 #include "local_lib/headers/conf_shm.h"
 #include "local_lib/headers/book_master_shm.h"
+
 #ifdef DEBUG
 
 #include "local_lib/headers/debug_utility.h"
@@ -120,7 +122,7 @@ void signals_handler(int signum);
 struct conf simulation_conf; /*Structure representing the configuration present in the conf file*/
 struct processes_info_list *proc_list; /* Pointer to a linked list of all proc generated*/
 struct shm_conf *shm_conf_pointer; /* Pointer to the shm_conf structure in shared memory*/
-struct shm_book_master * shm_masterbook_pointer; /* Pointer to the shm_masterbook structure in shared memory*/
+struct shm_book_master *shm_masterbook_pointer; /* Pointer to the shm_masterbook structure in shared memory*/
 int simulation_end = 0; /* For value different from 0 the simulation must end*/
 int shm_conf_id = -1; /* Id of the shm for the configuration of the node*/
 int shm_masterbook_id = -1; /* Id of the shm for the master book */
@@ -356,13 +358,13 @@ void create_semaphores(void) {
     DEBUG_NOTIFY_ACTIVITY_DONE("INITIALIZATION OF START_SEMAPHORE CHILDREN DONE");
     DEBUG_NOTIFY_ACTIVITY_RUNNING("CREATION OF MASTEBOOK ACCESS SEM....");
 
-    semaphore_masterbook_id= semget(SEMAPHORE_MASTER_BOOK_ACCESS_KEY, 1, IPC_CREAT | IPC_EXCL | 0600);
-    if (semaphore_masterbook_id< 0) {
+    semaphore_masterbook_id = semget(SEMAPHORE_MASTER_BOOK_ACCESS_KEY, 1, IPC_CREAT | IPC_EXCL | 0600);
+    if (semaphore_masterbook_id < 0) {
         ERROR_EXIT_SEQUENCE_MAIN("IMPOSSIBLE TO CREATE MASTERBOOK SEM");
     }
     DEBUG_NOTIFY_ACTIVITY_DONE("CREATION OF MASTEBOOK ACCESS SEM...");
     DEBUG_NOTIFY_ACTIVITY_RUNNING("INITIALIZATION OF MASTERBOOK ACCESS SEM....");
-    if (semctl(semaphore_masterbook_id, 0, SETVAL, SO_REGISTRY_SIZE)<
+    if (semctl(semaphore_masterbook_id, 0, SETVAL, SO_REGISTRY_SIZE) <
         0) {
         ERROR_EXIT_SEQUENCE_MAIN("IMPOSSIBLE TO INITIALISE SEMAPHORE START CHILDREN");
     }
@@ -370,11 +372,11 @@ void create_semaphores(void) {
     DEBUG_BLOCK_ACTION_END();
 
     DEBUG_NOTIFY_ACTIVITY_RUNNING("CREATION OF TO_FILL SEM....");
-    semaphore_to_fill_id= semget(SEMAPHORE_MASTER_BOOK_TO_FILL_KEY, 1, IPC_CREAT | IPC_EXCL | 0600);
+    semaphore_to_fill_id = semget(SEMAPHORE_MASTER_BOOK_TO_FILL_KEY, 1, IPC_CREAT | IPC_EXCL | 0600);
     if (semaphore_start_id < 0) {
         ERROR_EXIT_SEQUENCE_MAIN("IMPOSSIBLE TO CREATE TO_FILL SEM");
     }
-    DEBUG_NOTIFY_ACTIVITY_DONE("CREATION OF TO_FILL DONE")SEMAPHORE_MASTER_BOOK_TO_FILL_KEY;
+    DEBUG_NOTIFY_ACTIVITY_DONE("CREATION OF TO_FILL DONE");
 }
 
 void wait_kids() {
@@ -399,9 +401,9 @@ void kill_kids() {
                  * the termination has not been read by main, in this case need wait on the proc to update the proc-list
                  * state
                  */
-                DEBUG_MESSAGE("PROC KILLED");
+                    DEBUG_MESSAGE("PROC KILLED");
             else {
-                if (errno == EINTR){continue;}
+                if (errno == EINTR) { continue; }
                 ERROR_MESSAGE("IMPOSSIBLE TO SEND TERMINATION SIGNAL TO KID");
             }
     DEBUG_NOTIFY_ACTIVITY_DONE("KILLING KIDS DONE");
@@ -416,13 +418,26 @@ void free_sysVar() {
     if (semaphore_start_id >= 0 && semctl(semaphore_start_id, 0, IPC_RMID) < 0)
         ERROR_MESSAGE("REMOVING PROCEDURE FOR START_SEM HAS FAILED");
     DEBUG_NOTIFY_ACTIVITY_DONE("REMOVING STARTING SEMAPHORE DONE");
+    DEBUG_NOTIFY_ACTIVITY_RUNNING("REMOVING MASTERBOOK SEMAPHORE...");
+    if (semaphore_masterbook_id>= 0 && semctl(semaphore_masterbook_id, 0, IPC_RMID) < 0)
+        ERROR_MESSAGE("REMOVING PROCEDURE FOR MASTERBOOK SEM HAS FAILED");
+    DEBUG_NOTIFY_ACTIVITY_DONE("REMOVING MASTERBOOK SEMAPHORE DONE");
+    DEBUG_NOTIFY_ACTIVITY_RUNNING("REMOVING TO_FILL MASTERBOOK SEMAPHORE...");
+    if (semaphore_to_fill_id>= 0 && semctl(semaphore_to_fill_id, 0, IPC_RMID) < 0)
+        ERROR_MESSAGE("REMOVING PROCEDURE FOR TO_FILL MASTERBOOK SEM HAS FAILED");
+    DEBUG_NOTIFY_ACTIVITY_DONE("REMOVING TO_FILL MASTERBOOK SEMAPHORE DONE");
     DEBUG_NOTIFY_ACTIVITY_RUNNING("REMOVING SHM CONF...");
     if (shm_conf_id >= 0 && shmctl(shm_conf_id, IPC_RMID, NULL) < 0) {
         ERROR_MESSAGE("REMOVING PROCEDURE FOR SHM_CONF FAILED");
     }
     DEBUG_NOTIFY_ACTIVITY_DONE("REMOVING SHM CONF DONE");
+    DEBUG_NOTIFY_ACTIVITY_RUNNING("REMOVING SHM MASTERBOOK...");
+    if (shm_masterbook_id>= 0 && shmctl(shm_masterbook_id, IPC_RMID, NULL) < 0) {
+        ERROR_MESSAGE("REMOVING PROCEDURE FOR SHM_MASTERBOOK FAILED");
+    }
+    DEBUG_NOTIFY_ACTIVITY_DONE("REMOVING SHM MASTERBOOK DONE");
     DEBUG_NOTIFY_ACTIVITY_RUNNING("REMOVING MASTER QUEUE...");
-    if (msg_report_id_master>= 0 && msgctl(msg_report_id_master, IPC_RMID, NULL) < 0) {
+    if (msg_report_id_master >= 0 && msgctl(msg_report_id_master, IPC_RMID, NULL) < 0) {
         ERROR_MESSAGE("IMPOSSIBLE TO DELETE MESSAGE QUEUE OF MASTER");
     }
     DEBUG_NOTIFY_ACTIVITY_DONE("REMOVING MASTER QUEUE DONE");
@@ -517,15 +532,16 @@ void create_shm_conf(void) {
     DEBUG_NOTIFY_ACTIVITY_DONE("CREATING SHM_CONF DONE");
     DEBUG_BLOCK_ACTION_END();
 }
+
 void create_masterbook() {
     DEBUG_BLOCK_ACTION_START("CREATE MASTERBOOK");
     DEBUG_NOTIFY_ACTIVITY_RUNNING("CREATING THE MASTER_BOOK....");
-    shm_masterbook_id = shmget(MASTER_BOOK_SHM_KEY, sizeof (struct shm_book_master), IPC_CREAT | IPC_EXCL | 0600);
-    if(shm_masterbook_id<0){
+    shm_masterbook_id = shmget(MASTER_BOOK_SHM_KEY, sizeof(struct shm_book_master), IPC_CREAT | IPC_EXCL | 0600);
+    if (shm_masterbook_id < 0) {
         ERROR_EXIT_SEQUENCE_MAIN("IMPOSSIBLE TO CREATE THE SHARED MEM FOR MASTERBOOK");
     }
     shm_masterbook_pointer = shmat(shm_masterbook_id, NULL, 0);
-    if(shm_masterbook_id == (void*)-1){
+    if (shm_masterbook_id == (void *) -1) {
         ERROR_EXIT_SEQUENCE_MAIN("IMPOSSIBLE TO CONNECT TO THE MASTERBOOK SHM");
     }
     DEBUG_NOTIFY_ACTIVITY_DONE("CREATING THE MASTER BOOK DOONE");

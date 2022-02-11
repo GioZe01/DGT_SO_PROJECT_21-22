@@ -1,6 +1,8 @@
+#define _GNU_SOURCE
 /*  Standard Library */
 #include <stdio.h>
 #include <stdlib.h>
+
 /* Sys  */
 #include <sys/ipc.h>
 #include <sys/sem.h>
@@ -25,6 +27,7 @@
 #include "local_lib/headers/user_msg_report.h"
 #include "local_lib/headers/node_msg_report.h"
 #include "local_lib/headers/conf_shm.h"
+#include "local_lib/headers/book_master_shm.h"
 
 #ifdef DEBUG
 
@@ -108,13 +111,43 @@ void connect_to_queues(void);
  * @return
  */
 Bool load_block();
+
 /**
  * \brief Acquire the semaphore_id related to the node
  * In particular:
  * - semaphore_start_id
  * - semaphore_masterbook_id
  */
-void acquire_sempahores_ids(void);
+void acquire_semaphore_ids(void);
+
+/* Lock the shm book_master via masterbook_to_fill param and the cell to fill index.
+ *
+ */
+void lock_shm_masterbook(void);
+
+/* Lock the to_fill index saved in the shared_memory access
+ */
+void lock_to_fill_sem(void);
+
+/* Lock the current cell of the masterbook shm in which the node had written the block
+ * @param i_cell_block_list index to be blocked
+ */
+void lock_masterbook_cell_access(int i_cell_block_list);
+
+/* Unlock the to_fill index saved in the shared_memory access
+ */
+void unlock_to_fill_sem(void);
+
+/* Unloack the current cell of the masterbook shm in which the node had written the block
+ */
+void unlock_masterbook_cell_access(void);
+
+/* Advice the master porc via master_message queue by sending a master_message
+*/
+void advice_master_of_termination(void);
+
+int get_time_processing(void);
+
 /* SysVar */
 int state; /* Current state of the node proc*/
 int semaphore_start_id = -1; /*Id of the start semaphore arrays for sinc*/
@@ -124,9 +157,11 @@ int queue_node_id = -1;/* Identifier of the node queue id */
 int queue_user_id = -1; /* Identifier of the user queue id*/
 int node_end = 0; /* For value different from 0 the node proc must end*/
 int node_id = -1; /* Id of the current node into the snapshots vector*/
+int last_signal;
 struct node current_node; /* Current representation of the node*/
 struct conf node_configuration; /* Configuration File representation*/
 struct shm_conf *shm_conf_pointer_node; /* Ref to the shm for configuration of the node*/
+struct shm_book_master *shm_masterbook_pointer;/* Ref to the shm for the masterbook shm */
 
 int main(int argc, char const *argv[]) {
     DEBUG_MESSAGE("NODE PROCESS STARTED");
@@ -158,7 +193,7 @@ int main(int argc, char const *argv[]) {
         /*---------------------------*/
         /*  SEMAPHORES ACQUISITION   */
         /*---------------------------*/
-        acquire_sempahores_ids();
+        acquire_semaphore_ids();
         DEBUG_MESSAGE("NODE READY, ON START_SEM");
         if (semaphore_wait_for_sinc(semaphore_start_id, 0) < 0) {
             ERROR_EXIT_SEQUENCE_NODE("IMPOSSIBLE TO WAIT FOR START");
@@ -175,7 +210,7 @@ int main(int argc, char const *argv[]) {
 #ifdef DEBUG
             node_msg_print(&msg_rep);
 #endif
-            if (process_node_block() < 0){
+            if (process_node_block() < 0) {
 
             }
         }
@@ -244,6 +279,7 @@ Bool set_signal_handler_node(struct sigaction sa, sigset_t sigmask) {
  */
 void signals_handler(int signum) {
     DEBUG_SIGNAL("SIGNAL RECEIVED ", signum);
+    last_signal = signum;
     switch (signum) {
         case SIGINT:
             /*TODO: avvisare main*/
@@ -279,6 +315,7 @@ void attach_to_shm_conf(void) {
     shm_conf_pointer_node = shmat(shm_conf_id, NULL, 0);
     if (shm_conf_pointer_node == (void *) -1) { ERROR_EXIT_SEQUENCE_NODE("IMPOSSIBLE TO CONNECT TO SHM CONF"); }
     DEBUG_NOTIFY_ACTIVITY_DONE("ATTACHING TO SHM DONE");
+    shm_conf_id = shmget(MASTER_BOOK_SHM_KEY, sizeof(struct shm_book_master), 0600);
 }
 
 void process_node_transaction(struct node_msg *msg_rep) {
@@ -314,14 +351,85 @@ void connect_to_queues(void) {
 int process_node_block() {
     if (get_num_transactions(current_node.transaction_pool) >= SO_BLOCK_SIZE) {
         /*Loading them into the node_block_transactions*/
-        if (load_block()== FALSE) return -1;
+        if (load_block() == FALSE) return -1;
         current_node.calc_reward(&current_node, -1, TRUE);
-        struct Transaction t_vector [get_num_transactions(current_node.transaction_block)];
-        queue_to_array(current_node.transaction_block,&t_vector);
+        struct Transaction t_vector[get_num_transactions(current_node.transaction_block)];
+        queue_to_array(current_node.transaction_block, &t_vector);
         /*TODO: insert it into the shm with sem_lock*/
-
+        lock_shm_masterbook();
     }
     return 0;
+}
+
+void advice_master_of_termination(void) {
+
+}
+
+void lock_to_fill_sem(void) {
+    while (semaphore_lock(semaphore_to_fill_id, 0) < 0) {
+        if (errno == EINTR) {
+            if (last_signal == SIGALRM) {
+                /**RICEZIONE DI SEGNALE*/
+                unlock_to_fill_sem();
+                /*Avvisare il main e il processo deve terminare*/
+                advice_master_of_termination();
+            } else {
+                continue;
+            }
+        } else {
+            ERROR_EXIT_SEQUENCE_NODE("ERROR WHILE TRYING TO EXEC LOCK ON TO_FILL ACCESS SEM");
+        }
+    }
+}
+
+void lock_masterbook_cell_access(int i_cell_block_list) {
+    while (semaphore_lock(semaphore_masterbook_id, i_cell_block_list)) {
+        /*TODO: fare refactoring nei due while*/
+        if (errno == EINTR) {
+            if (last_signal == SIGALRM) {
+                /**RICEZIONE DI SEGNALE*/
+                unlock_masterbook_cell_access();
+                /*Avvisare il main e il processo deve terminare*/
+                advice_master_of_termination();
+            } else {
+                continue;
+            }
+        } else {
+            ERROR_EXIT_SEQUENCE_NODE("ERROR WHILE TRYING TO EXEC LOCK ON TO_FILL ACCESS SEM");
+        }
+    }
+}
+
+void unlock_to_fill_sem(void) {
+    while (semaphore_unlock(semaphore_to_fill_id, 0)) {
+        if (errno != EINTR) {
+            ERROR_EXIT_SEQUENCE_NODE("ERROR DURING THE UNLOCK OF THE SEMAPHORE");
+        }
+    }
+}
+
+void unlock_masterbook_cell_access(void) {
+    while (semaphore_unlock(semaphore_masterbook_id, 0)) {
+        if (errno != EINTR) {
+            ERROR_EXIT_SEQUENCE_NODE("ERROR DURING THE UNLOCK OF BOOKMASTER CELL");
+        }
+    }
+}
+
+void lock_shm_masterbook(void) {
+    struct timespec trans_proc_sim;
+    trans_proc_sim.tv_sec = 0;
+    trans_proc_sim.tv_nsec = get_time_processing();
+    nanosleep(&trans_proc_sim, (void *) NULL);
+    lock_to_fill_sem();
+    int i_cell_block_list = shm_masterbook_pointer->to_fill;
+    /*Inserting the block into the shm*/
+    shm_masterbook_pointer->to_fill += 1;
+    lock_masterbook_cell_access(i_cell_block_list);
+    insert_block(shm_masterbook_pointer, current_node.transaction_block);
+    /*Unloacking the semaphore*/
+    unlock_masterbook_cell_access();
+    unlock_to_fill_sem();
 }
 
 Bool load_block() {
@@ -339,18 +447,26 @@ Bool load_block() {
     }
     return TRUE;
 }
-void acquire_semaphore_ids(){
+
+void acquire_semaphore_ids(void) {
     semaphore_start_id = semget(SEMAPHORE_SINC_KEY_START, 1, 0);
     if (semaphore_start_id < 0) { ERROR_EXIT_SEQUENCE_NODE("IMPOSSIBLE TO OBTAIN ID OF START SEM"); }
     if (semaphore_lock(semaphore_start_id, 0) < 0) {
         ERROR_EXIT_SEQUENCE_NODE("IMPOSSIBLE TO OBTAIN THE START SEMAPHORE");
     }
-    semaphore_masterbook_id= semget(SEMAPHORE_MASTER_BOOK_ACCESS_KEY, 1, 0);
-    if (semaphore_masterbook_id< 0) {
+    semaphore_masterbook_id = semget(SEMAPHORE_MASTER_BOOK_ACCESS_KEY, 1, 0);
+    if (semaphore_masterbook_id < 0) {
         ERROR_EXIT_SEQUENCE_NODE("IMPOSSIBLE TO OBTAIN THE MASTERBOOK SEM");
     }
-    semaphore_to_fill_id= semget(SEMAPHORE_MASTER_BOOK_TO_FILL_KEY, 1, 0);
-    if(semaphore_to_fill_id<0){
+    semaphore_to_fill_id = semget(SEMAPHORE_MASTER_BOOK_TO_FILL_KEY, 1, 0);
+    if (semaphore_to_fill_id < 0) {
         ERROR_EXIT_SEQUENCE_NODE("IMPOSSIBLE TO OBTAIN MASTERBOOK_TO_FILL SEM");
     }
+}
+
+int get_time_processing(void) {
+    srand(getpid());
+    return (rand() %
+            (node_configuration.so_max_trans_gen_nsec - node_configuration.so_min_trans_proc_nsec + 1)) +
+           node_configuration.so_min_trans_proc_nsec;
 }

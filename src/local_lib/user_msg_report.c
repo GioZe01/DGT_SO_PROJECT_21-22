@@ -10,8 +10,12 @@
 int user_msg_create(struct user_msg *self, long type, pid_t sender_pid, struct Transaction *t) {
     switch (type) {
         case MSG_TRANSACTION_CONFIRMED_TYPE:
+            self->t = *t;
+            t->t_type = TRANSACTION_SUCCES;
+            break;
         case MSG_TRANSACTION_FAILED_TYPE:
             self->t = *t;
+            t->t_type = TRANSACTION_FAILED;
             break;
         default:
             ERROR_MESSAGE("WRONG TYPE");
@@ -53,7 +57,7 @@ int user_msg_snd(int id, struct user_msg *msg, long type, struct Transaction *t,
     return 0;
 }
 
-int user_msg_receive(int id, struct user_msg* msg, long type) {
+int user_msg_receive(int id, struct user_msg *msg, long type) {
     if (msgrcv(id, msg, sizeof(*msg) - sizeof(long), type, IPC_NOWAIT) < 0) {
         if (errno == ENOMSG) {
             return -2;
