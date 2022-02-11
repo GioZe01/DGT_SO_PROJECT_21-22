@@ -176,7 +176,7 @@ int main(int argc, char const *argv[]) {
         struct node_msg msg_rep;
         read_conf_node(&node_configuration);
         node_create(&current_node, getpid(), 0, node_configuration.so_tp_size, SO_BLOCK_SIZE,
-                    node_configuration.so_reward, &calc_reward);
+                node_configuration.so_reward, &calc_reward);
 
         /*-----------------------*/
         /*  CONNECTING TO QUEUES */
@@ -213,11 +213,9 @@ int main(int argc, char const *argv[]) {
 #ifdef DEBUG
             node_msg_print(&msg_rep);
 #endif
-            if (process_node_block() < 0) {
-
+            if (get_num_transactions(current_node.transaction_pool) >= SO_BLOCK_SIZE && process_node_block()<0) {
             }
         }
-
     }
     EXIT_PROCEDURE_NODE(0);
 }
@@ -352,7 +350,6 @@ void connect_to_queues(void) {
 }
 
 int process_node_block() {
-    if (get_num_transactions(current_node.transaction_pool) >= SO_BLOCK_SIZE) {
         /*Loading them into the node_block_transactions*/
         if (load_block() == FALSE) return -1;
         current_node.calc_reward(&current_node, -1, TRUE);
@@ -360,7 +357,6 @@ int process_node_block() {
         queue_to_array(current_node.transaction_block, &t_vector);
         /*TODO: insert it into the shm with sem_lock*/
         lock_shm_masterbook();
-    }
     return 0;
 }
 
