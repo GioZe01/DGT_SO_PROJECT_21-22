@@ -189,11 +189,14 @@ int main(int argc, char const *argv[]) {
         /************************************
          *      SINC AND WAITING FASE       *
          * **********************************/
-
         /*---------------------------*/
         /*  SEMAPHORES ACQUISITION   */
         /*---------------------------*/
         acquire_semaphore_ids();
+
+        /*---------------------------*/
+        /*  SEMAPHORES SINC..        */
+        /*---------------------------*/
         DEBUG_MESSAGE("NODE READY, ON START_SEM");
         if (semaphore_wait_for_sinc(semaphore_start_id, 0) < 0) {
             ERROR_EXIT_SEQUENCE_NODE("IMPOSSIBLE TO WAIT FOR START");
@@ -417,6 +420,7 @@ void unlock_masterbook_cell_access(void) {
 }
 
 void lock_shm_masterbook(void) {
+    DEBUG_NOTIFY_ACTIVITY_RUNNING("NODE:= LOCKING THE SHM FOR ADDING THE BLOCK...");
     struct timespec trans_proc_sim;
     trans_proc_sim.tv_sec = 0;
     trans_proc_sim.tv_nsec = get_time_processing();
@@ -426,14 +430,18 @@ void lock_shm_masterbook(void) {
     /*Inserting the block into the shm*/
     shm_masterbook_pointer->to_fill += 1;
     lock_masterbook_cell_access(i_cell_block_list);
-    insert_block(shm_masterbook_pointer, current_node.transaction_block);
+    struct Transaction block_list [get_num_transactions(current_node.transaction_block)];
+    queue_to_array(current_node.transaction_block,block_list);
+    insert_block(shm_masterbook_pointer,block_list);
     /*Unloacking the semaphore*/
     unlock_masterbook_cell_access();
     unlock_to_fill_sem();
+    DEBUG_NOTIFY_ACTIVITY_DONE("NODE:= LOCKING THE SHM FOR ADDING THE BLOCK DONE");
 }
 
 Bool load_block() {
     /*Finish check*/
+    DEBUG_NOTIFY_ACTIVITY_RUNNING("NODE:= LOADING THE BLOCK FROM THE TRANSACTION POOL...");
     int i;
     for (i = 0; i < current_node.block_size - 1; i++) {
         queue_append(current_node.transaction_block, queue_head(current_node.transaction_pool));
@@ -445,6 +453,7 @@ Bool load_block() {
                            queue_get_reward(current_node.transaction_block));
         queue_append(current_node.transaction_block, node_transaction);
     }
+    DEBUG_NOTIFY_ACTIVITY_DONE("NODE:= LOADING THE BLOCK FROM THE TRANSACTION POOL DONE");
     return TRUE;
 }
 

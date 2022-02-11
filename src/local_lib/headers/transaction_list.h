@@ -95,8 +95,8 @@ int get_num_transactions(Queue q);
 /**
  * From the given queue load the data into a vector rather then a linked list
  * @param q the queue to load the data from
- * @param vector to be loaded
+ * @param vector pointer of transactions to be loaded
  * @return -1 in case of failure. 0 otherwise
  */
-int queue_to_array(Queue q, struct Transaction vector[]);
+int queue_to_array(Queue q, struct Transaction* vector);
 #endif /*DGT_SO_PROJECT_21_22_TRANSACTION_LIST_H*/
