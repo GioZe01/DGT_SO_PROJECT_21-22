@@ -85,10 +85,9 @@ int load_configuration(struct conf *self) {
         self->so_tp_size <= 0 ||
         self->so_min_trans_proc_nsec <= 0 ||
         self->so_max_trans_proc_nsec <= 0 ||
-        self->so_sim_sec <= 0) {
+        self->so_sim_sec <= 0){
         fclose(conf_file);
-        return -2;
-    }
+        return -2;}
     /*Checks for -3*/
     if (self->so_user_num < 2 || self->so_nodes_num < 1) {/*TODO: numbers nodes check requested ?*/
         fclose(conf_file);

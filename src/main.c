@@ -28,9 +28,9 @@
 #include "local_lib/headers/book_master_shm.h"
 
 #ifdef DEBUG
-
+#ifdef DEBUG_MAIN
 #include "local_lib/headers/debug_utility.h"
-
+#endif
 #else /*unimplemented*/
 #define DEBUG_NOTIFY_ACTIVITY_RUNNING(mex)
 #define DEBUG_NOTIFY_ACTIVITY_DONE(mex)

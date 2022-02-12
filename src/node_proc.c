@@ -28,11 +28,11 @@
 #include "local_lib/headers/node_msg_report.h"
 #include "local_lib/headers/conf_shm.h"
 #include "local_lib/headers/book_master_shm.h"
-
 #ifdef DEBUG
 
+#ifdef DEBUG_NODE
 #include "local_lib/headers/debug_utility.h"
-
+#endif
 #else
 #define DEBUG_NOTIFY_ACTIVITY_RUNNING(mex)
 #define DEBUG_NOTIFY_ACTIVITY_DONE(mex)
@@ -212,6 +212,7 @@ int main(int argc, char const *argv[]) {
             process_simple_transaction_type(&msg_rep);
 #ifdef DEBUG
             node_msg_print(&msg_rep);
+            queue_print(current_node.transaction_block);
 #endif
             if (get_num_transactions(current_node.transaction_pool) >= SO_BLOCK_SIZE && process_node_block()<0) {
             }
@@ -427,7 +428,7 @@ void lock_shm_masterbook(void) {
     shm_masterbook_pointer->to_fill += 1;
     lock_masterbook_cell_access(i_cell_block_list);
     struct Transaction block_list [get_num_transactions(current_node.transaction_block)];
-    queue_to_array(current_node.transaction_block,block_list);
+    queue_to_array(current_node.transaction_block,&block_list);
     insert_block(shm_masterbook_pointer,block_list);
     /*Unloacking the semaphore*/
     unlock_masterbook_cell_access();
