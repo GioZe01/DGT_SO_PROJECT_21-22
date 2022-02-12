@@ -454,7 +454,7 @@ void free_sysVar() {
 }
 
 Bool read_conf(void) {
-    DEBUG_BLOCK_ACTION_START("READING CONF")
+    DEBUG_BLOCK_ACTION_START("READING CONF");
     DEBUG_NOTIFY_ACTIVITY_RUNNING("READING CONFIGURATION...");
     switch (load_configuration(&simulation_conf)) {
         case 0:
