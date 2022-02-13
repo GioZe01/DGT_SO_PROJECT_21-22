@@ -29,7 +29,7 @@ void node_proc_block_create(struct node*self, pid_t node_pid, float budget, int 
     self->pid = node_pid;
     self->type.block = block;
 }
-void node_proc_tp_create(struct node*self, pid_t node_pid, float budget, int tp_size, int block_size, int percentage,Reward calc_reward){
+void node_proc_tp_create(struct node*self, pid_t node_pid, int tp_size){
     node_tp tp_node;
     tp_node.tp_size = tp_size;
     self->pid = node_pid;

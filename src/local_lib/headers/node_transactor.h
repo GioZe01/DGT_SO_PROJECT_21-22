@@ -45,7 +45,7 @@ void node_proc_block_create(struct node*self, pid_t node_pid, float budget, int 
  * @param node_pid pid of the node proc associated with this struct
  * @param tp_size size of the transaction pool
  */
-void node_proc_tp_create(struct node*self, pid_t node_pid, float budget, int tp_size, int block_size, int percentage,Reward calc_reward);
+void node_proc_tp_create(struct node*self, pid_t node_pid, int tp_size);
 
 /**
  * Free the memory from the queue list of transactions
