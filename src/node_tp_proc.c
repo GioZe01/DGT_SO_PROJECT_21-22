@@ -87,6 +87,7 @@ int main(int argc, char const *argv[]){
      *      CONFIGURATION FASE          *
      * **********************************/
     if(check_arguments(argc,argv)==TRUE){
+        node_create(&current_node_tp,getpid(),0, current_node_tp.so_tp_size, SO_BLOCK_SIZE, 0, &calc_reward);
     }
 }
 

@@ -6,30 +6,46 @@
 #include "transaction_list.h"
 
 typedef float(*Reward)(struct node *self, int percentage, Bool use_default);
-/*this can be optimized using a union:
- * that differenciate the node_tp_proc and node_proc implementation
+/*
+ * Can be done a rifactoring using ADT and obscuring the union, and create just one create method
  * */
-struct node {
+typedef struct {
+        float budget;
+        int block_size;
+        int percentage;
+        Reward calc_reward;
+    }node_block;
+
+typedef struct {
+        int tp_size;/* The transaction pool size for the current node rappresented*/
+    }node_tp;
+union node_type{
+    node_block block;
+    node_tp tp;
+};
+struct node{
     pid_t pid;
     int exec_state;/* Current state of the node proc*/
-    float budget;
-    int tp_size;/* The transaction pool size for the current node rappresented*/
-    int block_size;
-    int percentage;
     Queue transactions_list;/*list of transactions*/
-    Reward calc_reward;
+    node_type type;
 };
-
 /**
  * Initialize the node with the given param, and the transaction list as empty
  * @param self node to be initialized
  * @param node_pid pid of the node proc associated with this struct
  * @param budget initial budget of the node
- * @param tp_size size of the transaction pool
  * @param block_size size of the transaction block
  * @param calc_reward pointer to function that calculate the reward
  */
-void node_create(struct node *self, pid_t node_pid, float budget, int tp_size, int block_size, int percentage,Reward calc_reward);
+void node_proc_block_create(struct node*self, pid_t node_pid, float budget, int block_size, int percentage,Reward calc_reward);
+
+/**
+ * Initialize the node with the given param, and the transaction list as empty
+ * @param self node to be initialized
+ * @param node_pid pid of the node proc associated with this struct
+ * @param tp_size size of the transaction pool
+ */
+void node_proc_tp_create(struct node*self, pid_t node_pid, float budget, int tp_size, int block_size, int percentage,Reward calc_reward);
 
 /**
  * Free the memory from the queue list of transactions

@@ -19,15 +19,22 @@
 #define DEBUG_ERROR_MESSAGE(mex)
 #endif
 
-void node_create(struct node *self, pid_t node_pid, float budget, int tp_size, int block_size,int percentage, Reward calc_reward) {
+void node_proc_block_create(struct node*self, pid_t node_pid, float budget, int block_size,int percentage, Reward calc_reward) {
+    node_block block;
+    block.budget = budget;
+    block.block_size = block_size;
+    block.calc_reward = calc_reward;
+    block.percentage = percentage;
+    self->transactions_list= queue_create();
     self->pid = node_pid;
-    self->budget = budget;
-    self->tp_size = tp_size;
-    self->block_size = block_size;
+    self->type.block = block;
+}
+void node_proc_tp_create(struct node*self, pid_t node_pid, float budget, int tp_size, int block_size, int percentage,Reward calc_reward){
+    node_tp tp_node;
+    tp_node.tp_size = tp_size;
+    self->pid = node_pid;
     self->transactions_list= queue_create();
-    self->transactions_list= queue_create();
-    self->calc_reward = calc_reward;
-    self->percentage = percentage;
+    self->type.tp= tp_node;
 }
 
 void free_node(struct node *self) {
@@ -49,7 +56,7 @@ int update_budget(struct node *self) {
     t_reward.reward = 0;
     t_reward.amount = queue_get_reward(self->transactions_list);
     t_reward.timestamp = timestamp;
-    self->budget+=t_reward.amount;
+    self->type.block.budget+=t_reward.amount;
     return 0;
 }
 
@@ -60,7 +67,7 @@ int add_to_transactions_list(struct node *self, struct Transaction *t) {
 int calc_reward(struct node* self, int percentage, Bool use_default){
     switch (use_default) {
         case TRUE:
-            if(queue_apt_amount_reward(self->transactions_list, self->percentage)<0)return -1;
+            if(queue_apt_amount_reward(self->transactions_list, self->type.block.percentage)<0)return -1;
             break;
         case FALSE:
             if(queue_apt_amount_reward(self->transactions_list, percentage)<0)return -1;
