@@ -24,16 +24,15 @@ void node_create(struct node *self, pid_t node_pid, float budget, int tp_size, i
     self->budget = budget;
     self->tp_size = tp_size;
     self->block_size = block_size;
-    self->transaction_block = queue_create();
-    self->transaction_pool = queue_create();
+    self->transactions_list= queue_create();
+    self->transactions_list= queue_create();
     self->calc_reward = calc_reward;
     self->percentage = percentage;
 }
 
 void free_node(struct node *self) {
     DEBUG_NOTIFY_ACTIVITY_RUNNING("FREE NODE OPERATIONS...");
-    queue_destroy(self->transaction_pool);
-    queue_destroy(self->transaction_block);
+    queue_destroy(self->transactions_list);
     DEBUG_NOTIFY_ACTIVITY_DONE("FREE NODE OPERATIONS DONE");
 }
 
@@ -48,26 +47,23 @@ int update_budget(struct node *self) {
     }
     t_reward.sender = -1;
     t_reward.reward = 0;
-    t_reward.amount = queue_get_reward(self->transaction_block);
+    t_reward.amount = queue_get_reward(self->transactions_list);
     t_reward.timestamp = timestamp;
     self->budget+=t_reward.amount;
     return 0;
 }
 
-int add_to_pool(struct node *self, struct Transaction *t) {
-    queue_append(self->transaction_pool, *t);
+int add_to_transactions_list(struct node *self, struct Transaction *t) {
+    queue_append(self->transactions_list, *t);
 }
 
-int add_to_block(struct node *self, struct Transaction *t) {
-    queue_append(self->transaction_block, *t);
-}
 int calc_reward(struct node* self, int percentage, Bool use_default){
     switch (use_default) {
         case TRUE:
-            if(queue_apt_amount_reward(self->transaction_block, self->percentage)<0)return -1;
+            if(queue_apt_amount_reward(self->transactions_list, self->percentage)<0)return -1;
             break;
         case FALSE:
-            if(queue_apt_amount_reward(self->transaction_block, percentage)<0)return -1;
+            if(queue_apt_amount_reward(self->transactions_list, percentage)<0)return -1;
             break;
         default:
             ERROR_MESSAGE("MISSING PARAMETER USE DEFAULT");

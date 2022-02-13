@@ -203,7 +203,7 @@ int main(int argc, char const *argv[]) {
         if (semaphore_wait_for_sinc(semaphore_start_id, 0) < 0) {
             ERROR_EXIT_SEQUENCE_NODE("IMPOSSIBLE TO WAIT FOR START");
         }
-        state = RUNNING_STATE;
+        current_node.exec_state= PROC_STATE_RUNNING;
 
         /****************************************
          *      PROCESSING OF TRANSACTION FASE  *
@@ -250,11 +250,6 @@ Bool read_conf_node() {
     return TRUE;
 }
 
-/**
- * Calculate the balance of the current user_proc
- * @param budget the current budget that is available for the user_proc
- * @return the value of the balance
- */
 Bool check_arguments(int argc, char const *argv[]) {
     DEBUG_NOTIFY_ACTIVITY_RUNNING("CHECKING ARGC AND ARGV...");
     if (argc < 2) {

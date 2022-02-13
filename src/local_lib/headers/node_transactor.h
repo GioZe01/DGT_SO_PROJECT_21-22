@@ -6,15 +6,17 @@
 #include "transaction_list.h"
 
 typedef float(*Reward)(struct node *self, int percentage, Bool use_default);
+/*this can be optimized using a union:
+ * that differenciate the node_tp_proc and node_proc implementation
+ * */
 struct node {
     pid_t pid;
     int exec_state;/* Current state of the node proc*/
     float budget;
-    int tp_size;
+    int tp_size;/* The transaction pool size for the current node rappresented*/
     int block_size;
     int percentage;
-    Queue transaction_pool;/*Make it a pointer to shm*/
-    Queue transaction_block;
+    Queue transactions_list;/*list of transactions*/
     Reward calc_reward;
 };
 
@@ -48,15 +50,8 @@ int update_budget(struct node *self);
  * @param t transaction to be added
  * @return -1 in case of FAILURE. 0 otherwise
  */
-int add_to_pool(struct node *self, struct Transaction *t);
+int add_to_transactions_list(struct node *self, struct Transaction *t);
 
-/**
- * Add to the transaction block the given transaction
- * @param self at wich u want the transaction to be added
- * @param t transaction to be added
- * @return -1 in case of FAILURE. 0 otherwise
- */
-int add_to_block(struct node *self, struct Transaction *t);
 /**
  * Calculate the expected reward on the transaction block of the given node
  * @param self node to operate the calc on

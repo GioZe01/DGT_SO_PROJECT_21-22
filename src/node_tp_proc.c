@@ -57,6 +57,13 @@
  * - semaphore_node_tp_shm_access
  */
 void acquire_semaphore_ids(void);
+/**
+ * Check the argc and argv to match with project specification and load so_tp_size
+ * @param argc number of argument given
+ * @param argv pointer to a char list of params given
+ * @return FALSE in case of FAILURE, TRUE otherwise
+ */
+Bool check_arguments(int argc, char const *argv[]);
 
 /**
  * Connects to the differents queues: master, node's and user's
@@ -72,5 +79,28 @@ int state;
 struct node current_node_tp;
 int main(int argc, char const *argv[]){
     DEBUG_MESSAGE("NODE TP PROCESS STARTED");
+    struct sigaction sa;
+    sigset_t sigmask;
+    DEBUG_MESSAGE("NODE TP PROCESS SET TO INIT");
     current_node_tp.exec_state = PROC_STATE_INIT;
+    /************************************
+     *      CONFIGURATION FASE          *
+     * **********************************/
+    if(check_arguments(argc,argv)==TRUE){
+    }
+}
+
+
+Bool check_arguments(int argc, char const *argv[]) {
+    DEBUG_NOTIFY_ACTIVITY_RUNNING("CHECKING ARGC AND ARGV...");
+    if (argc < 2) {
+        ERROR_EXIT_SEQUENCE_NODE_TP("MISSING ARGUMENT");
+    }
+    int tp_size = atoi(argv[1]);
+    if(tp_size <=0){
+        ERROR_EXIT_SEQUENCE_NODE_TP("TP_SIZE IS <= 0. NOT ACCEPTED");
+    }
+    current_node_tp.tp_size=tp_size;
+    DEBUG_NOTIFY_ACTIVITY_DONE("CHECKING ARGC AND ARGV DONE");
+    return TRUE;
 }
