@@ -28,11 +28,11 @@
 #include "local_lib/headers/node_msg_report.h"
 #include "local_lib/headers/conf_shm.h"
 #include "local_lib/headers/book_master_shm.h"
+#include "local_lib/headers/master_msg_report.h"
 #ifdef DEBUG
 
 #ifdef DEBUG_NODE
 #include "local_lib/headers/debug_utility.h"
-#endif
 #else
 #define DEBUG_NOTIFY_ACTIVITY_RUNNING(mex)
 #define DEBUG_NOTIFY_ACTIVITY_DONE(mex)
@@ -40,9 +40,8 @@
 #define DEBUG_SIGNAL(mex, signum)
 #define DEBUG_ERROR_MESSAGE(mex)
 #endif
+#endif
 
-#define INIT_STATE 0
-#define RUNNING_STATE 1
 
 /* Support Function*/
 
@@ -89,7 +88,8 @@ void process_node_transaction(struct node_msg *msg_rep);
 
 /**
  * if it finds node msg of type TRANSACTION_TYPE it process them
- * and make the aknowledgement
+ * and make the aknowledgement adding them to the transaction_pool and the transaction_block if
+ * need
  * @param msg_rep the messagge to be loaded if present in the queue
  * */
 void process_simple_transaction_type(struct node_msg *msg_rep);
@@ -117,6 +117,7 @@ Bool load_block();
  * In particular:
  * - semaphore_start_id
  * - semaphore_masterbook_id
+ * - semaphore_node_tp_shm_access TODO: to be implemented
  */
 void acquire_semaphore_ids(void);
 
@@ -145,11 +146,12 @@ void unlock_masterbook_cell_access(void);
 /* Advice the master porc via master_message queue by sending a master_message
 */
 void advice_master_of_termination(void);
-
+/*Extract randomly the time needed for processing from node_configuration
+ *@return an integer that rappresent the time for processing
+ * */
 int get_time_processing(void);
 
 /* SysVar */
-int state; /* Current state of the node proc*/
 int semaphore_start_id = -1; /*Id of the start semaphore arrays for sinc*/
 int semaphore_masterbook_id = -1; /*Id of the masterbook semaphore for accessing the block matrix*/
 int semaphore_to_fill_id = -1; /* Id of the masterbook to_fill access semaphore*/
@@ -168,7 +170,7 @@ int main(int argc, char const *argv[]) {
     struct sigaction sa;
     sigset_t sigmask;
     DEBUG_MESSAGE("NODE STATE SET TO INIT");
-    state = INIT_STATE;
+    current_node.exec_state= PROC_STATE_INIT;
     /************************************
      *      CONFIGURATION FASE          *
      * **********************************/
@@ -212,9 +214,14 @@ int main(int argc, char const *argv[]) {
             process_simple_transaction_type(&msg_rep);
 #ifdef DEBUG
             node_msg_print(&msg_rep);
-            queue_print(current_node.transaction_block);
+            queue_print(current_node.transaction_pool);
+            struct timespec print_waiting_time;
+            print_waiting_time.tv_sec = 1;
+            print_waiting_time.tv_nsec = 0;
+            nanosleep(&print_waiting_time, (void *)NULL);
 #endif
             if (get_num_transactions(current_node.transaction_pool) >= SO_BLOCK_SIZE && process_node_block()<0) {
+                printf("PROCESSING NODE BLOCKS---------------------\n");
             }
         }
     }
@@ -321,7 +328,7 @@ void attach_to_shm_conf(void) {
 }
 
 void process_node_transaction(struct node_msg *msg_rep) {
-    if (node_msg_receive(queue_node_id, msg_rep, node_id) == 0) {
+    if (node_msg_receive(queue_node_id, msg_rep, node_id-MSG_NODE_ORIGIN_TYPE) == 0) {
         /*Checking for transaction coming from node*/
         DEBUG_MESSAGE("NODE TRANSACTION RECEIVED");
         /*TODO: Implement incoming transaction from other node*/
@@ -329,8 +336,7 @@ void process_node_transaction(struct node_msg *msg_rep) {
 }
 
 void process_simple_transaction_type(struct node_msg *msg_rep) {
-    if (node_msg_receive(queue_node_id, msg_rep, node_id - MSG_NODE_ORIGIN_TYPE) == 0) {
-        /*Checking for transaction type*/
+    if (node_msg_receive(queue_node_id, msg_rep, node_id) == 0) {
         DEBUG_MESSAGE("NODE TRANSACTION TYPE RECEIVED");
         if (get_num_transactions(current_node.transaction_pool) < node_configuration.so_tp_size) {
             queue_append(current_node.transaction_pool, msg_rep->t);
@@ -355,7 +361,7 @@ int process_node_block() {
         if (load_block() == FALSE) return -1;
         current_node.calc_reward(&current_node, -1, TRUE);
         struct Transaction t_vector[get_num_transactions(current_node.transaction_block)];
-        queue_to_array(current_node.transaction_block, &t_vector);
+        queue_to_array(current_node.transaction_block, t_vector);
         /*TODO: insert it into the shm with sem_lock*/
         lock_shm_masterbook();
     return 0;

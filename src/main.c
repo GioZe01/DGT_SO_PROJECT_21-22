@@ -30,7 +30,6 @@
 #ifdef DEBUG
 #ifdef DEBUG_MAIN
 #include "local_lib/headers/debug_utility.h"
-#endif
 #else /*unimplemented*/
 #define DEBUG_NOTIFY_ACTIVITY_RUNNING(mex)
 #define DEBUG_NOTIFY_ACTIVITY_DONE(mex)
@@ -39,6 +38,7 @@
 #define DEBUG_ERROR_MESSAGE(mex)
 #define DEBUG_BLOCK_ACTION_START(mex)
 #define DEBUG_BLOCK_ACTION_END()
+#endif
 #endif
 
 

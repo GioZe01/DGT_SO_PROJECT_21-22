@@ -28,13 +28,13 @@
 #ifdef DEBUG
 #ifdef DEBUG_USER
 #include "local_lib/headers/debug_utility.h"
-#endif
 #else /*unimplemented*/
 #define DEBUG_NOTIFY_ACTIVITY_RUNNING(mex)
 #define DEBUG_NOTIFY_ACTIVITY_DONE(mex)
 #define DEBUG_MESSAGE(mex)
 #define DEBUG_SIGNAL(mex, signum)
 #define DEBUG_ERROR_MESSAGE(mex)
+#endif
 #endif
 
 /*  Constant definition */

@@ -6,14 +6,14 @@
 #include "transaction_list.h"
 
 typedef float(*Reward)(struct node *self, int percentage, Bool use_default);
-
 struct node {
     pid_t pid;
+    int exec_state;/* Current state of the node proc*/
     float budget;
     int tp_size;
     int block_size;
     int percentage;
-    Queue transaction_pool;
+    Queue transaction_pool;/*Make it a pointer to shm*/
     Queue transaction_block;
     Reward calc_reward;
 };
