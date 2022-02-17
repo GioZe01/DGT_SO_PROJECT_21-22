@@ -75,6 +75,8 @@ void connect_to_queues(void);
  * @param signum type of signal to be handled
  */
 void signals_handler(int signum);
+
+/* SysVar */
 int state;
 struct node current_node_tp;
 int main(int argc, char const *argv[]){
@@ -87,7 +89,7 @@ int main(int argc, char const *argv[]){
      *      CONFIGURATION FASE          *
      * **********************************/
     if(check_arguments(argc,argv)==TRUE){
-        node_create(&current_node_tp,getpid(),0, current_node_tp.so_tp_size, SO_BLOCK_SIZE, 0, &calc_reward);
+        node_create(&current_node_tp,getpid(),0, current_node_tp.type.tp.tp_size, SO_BLOCK_SIZE, 0, &calc_reward);
     }
 }
 

@@ -17,7 +17,13 @@
 # Node Proc
 
 L'apt della reward per singola transazione viene fatta solo quando block size e caricato -> parte più critica
-
+# Node Tp Proc
+*  Scopes:
+    1)  Keep the queue empty from all the messages related to is node parent. Serve and mantain updated
+        the tp_shm memory in order to allow node_proc to process all the blocks in order
+    2)  Make sure that the tp_size is respected and advice user in case of tp_size full
+    3)  In case of executing the 30 point version it is able to handle the transaction incoming when
+        the tp size is full. If full it will send the transaction to another node
 # User Proc
 
 Viene tenuto in vita fino a che la lista di transazioni non è vuota (if cashing is on). otherwise check for balance and
