@@ -15,6 +15,7 @@
 #define SEMAPHORE_SINC_KEY_START 0x60
 #define SEMAPHORE_MASTER_BOOK_ACCESS_KEY 0x61 /*For single block access*/
 #define SEMAPHORE_MASTER_BOOK_TO_FILL_KEY 0X62 /*For to_fill shm param look for def into shm_masterbook*/
+#define SEMAPHORE_TP_SHM_KEY 0x63
 /*  QUEUE KEY  values from 71 to 80*/
 #define MASTER_QUEUE_KEY 0x71
 #define USERS_QUEUE_KEY 0x72
@@ -22,6 +23,7 @@
 /*  SHARED MEM. KEY values from 81 to 90*/
 #define SHM_CONFIGURATION 0x81
 #define MASTER_BOOK_SHM_KEY 0x82
+#define SHM_NODE_TP_KEY 0x83
 /*  COLOR DEFINITION    */
 #define COLOR_RED_ANSI_CODE "\x1b[31m"
 #define COLOR_GREEN_ANSI_CODE "\x1b[32m"

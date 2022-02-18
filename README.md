@@ -2,6 +2,9 @@
 
 ----
 
+Note for the programmer:
+in any case if termination of the node proc a message would be pushed into master messagge queue
+if available before termination occure
 # Requirements
 
 * Unix Sys.
@@ -17,6 +20,14 @@
 # Node Proc
 
 L'apt della reward per singola transazione viene fatta solo quando block size e caricato -> parte più critica
+    *SHM: part of the responsability of a node proc is to create the tp_shm that will be used by the
+         node for loading the transaction_block to be processed
+    *Node_tp_proc: it just start one tp_proc and kill it when node_proc terminate. (Maybe can be
+     implemented a waiting time out of wich node_proc terminate in case of no new block loaded into
+     tp shm)
+Note for the programmer:
+in any case if termination of the node proc a message would be pushed into master messagge queue
+if available before termination occure
 # Node Tp Proc
 *  Scopes:
     1)  Keep the queue empty from all the messages related to is node parent. Serve and mantain updated

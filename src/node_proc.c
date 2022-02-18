@@ -29,6 +29,7 @@
 #include "local_lib/headers/conf_shm.h"
 #include "local_lib/headers/book_master_shm.h"
 #include "local_lib/headers/master_msg_report.h"
+#include "local_lib/headers/node_tp_shm.h"
 #ifdef DEBUG
 
 #ifdef DEBUG_NODE
@@ -151,10 +152,21 @@ void advice_master_of_termination(void);
  * */
 int get_time_processing(void);
 
+/*
+ * Create the semaphores needed for the access regulation for this specific program
+ */
+void create_semaphore(void);
+
+/*
+ * Create the shmared memory for the tp (transaction pool) of the current node
+ * */
+void create_tp_shm(void);
 /* SysVar */
+int shm_tp_id = -1; /*Id of the transaction pool shm */
 int semaphore_start_id = -1; /*Id of the start semaphore arrays for sinc*/
 int semaphore_masterbook_id = -1; /*Id of the masterbook semaphore for accessing the block matrix*/
 int semaphore_to_fill_id = -1; /* Id of the masterbook to_fill access semaphore*/
+int semaphore_tp_shm = -1; /* Id of the tp_shm for accesing the current block to be processed*/
 int queue_node_id = -1;/* Identifier of the node queue id */
 int queue_user_id = -1; /* Identifier of the user queue id*/
 int node_end = 0; /* For value different from 0 the node proc must end*/
@@ -164,6 +176,7 @@ struct node current_node; /* Current representation of the node*/
 struct conf node_configuration; /* Configuration File representation*/
 struct shm_conf *shm_conf_pointer_node; /* Ref to the shm for configuration of the node*/
 struct shm_book_master *shm_masterbook_pointer;/* Ref to the shm for the masterbook shm */
+struct node_block * shm_node_tp; /* Ref to the shm for the node_tp shm */
 
 int main(int argc, char const *argv[]) {
     DEBUG_MESSAGE("NODE PROCESS STARTED");
@@ -179,7 +192,14 @@ int main(int argc, char const *argv[]) {
         read_conf_node(&node_configuration);
         node_create(&current_node, getpid(), 0, node_configuration.so_tp_size, SO_BLOCK_SIZE,
                 node_configuration.so_reward, &calc_reward);
-
+        /*-----------------------*/
+        /*  CREATING SEMAPHORES  */
+        /*-----------------------*/
+        create_semaphore();
+        /*-----------------------*/
+        /*  CREATING SHM TP      */
+        /*-----------------------*/
+        create_tp_shm();
         /*-----------------------*/
         /*  CONNECTING TO QUEUES */
         /*-----------------------*/
@@ -298,13 +318,27 @@ void signals_handler(int signum) {
 
 void free_sysVar_node() {
     int semaphore_start_value;
-    if (state == INIT_STATE && semaphore_start_id >= 0) {
+    /* If the process is in INIT STATE his termination can block the whole simulation. So it need to
+     * lock the sart semaphore.
+     * If the semaphore_start_id is impossible to retrive ( = -1) nothing can be done.
+     * */
+    if (current_node.exec_state== PROC_STATE_INIT && semaphore_start_id >= 0) {
         semaphore_start_value = semctl(semaphore_start_id, 0, GETVAL);
         if (semaphore_start_value < 0) ERROR_MESSAGE("IMPOSSIBLE TO RETRIEVE INFORMATION ON STARTING SEMAPHORE");
         else if (semaphore_start_value > 0 && (semaphore_lock(semaphore_start_id, 0) < 0)) {
             ERROR_MESSAGE("IMPOSSIBLE TO EXECUTE THE FREE SYS VAR (prob. sem_lock not set so cannot be closed)");
         }
     }
+    DEBUG_NOTIFY_ACTIVITY_RUNNING("REMOVING SEMAPHORE_TP_SHM...");
+    if(semaphore_tp_shm >= 0 && semctl(semaphore_tp_shm,0,IPC_RMID) < 0){
+        ERROR_MESSAGE("REMOVING PROCEDURE FOR TP SHM SEMAPHORE HAS FAILED");
+    }
+    DEBUG_NOTIFY_ACTIVITY_DONE("REMOVING SEMAPHORE_TP_SHM DONE");
+    DEBUG_NOTIFY_ACTIVITY_RUNNING("REMOVING TP_SHM ....");
+    if(shm_tp_id>= 0 && semctl(shm_tp_id, IPC_RMID, NULL) < 0){
+        ERROR_MESSAGE("REMOVING PROCEDURE FOR TP SHM HAS FAILED");
+    }
+    DEBUG_NOTIFY_ACTIVITY_DONE("REMOVING TP_SHM DONE");
 }
 
 void free_mem_node() {
@@ -476,4 +510,24 @@ int get_time_processing(void) {
     return (rand() %
             (node_configuration.so_max_trans_gen_nsec - node_configuration.so_min_trans_proc_nsec + 1)) +
            node_configuration.so_min_trans_proc_nsec;
+}
+void create_semaphore(void){
+    DEBUG_NOTIFY_ACTIVITY_RUNNING("CREATION OF THE TP_SHM SEM...");
+    semaphore_tp_shm = semget(SEMAPHORE_TP_SHM_KEY,1, IPC_CREAT | IPC_EXCL | 0600);
+    if(semaphore_tp_shm < 0){
+        ERROR_EXIT_SEQUENCE_NODE("IMPOSSIBLE TO CREATE TP_SHM SEM");
+    }
+    DEBUG_NOTIFY_ACTIVITY_DONE("CREATION OF THE TP_SHM SEM DONE");
+}
+void create_tp_shm(void){
+    DEBUG_NOTIFY_ACTIVITY_RUNNING("CREATION OF THE TP_SHM...");
+    shm_tp_id = shmget(SHM_NODE_TP_KEY, sizeof(struct node_block), IPC_CREAT | IPC_EXCL | 0600);
+    if (shm_tp_id < 0){
+        ERROR_EXIT_SEQUENCE_NODE("IMPOSSIBLE TO CREATE NODE TP_SHM");
+    }
+    shm_node_tp = shmat(shm_tp_id, NULL, 0);
+    if(shm_node_tp == (void * )-1){
+        ERROR_EXIT_SEQUENCE_NODE("IMPOSSIBLE TO CONNECT TO THE NODE_TP SHM");
+    }
+    DEBUG_NOTIFY_ACTIVITY_DONE("CREATION OF THE TP_SHM DONE");
 }

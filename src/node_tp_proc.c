@@ -1,8 +1,9 @@
 /* Handle a single node transaction queue, keep loading the transactions into a transaction pool,
  * as node_proc is data status is rappresented via the ADT structure "node".
+ *
  * -> responsability: is responsable of mantaining the tranzaction pool and updating the node_tp_shm
- *                    and advice the user in case of max transaction in tp. and
- *                    send back the failure. Also sending an advice to the proc_master
+ *                    and advice the user in case of max transaction in tp by sending back the
+ *                    failure. Also sending an advice to the proc_master
  *                    of his termination in case of failure or timeout.
  * */
 
@@ -103,7 +104,7 @@ Bool check_arguments(int argc, char const *argv[]) {
     if(tp_size <=0){
         ERROR_EXIT_SEQUENCE_NODE_TP("TP_SIZE IS <= 0. NOT ACCEPTED");
     }
-    current_node_tp.tp_size=tp_size;
+    current_node_tp.type.tp.tp_size=tp_size;
     DEBUG_NOTIFY_ACTIVITY_DONE("CHECKING ARGC AND ARGV DONE");
     return TRUE;
 }
