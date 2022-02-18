@@ -33,7 +33,9 @@
                             EXIT_PROCEDURE_NODE(EXIT_FAILURE)
 #define ERROR_EXIT_SEQUENCE_NODE_TP(str) ERROR_MESSAGE(str); \
                             EXIT_PROCEDURE_NODE_TP(EXIT_FAILURE)
+
 /*  FUNCTION TO PROTECT EXIT SEQUENCE MAIN*/
+
 void wait_kids();
 
 void kill_kids();
@@ -41,18 +43,22 @@ void kill_kids();
 void free_mem();
 
 void free_sysVar();
+
 /*  FUNCTION TO PROTECT EXIT SEQUENCE USER*/
 void free_mem_user();
 
 void free_sysVar_user();
+
 /*  FUNCTION TO PROTECT EXIT SEQUENCE NODE*/
 void free_mem_node();
 
 void free_kids_node();
 
 void free_sysVar_node();
+
 /*  FUNCTION TO PROTECT EXIT SEQUENCE NODE_TP*/
 void free_mem_node_tp();
 
 void free_sysVar_node_tp();
+
 #endif /*DGT_SO_PROJECT_21_22_ERRORS_H*/

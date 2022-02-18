@@ -25,6 +25,7 @@ union node_type{
 };
 struct node{
     pid_t pid;
+    int node_id; /* Index id of the node into the message queues for nodes*/
     int exec_state;/* Current state of the node proc*/
     Queue transactions_list;/*list of transactions*/
     node_type type;

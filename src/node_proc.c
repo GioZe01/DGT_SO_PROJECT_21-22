@@ -76,24 +76,12 @@ Bool set_signal_handler_node(struct sigaction sa, sigset_t sigmask);
 Bool check_arguments(int argc, char const *argv[]);
 
 /**
- * Make the shm_conf_pointer points to the correct conf shm
+ * \brief Attach the current node to the related shms
+ * Specificcaly:
+ *  -book_master_shm
+ *  -node_tp_shm
  */
-void attach_to_shm_conf(void);
-
-/**
- * If it finds node msg of type NODE_TRANSACTION it proccess them
- * and make the aknowledgement
- * @param msg_rep the messagge to be loaded if present in the queue
- * */
-void process_node_transaction(struct node_msg *msg_rep);
-
-/**
- * if it finds node msg of type TRANSACTION_TYPE it process them
- * and make the aknowledgement adding them to the transaction_pool and the transaction_block if
- * need
- * @param msg_rep the messagge to be loaded if present in the queue
- * */
-void process_simple_transaction_type(struct node_msg *msg_rep);
+void attach_to_shms(void);
 
 /**
  * If node_transaction pool has at list node_block_size of transactions it load them in a transaction block
@@ -115,10 +103,10 @@ Bool load_block();
 
 /**
  * \brief Acquire the semaphore_id related to the node
- * In particular:
+ * Specificcaly:
  * - semaphore_start_id
  * - semaphore_masterbook_id
- * - semaphore_node_tp_shm_access TODO: to be implemented
+ * - semaphore_node_tp_shm_access
  */
 void acquire_semaphore_ids(void);
 
@@ -161,6 +149,7 @@ void create_semaphore(void);
  * Create the shmared memory for the tp (transaction pool) of the current node
  * */
 void create_tp_shm(void);
+
 /* SysVar */
 int shm_tp_id = -1; /*Id of the transaction pool shm */
 int semaphore_start_id = -1; /*Id of the start semaphore arrays for sinc*/
@@ -169,8 +158,7 @@ int semaphore_to_fill_id = -1; /* Id of the masterbook to_fill access semaphore*
 int semaphore_tp_shm = -1; /* Id of the tp_shm for accesing the current block to be processed*/
 int queue_node_id = -1;/* Identifier of the node queue id */
 int queue_user_id = -1; /* Identifier of the user queue id*/
-int node_end = 0; /* For value different from 0 the node proc must end*/
-int node_id = -1; /* Id of the current node into the snapshots vector*/
+int node_end = 0; /* For values different from 0 the node proc must end*/
 int last_signal;
 struct node current_node; /* Current representation of the node*/
 struct conf node_configuration; /* Configuration File representation*/
@@ -188,7 +176,6 @@ int main(int argc, char const *argv[]) {
      *      CONFIGURATION FASE          *
      * **********************************/
     if (check_arguments(argc, argv) && set_signal_handler_node(sa, sigmask)) {
-        struct node_msg msg_rep;
         read_conf_node(&node_configuration);
         node_create(&current_node, getpid(), 0, node_configuration.so_tp_size, SO_BLOCK_SIZE,
                 node_configuration.so_reward, &calc_reward);
@@ -207,7 +194,7 @@ int main(int argc, char const *argv[]) {
         /*-------------------------*/
         /*  SHARED MEM  CONFIG     */
         /*-------------------------*/
-        attach_to_shm_conf();
+        attach_to_shms();
         /************************************
          *      SINC AND WAITING FASE       *
          * **********************************/
@@ -229,9 +216,7 @@ int main(int argc, char const *argv[]) {
          *      PROCESSING OF TRANSACTION FASE  *
          * **************************************/
         while (node_end != 1) {
-            /*TODO: verificare*/
-            process_node_transaction(&msg_rep);
-            process_simple_transaction_type(&msg_rep);
+            load_block();/*Implement the load from the shm*/
 #ifdef DEBUG
             node_msg_print(&msg_rep);
             queue_print(current_node.transaction_pool);
@@ -275,7 +260,7 @@ Bool check_arguments(int argc, char const *argv[]) {
     if (argc < 2) {
         ERROR_EXIT_SEQUENCE_NODE("MISSING ARGUMENT");
     }
-    node_id = atoi(argv[1]);
+    current_node.node_id = atoi(argv[1]);
     DEBUG_NOTIFY_ACTIVITY_DONE("CHECKING ARGC AND ARGV DONE");
     return TRUE;
 }
@@ -297,10 +282,6 @@ Bool set_signal_handler_node(struct sigaction sa, sigset_t sigmask) {
     return TRUE;
 }
 
-/**
- * Set the signal handler and signal mask for the user_proc
- * @return TRUE if success, FALSE otherwise.
- */
 void signals_handler(int signum) {
     DEBUG_SIGNAL("SIGNAL RECEIVED ", signum);
     last_signal = signum;
@@ -345,7 +326,7 @@ void free_mem_node() {
     free_node(&current_node);
 }
 
-void attach_to_shm_conf(void) {
+void attach_to_shms(void) {
     DEBUG_NOTIFY_ACTIVITY_RUNNING("ATTACHING TO SHM...");
     int shm_conf_id = -1;/* id to the shm_conf*/
     shm_conf_id = shmget(SHM_CONFIGURATION, sizeof(struct shm_conf), 0600);
@@ -354,29 +335,19 @@ void attach_to_shm_conf(void) {
     if (shm_conf_pointer_node == (void *) -1) { ERROR_EXIT_SEQUENCE_NODE("IMPOSSIBLE TO CONNECT TO SHM CONF"); }
     DEBUG_NOTIFY_ACTIVITY_DONE("ATTACHING TO SHM DONE");
     shm_conf_id = shmget(MASTER_BOOK_SHM_KEY, sizeof(struct shm_book_master), 0600);
-}
-
-void process_node_transaction(struct node_msg *msg_rep) {
-    if (node_msg_receive(queue_node_id, msg_rep, node_id-MSG_NODE_ORIGIN_TYPE) == 0) {
-        /*Checking for transaction coming from node*/
-        DEBUG_MESSAGE("NODE TRANSACTION RECEIVED");
-        /*TODO: Implement incoming transaction from other node*/
+    if (shm_conf_id<0){
+        ERROR_EXIT_SEQUENCE_NODE("IMPOSSIBLE TO ACCESS SHM BOOKMASTER");
+    }
+    shm_masterbook_pointer = shmat(shm_conf_id, NULL, 0);
+    if (shm_masterbook_pointer == (void *)-1){
+        ERROR_EXIT_SEQUENCE_NODE("IMPOSSIBLE TO CONNECT TO THE SHM_MASTERBOOK");
+    }
+    shm_node_tp = shmat(shm_tp_id, NULL, 0);
+    if(shm_node_tp == (void * )-1){
+        ERROR_EXIT_SEQUENCE_NODE("IMPOSSIBLE TO CONNECT TO THE NODE_TP SHM");
     }
 }
 
-void process_simple_transaction_type(struct node_msg *msg_rep) {
-    if (node_msg_receive(queue_node_id, msg_rep, node_id) == 0) {
-        DEBUG_MESSAGE("NODE TRANSACTION TYPE RECEIVED");
-        if (get_num_transactions(current_node.transaction_pool) < node_configuration.so_tp_size) {
-            queue_append(current_node.transaction_pool, msg_rep->t);
-        } else {
-            struct user_msg *u_msg_rep;
-            DEBUG_ERROR_MESSAGE("NODE TRANSACTION FAILED");
-            u_msg_rep->t.t_type = TRANSACTION_FAILED;
-            user_msg_snd(queue_user_id, u_msg_rep, MSG_TRANSACTION_FAILED_TYPE, &msg_rep->t, current_node.pid, TRUE);
-        }
-    }
-}
 
 void connect_to_queues(void) {
     queue_node_id = msgget(NODES_QUEUE_KEY, 0600);
@@ -397,7 +368,7 @@ int process_node_block() {
 }
 
 void advice_master_of_termination(void) {
-
+/*TODO: to be implemented*/
 }
 
 void lock_to_fill_sem(void) {
@@ -524,10 +495,6 @@ void create_tp_shm(void){
     shm_tp_id = shmget(SHM_NODE_TP_KEY, sizeof(struct node_block), IPC_CREAT | IPC_EXCL | 0600);
     if (shm_tp_id < 0){
         ERROR_EXIT_SEQUENCE_NODE("IMPOSSIBLE TO CREATE NODE TP_SHM");
-    }
-    shm_node_tp = shmat(shm_tp_id, NULL, 0);
-    if(shm_node_tp == (void * )-1){
-        ERROR_EXIT_SEQUENCE_NODE("IMPOSSIBLE TO CONNECT TO THE NODE_TP SHM");
     }
     DEBUG_NOTIFY_ACTIVITY_DONE("CREATION OF THE TP_SHM DONE");
 }
