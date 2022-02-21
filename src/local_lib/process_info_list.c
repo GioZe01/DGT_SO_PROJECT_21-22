@@ -1,9 +1,14 @@
+
+/* Std */
 #include <stdlib.h>
 #include <stdio.h>
 #include <unistd.h>
 #include <signal.h>
 #include <errno.h>
+/* Sys */
 #include <sys/types.h>
+#include <sys/wait.h>
+/* Local */
 #include "headers/glob.h"
 #include "headers/process_info_list.h"
 #include "headers/simulation_errors.h"
@@ -39,7 +44,7 @@ ProcList proc_list_create(){
     return p;
 }
 
-void insert_in_list(struct processes_info_list *self, pid_t pid, short int type, int queue_id) {
+void insert_in_list(ProcList self, pid_t pid, short int type, int queue_id) {
     struct node * new;
     if ((new = malloc(sizeof(struct node)))==NULL){
         ERROR_MESSAGE("IMPOSSIBLE TO INSERT NEW PROC");
@@ -163,4 +168,31 @@ void proc_list_remove_head(ProcList self){
 }
 void proc_list_underflow(){
     ERROR_MESSAGE("PROCESS LIST IS EMPTY");
+}
+void terminator(ProcList self){
+    struct node *tmp = self->first;
+    for (;tmp!=NULL;tmp=tmp->next){
+        if (tmp->p->proc_state == PROC_INFO_STATE_RUNNING){
+            if(kill(tmp->p->pid, SIGINT)>= 0 || errno == ESRCH){
+                /**
+                 * errno == ESRCH is allowed because it might be that the proc intrest is terminated and
+                 * the termination has not been read by main, in this case need wait on the proc to update the proc-list
+                 * state
+                 */
+                DEBUG_MESSAGE("PROC KILLED");
+            }else {
+                if (errno == EINTR) { continue; }
+                ERROR_MESSAGE("IMPOSSIBLE TO SEND TERMINATION SIGNAL TO KID");
+            }
+        }
+    }
+}
+void saving_private_ryan(ProcList self){
+    struct node *tmp = self->first;
+    for (;tmp!=NULL;tmp=tmp->next){
+        if (tmp->p->proc_state == PROC_INFO_STATE_RUNNING){
+            waitpid(tmp->p->pid,NULL,0);
+            tmp->p->proc_state = PROC_INFO_STATE_TERMINATED;
+        }
+    }
 }

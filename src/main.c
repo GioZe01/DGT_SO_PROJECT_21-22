@@ -162,7 +162,7 @@ int main() {
         /************************************
          *      CONFIGURATION FASE
          * ***********************************/
-
+        proc_list = proc_list_create();
         set_signal_handlers(sa);
         create_semaphores();
         create_masterbook();
@@ -252,7 +252,7 @@ int create_users_proc(int *users_pids, int *users_queues_ids) {
                 users_pids[i + 1] = user_pid;
                 users_pids[0] += 1;
                 users_queues_ids[0] += 1;
-                proc_list = insert_in_list(proc_list, user_pid, PROC_TYPE_USER, queue_id);
+                insert_in_list(proc_list, user_pid, PROC_TYPE_USER, queue_id);
                 /*Free if utilized pointers to argv*/
                 if (argv_user[1] != NULL) free(argv_user[1]);
                 if (argv_user[2] != NULL) free(argv_user[2]);
@@ -291,7 +291,7 @@ int create_nodes_proc(int *nodes_pids, int *nodes_queues_ids) {
                 nodes_pids[i + 1] = node_pid;
                 nodes_pids[0] += 1;
                 nodes_queues_ids[0] += 1;
-                proc_list = insert_in_list(proc_list, node_pid, PROC_TYPE_NODE, queue_id);
+                insert_in_list(proc_list, node_pid, PROC_TYPE_NODE, queue_id);
                 /*Free if utilized pointers to argv*/
                 if (argv_node[1] != NULL) free(argv_node[1]);
                 if (argv_node[2] != NULL) free(argv_node[2]);
@@ -393,32 +393,13 @@ void create_semaphores(void) {
 
 void wait_kids() {
     DEBUG_NOTIFY_ACTIVITY_RUNNING("WAITING KIDS...");
-    ProcList proc = proc_list;
-    for (; proc != NULL; proc = proc->next)
-        if (proc->p.proc_state == PROC_INFO_STATE_RUNNING) {
-            waitpid(proc->p.pid, NULL, 0);
-            proc->p.proc_state = PROC_INFO_STATE_TERMINATED;
-        }
+    saving_private_ryan(proc_list);
     DEBUG_NOTIFY_ACTIVITY_DONE("WAITING KIDS DONE");
 }
 
 void kill_kids() {
     DEBUG_NOTIFY_ACTIVITY_RUNNING("KILLING KIDS...");
-    struct processes_info_list *proc = proc_list;
-    for (; proc != NULL; proc = proc->next){
-        if (proc->proc_state == PROC_INFO_STATE_RUNNING)
-            if (kill(proc->pid, SIGINT) >= 0 || errno == ESRCH)
-                /**
-                 * errno == ESRCH is allowed because it might be that the proc intrest is terminated and
-                 * the termination has not been read by main, in this case need wait on the proc to update the proc-list
-                 * state
-                 */
-                DEBUG_MESSAGE("PROC KILLED");
-            else {
-                if (errno == EINTR) { continue; }
-                ERROR_MESSAGE("IMPOSSIBLE TO SEND TERMINATION SIGNAL TO KID");
-            }
-    }
+    terminator(proc_list);
     DEBUG_NOTIFY_ACTIVITY_DONE("KILLING KIDS DONE");
 }
 
