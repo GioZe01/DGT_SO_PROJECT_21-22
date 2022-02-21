@@ -48,3 +48,12 @@ int master_msg_receive(int id, struct master_msg_report * self){
     }
     return 0;
 }
+int master_msg_receive_info(int id, struct master_msg_report * self){
+    if(msgrcv(id, self, sizeof(struct master_msg_report),INFO_BUDGET,0)<0){
+        if(errno == ENOMSG){
+            return -2;
+        }
+        return -1;
+    }
+    return 0;
+}

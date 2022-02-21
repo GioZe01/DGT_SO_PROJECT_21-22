@@ -34,15 +34,16 @@ void node_msg_print(struct node_msg *self);
 
 /**
 * (Create if option selected) and Send the message on ipc user_queue with the key as specified
- * @warning send is repeated until it succeed or errno != EINTR
+ * @warning send is repeated until it succeed or errno != EINTR or so_retry is not reached
  * @param id of the message queue
  * @param msg the message to be sent to
  * @param data user_data to be sent
  * @param sender pid_t of the sender of this message
  * @param crete TRUE if u want to create it before sending.
+ * @param so_retry number of retry before failure occures.
  * @return -1 in case of failure, 0 otherwise
  */
-int node_msg_snd(int id, struct node_msg *msg, long type, struct Transaction *t, pid_t sender, Bool crete);
+int node_msg_snd(int id, struct node_msg *msg, long type, struct Transaction *t, pid_t sender, Bool crete, int so_retry);
 
 /**
  * Retrieve the message_user_report on the specified message queue

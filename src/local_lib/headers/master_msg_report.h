@@ -16,6 +16,7 @@ typedef enum {
     IMPOSSIBLE_TO_SEND_TRANSACTION,
     IMPOSSIBLE_TO_CONNECT_TO_SHM,
     SIGNALS_OF_TERM_RECEIVED,
+    INFO_BUDGET,
 }MSG_REPORT_TYPE;
 typedef enum{
     USER,
@@ -62,4 +63,12 @@ int master_msg_send(int id, struct master_msg_report * self,long type,long proc_
  * @return -2 in case of no msg on queue. -1 in case of failure. 0 otherwise
  */
 int master_msg_receive(int id, struct master_msg_report * self);
+/**
+ * Retrive the message_node_report on the specified message queue
+ * @warning the retriving operation is repeated until it succeed or errno != EINTR
+ * @param id of the message queue
+ * @param msg to be caught
+ * @return -2 in case of no msg on queue. -1 in case of failure. 0 otherwise
+ */
+int master_msg_receive_info(int id, struct master_msg_report * self);
 #endif /*DGT_SO_PROJECT_21_22_MASTER_MSG_REPORT_H*/

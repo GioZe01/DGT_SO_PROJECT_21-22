@@ -64,13 +64,15 @@ int add_to_transactions_list(struct node *self, struct Transaction *t) {
     queue_append(self->transactions_list, *t);
 }
 
-int calc_reward(struct node* self, int percentage, Bool use_default){
+int calc_reward(struct node* self, int percentage, Bool use_default, float * block_tot_reward){
     switch (use_default) {
         case TRUE:
-            if(queue_apt_amount_reward(self->transactions_list, self->type.block.percentage)<0)return -1;
+            *block_tot_reward = queue_apt_amount_reward(self->transactions_list, self->type.block.percentage);
+            if(block_tot_reward<0)return -1;
             break;
         case FALSE:
-            if(queue_apt_amount_reward(self->transactions_list, percentage)<0)return -1;
+            *block_tot_reward = queue_apt_amount_reward(self->transactions_list, percentage);
+            if(block_tot_reward<0)return -1;
             break;
         default:
             ERROR_MESSAGE("MISSING PARAMETER USE DEFAULT");

@@ -17,7 +17,7 @@ struct user_transaction {
     int pid;
     float budget; /*Contains the confirmed by nodes value in the pocket of the current user*/
     Balance u_balance;
-    Queue transactions_done; /*Actually confermed by the nodes_proc -> updated into the shm*/
+    Queue transactions_failed; /*transactions_failed not processed by any node*/
     Queue in_process;/*Validated, but still to be confirmed by the nodes_proc*/
     struct UCashFlow cash_flow;
     CalcCashFlow update_cash_flow; /*Can set the function u desire while implementing, consider the one already implemented below*/

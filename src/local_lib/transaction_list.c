@@ -207,6 +207,7 @@ int queue_apt_amount_reward(Queue q, int percentage) {
         return -1;
     }
     struct node *first = q->first;
+    float total_reward = 0;
 
     for (; first != NULL; first = first->next) {
         first->t.reward = (float) (first->t.amount * ((float) percentage)) / 100;
@@ -215,8 +216,9 @@ int queue_apt_amount_reward(Queue q, int percentage) {
             return -1;
         }
         first->t.amount -= first->t.reward;
+        total_reward += first->t.reward;
     }
-    return 0;
+    return total_reward;
 }
 
 float queue_get_reward(Queue q) {

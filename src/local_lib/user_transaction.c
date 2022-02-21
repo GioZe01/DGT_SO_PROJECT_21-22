@@ -46,7 +46,7 @@ void user_create(struct user_transaction *self, float budget, int pid, Balance b
     self->pid = pid;
     self->budget = budget;
     self->u_balance = balance;
-    self->transactions_done = queue_create();
+    self->transactions_failed= queue_create();
     self->in_process = queue_create();
     self->cash_flow.entries = budget;
     self->cash_flow.outcomes = 0;
@@ -58,7 +58,7 @@ void user_create(struct user_transaction *self, float budget, int pid, Balance b
 void free_user(struct user_transaction *self) {
     DEBUG_NOTIFY_ACTIVITY_RUNNING("FREE USER OPERATION...");
     queue_destroy(self->in_process);
-    queue_destroy(self->transactions_done);
+    queue_destroy(self->transactions_failed);
     DEBUG_NOTIFY_ACTIVITY_RUNNING("FREE USER OPERATION DONE");
 }
 

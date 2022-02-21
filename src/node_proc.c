@@ -167,6 +167,7 @@ int queue_node_id = -1;/* Identifier of the node queue id */
 int queue_user_id = -1; /* Identifier of the user queue id*/
 int queue_master_id = -1; /* Identifier of the master queue id*/
 int node_end = 0; /* For values different from 0 the node proc must end*/
+float current_block_reward = 0; /* The current value of all node block reward*/
 int last_signal;
 struct node current_node; /* Current representation of the node*/
 struct conf node_configuration; /* Configuration File representation*/
@@ -368,7 +369,7 @@ void connect_to_queues(void) {
 int process_node_block() {
         /*Loading them into the node_block_transactions*/
         if (load_block() == FALSE) return -1;
-        current_node.type.block.calc_reward(&current_node, -1, TRUE);
+        current_node.type.block.calc_reward(&current_node, -1, TRUE, &current_block_reward);
         lock_shm_masterbook();
     return 0;
 }
@@ -385,7 +386,9 @@ void lock_shm_masterbook(void) {
     lock_masterbook_cell_access(i_cell_block_list);
     struct Transaction block_list [get_num_transactions(current_node.transactions_list)];
     queue_to_array(current_node.transactions_list,&block_list);
-    insert_block(shm_masterbook_pointer,block_list);
+    if (insert_block(shm_masterbook_pointer,block_list) == 0){
+        current_node.type.block.budget = current_block_reward;
+    }else ERROR_MESSAGE("IMPOSSIBLE TO INSERT BLOCK");
     /*Unloacking the semaphore*/
     unlock_masterbook_cell_access();
     unlock_to_fill_sem();

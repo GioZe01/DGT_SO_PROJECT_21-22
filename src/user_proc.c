@@ -290,7 +290,7 @@ int send_to_node(void) {
     struct node_msg msg;
     struct Transaction t = queue_last(current_user.in_process);
     if (node_msg_snd(queue_node_id, &msg, shm_conf_pointer->nodes_snapshots[node_num][1], &t,
-                     current_user.pid, TRUE) < 0) { return -1; }
+                     current_user.pid, TRUE, configuration.so_retry) < 0) { return -1; }
 #ifdef DEBUG
     node_msg_print(&msg);
 #endif
@@ -311,19 +311,16 @@ void attach_to_shm_conf(void) {
 void generating_transactions(void) {
     struct timespec gen_sleep;
     while (current_user.budget >=
-           0) {
+            0) {
         DEBUG_MESSAGE("TRANSACTION ALLOWED");
         check_for_transactions_confirmed();
         check_for_transactions_failed();
         if (current_user.u_balance > 2 && generate_transaction(&current_user, current_user.pid, shm_conf_pointer) < 0) {
             ERROR_MESSAGE("IMPOSSIBLE TO GENERATE TRANSACTION");/*TODO: can be a simple advice, not a critical one*/
         }
-/*#ifdef DEBUG
-        queue_print(current_user.in_process);
-#endif*/
         gen_sleep.tv_nsec =
-                (rand() % (configuration.so_max_trans_gen_nsec - configuration.so_min_trans_gen_nsec + 1)) +
-                configuration.so_min_trans_gen_nsec;
+            (rand() % (configuration.so_max_trans_gen_nsec - configuration.so_min_trans_gen_nsec + 1)) +
+            configuration.so_min_trans_gen_nsec;
 #ifdef U_CASHING
         /*TODO: make cashing*/
 #else
@@ -346,12 +343,17 @@ Bool check_for_transactions_confirmed(void) {
         /*Messagge found*/
         current_user.to_wait_transaction--;
         queue_remove(current_user.in_process, msg->t);
-        queue_append(current_user.transactions_done, msg->t);
         return TRUE;
     }
     return FALSE;
 }
 
 Bool check_for_transactions_failed(void) {
-    return TRUE;
+    struct user_msg *msg = sizeof(struct user_msg);
+    if (user_msg_receive(queue_user_id, msg, user_id-MSG_TRANSACTION_FAILED_TYPE) == 0) {
+        /*Take aknowledgement of transaction falure*/
+        queue_append(current_user.transactions_failed, msg->t);
+        return TRUE;
+    }
+    return FALSE;
 }

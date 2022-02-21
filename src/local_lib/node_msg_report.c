@@ -36,12 +36,17 @@ void node_msg_print(struct node_msg *self) {
     }
 }
 
-int node_msg_snd(int id, struct node_msg *msg, long type, struct Transaction *t, pid_t sender, Bool create) {
+int node_msg_snd(int id, struct node_msg *msg, long type, struct Transaction *t, pid_t sender, Bool create, int so_retry) {
+    int retry = 0;
     if (create == TRUE) { node_msg_create(msg, type, sender, t); }
     while (msgsnd(id, msg, sizeof(*msg) - sizeof(long), 0) < 0) {
         if (errno != ENOMSG) {
             return -1;
         }
+        retry++;
+    }
+    if (retry == so_retry){
+        return -1;
     }
     return 0;
 }

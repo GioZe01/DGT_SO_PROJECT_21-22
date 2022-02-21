@@ -4,7 +4,7 @@
 
 #include "transaction_list.h"
 
-typedef float(*Reward)(struct node *self, int percentage, Bool use_default);
+typedef float(*Reward)(struct node *self, int percentage, Bool use_default, float * block_tot_reward);
 /*
  * Can be done a rifactoring using ADT and obscuring the union, and create just one create method
  * */
@@ -30,6 +30,8 @@ struct node{
     Queue transactions_list;/*list of transactions*/
     union node_type type;
 };
+
+
 /**
  * Initialize the node with the given param, and the transaction list as empty
  * @param self node to be initialized
@@ -70,11 +72,13 @@ int update_budget(struct node *self);
 int add_to_transactions_list(struct node *self, struct Transaction *t);
 
 /**
- * Calculate the expected reward on the transaction block of the given node
+ * Calculate the expected reward on the transaction block of the given node and update current node
+ * budget
  * @param self node to operate the calc on
  * @param percentage the non default percentage that u want to use to calc the reward
  * @param use_default if u want to use the default percentage loaded in the node on creation time
+ * @param block_tot_reward the total block reward value
  * @return -1 in case of FAILURE. 0 otherwise
  */
-int calc_reward(struct node * self, int percentage, Bool use_default);
+int calc_reward(struct node * self, int percentage, Bool use_default, float * block_tot_reward);
 #endif /*DGT_SO_PROJECT_21_22_NODE_TRANSACTOR_H*/

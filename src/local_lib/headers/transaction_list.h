@@ -67,9 +67,9 @@ Bool queue_is_empty(Queue q);
  * Calculate the reward for each transaction with give perc and apt the amount
  * @param q the queue from whom is calculated the reward
  * @param percentage the percentage to calculate 4 each transaction
- * @return -1 in case of FAILURE. 0 otherwise
+ * @return -1 in case of FAILURE. positive float otherwise
  */
-int queue_apt_amount_reward(Queue q, int percentage);
+float queue_apt_amount_reward(Queue q, int percentage);
 /**
  * Return the total reward summing each transaction reward
  * @param q queue to make the operation on

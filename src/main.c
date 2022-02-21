@@ -100,6 +100,11 @@ void create_nodes_msg_queue(void);
 int create_nodes_proc(int *nodes_pids, int *nodes_queues_ids);
 
 /**
+ * Print all the information requested by the project specification
+ */
+void print_info(void);
+
+/**
  * \brief Read the conf file present in te project dir
  * load the configuration directly in the struct conf configuration that is a SysVar
  */
@@ -117,10 +122,14 @@ void set_signal_handlers(struct sigaction sa);
  */
 void signals_handler(int signum);
 
+/*
+ * Update the budget of kids process saved into the proc_list via master message queue
+ */
+void update_kids_info(void);
 
 /* Variables*/
 struct conf simulation_conf; /*Structure representing the configuration present in the conf file*/
-struct processes_info_list *proc_list; /* Pointer to a linked list of all proc generated*/
+ProcList proc_list; /* Pointer to a linked list of all proc generated*/
 struct shm_conf *shm_conf_pointer; /* Pointer to the shm_conf structure in shared memory*/
 struct shm_book_master *shm_masterbook_pointer; /* Pointer to the shm_masterbook structure in shared memory*/
 int simulation_end = 0; /* For value different from 0 the simulation must end*/
@@ -329,6 +338,9 @@ void signals_handler(int signum) { /*TODO: Scrivere implementazione*/
         case SIGALRM:
             if (getpid() == main_pid) {
                 num_inv++;
+                /*request info from kids */
+                update_kids_info();
+                /*Printing infos*/
                 if (num_inv == simulation_conf.so_sim_sec) simulation_end = 1;
                 else alarm(1);
                 /*TODO: METTO IN PAUSA I NODI vedere se mettere anche in pausa i processi user*/
@@ -352,7 +364,7 @@ void create_semaphores(void) {
 
     DEBUG_NOTIFY_ACTIVITY_RUNNING("INITIALIZATION OF START_SEMAPHORE CHILDREN....");
     if (semctl(semaphore_start_id, 0, SETVAL, simulation_conf.so_user_num + (2*simulation_conf.so_nodes_num))<
-        0) {
+            0) {
         ERROR_EXIT_SEQUENCE_MAIN("IMPOSSIBLE TO INITIALISE SEMAPHORE START CHILDREN");
     }
     DEBUG_NOTIFY_ACTIVITY_DONE("INITIALIZATION OF START_SEMAPHORE CHILDREN DONE");
@@ -365,7 +377,7 @@ void create_semaphores(void) {
     DEBUG_NOTIFY_ACTIVITY_DONE("CREATION OF MASTEBOOK ACCESS SEM...");
     DEBUG_NOTIFY_ACTIVITY_RUNNING("INITIALIZATION OF MASTERBOOK ACCESS SEM....");
     if (semctl(semaphore_masterbook_id, 0, SETVAL, SO_REGISTRY_SIZE) <
-        0) {
+            0) {
         ERROR_EXIT_SEQUENCE_MAIN("IMPOSSIBLE TO INITIALISE SEMAPHORE START CHILDREN");
     }
     DEBUG_NOTIFY_ACTIVITY_DONE("INITIALIZATION OF MASTEBOOK ACCESS SEM....");
@@ -381,11 +393,11 @@ void create_semaphores(void) {
 
 void wait_kids() {
     DEBUG_NOTIFY_ACTIVITY_RUNNING("WAITING KIDS...");
-    struct processes_info_list *proc = proc_list;
+    ProcList proc = proc_list;
     for (; proc != NULL; proc = proc->next)
-        if (proc->proc_state == PROC_INFO_STATE_RUNNING) {
-            waitpid(proc->pid, NULL, 0);
-            proc->proc_state = PROC_INFO_STATE_TERMINATED;
+        if (proc->p.proc_state == PROC_INFO_STATE_RUNNING) {
+            waitpid(proc->p.pid, NULL, 0);
+            proc->p.proc_state = PROC_INFO_STATE_TERMINATED;
         }
     DEBUG_NOTIFY_ACTIVITY_DONE("WAITING KIDS DONE");
 }
@@ -393,7 +405,7 @@ void wait_kids() {
 void kill_kids() {
     DEBUG_NOTIFY_ACTIVITY_RUNNING("KILLING KIDS...");
     struct processes_info_list *proc = proc_list;
-    for (; proc != NULL; proc = proc->next)
+    for (; proc != NULL; proc = proc->next){
         if (proc->proc_state == PROC_INFO_STATE_RUNNING)
             if (kill(proc->pid, SIGINT) >= 0 || errno == ESRCH)
                 /**
@@ -401,11 +413,12 @@ void kill_kids() {
                  * the termination has not been read by main, in this case need wait on the proc to update the proc-list
                  * state
                  */
-                    DEBUG_MESSAGE("PROC KILLED");
+                DEBUG_MESSAGE("PROC KILLED");
             else {
                 if (errno == EINTR) { continue; }
                 ERROR_MESSAGE("IMPOSSIBLE TO SEND TERMINATION SIGNAL TO KID");
             }
+    }
     DEBUG_NOTIFY_ACTIVITY_DONE("KILLING KIDS DONE");
 }
 
@@ -546,4 +559,25 @@ void create_masterbook() {
     }
     DEBUG_NOTIFY_ACTIVITY_DONE("CREATING THE MASTER BOOK DOONE");
     DEBUG_BLOCK_ACTION_END();
+}
+void print_info(void){
+    printf("====== INFO ======\n");
+
+}
+void update_kids_info(void){
+    int num_msg_to_wait_for = send_sig_to_all(proc_list, SIGUSR2);
+    if(num_msg_to_wait_for<0){
+        ERROR_MESSAGE("IMPOSSIBLE TO UPDATE KIDS INFO");
+    }
+    else if (num_msg_to_wait_for== 0){
+        DEBUG_MESSAGE("NO PROCESS TO UPDATE");
+    }
+    struct master_msg_report * msg_rep;
+    do{
+        alarm(MAX_WAITING_TIME_FOR_UPDATE);/*cannot loop forever*/
+        master_msg_receive_info(msg_report_id_master, msg_rep);
+        Proc proc_to_update = get_proc_from_pid(proc_list,msg_rep->sender_pid);
+        proc_to_update->budget = msg_rep->budget;
+        num_msg_to_wait_for--;
+    }while(num_msg_to_wait_for!=0);
 }

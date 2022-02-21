@@ -7,14 +7,23 @@
 
 #include <unistd.h>
 #include <sys/types.h>
-struct processes_info_list{
+
+#include "boolean.h"
+struct ProcessInfo{
     pid_t pid;
     int id_queue;/*Id for calculating range type of a user*/
     short int proc_state;
     short int proc_type;
     float budget;/*TODO: verificare se basta*/
-    struct processes_info_list* next;
 };
+typedef struct ProcessInfo * Proc;
+typedef struct processes_info_list * ProcList;
+
+/**
+ * Create the ProcList Linked list
+ * @return the linked list created
+ * */
+ProcList proc_list_create();
 /**
  * Insert the new process and initialize it in running mode
  * @param self the next of the list to be linked with
@@ -22,21 +31,34 @@ struct processes_info_list{
  * @param type proc_type ex: PROC_TYPE_USER or PROC_TYPE_NODE
  * @return the new linked list with the structure inserted
  */
-struct processes_info_list* insert_in_list(struct processes_info_list* self, pid_t pid, short int type, int id_queue);
+void insert_in_list(struct processes_info_list* self, pid_t pid, short int type, int id_queue);
+
+/**
+ * Check if the ProcList is empty
+ * @return TRUE if is empty, FALSE otherwise
+ * */
+Bool proc_list_is_empty(ProcList self);
 /**
  * Return the process inside the list associated with the pid given as param
  * @param self the list to search in
  * @param pid the value to search for
  * @return the element with the specified pid if found. Otherwise NULL
  */
-struct processes_info_list* get_proc_from_pid(struct processes_info_list* self, pid_t pid);
+Proc get_proc_from_pid(struct processes_info_list* self, pid_t pid);
 /**
  * Return the process inside the list associated with the id_queue given as param
  * @param self the list to search in
  * @param queue_id the value to search for
  * @return the element with the specified pid if found. Otherwise NULL
  */
-struct processes_info_list* get_proc_from_queue_id(struct processes_info_list* self, int id_queue);
+Proc get_proc_from_queue_id(struct processes_info_list* self, int id_queue);
+/**
+ * Send the given signal to all proc saved via kill() method
+ * @param proc_list the list of proced to receive the signal
+ * @param signal signal to be sent
+ * @return FALSE in case of failure. TRUE otherwise
+ */
+Bool send_sig_to_all(struct processes_info_list * proc_list,int signal);
 /**
  * Print at console the specified list
  * @param self ref of the list to print_list

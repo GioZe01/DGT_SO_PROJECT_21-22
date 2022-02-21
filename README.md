@@ -16,6 +16,10 @@ if available before termination occure
 *
 
 # Principal Process Running
+* Printing:
+    if we want to save current budget into bookmaster shm the problem is that i'm saving to much info
+        into the shm consuming bytes. so it'would be great to get info via message report queue
+        by sending snapshot of users
 
 # Node Proc
 
