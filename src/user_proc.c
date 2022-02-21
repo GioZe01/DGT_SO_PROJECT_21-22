@@ -42,6 +42,16 @@
 #define RUNNING_STATE 1
 
 /*  Support functions*/
+
+/* Advice the master porc via master_message queue by sending a master_message
+ * @param termination_type MSG_REPORT_TYPE type process termination occured
+*/
+void advice_master_of_termination(int termination_type);
+
+/**
+ * Connects to the differents queues: master, node's and user's
+ * */
+void connect_to_queues(void);
 /**
  * handler of the signal
  * @param signum type of signal to be handled
@@ -103,8 +113,9 @@ void generating_transactions(void);
 /*  SysV  */
 int state; /* Current state of the user proc*/
 int semaphore_start_id = -1; /*Id of the start semaphore arrays for sinc*/
-int queue_report_id = -1; /* Identifier of the user queue id*/
-int node_queue_report_id = -1; /*Identifier of the node queue id*/
+int queue_node_id = -1;/* Identifier of the node queue id */
+int queue_user_id = -1; /* Identifier of the user queue id*/
+int queue_master_id = -1; /* Identifier of the master queue id*/
 int user_id = -1; /*Id of the current user into the snapshots vectors*/
 struct user_transaction current_user; /* Current representation of the user*/
 struct conf configuration; /* Configuration File representation */
@@ -131,11 +142,7 @@ int main(int arc, char const *argv[]) {
         /*--------------------------------------*/
         /*  CONNECTING TO THE USER REPORT QUEUE *
         /*--------------------------------------*/
-        /*TODO: Aggiungerla come optional alla compilazione*/
-        queue_report_id = msgget(USERS_QUEUE_KEY, 0600);
-        if (queue_report_id < 0) { ERROR_EXIT_SEQUENCE_USER("IMPOSSIBLE TO CONNECT TO USER QUEUE"); }
-        node_queue_report_id = msgget(NODES_QUEUE_KEY, 0600);
-        if (node_queue_report_id < 0) { ERROR_EXIT_SEQUENCE_USER("IMPOSSIBLE TO CONNECT TO NODE QUEUE"); }
+        connect_to_queues();
         /*-------------------------*/
         /*  SHARED MEM  CONFIG     *
         /*-------------------------*/
@@ -177,6 +184,7 @@ int main(int arc, char const *argv[]) {
 #endif
         /*TODO: check for remaining transaction confirmed*/
         DEBUG_MESSAGE("USER ENDED -----------------------------");
+        advice_master_of_termination(TERMINATION_END_CORRECTLY);
         EXIT_PROCEDURE_USER(0);
     }
 
@@ -191,6 +199,14 @@ Bool check_argument(int argc, char const *argv[]) {
     user_id = atoi(argv[1]);
     DEBUG_NOTIFY_ACTIVITY_DONE("CHECKING ARGC AND ARGV DONE");
     return TRUE;
+}
+void connect_to_queues(void) {
+    queue_node_id = msgget(NODES_QUEUE_KEY, 0600);
+    if (queue_node_id < 0) { ERROR_EXIT_SEQUENCE_NODE("IMPOSSIBLE TO CONNECT TO NODE MESSAGE QUEUE"); }
+    queue_user_id = msgget(USERS_QUEUE_KEY, 0600);
+    if (queue_user_id < 0) { ERROR_EXIT_SEQUENCE_NODE("IMPOSSIBLE TO CONNECT TO USER QUEUE"); }
+    queue_master_id = msget(MASTER_QUEUE_KEY, 0600);
+    if (queue_master_id < 0){ERROR_EXIT_SEQUENCE_NODE("IMPOSSIBLE TO CONNECT TO MASTER QUEUE");}
 }
 
 Bool set_signal_handler_user(struct sigaction sa, sigset_t sigmask) {
@@ -214,8 +230,8 @@ void signals_handler(int signum) {
     DEBUG_SIGNAL("SIGNAL RECEIVED", signum);
     switch (signum) {
         case SIGINT:
-            /*TODO: Avvisare main chiusura*/
             alarm(0);/* pending alarm removed*/
+            advice_master_of_termination(SIGNALS_OF_TERM_RECEIVED);
             EXIT_PROCEDURE_USER(0);
         case SIGALRM: /*    Generate a new transaction  */
             DEBUG_NOTIFY_ACTIVITY_RUNNING("GENERATING A NEW TRANSACTION FROM SIG...");
@@ -273,7 +289,7 @@ int send_to_node(void) {
     int node_num = (rand() % (shm_conf_pointer->nodes_snapshots[0][0])) + 1;
     struct node_msg msg;
     struct Transaction t = queue_last(current_user.in_process);
-    if (node_msg_snd(node_queue_report_id, &msg, shm_conf_pointer->nodes_snapshots[node_num][1], &t,
+    if (node_msg_snd(queue_node_id, &msg, shm_conf_pointer->nodes_snapshots[node_num][1], &t,
                      current_user.pid, TRUE) < 0) { return -1; }
 #ifdef DEBUG
     node_msg_print(&msg);
@@ -326,7 +342,7 @@ void generating_transactions(void) {
 
 Bool check_for_transactions_confirmed(void) {
     struct user_msg *msg = sizeof(struct user_msg);
-    if (user_msg_receive(queue_report_id, msg, user_id) == 0) {
+    if (user_msg_receive(queue_user_id, msg, user_id) == 0) {
         /*Messagge found*/
         current_user.to_wait_transaction--;
         queue_remove(current_user.in_process, msg->t);

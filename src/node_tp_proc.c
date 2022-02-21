@@ -52,6 +52,12 @@
 #endif
 
 /* Support Function*/
+
+/* Advice the master porc via master_message queue by sending a master_message
+ * @param termination_type MSG_REPORT_TYPE type process termination occured
+*/
+void advice_master_of_termination(int termination_type);
+
 /**
  * \brief Acquire the semaphore_id related to the node
  * In particular:
@@ -74,8 +80,9 @@ void connect_to_queues(void);
 
 /*
  * Load the block into the shm_node_tp if semval is set to 0
+ * @return TRUE if all operetaion succeded, false otherwise
  * */
-void load_block_to_shm(void);
+Bool load_block_to_shm(void);
 
 /**
  * handler of the signal
@@ -108,6 +115,7 @@ int sem_start_id = -1; /*Id of the start semaphore arrays for sinc*/
 int sem_node_tp_id = -1; /* Id of the semaphore for accesing node_tp_shm*/
 int queue_node_id = -1;/* Identifier of the node queue id */
 int queue_user_id = -1; /* Identifier of the user queue id*/
+int queue_master_id = -1; /* Identifier of the master queue id*/
 int node_tp_end = 0; /* For values different from 0 the node proc must end*/
 int last_signal;
 struct node current_node_tp; /* Current rappresentation of the node_tp */
@@ -117,6 +125,7 @@ int main(int argc, char const *argv[]){
     DEBUG_MESSAGE("NODE TP PROCESS STARTED");
     struct sigaction sa;
     sigset_t sigmask;
+    int failure_shm = 0;
     DEBUG_MESSAGE("NODE TP PROCESS SET TO INIT");
     current_node_tp.exec_state = PROC_STATE_INIT;
     /************************************
@@ -146,12 +155,28 @@ int main(int argc, char const *argv[]){
             ERROR_EXIT_SEQUENCE_NODE("IMPOSSIBLE TO WAIT FOR START");
         }
         current_node_tp.exec_state= PROC_STATE_RUNNING;
-        while(node_tp_end != 1){
+        while(node_tp_end != 1 && failure_shm < MAX_FAILURE_SHM_LOADING){
             process_node_transaction(&msg_rep);
             process_simple_transaction_type(&msg_rep);
-            load_block_to_shm();
+#ifdef DEBUG
+            node_msg_print(&msg_rep);
+            queue_print(current_node_tp.transactions_list);
+            struct timespec print_waiting_time;
+            print_waiting_time.tv_sec = 1;
+            print_waiting_time.tv_nsec = 0;
+            nanosleep(&print_waiting_time, (void *)NULL);
+#endif
+            if (load_block_to_shm()==FALSE){
+                failure_shm++;
+            };
         }
+        if (failure_shm>MAX_FAILURE_SHM_LOADING){
+            ERROR_EXIT_SEQUENCE_NODE("IMPOSSIBLE TO READ DATA FROM NODE_TP_SHM");
+        }
+
     }
+    advice_master_of_termination(TERMINATION_END_CORRECTLY);
+    EXIT_PROCEDURE_NODE_TP(0);
 }
 
 
@@ -168,6 +193,12 @@ Bool check_arguments(int argc, char const *argv[]) {
     current_node_tp.type.tp.tp_size=tp_size;
     DEBUG_NOTIFY_ACTIVITY_DONE("CHECKING ARGC AND ARGV DONE");
     return TRUE;
+}
+void advice_master_of_termination(int termination_type) {
+    struct master_msg_report termination_report;
+   if (master_msg_send(queue_master_id, &termination_report, termination_type, NODE_TP,current_node_tp.pid, current_node_tp.exec_state,TRUE)<0){
+       ERROR_MESSAGE("IMPOSSIBLE TO ADVICE MASTER OF TERMINATION");
+   }
 }
 void acquire_semaphore_ids(void){
     sem_start_id= semget(SEMAPHORE_SINC_KEY_START, 1, 0);
@@ -200,16 +231,19 @@ void process_node_transaction(struct node_msg *msg_rep) {
         /*TODO: Implement incoming transaction from other node*/
     }
 }
-void load_block_to_shm(void){
+Bool load_block_to_shm(void){
     int sem_val = semctl(sem_node_tp_id, 0, GETVAL);
     if(sem_val == IS_EMPTY && get_num_transactions(current_node_tp.transactions_list) >= SO_BLOCK_SIZE){
         update_block();
         if (semctl(sem_node_tp_id,0,SETVAL, FULL) < 0){
             ERROR_MESSAGE("IMPOSSIBLE TO SET NODE TP SEM TO FULL");
+            return FALSE;
         }
     }else if (sem_val < 0){
         ERROR_MESSAGE("IMPOSSIBLE TO RETRIVE VAL FROM TP SHM SEMAPHORE");
+        return FALSE;
     }
+    return TRUE;
 }
 void update_block(void){
     int i;
@@ -223,8 +257,8 @@ void signals_handler(int signum) {
     last_signal = signum;
     switch (signum) {
         case SIGINT:
-            /*TODO: avvisare main*/
             alarm(0);/*pending alarm removed*/
+            advice_master_of_termination(SIGNALS_OF_TERM_RECEIVED);
             EXIT_PROCEDURE_NODE_TP(0);
         case SIGALRM:
             break;
@@ -237,6 +271,8 @@ void connect_to_queues(void) {
     if (queue_node_id < 0) { ERROR_EXIT_SEQUENCE_NODE("IMPOSSIBLE TO CONNECT TO NODE MESSAGE QUEUE"); }
     queue_user_id = msgget(USERS_QUEUE_KEY, 0600);
     if (queue_user_id < 0) { ERROR_EXIT_SEQUENCE_NODE("IMPOSSIBLE TO CONNECT TO USER QUEUE"); }
+    queue_master_id = msget(MASTER_QUEUE_KEY, 0600);
+    if (queue_master_id < 0){ERROR_EXIT_SEQUENCE_NODE("IMPOSSIBLE TO CONNECT TO MASTER QUEUE");}
 }
 
 void free_mem_node_tp(){

@@ -295,3 +295,12 @@ int queue_to_array(Queue q, struct Transaction vector[]) {
     }
     return -1;
 }
+int array_to_queue(Queue q, struct Transaction* vector){
+    if (vector == NULL){
+        return -1;
+    }
+    for (;vector != NULL; vector++){
+        queue_append(q, *vector);
+    }
+    return 0;
+}

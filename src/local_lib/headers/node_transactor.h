@@ -1,4 +1,3 @@
-
 #ifndef DGT_SO_PROJECT_21_22_NODE_TRANSACTOR_H
 #define DGT_SO_PROJECT_21_22_NODE_TRANSACTOR_H
 
@@ -10,6 +9,7 @@ typedef float(*Reward)(struct node *self, int percentage, Bool use_default);
  * Can be done a rifactoring using ADT and obscuring the union, and create just one create method
  * */
 typedef struct {
+        int kid_pid;
         float budget;
         int block_size;
         int percentage;
@@ -28,7 +28,7 @@ struct node{
     int node_id; /* Index id of the node into the message queues for nodes*/
     int exec_state;/* Current state of the node proc*/
     Queue transactions_list;/*list of transactions*/
-    node_type type;
+    union node_type type;
 };
 /**
  * Initialize the node with the given param, and the transaction list as empty

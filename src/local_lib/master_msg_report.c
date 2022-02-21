@@ -1,10 +1,13 @@
+#define _GNU_SOURCE
 #include <stdio.h>
-#include <sys/types.h>
+#include <sys/msg.h>
+#include <errno.h>
 #include "headers/master_msg_report.h"
 #include "headers/glob.h"
 
-void master_msg_report_create(struct master_msg_report *self, long type, pid_t sender_pid, short int state) {
+void master_msg_report_create(struct master_msg_report *self, long type,long proc_type, pid_t sender_pid, short int state) {
     self->type = type;
+    self->proc_type = proc_type;
     self->sender_pid = sender_pid;
     self->state = state;
 }
@@ -28,4 +31,20 @@ void master_msg_report_print(struct master_msg_report *self) {
         default:
             printf("[MASTER_MSG_REPORT]  := type: %ld | sender: %d | state: %d \n", self->type, self->sender_pid, self->state);
     }
+}
+int master_msg_send(int id, struct master_msg_report * self,long type,long proc_type, pid_t sender_pid, short int state, Bool create){
+    if (create == TRUE){master_msg_report_create(self,type,proc_type,sender_pid, state);}
+    while(msgsnd(id, self, sizeof(*self)-sizeof(long),0)<0){
+        if (errno != ENOMSG) return -1;
+    }
+    return 0;
+}
+int master_msg_receive(int id, struct master_msg_report * self){
+    if(msgrcv(id, self, sizeof(struct master_msg_report),0/*all incoming messages*/,IPC_NOWAIT)<0){
+        if(errno == ENOMSG){
+            return -2;
+        }
+        return -1;
+    }
+    return 0;
 }
