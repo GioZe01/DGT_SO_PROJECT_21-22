@@ -201,7 +201,7 @@ static void queue_underflow(void) {
     return;
 }
 
-int queue_apt_amount_reward(Queue q, int percentage) {
+float queue_apt_amount_reward(Queue q, int percentage) {
     if (queue_is_empty(q) == TRUE) {
         ERROR_MESSAGE("CALL APT AMOUNT-REWARD ON EMPTY QUEUE");
         return -1;

@@ -41,7 +41,7 @@ void user_msg_print(struct user_msg *self);
  * @param crete TRUE if u want to create it before sending.
  * @return -1 in case of failure, -1 otherwise
  */
-int user_msg_snd(int id, struct user_msg *msg, long type, struct Transaction *t, pid_t sender, Bool crete, int so_retry);
+int user_msg_snd(int id, struct user_msg *msg, long type, struct Transaction *t, pid_t sender, Bool crete);
 
 /**
  * Retrieve the message_user_report on the specified message queue

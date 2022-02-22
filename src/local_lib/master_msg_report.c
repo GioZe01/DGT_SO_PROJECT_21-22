@@ -1,7 +1,9 @@
 #define _GNU_SOURCE
+/* Sys */
 #include <stdio.h>
 #include <sys/msg.h>
 #include <errno.h>
+/* Local */
 #include "headers/master_msg_report.h"
 #include "headers/glob.h"
 
@@ -10,6 +12,7 @@ void master_msg_report_create(struct master_msg_report *self, long type,long pro
     self->proc_type = proc_type;
     self->sender_pid = sender_pid;
     self->state = state;
+    self->budget = 0;
 }
 
 void master_msg_report_print(struct master_msg_report *self) {

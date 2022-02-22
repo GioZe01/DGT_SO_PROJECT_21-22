@@ -155,12 +155,12 @@ int main() {
         int *users_queues_ids;/*in 0 position is saved the actual size of the array of ids saved in the pointer*/
         int *nodes_queues_ids;/*in 0 position is saved the actual size of the array of ids saved in the pointer*/
         /* Pointers allocation  */
-        users_pids = (int *) malloc(sizeof(int) * simulation_conf.so_user_num);
-        nodes_pids = (int *) malloc(sizeof(int) * simulation_conf.so_nodes_num);
-        users_queues_ids = (int *) malloc(sizeof(int) * simulation_conf.so_user_num);
-        nodes_queues_ids = (int *) malloc(sizeof(int) * simulation_conf.so_nodes_num);
+        users_pids = (int *) malloc(sizeof(int) * (simulation_conf.so_user_num+1));
+        nodes_pids = (int *) malloc(sizeof(int) * (simulation_conf.so_nodes_num+1));
+        users_queues_ids = (int *) malloc(sizeof(int) * (simulation_conf.so_user_num+1));
+        nodes_queues_ids = (int *) malloc(sizeof(int) * (simulation_conf.so_nodes_num+1));
         /************************************
-         *      CONFIGURATION FASE
+         *      CONFIGURATION FASE          *
          * ***********************************/
         proc_list = proc_list_create();
         set_signal_handlers(sa);
@@ -172,13 +172,13 @@ int main() {
          * ***********************************/
 
         /*-------------------------------*/
-        /*  CREATING THE QUEUES          *
+        /*  CREATING THE QUEUES          */
         /*-------------------------------*/
         create_users_msg_queue();
         create_nodes_msg_queue();
         create_master_msg_report_queue();
         /*-------------------------*/
-        /*  CREATION OF PROCESSES  *
+        /*  CREATION OF PROCESSES  */
         /*-------------------------*/
 
         DEBUG_BLOCK_ACTION_START("PROC GENERATION");
@@ -225,10 +225,6 @@ int main() {
     exit(0);
 }
 
-/**
- *  Create a new user proc
- * @return -1 if fail. 0 otherwise
- */
 int create_users_proc(int *users_pids, int *users_queues_ids) {
     char *argv_user[] = {PATH_TO_USER, NULL, NULL}; /*Future addon*/
     pid_t user_pid;
@@ -264,11 +260,8 @@ int create_users_proc(int *users_pids, int *users_queues_ids) {
     return 0;
 }
 
-/**
- * Create a new node proc
- * @return -1 if fail. 0 otherwise
- */
 int create_nodes_proc(int *nodes_pids, int *nodes_queues_ids) {
+    printf("STO GENERANDO I NODII \n");
     char *argv_node[] = {PATH_TO_NODE, NULL, NULL}; /*Future addon*/
     pid_t node_pid;
     int i, queue_id = DELTA_NODE_MSG_TYPE;

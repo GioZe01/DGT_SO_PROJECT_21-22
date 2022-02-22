@@ -22,9 +22,6 @@
 #include "local_lib/headers/boolean.h"
 #include "local_lib/headers/conf_shm.h"
 
-#define EXIT_PROCEDURE_USER(exit_value) free_mem_user();         \
-                                free_sysVar_user();      \
-                                exit(exit_value)
 #ifdef DEBUG
 #ifdef DEBUG_USER
 #include "local_lib/headers/debug_utility.h"
@@ -36,10 +33,6 @@
 #define DEBUG_ERROR_MESSAGE(mex)
 #endif
 #endif
-
-/*  Constant definition */
-#define INIT_STATE 0
-#define RUNNING_STATE 1
 
 /*  Support functions*/
 
@@ -111,7 +104,6 @@ void attach_to_shm_conf(void);
 void generating_transactions(void);
 
 /*  SysV  */
-int state; /* Current state of the user proc*/
 int semaphore_start_id = -1; /*Id of the start semaphore arrays for sinc*/
 int queue_node_id = -1;/* Identifier of the node queue id */
 int queue_user_id = -1; /* Identifier of the user queue id*/
@@ -133,7 +125,7 @@ int main(int arc, char const *argv[]) {
      * **********************************/
 
     DEBUG_MESSAGE("USER STATE IS SET TO INIT");
-    state = INIT_STATE;
+    current_user.exec_state = PROC_STATE_INIT;
 
     if (check_argument(arc, argv) && set_signal_handler_user(sa, sigmask)) {
         /*  VARIABLE INITIALIZATION */
@@ -173,7 +165,8 @@ int main(int arc, char const *argv[]) {
         if (semaphore_wait_for_sinc(semaphore_start_id, 0) < 0) {
             ERROR_EXIT_SEQUENCE_USER("ERROR DURING WAITING START_SEMAPHORE UNLOCK");
         }
-        state = RUNNING_STATE;
+        printf("DOPO WAITING \n");
+        current_user.exec_state = PROC_STATE_RUNNING;
 
         /****************************************
          *      GENERATION OF TRANSACTION FASE *
@@ -202,11 +195,11 @@ Bool check_argument(int argc, char const *argv[]) {
 }
 void connect_to_queues(void) {
     queue_node_id = msgget(NODES_QUEUE_KEY, 0600);
-    if (queue_node_id < 0) { ERROR_EXIT_SEQUENCE_NODE("IMPOSSIBLE TO CONNECT TO NODE MESSAGE QUEUE"); }
+    if (queue_node_id < 0) { ERROR_EXIT_SEQUENCE_USER("IMPOSSIBLE TO CONNECT TO NODE MESSAGE QUEUE"); }
     queue_user_id = msgget(USERS_QUEUE_KEY, 0600);
-    if (queue_user_id < 0) { ERROR_EXIT_SEQUENCE_NODE("IMPOSSIBLE TO CONNECT TO USER QUEUE"); }
-    queue_master_id = msget(MASTER_QUEUE_KEY, 0600);
-    if (queue_master_id < 0){ERROR_EXIT_SEQUENCE_NODE("IMPOSSIBLE TO CONNECT TO MASTER QUEUE");}
+    if (queue_user_id < 0) { ERROR_EXIT_SEQUENCE_USER("IMPOSSIBLE TO CONNECT TO USER QUEUE"); }
+    queue_master_id = msgget(MASTER_QUEUE_KEY, 0600);
+    if (queue_master_id < 0){ERROR_EXIT_SEQUENCE_USER("IMPOSSIBLE TO CONNECT TO MASTER QUEUE");}
 }
 
 Bool set_signal_handler_user(struct sigaction sa, sigset_t sigmask) {
@@ -244,7 +237,12 @@ void signals_handler(int signum) {
     }
 }
 
-
+void advice_master_of_termination(int termination_type) {
+    struct master_msg_report termination_report;
+   if (master_msg_send(queue_master_id, &termination_report, termination_type, NODE_TP,current_user.pid, current_user.exec_state,TRUE)<0){
+       ERROR_MESSAGE("IMPOSSIBLE TO ADVICE MASTER OF TERMINATION");
+   }
+}
 void free_mem_user() {
     free_user(&current_user);
 }
@@ -252,7 +250,7 @@ void free_mem_user() {
 void free_sysVar_user() {
     /*TODO: aggiungi altri */
     int semaphore_start_value;
-    if (state == INIT_STATE && semaphore_start_id >= 0) {
+    if (current_user.exec_state == PROC_STATE_RUNNING && semaphore_start_id >= 0) {
         semaphore_start_value = semctl(semaphore_start_id, 0, GETVAL);
         if (semaphore_start_value < 0) ERROR_MESSAGE("IMPOSSIBLE TO RETRIEVE INFORMATION ON STARTING SEMAPHORE");
         else if (semaphore_start_value > 0 && (semaphore_lock(semaphore_start_id, 0) < 0)) {
@@ -338,7 +336,7 @@ void generating_transactions(void) {
 }
 
 Bool check_for_transactions_confirmed(void) {
-    struct user_msg *msg = sizeof(struct user_msg);
+    struct user_msg *msg = malloc (sizeof(struct user_msg));
     if (user_msg_receive(queue_user_id, msg, user_id) == 0) {
         /*Messagge found*/
         current_user.to_wait_transaction--;
@@ -349,7 +347,7 @@ Bool check_for_transactions_confirmed(void) {
 }
 
 Bool check_for_transactions_failed(void) {
-    struct user_msg *msg = sizeof(struct user_msg);
+    struct user_msg *msg = malloc(sizeof(struct user_msg));
     if (user_msg_receive(queue_user_id, msg, user_id-MSG_TRANSACTION_FAILED_TYPE) == 0) {
         /*Take aknowledgement of transaction falure*/
         queue_append(current_user.transactions_failed, msg->t);

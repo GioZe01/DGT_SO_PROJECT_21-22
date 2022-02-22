@@ -173,7 +173,6 @@ int main(int argc, char const *argv[]){
         if (failure_shm>MAX_FAILURE_SHM_LOADING){
             ERROR_EXIT_SEQUENCE_NODE("IMPOSSIBLE TO READ DATA FROM NODE_TP_SHM");
         }
-
     }
     advice_master_of_termination(TERMINATION_END_CORRECTLY);
     EXIT_PROCEDURE_NODE_TP(0);
@@ -271,7 +270,7 @@ void connect_to_queues(void) {
     if (queue_node_id < 0) { ERROR_EXIT_SEQUENCE_NODE("IMPOSSIBLE TO CONNECT TO NODE MESSAGE QUEUE"); }
     queue_user_id = msgget(USERS_QUEUE_KEY, 0600);
     if (queue_user_id < 0) { ERROR_EXIT_SEQUENCE_NODE("IMPOSSIBLE TO CONNECT TO USER QUEUE"); }
-    queue_master_id = msget(MASTER_QUEUE_KEY, 0600);
+    queue_master_id = msgget(MASTER_QUEUE_KEY, 0600);
     if (queue_master_id < 0){ERROR_EXIT_SEQUENCE_NODE("IMPOSSIBLE TO CONNECT TO MASTER QUEUE");}
 }
 

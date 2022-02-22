@@ -28,6 +28,7 @@ struct master_msg_report{
     long proc_type;
     pid_t sender_pid;
     short int state;
+    float budget;
 };
 /**
  * Constructor for the message to be sent to the master_proc

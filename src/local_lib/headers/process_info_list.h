@@ -32,12 +32,11 @@ ProcList proc_list_create();
  * @return the new linked list with the structure inserted
  */
 void insert_in_list(ProcList self, pid_t pid, short int type, int id_queue);
-
 /**
  * Check if the ProcList is empty
  * @return TRUE if is empty, FALSE otherwise
  * */
-Bool proc_list_is_empty(ProcList self);
+Bool proc_list_is_empty(const ProcList self);
 /**
  * Return the process inside the list associated with the pid given as param
  * @param self the list to search in
