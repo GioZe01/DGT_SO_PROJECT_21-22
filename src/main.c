@@ -30,6 +30,7 @@
 #ifdef DEBUG
 #ifdef DEBUG_MAIN
 #include "local_lib/headers/debug_utility.h"
+#endif
 #else /*unimplemented*/
 #define DEBUG_NOTIFY_ACTIVITY_RUNNING(mex)
 #define DEBUG_NOTIFY_ACTIVITY_DONE(mex)
@@ -38,7 +39,6 @@
 #define DEBUG_ERROR_MESSAGE(mex)
 #define DEBUG_BLOCK_ACTION_START(mex)
 #define DEBUG_BLOCK_ACTION_END()
-#endif
 #endif
 
 
@@ -191,7 +191,7 @@ int main() {
         DEBUG_NOTIFY_ACTIVITY_RUNNING("SHM INITIALIZING...");
         if (shm_conf_create(shm_conf_pointer, users_pids, users_queues_ids, nodes_pids, nodes_queues_ids) < 0) {
             ERROR_EXIT_SEQUENCE_MAIN("FAILED ON SHM_CONF INITIALIZING");
-        };
+        }
         free(nodes_queues_ids);
         free(nodes_pids);
         free(users_pids);
@@ -228,10 +228,11 @@ int main() {
 int create_users_proc(int *users_pids, int *users_queues_ids) {
     char *argv_user[] = {PATH_TO_USER, NULL, NULL}; /*Future addon*/
     pid_t user_pid;
-    int i, queue_id = DELTA_USER_MSG_TYPE;
+    int i = 0;
+    int queue_id = DELTA_USER_MSG_TYPE;
     users_pids[0] = 0;
     users_queues_ids[0] = 0;
-    for (i = 0; i < simulation_conf.so_user_num; i++) {
+    for (; i < simulation_conf.so_user_num; i++) {
         argv_user[1] = (char *) malloc(11 * sizeof(char));
         switch (user_pid = fork()) {
             case -1:
@@ -261,13 +262,13 @@ int create_users_proc(int *users_pids, int *users_queues_ids) {
 }
 
 int create_nodes_proc(int *nodes_pids, int *nodes_queues_ids) {
-    printf("STO GENERANDO I NODII \n");
     char *argv_node[] = {PATH_TO_NODE, NULL, NULL}; /*Future addon*/
     pid_t node_pid;
-    int i, queue_id = DELTA_NODE_MSG_TYPE;
+    int i=0;
+    int queue_id = DELTA_NODE_MSG_TYPE;
     nodes_pids[0] = 0;
     nodes_queues_ids[0] = 0;
-    for (i = 0; i < simulation_conf.so_nodes_num; i++) {
+    for (; i < simulation_conf.so_nodes_num; i++) {
         argv_node[1] = (char *) malloc(11 * sizeof(char));
         switch (node_pid = fork()) {
             case -1:
@@ -392,6 +393,7 @@ void wait_kids() {
 
 void kill_kids() {
     DEBUG_NOTIFY_ACTIVITY_RUNNING("KILLING KIDS...");
+    update_kids_info();
     terminator(proc_list);
     DEBUG_NOTIFY_ACTIVITY_DONE("KILLING KIDS DONE");
 }
@@ -535,18 +537,20 @@ void create_masterbook() {
     DEBUG_BLOCK_ACTION_END();
 }
 void print_info(void){
-    printf("====== INFO ======\n");
+    printf("============== INFO ============== \n");
+    printf("Number of node active: %d\n", get_num_of_user_proc_running(proc_list));
 
 }
 void update_kids_info(void){
-    int num_msg_to_wait_for = send_sig_to_all(proc_list, SIGUSR2);
+    int num_msg_to_wait_for= -1;
+    num_msg_to_wait_for= send_sig_to_all(proc_list, SIGUSR2);
     if(num_msg_to_wait_for<0){
         ERROR_MESSAGE("IMPOSSIBLE TO UPDATE KIDS INFO");
     }
     else if (num_msg_to_wait_for== 0){
         DEBUG_MESSAGE("NO PROCESS TO UPDATE");
     }
-    struct master_msg_report * msg_rep;
+    struct master_msg_report * msg_rep = (struct master_msg_report *)malloc(sizeof(struct master_msg_report));
     do{
         alarm(MAX_WAITING_TIME_FOR_UPDATE);/*cannot loop forever*/
         master_msg_receive_info(msg_report_id_master, msg_rep);

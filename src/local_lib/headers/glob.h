@@ -8,6 +8,7 @@
 /*  EXCVE PATH   */
 #define PATH_TO_USER "build/bin/user"
 #define PATH_TO_NODE "build/bin/node"
+#define PATH_TO_NODE_TP "build/bin/node_tp"
 /*  NUM LIMIT OF PROCS */
 #define USERS_MAX 1000 /*Max users that can be saved in shm*/
 #define NODES_MAX 100    /*Max nodes that can be saved in shm*/

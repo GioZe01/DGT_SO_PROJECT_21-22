@@ -30,17 +30,17 @@
 #include "local_lib/headers/book_master_shm.h"
 #include "local_lib/headers/master_msg_report.h"
 #include "local_lib/headers/node_tp_shm.h"
-#ifdef DEBUG
 
+#ifdef DEBUG
 #ifdef DEBUG_NODE
 #include "local_lib/headers/debug_utility.h"
+#endif
 #else
 #define DEBUG_NOTIFY_ACTIVITY_RUNNING(mex)
 #define DEBUG_NOTIFY_ACTIVITY_DONE(mex)
 #define DEBUG_MESSAGE(mex)
 #define DEBUG_SIGNAL(mex, signum)
 #define DEBUG_ERROR_MESSAGE(mex)
-#endif
 #endif
 
 
@@ -74,6 +74,11 @@ Bool set_signal_handler_node(struct sigaction sa, sigset_t sigmask);
  * @return FALSE in case of FAILURE, TRUE otherwise
  */
 Bool check_arguments(int argc, char const *argv[]);
+
+/**
+ * Create and Lunch the node transaction pool process
+ */
+void create_node_tp_proc(void);
 
 /**
  * \brief Attach the current node to the related shms
@@ -127,7 +132,7 @@ void lock_to_fill_sem(void);
 /* Lock the current cell of the masterbook shm in which the node had written the block
  * @param i_cell_block_list index to be blocked
  */
-void lock_masterbook_cell_access(int i_cell_block_list);
+void lock_masterbook_cell_access(unsigned short int i_cell_block_list);
 
 /* Unlock the to_fill index saved in the shared_memory access
  */
@@ -145,7 +150,7 @@ void advice_master_of_termination(int termination_type);
 /*Extract randomly the time needed for processing from node_configuration
  *@return an integer that rappresent the time for processing
  * */
-int get_time_processing(void);
+long int get_time_processing(void);
 
 /*
  * Create the semaphores needed for the access regulation for this specific program
@@ -212,6 +217,11 @@ int main(int argc, char const *argv[]) {
         /*---------------------------*/
         acquire_semaphore_ids();
 
+        /************************************
+         *      CREATING NODE_TP_PROC       *
+         * **********************************/
+        create_node_tp_proc();
+
         /*---------------------------*/
         /*  SEMAPHORES SINC..        */
         /*---------------------------*/
@@ -265,16 +275,17 @@ Bool check_arguments(int argc, char const *argv[]) {
 }
 
 Bool set_signal_handler_node(struct sigaction sa, sigset_t sigmask) {
-    DEBUG_NOTIFY_ACTIVITY_RUNNING("SETTING SIGNAL MASK...");
+/*    DEBUG_NOTIFY_ACTIVITY_RUNNING("SETTING SIGNAL MASK...");
     sigemptyset(&sigmask);/*Creating an empty mask*/
-    sigaddset(&sigmask, SIGALRM);/*Adding signal to the mask*/
-    DEBUG_NOTIFY_ACTIVITY_DONE("SETTING SIGNAL MASK DONE");
+   /* sigaddset(&sigmask, SIGALRM);/*Adding signal to the mask*/
+    /*DEBUG_NOTIFY_ACTIVITY_DONE("SETTING SIGNAL MASK DONE");*/
 
     memset(&sa, 0, sizeof(sa));
     sa.sa_handler = signals_handler;
     sa.sa_mask = sigmask;
     if (sigaction(SIGINT, &sa, NULL) < 0 ||
-        sigaction(SIGALRM, &sa, NULL) < 0
+        sigaction(SIGALRM, &sa, NULL) < 0 ||
+        sigaction(SIGUSR2, &sa, NULL) < 0
             ) {
         ERROR_EXIT_SEQUENCE_NODE("ERROR DURING THE CREATION OF THE SIG HANDLER ");
     }
@@ -284,12 +295,17 @@ Bool set_signal_handler_node(struct sigaction sa, sigset_t sigmask) {
 void signals_handler(int signum) {
     DEBUG_SIGNAL("SIGNAL RECEIVED ", signum);
     last_signal = signum;
+    struct master_msg_report msg;
     switch (signum) {
         case SIGINT:
             alarm(0);/*pending alarm removed*/
             advice_master_of_termination(SIGNALS_OF_TERM_RECEIVED);
             EXIT_PROCEDURE_NODE(0);
+            break;
         case SIGALRM:
+            break;
+        case SIGUSR2:
+            master_msg_send(queue_master_id,&msg, INFO_BUDGET,NODE,current_node.pid,current_node.exec_state,TRUE);
             break;
         default:
             break;
@@ -380,7 +396,7 @@ void lock_shm_masterbook(void) {
     trans_proc_sim.tv_nsec = get_time_processing();
     nanosleep(&trans_proc_sim, (void *) NULL);
     lock_to_fill_sem();
-    int i_cell_block_list = shm_masterbook_pointer->to_fill;
+    unsigned short int i_cell_block_list = shm_masterbook_pointer->to_fill;
     /*Inserting the block into the shm*/
     shm_masterbook_pointer->to_fill += 1;
     lock_masterbook_cell_access(i_cell_block_list);
@@ -412,7 +428,7 @@ void lock_to_fill_sem(void) {
     }
 }
 
-void lock_masterbook_cell_access(int i_cell_block_list) {
+void lock_masterbook_cell_access(unsigned short int i_cell_block_list) {
     while (semaphore_lock(semaphore_masterbook_id, i_cell_block_list)) {
         /*TODO: fare refactoring nei due while*/
         if (errno == EINTR) {
@@ -488,7 +504,7 @@ void acquire_semaphore_ids(void) {
     }
 }
 
-int get_time_processing(void) {
+long int get_time_processing(void) {
     srand(getpid());
     return (rand() %
             (node_configuration.so_max_trans_gen_nsec - node_configuration.so_min_trans_proc_nsec + 1)) +
@@ -519,4 +535,26 @@ void free_kids_node(){
         if(errno == EINTR){return;}
         ERROR_MESSAGE("IMPOSSIBLE TO SEND TERMINATION SIGNAL TO NODE_TP KID");
     }
+}
+void create_node_tp_proc(void){
+   char *argv_node_tp[]={PATH_TO_NODE_TP,NULL,NULL, NULL};
+   pid_t node_tp_pid;
+   argv_node_tp[1] = (char *) malloc(11 * sizeof(char));
+   argv_node_tp[2] = (char *) malloc(11 * sizeof(char));
+   switch(node_tp_pid =fork()){
+       case -1:
+           ERROR_EXIT_SEQUENCE_NODE("IMPOSSIBLE TO GENERATE NODE_TP");
+           break;
+       case 0: /*kid*/
+           sprintf(argv_node_tp[1], "%d",node_configuration.so_tp_size);
+           sprintf(argv_node_tp[2], "%d",current_node.node_id);
+           execve(argv_node_tp[0],argv_node_tp,NULL);
+           ERROR_EXIT_SEQUENCE_NODE("IMPOSSIBLE TO GENERATE NODE_TP");
+           break;
+       default:/*father*/
+           if (argv_node_tp[1] != NULL) free(argv_node_tp[1]);
+           if (argv_node_tp[2] != NULL) free(argv_node_tp[2]);
+           current_node.type.block.kid_pid = node_tp_pid;
+           break;
+   }
 }

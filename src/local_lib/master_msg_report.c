@@ -15,7 +15,7 @@ void master_msg_report_create(struct master_msg_report *self, long type,long pro
     self->budget = 0;
 }
 
-void master_msg_report_print(struct master_msg_report *self) {
+void master_msg_report_print(const struct master_msg_report *self) {
     switch (self->type) {
         case IMPOSSIBLE_TO_SEND_TRANSACTION:
         case IMPOSSIBLE_TO_CONNECT_TO_SHM:

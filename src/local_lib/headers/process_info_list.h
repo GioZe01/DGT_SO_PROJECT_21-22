@@ -84,7 +84,14 @@ void terminator(ProcList self);
 
 /**
  * Wait for all proc to terminate
+ * @param self list of all the proc to wait for
  */
 void saving_private_ryan(ProcList self);
+
+/**
+ * Return the number of active user_proc
+ * @return integer rappresenting the number of active user
+ */
+int get_num_of_user_proc_running(ProcList self);
 /*TODO: implementare budget maggiore get -> vedere se fare una hash table di processi*/
 #endif /*DGT_SO_PROJECT_21_22_PROCESS_INFO_LIST_H*/

@@ -213,7 +213,8 @@ Bool set_signal_handler_user(struct sigaction sa, sigset_t sigmask) {
     sa.sa_mask = sigmask;
     if (sigaction(SIGINT, &sa, NULL) < 0 ||
         sigaction(SIGALRM, &sa, NULL) < 0 ||
-        sigaction(SIGUSR1, &sa, NULL) < 0) {
+        sigaction(SIGUSR1, &sa, NULL) < 0 ||
+        sigaction(SIGUSR2, &sa, NULL) < 0) {
         ERROR_EXIT_SEQUENCE_USER("ERROR DURING THE CREATION OF THE SIG HANDLER ");
     }
     return TRUE;
@@ -221,6 +222,7 @@ Bool set_signal_handler_user(struct sigaction sa, sigset_t sigmask) {
 
 void signals_handler(int signum) {
     DEBUG_SIGNAL("SIGNAL RECEIVED", signum);
+    struct master_msg_report msg;
     switch (signum) {
         case SIGINT:
             alarm(0);/* pending alarm removed*/
@@ -232,6 +234,9 @@ void signals_handler(int signum) {
                 ERROR_EXIT_SEQUENCE_USER("IMPOSSIBLE TO GENERATE TRANSACTION");
             }
             DEBUG_NOTIFY_ACTIVITY_DONE("GENERATING A NEW TRANSACTION FROM SIG DONE");
+        case SIGUSR2:
+            master_msg_send(queue_master_id,&msg, INFO_BUDGET,NODE,current_user.pid,current_user.exec_state,TRUE);
+            break;
         default:
             break;
     }

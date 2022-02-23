@@ -192,7 +192,7 @@ void proc_list_underflow() {
 void terminator(ProcList self) {
     struct node *tmp = self->first;
     for (; tmp != NULL; tmp = tmp->next) {
-        if (tmp->p->proc_state == PROC_INFO_STATE_RUNNING && kill(tmp->p->pid, SIGINT) >= 0 || errno == ESRCH) {
+        if (tmp->p->proc_state == PROC_INFO_STATE_RUNNING && (kill(tmp->p->pid, SIGINT) >= 0 || errno == ESRCH)) {
             /**
              * errno == ESRCH is allowed because it might be that the proc intrest is terminated and
              * the termination has not been read by main, in this case need wait on the proc to update the proc-list
@@ -217,4 +217,17 @@ void saving_private_ryan(ProcList self) {
             tmp->p->proc_state = PROC_INFO_STATE_TERMINATED;
         }
     }
+}
+int get_num_of_user_proc_running(ProcList self){
+    if (self->first == NULL){
+        return 0;
+    }
+    struct node * tmp = self->first;
+    int ris = 0;
+    for(;tmp != NULL; tmp = tmp->next){
+        if (tmp->p->proc_type == PROC_TYPE_USER && tmp->p->proc_state == PROC_INFO_STATE_RUNNING){
+            ris++;
+        }
+    }
+    return ris;
 }

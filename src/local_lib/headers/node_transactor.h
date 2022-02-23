@@ -26,7 +26,7 @@ union node_type{
 struct node{
     pid_t pid;
     int node_id; /* Index id of the node into the message queues for nodes*/
-    int exec_state;/* Current state of the node proc*/
+    short int exec_state;/* Current state of the node proc*/
     Queue transactions_list;/*list of transactions*/
     union node_type type;
 };
@@ -57,7 +57,7 @@ void node_proc_tp_create(struct node*self, pid_t node_pid, int tp_size);
 void free_node(struct node *self);
 
 /**
- * Update the budget of the node based on the processed nodes;
+ * Update the budget of the node based on the processed nodes
  * @param self node to be updated
  * @return  -1 in case of FAILURE. 0 otherwise
  */

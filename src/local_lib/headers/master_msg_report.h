@@ -5,11 +5,9 @@
 #include <unistd.h>
 #include "boolean.h"
 
-#define PROC_STATE_INIT 0
-#define PROC_STATE_RUNNING 1
-#define PROC_STATE_WAITING 2
-#define PROC_STATE_NODE_SERV_TRANS 3
-
+typedef enum {
+    PROC_STATE_INIT, PROC_STATE_RUNNING, PROC_STATE_WAITING, PROC_STATE_NODE_SERV_TRANS
+} PROCSTATE;
 /*  ABORT TYPE */
 typedef enum {
     TERMINATION_END_CORRECTLY,
@@ -17,19 +15,20 @@ typedef enum {
     IMPOSSIBLE_TO_CONNECT_TO_SHM,
     SIGNALS_OF_TERM_RECEIVED,
     INFO_BUDGET,
-}MSG_REPORT_TYPE;
-typedef enum{
+} MSG_REPORT_TYPE;
+typedef enum {
     USER,
     NODE,
     NODE_TP,
-}PROC_TYPE;
-struct master_msg_report{
+} PROC_TYPE;
+struct master_msg_report {
     long type;
     long proc_type;
     pid_t sender_pid;
     short int state;
     float budget;
 };
+
 /**
  * Constructor for the message to be sent to the master_proc
  * @param self the message
@@ -37,13 +36,14 @@ struct master_msg_report{
  * @param sender_pid the pid of the user to sent this msg
  * @param state state of the current proc who's sending this message
  */
-void master_msg_report_create(struct master_msg_report * self,long type, long proc_type, pid_t sender_pid, short int state);
+void
+master_msg_report_create(struct master_msg_report *self, long type, long proc_type, pid_t sender_pid, short int state);
 
 /**
  * Print the message based on his type
  * @param sel the messagge to be printed
  * */
-void master_msg_report_print(struct master_msg_report * self);
+void master_msg_report_print(const struct master_msg_report *self);
 
 /**
  * (Create if option selected) and Send the message on ipc master_msg_queue with the given  key
@@ -54,7 +54,9 @@ void master_msg_report_print(struct master_msg_report * self);
  * @param state state of the current proc who's sending this message
  * @return -1 in case of failure. 0 otherwise
  * */
-int master_msg_send(int id, struct master_msg_report * self,long type,long proc_type, pid_t sender_pid, short int state, Bool create);
+int
+master_msg_send(int id, struct master_msg_report *self, long type, long proc_type, pid_t sender_pid, short int state,
+                Bool create);
 
 /**
  * Retrive the message_node_report on the specified message queue
@@ -63,7 +65,8 @@ int master_msg_send(int id, struct master_msg_report * self,long type,long proc_
  * @param msg to be caught
  * @return -2 in case of no msg on queue. -1 in case of failure. 0 otherwise
  */
-int master_msg_receive(int id, struct master_msg_report * self);
+int master_msg_receive(int id, struct master_msg_report *self);
+
 /**
  * Retrive the message_node_report on the specified message queue
  * @warning the retriving operation is repeated until it succeed or errno != EINTR
@@ -71,5 +74,6 @@ int master_msg_receive(int id, struct master_msg_report * self);
  * @param msg to be caught
  * @return -2 in case of no msg on queue. -1 in case of failure. 0 otherwise
  */
-int master_msg_receive_info(int id, struct master_msg_report * self);
+int master_msg_receive_info(int id, struct master_msg_report *self);
+
 #endif /*DGT_SO_PROJECT_21_22_MASTER_MSG_REPORT_H*/
