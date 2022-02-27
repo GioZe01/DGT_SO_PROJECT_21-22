@@ -6,7 +6,7 @@
 /* Helper function*/
 
 
-shm_conf_create(struct shm_conf *self, int *users_pids, int *users_queues_ids, int *nodes_pids, int *nodes_queues_ids) {
+int shm_conf_create(struct shm_conf *self, int *users_pids, int *users_queues_ids, int *nodes_pids, int *nodes_queues_ids) {
     shm_copy_snapshots(self->users_snapshots, users_pids, users_queues_ids);
     shm_copy_snapshots(self->nodes_snapshots, nodes_pids, nodes_queues_ids);
     return 0;

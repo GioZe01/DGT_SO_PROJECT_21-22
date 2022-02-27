@@ -1,7 +1,8 @@
+/* Sys */
 #include <stdio.h>
 #include <unistd.h>
 #include <sys/types.h>
-#include <math.h>
+/* Local */
 #include "headers/simulation_errors.h"
 #include "headers/transaction_list.h"
 #include "headers/node_transactor.h"

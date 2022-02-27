@@ -46,7 +46,7 @@ void user_create(struct user_transaction *self, float budget, int pid, Balance b
     self->pid = pid;
     self->budget = budget;
     self->u_balance = balance;
-    self->transactions_failed= queue_create();
+    self->transactions_failed = queue_create();
     self->in_process = queue_create();
     self->cash_flow.entries = budget;
     self->cash_flow.outcomes = 0;
@@ -66,7 +66,7 @@ Bool check_balance(struct user_transaction *self) {
     return self->u_balance >= 2 ? TRUE : FALSE;
 }
 
-float calc_balance(struct user_transaction *self) {
+double  calc_balance(struct user_transaction *self) {
     printf("Current user entries: %f \n", self->budget);
     return fabs(self->cash_flow.entries) - fabs(self->cash_flow.outcomes) - fabs(self->expected_out);
 }
@@ -105,7 +105,7 @@ int generate_transaction(struct user_transaction *self, pid_t user_proc_pid, str
 #endif
  */
         queue_append(self->in_process, t);
-        if(self->update_cash_flow(self, &t)<0){ ERROR_EXIT_SEQUENCE_USER("IMPOSSIBLE TO UPDATE CASH FLOW");}
+        if (self->update_cash_flow(self, &t) < 0) { ERROR_EXIT_SEQUENCE_USER("IMPOSSIBLE TO UPDATE CASH FLOW"); }
         self->to_wait_transaction++;
         /* DEBUG_NOTIFY_ACTIVITY_DONE("GENERATING THE TRANSACTION DONE"); */
         return 0;
@@ -115,7 +115,7 @@ int generate_transaction(struct user_transaction *self, pid_t user_proc_pid, str
 
 pid_t extract_user(int users_num[][2]) {
     srand(getpid());
-   /* DEBUG_NOTIFY_ACTIVITY_RUNNING("EXTRACTING USER FROM SNAPSHOTS...");*/
+    /* DEBUG_NOTIFY_ACTIVITY_RUNNING("EXTRACTING USER FROM SNAPSHOTS...");*/
     int max = users_num[0][0];
     int e = (rand() % (max)) + 1;
     while (users_num[e + 1][0] == NULL) {
@@ -126,7 +126,8 @@ pid_t extract_user(int users_num[][2]) {
 }
 
 int extract_node(int nodes_num) {
-
+    srand(getpid());
+    return (rand() % (nodes_num + 1));
 }
 
 

@@ -25,13 +25,14 @@
 #ifdef DEBUG
 #ifdef DEBUG_USER
 #include "local_lib/headers/debug_utility.h"
+#endif
 #else /*unimplemented*/
 #define DEBUG_NOTIFY_ACTIVITY_RUNNING(mex)
 #define DEBUG_NOTIFY_ACTIVITY_DONE(mex)
 #define DEBUG_MESSAGE(mex)
 #define DEBUG_SIGNAL(mex, signum)
 #define DEBUG_ERROR_MESSAGE(mex)
-#endif
+
 #endif
 
 /*  Support functions*/
@@ -253,7 +254,6 @@ void free_mem_user() {
 }
 
 void free_sysVar_user() {
-    /*TODO: aggiungi altri */
     int semaphore_start_value;
     if (current_user.exec_state == PROC_STATE_RUNNING && semaphore_start_id >= 0) {
         semaphore_start_value = semctl(semaphore_start_id, 0, GETVAL);

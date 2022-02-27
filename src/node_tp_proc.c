@@ -68,6 +68,13 @@ void advice_master_of_termination(int termination_type);
 void acquire_semaphore_ids(void);
 
 /**
+ * \brief Attach the current node to the related shms
+ * Specificcaly:
+ *  -node_tp_shm
+ */
+void attach_to_shms(void);
+
+/**
  * Check the argc and argv to match with project specification and load so_tp_size
  * @param argc number of argument given
  * @param argv pointer to a char list of params given
@@ -119,6 +126,7 @@ void set_signal_handlers(struct sigaction sa);
 void update_block(void);
 
 /* SysVar */
+int parent_id = -1; /* Id of the start semaphore arrays, ref. for shm_key*/
 int sem_start_id = -1; /*Id of the start semaphore arrays for sinc*/
 int sem_node_tp_id = -1; /* Id of the semaphore for accesing node_tp_shm*/
 int queue_node_id = -1;/* Identifier of the node queue id */
@@ -131,8 +139,6 @@ struct node_block *shm_node_tp; /* Ref to the shm for the node_tp_shm */
 
 int main(int argc, char const *argv[]) {
     DEBUG_MESSAGE("NODE TP PROCESS STARTED");
-    struct sigaction sa;
-    sigset_t sigmask;
     int failure_shm = 0;
     DEBUG_MESSAGE("NODE TP PROCESS SET TO INIT");
     current_node_tp.exec_state = PROC_STATE_INIT;
@@ -142,7 +148,7 @@ int main(int argc, char const *argv[]) {
     if (check_arguments(argc, argv) == TRUE) {
         struct node_msg msg_rep;
         struct sigaction sa; /*Structure for handling signals */
-        node_create(&current_node_tp, getpid(), 0, current_node_tp.type.tp.tp_size, SO_BLOCK_SIZE, 0, &calc_reward);
+        node_proc_tp_create(&current_node_tp, getpid(),  current_node_tp.type.tp.tp_size);
         set_signal_handlers(sa);
         /************************************
          *      SINC AND WAITING FASE       *
@@ -196,6 +202,7 @@ Bool check_arguments(int argc, char const *argv[]) {
     }
     int tp_size = atoi(argv[1]);
     int node_id = atoi(argv[2]);
+    parent_id = atoi(argv[3]);
     if (tp_size <= 0) {
         ERROR_EXIT_SEQUENCE_NODE_TP("TP_SIZE IS <= 0. NOT ACCEPTED");
     }
@@ -219,7 +226,7 @@ void acquire_semaphore_ids(void) {
     if (semaphore_lock(sem_start_id, 0) < 0) {
         ERROR_EXIT_SEQUENCE_NODE("IMPOSSIBLE TO OBTAIN THE START SEMAPHORE");
     }
-    sem_node_tp_id = semget(SEMAPHORE_TP_SHM_KEY, 1, 0);
+    sem_node_tp_id = semget(current_node_tp.node_id, 1, 0);
     if (sem_node_tp_id < 0) {
         ERROR_EXIT_SEQUENCE_NODE_TP("IMPOSSIBLE TO RETRIEVE");
     }
@@ -330,4 +337,18 @@ void free_sysVar_node_tp() {
             ERROR_MESSAGE("IMPOSSIBLE TO EXECUTE THE FREE SYS VAR (prob. sem_lock not set so cannot be closed)");
         }
     }
+}
+void attach_to_shms(void){
+    DEBUG_NOTIFY_ACTIVITY_RUNNING("ATTACHING TO SHM ...");
+    int shm_tp_id = -1;
+    shm_tp_id = shmget(parent_id, sizeof(struct node_block), 0600);
+    if (shm_tp_id < 0){
+        ERROR_EXIT_SEQUENCE_NODE("IMPOSSIBLE TO CREATE NODE TP_SHM");
+    }
+    shm_node_tp = shmat(shm_tp_id, NULL, 0);
+    if(shm_node_tp == (void * )-1){
+        advice_master_of_termination(IMPOSSIBLE_TO_CONNECT_TO_SHM);
+        ERROR_EXIT_SEQUENCE_NODE("IMPOSSIBLE TO CONNECT TO THE NODE_TP SHM");
+    }
+    DEBUG_NOTIFY_ACTIVITY_DONE("ATTACHING TO SHM DONE");
 }

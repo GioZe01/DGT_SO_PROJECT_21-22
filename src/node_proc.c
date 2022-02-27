@@ -163,7 +163,7 @@ void create_semaphore(void);
 void create_tp_shm(void);
 
 /* SysVar */
-int shm_tp_id = -1; /*Id of the transaction pool shm */
+int shm_tp_id = -1; /* Id of node_tp_shm*/
 int semaphore_start_id = -1; /*Id of the start semaphore arrays for sinc*/
 int semaphore_masterbook_id = -1; /*Id of the masterbook semaphore for accessing the block matrix*/
 int semaphore_to_fill_id = -1; /* Id of the masterbook to_fill access semaphore*/
@@ -365,11 +365,17 @@ void attach_to_shms(void) {
         advice_master_of_termination(IMPOSSIBLE_TO_CONNECT_TO_SHM);
         ERROR_EXIT_SEQUENCE_NODE("IMPOSSIBLE TO CONNECT TO THE SHM_MASTERBOOK");
     }
-    shm_node_tp = shmat(shm_tp_id, NULL, 0);
+    shm_conf_id = shmget(current_node.pid, sizeof(struct node_block), 0600);
+    if (shm_conf_id<0){
+        advice_master_of_termination(IMPOSSIBLE_TO_CONNECT_TO_SHM);
+        ERROR_EXIT_SEQUENCE_NODE("IMPOSSIBLE TO ACCESS SHM BOOKMASTER");
+    }
+    shm_node_tp = shmat(shm_conf_id, NULL, 0);
     if(shm_node_tp == (void * )-1){
         advice_master_of_termination(IMPOSSIBLE_TO_CONNECT_TO_SHM);
         ERROR_EXIT_SEQUENCE_NODE("IMPOSSIBLE TO CONNECT TO THE NODE_TP SHM");
     }
+    DEBUG_NOTIFY_ACTIVITY_DONE("ATTACHING TO SHM DONE");
 }
 
 
@@ -512,7 +518,7 @@ long int get_time_processing(void) {
 }
 void create_semaphore(void){
     DEBUG_NOTIFY_ACTIVITY_RUNNING("CREATION OF THE TP_SHM SEM...");
-    semaphore_tp_shm = semget(SEMAPHORE_TP_SHM_KEY,1, IPC_CREAT | IPC_EXCL | 0600);
+    semaphore_tp_shm = semget(current_node.node_id,1, IPC_CREAT | IPC_EXCL | 0600);
     if(semaphore_tp_shm < 0){
         ERROR_EXIT_SEQUENCE_NODE("IMPOSSIBLE TO CREATE TP_SHM SEM");
     }
@@ -520,7 +526,7 @@ void create_semaphore(void){
 }
 void create_tp_shm(void){
     DEBUG_NOTIFY_ACTIVITY_RUNNING("CREATION OF THE TP_SHM...");
-    shm_tp_id = shmget(SHM_NODE_TP_KEY, sizeof(struct node_block), IPC_CREAT | IPC_EXCL | 0600);
+    shm_tp_id = shmget(current_node.pid, sizeof(struct node_block), IPC_CREAT | IPC_EXCL | 0600);
     if (shm_tp_id < 0){
         ERROR_EXIT_SEQUENCE_NODE("IMPOSSIBLE TO CREATE NODE TP_SHM");
     }
@@ -537,10 +543,11 @@ void free_kids_node(){
     }
 }
 void create_node_tp_proc(void){
-   char *argv_node_tp[]={PATH_TO_NODE_TP,NULL,NULL, NULL};
+   char *argv_node_tp[]={PATH_TO_NODE_TP,NULL,NULL,NULL, NULL};
    pid_t node_tp_pid;
    argv_node_tp[1] = (char *) malloc(11 * sizeof(char));
    argv_node_tp[2] = (char *) malloc(11 * sizeof(char));
+   argv_node_tp[3] = (char *) malloc(11 * sizeof(char));
    switch(node_tp_pid =fork()){
        case -1:
            ERROR_EXIT_SEQUENCE_NODE("IMPOSSIBLE TO GENERATE NODE_TP");
@@ -548,13 +555,16 @@ void create_node_tp_proc(void){
        case 0: /*kid*/
            sprintf(argv_node_tp[1], "%d",node_configuration.so_tp_size);
            sprintf(argv_node_tp[2], "%d",current_node.node_id);
+           sprintf(argv_node_tp[3], "%d",current_node.pid);
            execve(argv_node_tp[0],argv_node_tp,NULL);
            ERROR_EXIT_SEQUENCE_NODE("IMPOSSIBLE TO GENERATE NODE_TP");
            break;
        default:/*father*/
            if (argv_node_tp[1] != NULL) free(argv_node_tp[1]);
            if (argv_node_tp[2] != NULL) free(argv_node_tp[2]);
+           if (argv_node_tp[3] != NULL) free(argv_node_tp[3]);
            current_node.type.block.kid_pid = node_tp_pid;
            break;
    }
 }
+

@@ -22,6 +22,8 @@ if available before termination occure
         by sending snapshot of users
 
 # Node Proc
+Node_tp_shm_key => current_node.pid
+node_tp_semaphore => current_node.id
 
 L'apt della reward per singola transazione viene fatta solo quando block size e caricato -> parte più critica
     *SHM: part of the responsability of a node proc is to create the tp_shm that will be used by the

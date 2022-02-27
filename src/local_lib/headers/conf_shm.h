@@ -16,8 +16,7 @@ struct shm_conf {
  * @param nodes_snapshot the nodes_info to be saved
  * @return -1 in case of UNKNOWN FAILURE. 0 otherwise
  */
-int
-shm_conf_create(struct shm_conf *self, int *users_pids, int *users_queues_ids, int *nodes_pids, int *nodes_queues_ids);
+int shm_conf_create(struct shm_conf *self, int *users_pids, int *users_queues_ids, int *nodes_pids, int *nodes_queues_ids);
 
 /**
  * Print the shared memory size on console

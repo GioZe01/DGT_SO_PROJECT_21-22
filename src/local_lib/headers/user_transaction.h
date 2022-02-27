@@ -15,7 +15,7 @@ typedef struct UCashFlow {
 };
 struct user_transaction {
     int pid;
-    int exec_state; /*current execution state of the user proc*/
+    short int exec_state; /*current execution state of the user proc*/
     float budget; /*Contains the confirmed by nodes value in the pocket of the current user*/
     Balance u_balance;
     Queue transactions_failed; /*transactions_failed not processed by any node*/
@@ -64,7 +64,7 @@ Bool check_balance(struct user_transaction *self);
  * @param self
  * @return the current balance
  */
-float calc_balance(struct user_transaction *self);
+double calc_balance(struct user_transaction *self);
 
 
 /**

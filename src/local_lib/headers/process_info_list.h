@@ -93,5 +93,6 @@ void saving_private_ryan(ProcList self);
  * @return integer rappresenting the number of active user
  */
 int get_num_of_user_proc_running(ProcList self);
+
 /*TODO: implementare budget maggiore get -> vedere se fare una hash table di processi*/
 #endif /*DGT_SO_PROJECT_21_22_PROCESS_INFO_LIST_H*/
