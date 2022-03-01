@@ -32,7 +32,6 @@
 #define DEBUG_MESSAGE(mex)
 #define DEBUG_SIGNAL(mex, signum)
 #define DEBUG_ERROR_MESSAGE(mex)
-
 #endif
 
 /*  Support functions*/
@@ -46,6 +45,7 @@ void advice_master_of_termination(int termination_type);
  * Connects to the differents queues: master, node's and user's
  * */
 void connect_to_queues(void);
+
 /**
  * handler of the signal
  * @param signum type of signal to be handled
@@ -134,11 +134,11 @@ int main(int arc, char const *argv[]) {
         read_conf();
         user_create(&current_user, configuration.so_buget_init, getpid(), &calc_balance, &update_cash_flow);
         /*--------------------------------------*/
-        /*  CONNECTING TO THE USER REPORT QUEUE *
+        /*  CONNECTING TO THE USER REPORT QUEUE */
         /*--------------------------------------*/
         connect_to_queues();
         /*-------------------------*/
-        /*  SHARED MEM  CONFIG     *
+        /*  SHARED MEM  CONFIG     */
         /*-------------------------*/
         attach_to_shm_conf();
 
@@ -151,7 +151,7 @@ int main(int arc, char const *argv[]) {
          * -----------------------------------*
          * INFO:                              *
          * unlock is done if sem hasn't 0 as  *
-         * value                              *
+         * value                              */
         /*------------------------------------*/
         /*TODO: need a semafore for reading into the message queue*/
         semaphore_start_id = semget(SEMAPHORE_SINC_KEY_START, 1, 0);
@@ -167,7 +167,6 @@ int main(int arc, char const *argv[]) {
         if (semaphore_wait_for_sinc(semaphore_start_id, 0) < 0) {
             ERROR_EXIT_SEQUENCE_USER("ERROR DURING WAITING START_SEMAPHORE UNLOCK");
         }
-        printf("DOPO WAITING \n");
         current_user.exec_state = PROC_STATE_RUNNING;
 
         /****************************************
@@ -237,7 +236,7 @@ void signals_handler(int signum) {
             }
             DEBUG_NOTIFY_ACTIVITY_DONE("GENERATING A NEW TRANSACTION FROM SIG DONE");
         case SIGUSR2:
-            master_msg_send(queue_master_id,&msg, INFO_BUDGET,NODE,current_user.pid,current_user.exec_state,TRUE);
+            master_msg_send(queue_master_id,&msg, INFO_BUDGET,NODE,current_user.pid,current_user.exec_state,TRUE, current_user.budget);
             break;
         default:
             break;
@@ -246,7 +245,7 @@ void signals_handler(int signum) {
 
 void advice_master_of_termination(int termination_type) {
     struct master_msg_report termination_report;
-   if (master_msg_send(queue_master_id, &termination_report, termination_type, NODE_TP,current_user.pid, current_user.exec_state,TRUE)<0){
+   if (master_msg_send(queue_master_id, &termination_report, termination_type, NODE_TP,current_user.pid, current_user.exec_state,TRUE, current_user.budget)<0){
        ERROR_MESSAGE("IMPOSSIBLE TO ADVICE MASTER OF TERMINATION");
    }
 }

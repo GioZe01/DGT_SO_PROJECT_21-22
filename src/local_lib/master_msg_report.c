@@ -7,11 +7,14 @@
 #include "headers/master_msg_report.h"
 #include "headers/glob.h"
 
-void master_msg_report_create(struct master_msg_report *self, long type,long proc_type, pid_t sender_pid, short int state) {
+void master_msg_report_create(struct master_msg_report *self, long type,long proc_type, pid_t sender_pid, short int state, float budget) {
     self->type = type;
     self->proc_type = proc_type;
     self->sender_pid = sender_pid;
     self->state = state;
+    if (type == INFO_BUDGET){
+        self->budget = budget;
+    }
     self->budget = 0;
 }
 
@@ -35,8 +38,8 @@ void master_msg_report_print(const struct master_msg_report *self) {
             printf("[MASTER_MSG_REPORT]  := type: %ld | sender: %d | state: %d \n", self->type, self->sender_pid, self->state);
     }
 }
-int master_msg_send(int id, struct master_msg_report * self,long type,long proc_type, pid_t sender_pid, short int state, Bool create){
-    if (create == TRUE){master_msg_report_create(self,type,proc_type,sender_pid, state);}
+int master_msg_send(int id, struct master_msg_report * self,long type,long proc_type, pid_t sender_pid, short int state, Bool create, float budget){
+    if (create == TRUE){master_msg_report_create(self,type,proc_type,sender_pid, state, budget);}
     while(msgsnd(id, self, sizeof(*self)-sizeof(long),0)<0){
         if (errno != ENOMSG) return -1;
     }

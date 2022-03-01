@@ -168,7 +168,7 @@ int main(int argc, char const *argv[]) {
         /*---------------------------*/
         DEBUG_MESSAGE("NODE READY, ON START_SEM");
         if (semaphore_wait_for_sinc(sem_start_id, 0) < 0) {
-            ERROR_EXIT_SEQUENCE_NODE("IMPOSSIBLE TO WAIT FOR START");
+            ERROR_EXIT_SEQUENCE_NODE_TP("IMPOSSIBLE TO WAIT FOR START");
         }
         current_node_tp.exec_state = PROC_STATE_RUNNING;
         while (node_tp_end != 1 && failure_shm < MAX_FAILURE_SHM_LOADING) {
@@ -187,7 +187,7 @@ int main(int argc, char const *argv[]) {
             };
         }
         if (failure_shm > MAX_FAILURE_SHM_LOADING) {
-            ERROR_EXIT_SEQUENCE_NODE("IMPOSSIBLE TO READ DATA FROM NODE_TP_SHM");
+            ERROR_EXIT_SEQUENCE_NODE_TP("IMPOSSIBLE TO READ DATA FROM NODE_TP_SHM");
         }
     }
     advice_master_of_termination(TERMINATION_END_CORRECTLY);
@@ -215,16 +215,16 @@ Bool check_arguments(int argc, char const *argv[]) {
 void advice_master_of_termination(int termination_type) {
     struct master_msg_report termination_report;
     if (master_msg_send(queue_master_id, &termination_report, termination_type, NODE_TP, current_node_tp.pid,
-                        current_node_tp.exec_state, TRUE) < 0) {
+                        current_node_tp.exec_state, TRUE,-1) < 0) {
         ERROR_MESSAGE("IMPOSSIBLE TO ADVICE MASTER OF TERMINATION");
     }
 }
 
 void acquire_semaphore_ids(void) {
     sem_start_id = semget(SEMAPHORE_SINC_KEY_START, 1, 0);
-    if (sem_start_id < 0) { ERROR_EXIT_SEQUENCE_NODE("IMPOSSIBLE TO OBTAIN ID OF START SEM"); }
+    if (sem_start_id < 0) { ERROR_EXIT_SEQUENCE_NODE_TP("IMPOSSIBLE TO OBTAIN ID OF START SEM"); }
     if (semaphore_lock(sem_start_id, 0) < 0) {
-        ERROR_EXIT_SEQUENCE_NODE("IMPOSSIBLE TO OBTAIN THE START SEMAPHORE");
+        ERROR_EXIT_SEQUENCE_NODE_TP("IMPOSSIBLE TO OBTAIN THE START SEMAPHORE");
     }
     sem_node_tp_id = semget(current_node_tp.node_id, 1, 0);
     if (sem_node_tp_id < 0) {
@@ -304,7 +304,7 @@ void signals_handler(int signum) {
         case SIGALRM:
             break;
         case SIGUSR2:
-            master_msg_send(queue_master_id,&msg, INFO_BUDGET,NODE,current_node_tp.pid,current_node_tp.exec_state,TRUE);
+            master_msg_send(queue_master_id,&msg, INFO_BUDGET,NODE,current_node_tp.pid,current_node_tp.exec_state,TRUE,-1);
             break;
         default:
             break;
@@ -313,11 +313,11 @@ void signals_handler(int signum) {
 
 void connect_to_queues(void) {
     queue_node_id = msgget(NODES_QUEUE_KEY, 0600);
-    if (queue_node_id < 0) { ERROR_EXIT_SEQUENCE_NODE("IMPOSSIBLE TO CONNECT TO NODE MESSAGE QUEUE"); }
+    if (queue_node_id < 0) { ERROR_EXIT_SEQUENCE_NODE_TP("IMPOSSIBLE TO CONNECT TO NODE MESSAGE QUEUE"); }
     queue_user_id = msgget(USERS_QUEUE_KEY, 0600);
-    if (queue_user_id < 0) { ERROR_EXIT_SEQUENCE_NODE("IMPOSSIBLE TO CONNECT TO USER QUEUE"); }
+    if (queue_user_id < 0) { ERROR_EXIT_SEQUENCE_NODE_TP("IMPOSSIBLE TO CONNECT TO USER QUEUE"); }
     queue_master_id = msgget(MASTER_QUEUE_KEY, 0600);
-    if (queue_master_id < 0) { ERROR_EXIT_SEQUENCE_NODE("IMPOSSIBLE TO CONNECT TO MASTER QUEUE"); }
+    if (queue_master_id < 0) { ERROR_EXIT_SEQUENCE_NODE_TP("IMPOSSIBLE TO CONNECT TO MASTER QUEUE"); }
 }
 
 void free_mem_node_tp() {
@@ -344,12 +344,12 @@ void attach_to_shms(void){
     int shm_tp_id = -1;
     shm_tp_id = shmget(parent_id, sizeof(struct node_block), 0600);
     if (shm_tp_id < 0){
-        ERROR_EXIT_SEQUENCE_NODE("IMPOSSIBLE TO CREATE NODE TP_SHM");
+        ERROR_EXIT_SEQUENCE_NODE_TP("IMPOSSIBLE TO CREATE NODE TP_SHM");
     }
     shm_node_tp = shmat(shm_tp_id, NULL, 0);
     if(shm_node_tp == (void * )-1){
         advice_master_of_termination(IMPOSSIBLE_TO_CONNECT_TO_SHM);
-        ERROR_EXIT_SEQUENCE_NODE("IMPOSSIBLE TO CONNECT TO THE NODE_TP SHM");
+        ERROR_EXIT_SEQUENCE_NODE_TP("IMPOSSIBLE TO CONNECT TO THE NODE_TP SHM");
     }
     DEBUG_NOTIFY_ACTIVITY_DONE("ATTACHING TO SHM DONE");
 }

@@ -57,7 +57,6 @@ ProcList proc_list_create() {
 
 void insert_in_list(ProcList self, pid_t pid, short int type, int queue_id) {
     struct node *new = (struct node *)malloc(sizeof(struct node));
-    printf("INSERTING PROC\n");
     if (new == NULL) {
         ERROR_MESSAGE("IMPOSSIBLE TO INSERT NEW PROC");
         return;

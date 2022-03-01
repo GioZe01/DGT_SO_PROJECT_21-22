@@ -35,9 +35,10 @@ struct master_msg_report {
  * @param type of the message, see MSG_REPORT_ABORTED_PROC as exmp.
  * @param sender_pid the pid of the user to sent this msg
  * @param state state of the current proc who's sending this message
+ * @param budget (Optional -1 as value), set if type is INFO_BUDGET otherwise budget set to 0
  */
 void
-master_msg_report_create(struct master_msg_report *self, long type, long proc_type, pid_t sender_pid, short int state);
+master_msg_report_create(struct master_msg_report *self, long type, long proc_type, pid_t sender_pid, short int state, float budget);
 
 /**
  * Print the message based on his type
@@ -52,11 +53,12 @@ void master_msg_report_print(const struct master_msg_report *self);
  * @param type of the message, see MSG_REPORT_ABORTED_PROC as exmp.
  * @param sender_pid the pid of the user to sent this msg
  * @param state state of the current proc who's sending this message
+ * @param budget (Optional -1 as value), set if type is INFO_BUDGET otherwise budget set to 0
  * @return -1 in case of failure. 0 otherwise
  * */
 int
 master_msg_send(int id, struct master_msg_report *self, long type, long proc_type, pid_t sender_pid, short int state,
-                Bool create);
+                Bool create, float budget);
 
 /**
  * Retrive the message_node_report on the specified message queue

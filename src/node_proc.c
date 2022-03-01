@@ -186,6 +186,7 @@ int main(int argc, char const *argv[]) {
     sigset_t sigmask;
     DEBUG_MESSAGE("NODE STATE SET TO INIT");
     current_node.exec_state= PROC_STATE_INIT;
+    current_node.pid = getpid();
     /************************************
      *      CONFIGURATION FASE          *
      * **********************************/
@@ -270,6 +271,9 @@ Bool check_arguments(int argc, char const *argv[]) {
         ERROR_EXIT_SEQUENCE_NODE("MISSING ARGUMENT");
     }
     current_node.node_id = atoi(argv[1]);
+#ifdef DEBUG_NODE
+    printf("\nNODE_PROC: %d WITH NODE ID: %d\n",current_node.pid, current_node.node_id);
+#endif
     DEBUG_NOTIFY_ACTIVITY_DONE("CHECKING ARGC AND ARGV DONE");
     return TRUE;
 }
@@ -305,7 +309,7 @@ void signals_handler(int signum) {
         case SIGALRM:
             break;
         case SIGUSR2:
-            master_msg_send(queue_master_id,&msg, INFO_BUDGET,NODE,current_node.pid,current_node.exec_state,TRUE);
+            master_msg_send(queue_master_id,&msg, INFO_BUDGET,NODE,current_node.pid,current_node.exec_state,TRUE, current_node.type.block.budget);
             break;
         default:
             break;
@@ -492,7 +496,7 @@ Bool load_block(void) {
 
 void advice_master_of_termination(int termination_type) {
     struct master_msg_report termination_report;
-   if (master_msg_send(queue_master_id, &termination_report, termination_type, NODE,current_node.pid, current_node.exec_state,TRUE)<0){
+   if (master_msg_send(queue_master_id, &termination_report, termination_type, NODE,current_node.pid, current_node.exec_state,TRUE, current_node.type.block.budget)<0){
        ERROR_MESSAGE("IMPOSSIBLE TO ADVICE MASTER OF TERMINATION");
    }
 }

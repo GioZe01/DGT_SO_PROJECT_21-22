@@ -225,13 +225,13 @@ int main() {
 }
 
 int create_users_proc(int *users_pids, int *users_queues_ids) {
-    char *argv_user[] = {PATH_TO_USER, NULL, NULL}; /*Future addon*/
     pid_t user_pid;
     int i = 0;
     int queue_id = DELTA_USER_MSG_TYPE;
     users_pids[0] = 0;
     users_queues_ids[0] = 0;
     for (; i < simulation_conf.so_user_num; i++) {
+        char *argv_user[] = {PATH_TO_USER, NULL, NULL}; /*Future addon*/
         argv_user[1] = (char *) malloc(11 * sizeof(char));
         switch (user_pid = fork()) {
             case -1:
@@ -261,13 +261,13 @@ int create_users_proc(int *users_pids, int *users_queues_ids) {
 }
 
 int create_nodes_proc(int *nodes_pids, int *nodes_queues_ids) {
-    char *argv_node[] = {PATH_TO_NODE, NULL, NULL}; /*Future addon*/
     pid_t node_pid;
     int i=0;
     int queue_id = DELTA_NODE_MSG_TYPE;
     nodes_pids[0] = 0;
     nodes_queues_ids[0] = 0;
     for (; i < simulation_conf.so_nodes_num; i++) {
+        char *argv_node[] = {PATH_TO_NODE, NULL, NULL}; /*Future addon*/
         argv_node[1] = (char *) malloc(11 * sizeof(char));
         switch (node_pid = fork()) {
             case -1:
@@ -331,10 +331,9 @@ void signals_handler(int signum) { /*TODO: Scrivere implementazione*/
         case SIGALRM:
             if (getpid() == main_pid) {
                 num_inv++;
-                printf("UPDATING KIDS-----------------------------------\n");
                 /*request info from kids */
                 update_kids_info();
-                printf("UPDATING FINISHED----------------------------------\n");
+                print_info();
                 /*Printing infos*/
                 if (num_inv == simulation_conf.so_sim_sec) simulation_end = 1;
                 else alarm(1);
@@ -540,7 +539,8 @@ void create_masterbook() {
 void print_info(void){
     printf("============== INFO ============== \n");
     printf("Number of node active: %d\n", get_num_of_user_proc_running(proc_list));
-
+    print_list(proc_list);
+    printf("============== END INFO ===========\n");
 }
 void update_kids_info(void){
     int num_msg_to_wait_for= -1;
@@ -552,11 +552,13 @@ void update_kids_info(void){
         DEBUG_MESSAGE("NO PROCESS TO UPDATE");
     }
     struct master_msg_report * msg_rep = (struct master_msg_report *)malloc(sizeof(struct master_msg_report));
+    DEBUG_NOTIFY_ACTIVITY_RUNNING("RETRIVING INFO ...");
     do{
-        alarm(MAX_WAITING_TIME_FOR_UPDATE);/*cannot loop forever*/
+        /*TODO: POSSIBLE INFITE WAITING CHECK FOR SIG*/
         master_msg_receive_info(msg_report_id_master, msg_rep);
         Proc proc_to_update = get_proc_from_pid(proc_list,msg_rep->sender_pid);
         proc_to_update->budget = msg_rep->budget;
         num_msg_to_wait_for--;
     }while(num_msg_to_wait_for!=0);
+    DEBUG_NOTIFY_ACTIVITY_DONE("RETRIVING INFO DONE");
 }
