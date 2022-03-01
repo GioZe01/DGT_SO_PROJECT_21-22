@@ -62,22 +62,23 @@ int update_budget(struct node *self) {
 }
 
 int add_to_transactions_list(struct node *self, struct Transaction *t) {
+    /*May need check after append method is called*/
     queue_append(self->transactions_list, *t);
+    return 0;
 }
 
 int calc_reward(struct node* self, int percentage, Bool use_default, float * block_tot_reward){
     switch (use_default) {
         case TRUE:
             *block_tot_reward = queue_apt_amount_reward(self->transactions_list, self->type.block.percentage);
-            if(block_tot_reward<0)return -1;
             break;
         case FALSE:
             *block_tot_reward = queue_apt_amount_reward(self->transactions_list, percentage);
-            if(block_tot_reward<0)return -1;
             break;
         default:
             ERROR_MESSAGE("MISSING PARAMETER USE DEFAULT");
             return -1;
     }
+    if(block_tot_reward<0)return -1;
     return 0;
 }

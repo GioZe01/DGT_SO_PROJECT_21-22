@@ -88,7 +88,8 @@ Bool set_signal_handler_user(struct sigaction sa, sigset_t sigmask);
 Bool read_conf();
 
 /**
- * \brief Send to the node all the transaction that still need to be processed
+ * \brief Send to the node all the transaction that still need to be processed and pop them
+ * from the transaction_list
  * with range block size if cashing is active
  * @return -1 in case of FAILURE. 0 otherwise
  */
@@ -291,9 +292,10 @@ int send_to_node(void) {
     DEBUG_NOTIFY_ACTIVITY_RUNNING("SENDING TRANSACTION TO THE NODE...");
     int node_num = (rand() % (shm_conf_pointer->nodes_snapshots[0][0])) + 1;
     struct node_msg msg;
-    struct Transaction t = queue_last(current_user.in_process);
+    struct Transaction t = queue_head(current_user.in_process);
     if (node_msg_snd(queue_node_id, &msg, shm_conf_pointer->nodes_snapshots[node_num][1], &t,
                      current_user.pid, TRUE, configuration.so_retry) < 0) { return -1; }
+    queue_remove_head(current_user.in_process);/*removed if and only if has been sent*/
 #ifdef DEBUG
     node_msg_print(&msg);
 #endif

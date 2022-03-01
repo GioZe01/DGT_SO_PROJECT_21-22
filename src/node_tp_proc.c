@@ -337,6 +337,7 @@ void free_sysVar_node_tp() {
             ERROR_MESSAGE("IMPOSSIBLE TO EXECUTE THE FREE SYS VAR (prob. sem_lock not set so cannot be closed)");
         }
     }
+    current_node_tp.exec_state = PROC_STATE_TERMINATED;
 }
 void attach_to_shms(void){
     DEBUG_NOTIFY_ACTIVITY_RUNNING("ATTACHING TO SHM ...");

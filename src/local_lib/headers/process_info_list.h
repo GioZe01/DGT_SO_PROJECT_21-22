@@ -1,14 +1,15 @@
 #ifndef DGT_SO_PROJECT_21_22_PROCESS_INFO_LIST_H
 #define DGT_SO_PROJECT_21_22_PROCESS_INFO_LIST_H
-#define PROC_TYPE_USER 1
-#define PROC_TYPE_NODE 2
-#define PROC_INFO_STATE_RUNNING 1
-#define PROC_INFO_STATE_TERMINATED 0
 
 #include <unistd.h>
 #include <sys/types.h>
 
 #include "boolean.h"
+
+typedef enum {
+    PROC_TYPE_USER, PROC_TYPE_NODE,
+} PROCTYPE;
+
 struct ProcessInfo{
     pid_t pid;
     int id_queue;/*Id for calculating range type of a user*/

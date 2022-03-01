@@ -144,7 +144,6 @@ int semaphore_to_fill_id = -1; /* Id of the masterbook to_fill access semaphore*
 pid_t main_pid; /*pid of the current proc*/
 
 int main() {
-    /* semctl(15, 0, IPC_RMID); TODO: Remove*/
     main_pid = getpid();
     if (read_conf() == TRUE) {
         /*  Local Var Declaration   */
@@ -332,8 +331,10 @@ void signals_handler(int signum) { /*TODO: Scrivere implementazione*/
         case SIGALRM:
             if (getpid() == main_pid) {
                 num_inv++;
+                printf("UPDATING KIDS-----------------------------------\n");
                 /*request info from kids */
                 update_kids_info();
+                printf("UPDATING FINISHED----------------------------------\n");
                 /*Printing infos*/
                 if (num_inv == simulation_conf.so_sim_sec) simulation_end = 1;
                 else alarm(1);
@@ -530,7 +531,7 @@ void create_masterbook() {
         ERROR_EXIT_SEQUENCE_MAIN("IMPOSSIBLE TO CREATE THE SHARED MEM FOR MASTERBOOK");
     }
     shm_masterbook_pointer = shmat(shm_masterbook_id, NULL, 0);
-    if (shm_masterbook_id == (void *) -1) {
+    if (shm_masterbook_id == (void*)-1) {
         ERROR_EXIT_SEQUENCE_MAIN("IMPOSSIBLE TO CONNECT TO THE MASTERBOOK SHM");
     }
     DEBUG_NOTIFY_ACTIVITY_DONE("CREATING THE MASTER BOOK DOONE");

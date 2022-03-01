@@ -331,10 +331,11 @@ void free_sysVar_node() {
     }
     DEBUG_NOTIFY_ACTIVITY_DONE("REMOVING SEMAPHORE_TP_SHM DONE");
     DEBUG_NOTIFY_ACTIVITY_RUNNING("REMOVING TP_SHM ....");
-    if(shm_tp_id>= 0 && semctl(shm_tp_id, IPC_RMID, NULL) < 0){
+    if(shm_tp_id>= 0 && shmctl(shm_tp_id, IPC_RMID, NULL) < 0){
         ERROR_MESSAGE("REMOVING PROCEDURE FOR TP SHM HAS FAILED");
     }
     DEBUG_NOTIFY_ACTIVITY_DONE("REMOVING TP_SHM DONE");
+    current_node.exec_state = PROC_STATE_TERMINATED;
 }
 
 void free_mem_node() {
@@ -391,7 +392,9 @@ void connect_to_queues(void) {
 int process_node_block() {
         /*Loading them into the node_block_transactions*/
         if (load_block() == FALSE) return -1;
-        current_node.type.block.calc_reward(&current_node, -1, TRUE, &current_block_reward);
+        if (current_node.type.block.calc_reward(&current_node, -1, TRUE, &current_block_reward)<0){
+            ERROR_EXIT_SEQUENCE_NODE("IMPOSSIBLE TO CALCULATE THE BLOCK REWARD");
+        }
         lock_shm_masterbook();
     return 0;
 }

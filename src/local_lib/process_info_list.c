@@ -12,6 +12,7 @@
 #include "headers/glob.h"
 #include "headers/process_info_list.h"
 #include "headers/simulation_errors.h"
+#include "headers/master_msg_report.h" /*imported for proc state enum type*/
 
 #ifdef DEBUG
 
@@ -68,7 +69,7 @@ void insert_in_list(ProcList self, pid_t pid, short int type, int queue_id) {
     } else {
         new->next = NULL;
         new->p->proc_type = type;
-        new->p->proc_state = PROC_INFO_STATE_RUNNING;
+        new->p->proc_state = PROC_STATE_RUNNING;
         new->p->id_queue = queue_id;
         new->p->budget = -1;
         new->p->pid = pid;
@@ -121,7 +122,7 @@ void process_info_print(const Proc p) {
         printf("# pid : %d | proc_type : %s | proc_state : %s | budget : %f ",
                p->pid,
                p->proc_type == PROC_TYPE_USER ? "User" : "Node",
-               p->proc_state == PROC_INFO_STATE_RUNNING ? "Running" : "Terminated",
+               p->proc_state == PROC_STATE_RUNNING ? "Running" : "Terminated",
                p->budget
         );
     else
@@ -151,13 +152,13 @@ int send_sig_to_all(ProcList proc_list, int signal) {
     struct node *tmp = proc_list->first;
     int num_proc_reciver = 0;
     for (; tmp != NULL; tmp = tmp->next) {
-        if (tmp->p->proc_state == PROC_INFO_STATE_RUNNING && kill(tmp->p->pid, signal) >= 0 || errno == ESRCH) {
+        if (tmp->p->proc_state == PROC_STATE_RUNNING && (kill(tmp->p->pid, signal) >= 0 || errno == ESRCH)){
             /**
              * errno == ESRCH is allowed because it might be that the proc intrest is terminated and
              * the termination has not been read by main, in this case need wait on the proc to update the proc-list
              * state
              */
-            ERROR_MESSAGE("PROCESS NOT FOUND MAY HAVE BEEN TERMINATED");
+            DEBUG_MESSAGE("SIGNAL SENT TO THE PROCESS");
         } else if (errno == EINTR) { continue; }
         else {
             return -1;
@@ -167,7 +168,7 @@ int send_sig_to_all(ProcList proc_list, int signal) {
     }
 
 #ifdef DEBUG
-    printf("SIG: %d HAS BEEN SENT TO: %d", signal, num_proc_reciver);
+    printf("SIG: %d HAS BEEN SENT TO: %d PROCESSES\n", signal, num_proc_reciver);
 #endif
     return num_proc_reciver;
 }
@@ -192,7 +193,7 @@ void proc_list_underflow() {
 void terminator(ProcList self) {
     struct node *tmp = self->first;
     for (; tmp != NULL; tmp = tmp->next) {
-        if (tmp->p->proc_state == PROC_INFO_STATE_RUNNING && (kill(tmp->p->pid, SIGINT) >= 0 || errno == ESRCH)) {
+        if (tmp->p->proc_state == PROC_STATE_RUNNING && (kill(tmp->p->pid, SIGINT) >= 0 || errno == ESRCH)) {
             /**
              * errno == ESRCH is allowed because it might be that the proc intrest is terminated and
              * the termination has not been read by main, in this case need wait on the proc to update the proc-list
@@ -212,9 +213,9 @@ void saving_private_ryan(ProcList self) {
     }
     struct node *tmp = self->first;
     for (; tmp != NULL; tmp = tmp->next) {
-        if (tmp->p->proc_state == PROC_INFO_STATE_RUNNING) {
+        if (tmp->p->proc_state == PROC_STATE_RUNNING) {
             waitpid(tmp->p->pid, NULL, 0);
-            tmp->p->proc_state = PROC_INFO_STATE_TERMINATED;
+            tmp->p->proc_state = PROC_STATE_TERMINATED;
         }
     }
 }
@@ -225,7 +226,7 @@ int get_num_of_user_proc_running(ProcList self){
     struct node * tmp = self->first;
     int ris = 0;
     for(;tmp != NULL; tmp = tmp->next){
-        if (tmp->p->proc_type == PROC_TYPE_USER && tmp->p->proc_state == PROC_INFO_STATE_RUNNING){
+        if (tmp->p->proc_type == PROC_TYPE_USER && tmp->p->proc_state == PROC_STATE_RUNNING){
             ris++;
         }
     }

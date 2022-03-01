@@ -4,7 +4,7 @@
 
 #include "transaction_list.h"
 
-typedef float(*Reward)(struct node *self, int percentage, Bool use_default, float * block_tot_reward);
+typedef int (*Reward)(struct node *self, int percentage, Bool use_default, float * block_tot_reward);
 /*
  * Can be done a rifactoring using ADT and obscuring the union, and create just one create method
  * */
