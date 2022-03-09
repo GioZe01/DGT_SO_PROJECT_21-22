@@ -1,7 +1,7 @@
-
 #include <stdio.h>
 #include <unistd.h>
 #include <sys/msg.h>
+
 /* Local*/
 #include "headers/user_msg_report.h"
 #include "headers/simulation_errors.h"
@@ -49,17 +49,17 @@ void user_msg_print(struct user_msg *self) {
     }
 }
 
-int user_msg_snd(int id, struct user_msg *msg, long type, struct Transaction *t, pid_t sender, Bool create) {
-    if (create == TRUE) { user_msg_create(msg, type, sender, t); }
+int user_msg_snd(int id, struct user_msg *msg, long type, struct Transaction *t, pid_t sender, Bool create, int queue_id) {
+    if (create == TRUE) { user_msg_create(msg, CHECK_USER_TYPE(queue_id,type), sender, t); }
     printf("ID RECEIVED: %d\n", id);
-    while (msgsnd(id, msg, sizeof(*msg) - sizeof(long), 0) < 0) {
+    while (msgsnd(id, msg, sizeof(struct user_msg) - sizeof(long), 0) < 0) {
         if (errno != EINTR) return -1;
     }
     return 0;
 }
 
 int user_msg_receive(int id, struct user_msg *msg, long type) {
-    if (msgrcv(id, msg, sizeof(*msg) - sizeof(long), type, IPC_NOWAIT) < 0) {
+    if (msgrcv(id, msg, sizeof(struct user_msg) - sizeof(long), type, IPC_NOWAIT) < 0) {
         if (errno == ENOMSG) {
             return -2;
         }

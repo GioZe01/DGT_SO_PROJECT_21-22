@@ -1,18 +1,19 @@
-
 #ifndef DGT_SO_PROJECT_21_22_USER_TRANSACTION_H
 #define DGT_SO_PROJECT_21_22_USER_TRANSACTION_H
 
+/* Local import */
 #include "boolean.h"
 #include "transaction_list.h"
 #include "conf_shm.h"
-typedef float(*Balance)(struct user_transaction* self);
+
+typedef double (*Balance)(struct user_transaction* self);
 
 typedef int (*CalcCashFlow)(struct user_transaction*self, struct Transaction *t);
 
-typedef struct UCashFlow {
+typedef struct {
     float entries;
     float outcomes;
-};
+}UCashFlow;
 struct user_transaction {
     int pid;
     short int exec_state; /*current execution state of the user proc*/
@@ -20,7 +21,7 @@ struct user_transaction {
     Balance u_balance;
     Queue transactions_failed; /*transactions_failed not processed by any node*/
     Queue in_process;/*Validated, but still to be confirmed by the nodes_proc*/
-    struct UCashFlow cash_flow;
+    UCashFlow cash_flow;
     CalcCashFlow update_cash_flow; /*Can set the function u desire while implementing, consider the one already implemented below*/
     float expected_out; /* Expected outcomes to still be processed*/
     int to_wait_transaction;/*Num Transactions to waite on for the conformation of processing */
@@ -66,6 +67,11 @@ Bool check_balance(struct user_transaction *self);
  */
 double calc_balance(struct user_transaction *self);
 
+/**
+ * Print the cashflow info
+ * @param self the user to be printed
+ */
+void print_cashflow(struct user_transaction * self);
 
 /**
  * Update entries, outcomes and budget based on transaction
@@ -90,9 +96,5 @@ int generate_transaction(struct user_transaction *self, pid_t user_proc_pid,stru
  * @return -1 in case of Failure, -2 in case of empty queue. 0 otherwise.
  */
 int queue_remove(Queue q, struct Transaction t);
-/*
-struct user_snapshot *get_user_snapshot(struct user_transaction user) {
-    TODO: implement get_user_snapshot
-}*/
 
 #endif /*DGT_SO_PROJECT_21_22_USER_TRANSACTION_H*/

@@ -24,7 +24,6 @@
 #include <unistd.h>
 #include <signal.h>
 
-
 /*  Local Library  */
 #include "local_lib/headers/glob.h"
 #include "local_lib/headers/boolean.h"
@@ -38,19 +37,8 @@
 #include "local_lib/headers/book_master_shm.h"
 #include "local_lib/headers/master_msg_report.h"
 #include "local_lib/headers/node_tp_shm.h"
-
-#ifdef DEBUG
-
-#ifdef DEBUG_NODE_TP
 #include "local_lib/headers/debug_utility.h"
-#endif
-#else
-#define DEBUG_NOTIFY_ACTIVITY_RUNNING(mex)
-#define DEBUG_NOTIFY_ACTIVITY_DONE(mex)
-#define DEBUG_MESSAGE(mex)
-#define DEBUG_SIGNAL(mex, signum)
-#define DEBUG_ERROR_MESSAGE(mex)
-#endif
+
 
 /* Support Function*/
 
@@ -133,9 +121,10 @@ int queue_node_id = -1;/* Identifier of the node queue id */
 int queue_user_id = -1; /* Identifier of the user queue id*/
 int queue_master_id = -1; /* Identifier of the master queue id*/
 int node_tp_end = 0; /* For values different from 0 the node proc must end*/
-int last_signal;
+int last_signal; /* Last signal received*/
 struct node current_node_tp; /* Current rappresentation of the node_tp */
 struct node_block *shm_node_tp; /* Ref to the shm for the node_tp_shm */
+struct shm_conf *shm_conf_pointer_node; /* Ref to the shm for configuration of the node*/
 
 int main(int argc, char const *argv[]) {
     DEBUG_MESSAGE("NODE TP PROCESS STARTED");
@@ -145,10 +134,10 @@ int main(int argc, char const *argv[]) {
     /************************************
      *      CONFIGURATION FASE          *
      * **********************************/
+    node_proc_tp_create(&current_node_tp, getpid(),  current_node_tp.type.tp.tp_size);
     if (check_arguments(argc, argv) == TRUE) {
         struct node_msg msg_rep;
         struct sigaction sa; /*Structure for handling signals */
-        node_proc_tp_create(&current_node_tp, getpid(),  current_node_tp.type.tp.tp_size);
         set_signal_handlers(sa);
         /************************************
          *      SINC AND WAITING FASE       *
@@ -172,19 +161,30 @@ int main(int argc, char const *argv[]) {
         }
         current_node_tp.exec_state = PROC_STATE_RUNNING;
         while (node_tp_end != 1 && failure_shm < MAX_FAILURE_SHM_LOADING) {
+#ifdef DEBUG_NODE_TP
+            struct msqid_ds info;
+            if (msgctl(queue_node_id, IPC_STAT, &info)<0){
+                ERROR_EXIT_SEQUENCE_NODE_TP("IMPOSSIBLE TO COMUNICATE WITH THE QUEUES");
+            }
+            if(info.msg_qnum >0){
+                printf("\n{DEBUG_NODE_TP}:= NUMBER OF MESSAGES : %d\n",info.msg_qnum);
+            }
+#endif
             process_node_transaction(&msg_rep);
             process_simple_transaction_type(&msg_rep);
-#ifdef DEBUG
-            node_msg_print(&msg_rep);
-            queue_print(current_node_tp.transactions_list);
-            struct timespec print_waiting_time;
-            print_waiting_time.tv_sec = 1;
-            print_waiting_time.tv_nsec = 0;
-            nanosleep(&print_waiting_time, (void *)NULL);
+#ifdef DEBUG_NODE_TP
+            if (msg_rep.sender_pid >=0 ){
+                node_msg_print(&msg_rep);
+                queue_print(current_node_tp.transactions_list);
+                struct timespec print_waiting_time;
+                print_waiting_time.tv_sec = 1;
+                print_waiting_time.tv_nsec = 0;
+                nanosleep(&print_waiting_time, (void *)NULL);
+            }
 #endif
-            if (load_block_to_shm() == FALSE) {
+            if (get_num_transactions(current_node_tp.transactions_list) >= SO_BLOCK_SIZE && load_block_to_shm() == FALSE) {
                 failure_shm++;
-            };
+            }
         }
         if (failure_shm > MAX_FAILURE_SHM_LOADING) {
             ERROR_EXIT_SEQUENCE_NODE_TP("IMPOSSIBLE TO READ DATA FROM NODE_TP_SHM");
@@ -233,9 +233,6 @@ void acquire_semaphore_ids(void) {
 }
 
 void process_simple_transaction_type(struct node_msg *msg_rep) {
-    if (msg_rep == (void *)-1){
-        return;
-    }
     if (node_msg_receive(queue_node_id, msg_rep, current_node_tp.node_id) == 0) {
         DEBUG_MESSAGE("NODE TRANSACTION TYPE RECEIVED");
         if (get_num_transactions(current_node_tp.transactions_list) < current_node_tp.type.tp.tp_size) {
@@ -244,8 +241,15 @@ void process_simple_transaction_type(struct node_msg *msg_rep) {
             struct user_msg *u_msg_rep =  (struct user_msg *) malloc(sizeof(struct user_msg));
             DEBUG_ERROR_MESSAGE("NODE TRANSACTION FAILED");
             u_msg_rep->t.t_type = TRANSACTION_FAILED;
-            user_msg_snd(queue_user_id, u_msg_rep, MSG_TRANSACTION_FAILED_TYPE, &msg_rep->t, current_node_tp.pid, TRUE);
+            int queue_id_user_proc= get_queueid_by_pid(shm_conf_pointer_node,msg_rep->sender_pid,TRUE);
+            if (queue_id_user_proc<0){
+                ERROR_MESSAGE("ILLIGAL PID INTO TRANSACTION, NO PIDS FOUND");
+                return;
+            }
+            user_msg_snd(queue_user_id, u_msg_rep, MSG_TRANSACTION_FAILED_TYPE, &msg_rep->t, current_node_tp.pid, TRUE, queue_id_user_proc);
         }
+    }else{
+        msg_rep->sender_pid =-1;
     }
 }
 
@@ -254,6 +258,8 @@ void process_node_transaction(struct node_msg *msg_rep) {
         /*Checking for transaction coming from node*/
         DEBUG_MESSAGE("NODE TRANSACTION RECEIVED");
         /*TODO: Implement incoming transaction from other node*/
+    }else{
+        msg_rep->sender_pid = -1;
     }
 }
 
@@ -341,6 +347,17 @@ void free_sysVar_node_tp() {
 }
 void attach_to_shms(void){
     DEBUG_NOTIFY_ACTIVITY_RUNNING("ATTACHING TO SHM ...");
+    int shm_conf_id = -1;/* id to the shm_conf*/
+    shm_conf_id = shmget(SHM_CONFIGURATION, sizeof(struct shm_conf), 0600);
+    if (shm_conf_id < 0) {
+        advice_master_of_termination(IMPOSSIBLE_TO_CONNECT_TO_SHM);
+        ERROR_EXIT_SEQUENCE_NODE_TP("IMPOSSIBLE TO ACCESS SHM CONF");
+    }
+    shm_conf_pointer_node = shmat(shm_conf_id, NULL, 0);
+    if (shm_conf_pointer_node == (void *) -1) {
+        advice_master_of_termination(IMPOSSIBLE_TO_CONNECT_TO_SHM);
+        ERROR_EXIT_SEQUENCE_NODE_TP("IMPOSSIBLE TO CONNECT TO SHM CONF");
+    }
     int shm_tp_id = -1;
     shm_tp_id = shmget(parent_id, sizeof(struct node_block), 0600);
     if (shm_tp_id < 0){

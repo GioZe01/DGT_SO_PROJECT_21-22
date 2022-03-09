@@ -26,20 +26,7 @@
 #include "local_lib/headers/process_info_list.h"
 #include "local_lib/headers/conf_shm.h"
 #include "local_lib/headers/book_master_shm.h"
-
-#ifdef DEBUG
-#ifdef DEBUG_MAIN
 #include "local_lib/headers/debug_utility.h"
-#endif
-#else /*unimplemented*/
-#define DEBUG_NOTIFY_ACTIVITY_RUNNING(mex)
-#define DEBUG_NOTIFY_ACTIVITY_DONE(mex)
-#define DEBUG_MESSAGE(mex)
-#define DEBUG_SIGNAL(mex, signum)
-#define DEBUG_ERROR_MESSAGE(mex)
-#define DEBUG_BLOCK_ACTION_START(mex)
-#define DEBUG_BLOCK_ACTION_END()
-#endif
 
 
 /* Support functions*/
@@ -186,7 +173,6 @@ int main() {
         /* Creating nodes*/
         if (create_nodes_proc(nodes_pids, nodes_queues_ids) < 0) { ERROR_MESSAGE("IMPOSSIBLE TO CREATE NODES PROC"); }
         DEBUG_BLOCK_ACTION_END();
-
         DEBUG_NOTIFY_ACTIVITY_RUNNING("SHM INITIALIZING...");
         if (shm_conf_create(shm_conf_pointer, users_pids, users_queues_ids, nodes_pids, nodes_queues_ids) < 0) {
             ERROR_EXIT_SEQUENCE_MAIN("FAILED ON SHM_CONF INITIALIZING");
@@ -197,7 +183,7 @@ int main() {
         free(users_queues_ids);
         DEBUG_NOTIFY_ACTIVITY_DONE("SHM INITIALIZING DONE");
 
-#ifdef DEBUG
+#ifdef DEBUG_MAIN
         shm_conf_print(shm_conf_pointer);
 #endif
         DEBUG_BLOCK_ACTION_START("WAITING CHILDREN");
@@ -540,6 +526,7 @@ void print_info(void){
     printf("============== INFO ============== \n");
     printf("Number of node active: %d\n", get_num_of_user_proc_running(proc_list));
     print_list(proc_list);
+    printf("\nTO FILL SHM VALUE: %d\n",shm_masterbook_pointer->to_fill);
     printf("============== END INFO ===========\n");
 }
 void update_kids_info(void){

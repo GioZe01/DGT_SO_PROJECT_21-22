@@ -30,21 +30,14 @@
 #include "local_lib/headers/book_master_shm.h"
 #include "local_lib/headers/master_msg_report.h"
 #include "local_lib/headers/node_tp_shm.h"
-
-#ifdef DEBUG
-#ifdef DEBUG_NODE
 #include "local_lib/headers/debug_utility.h"
-#endif
-#else
-#define DEBUG_NOTIFY_ACTIVITY_RUNNING(mex)
-#define DEBUG_NOTIFY_ACTIVITY_DONE(mex)
-#define DEBUG_MESSAGE(mex)
-#define DEBUG_SIGNAL(mex, signum)
-#define DEBUG_ERROR_MESSAGE(mex)
-#endif
 
 
 /* Support Function*/
+/**
+ * Advice the users of the processed transactions, both receivers and senders
+ */
+void adv_users_of_block(void);
 
 /**
  * handler of the signal
@@ -102,9 +95,9 @@ void connect_to_queues(void);
 
 /**
  * load block_size transactions from transaction pool into transaction block of the current node
- * @return
+ * @return TRUE if succeded, FALSE otherwise
  */
-Bool load_block();
+Bool load_block(void);
 
 /**
  * \brief Acquire the semaphore_id related to the node
@@ -115,15 +108,10 @@ Bool load_block();
  */
 void acquire_semaphore_ids(void);
 
-/*
- * Load from node_tp_shm the block into the current node transactions_list
- * */
-Bool load_block(void);
-
 /* Lock the shm book_master via masterbook_to_fill param and the cell to fill index.
- *
+ * @return FALSE in case of failure, TRUE otherwise
  */
-void lock_shm_masterbook(void);
+Bool lock_shm_masterbook(void);
 
 /* Lock the to_fill index saved in the shared_memory access
  */
@@ -190,10 +178,10 @@ int main(int argc, char const *argv[]) {
     /************************************
      *      CONFIGURATION FASE          *
      * **********************************/
+    read_conf_node(&node_configuration);
+    node_proc_block_create(&current_node, getpid(), 0, SO_BLOCK_SIZE,
+            node_configuration.so_reward, &calc_reward);
     if (check_arguments(argc, argv) && set_signal_handler_node(sa, sigmask)) {
-        read_conf_node(&node_configuration);
-        node_proc_block_create(&current_node, getpid(), 0, SO_BLOCK_SIZE,
-                node_configuration.so_reward, &calc_reward);
         /*-----------------------*/
         /*  CREATING SEMAPHORES  */
         /*-----------------------*/
@@ -271,9 +259,6 @@ Bool check_arguments(int argc, char const *argv[]) {
         ERROR_EXIT_SEQUENCE_NODE("MISSING ARGUMENT");
     }
     current_node.node_id = atoi(argv[1]);
-#ifdef DEBUG_NODE
-    printf("\nNODE_PROC: %d WITH NODE ID: %d\n",current_node.pid, current_node.node_id);
-#endif
     DEBUG_NOTIFY_ACTIVITY_DONE("CHECKING ARGC AND ARGV DONE");
     return TRUE;
 }
@@ -394,15 +379,20 @@ void connect_to_queues(void) {
 }
 
 int process_node_block() {
-        /*Loading them into the node_block_transactions*/
-        if (load_block() == FALSE) return -1;
-        if (current_node.type.block.calc_reward(&current_node, -1, TRUE, &current_block_reward)<0){
-            ERROR_EXIT_SEQUENCE_NODE("IMPOSSIBLE TO CALCULATE THE BLOCK REWARD");
-        }
-        lock_shm_masterbook();
+    /*Loading them into the node_block_transactions*/
+    if (load_block() == FALSE) return -1;
+    if (get_num_transactions(current_node.transactions_list)==SO_BLOCK_SIZE /* DID i got the correct num of transactions*/
+            && current_node.type.block.calc_reward(&current_node, -1, TRUE, &current_block_reward)>=0){
+        int num_of_shm_retry = 0;
+       while(lock_shm_masterbook() == FALSE){
+            num_of_shm_retry++;
+       }
+      /*TODO: send confirmed to all users*/
+    }
+
     return 0;
 }
-void lock_shm_masterbook(void) {
+Bool lock_shm_masterbook(void) {
     DEBUG_NOTIFY_ACTIVITY_RUNNING("NODE:= LOCKING THE SHM FOR ADDING THE BLOCK...");
     struct timespec trans_proc_sim;
     trans_proc_sim.tv_sec = 0;
@@ -414,14 +404,18 @@ void lock_shm_masterbook(void) {
     shm_masterbook_pointer->to_fill += 1;
     lock_masterbook_cell_access(i_cell_block_list);
     struct Transaction block_list [get_num_transactions(current_node.transactions_list)];
-    queue_to_array(current_node.transactions_list,&block_list);
+    queue_to_array(current_node.transactions_list,block_list);
     if (insert_block(shm_masterbook_pointer,block_list) == 0){
         current_node.type.block.budget = current_block_reward;
-    }else ERROR_MESSAGE("IMPOSSIBLE TO INSERT BLOCK");
+    }else {
+        ERROR_MESSAGE("IMPOSSIBLE TO INSERT BLOCK");
+        return FALSE;
+    }
     /*Unloacking the semaphore*/
     unlock_masterbook_cell_access();
     unlock_to_fill_sem();
     DEBUG_NOTIFY_ACTIVITY_DONE("NODE:= LOCKING THE SHM FOR ADDING THE BLOCK DONE");
+    return TRUE;
 }
 
 void lock_to_fill_sem(void) {
@@ -529,6 +523,9 @@ void create_semaphore(void){
     if(semaphore_tp_shm < 0){
         ERROR_EXIT_SEQUENCE_NODE("IMPOSSIBLE TO CREATE TP_SHM SEM");
     }
+    if (semctl(semaphore_tp_shm, 0, SETVAL, IS_EMPTY)<0){
+       ERROR_EXIT_SEQUENCE_NODE("IMPOSSIBLE TO SET NODE TP SEM TO IS_EMPTY");
+    }
     DEBUG_NOTIFY_ACTIVITY_DONE("CREATION OF THE TP_SHM SEM DONE");
 }
 void create_tp_shm(void){
@@ -575,3 +572,27 @@ void create_node_tp_proc(void){
    }
 }
 
+void adv_users_of_block(void){
+    int sender_pid = -1;
+    int receiver_pid = -1;
+  while(queue_is_empty(current_node.transactions_list)==FALSE){
+            struct user_msg *u_msg_rep =  (struct user_msg *) malloc(sizeof(struct user_msg));
+            DEBUG_ERROR_MESSAGE("NODE TRANSACTION FAILED");
+            u_msg_rep->t.t_type = TRANSACTION_SUCCES;
+            struct Transaction t = queue_head(current_node.transactions_list);
+            sender_pid = t.sender;
+            receiver_pid = t.reciver;
+            int queue_id_user_proc= get_queueid_by_pid(shm_conf_pointer_node,sender_pid,TRUE);
+            if (queue_id_user_proc<0){
+                ERROR_MESSAGE("ILLIGAL PID INTO TRANSACTION, NO PIDS FOUND");
+                return;
+            }
+            user_msg_snd(queue_user_id, u_msg_rep, MSG_TRANSACTION_CONFIRMED_TYPE, &t, current_node.pid, TRUE, queue_id_user_proc);
+            queue_id_user_proc= get_queueid_by_pid(shm_conf_pointer_node,receiver_pid,TRUE);
+            if (queue_id_user_proc<0){
+                ERROR_MESSAGE("ILLIGAL PID INTO TRANSACTION, NO PIDS FOUND");
+                return;
+            }
+            user_msg_snd(queue_user_id, u_msg_rep, MSG_TRANSACTION_INCOME_TYPE, &t, current_node.pid, TRUE, queue_id_user_proc);
+  }
+}

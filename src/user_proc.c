@@ -21,18 +21,7 @@
 #include "local_lib/headers/master_msg_report.h"
 #include "local_lib/headers/boolean.h"
 #include "local_lib/headers/conf_shm.h"
-
-#ifdef DEBUG
-#ifdef DEBUG_USER
 #include "local_lib/headers/debug_utility.h"
-#endif
-#else /*unimplemented*/
-#define DEBUG_NOTIFY_ACTIVITY_RUNNING(mex)
-#define DEBUG_NOTIFY_ACTIVITY_DONE(mex)
-#define DEBUG_MESSAGE(mex)
-#define DEBUG_SIGNAL(mex, signum)
-#define DEBUG_ERROR_MESSAGE(mex)
-#endif
 
 /*  Support functions*/
 
@@ -104,6 +93,10 @@ void attach_to_shm_conf(void);
  * generate the transactions, and take knowledge of usr_msg int usr_msg_queue
  */
 void generating_transactions(void);
+/**
+ * Check for incoming transactions with him as receiver
+ */
+Bool getting_richer(void);
 
 /*  SysV  */
 int semaphore_start_id = -1; /*Id of the start semaphore arrays for sinc*/
@@ -121,6 +114,7 @@ int main(int arc, char const *argv[]) {
     struct user_msg msg_rep;
     int start_sem_value;
     sigset_t sigmask; /* sinal mask */
+    srand(getpid());
 
     /************************************
      *      CONFIGURATION FASE          *
@@ -129,10 +123,13 @@ int main(int arc, char const *argv[]) {
     DEBUG_MESSAGE("USER STATE IS SET TO INIT");
     current_user.exec_state = PROC_STATE_INIT;
 
+
+    /*  VARIABLE INITIALIZATION */
+    read_conf();
+    user_create(&current_user, configuration.so_buget_init, getpid(), (Balance)&calc_balance,
+            (CalcCashFlow)&update_cash_flow);
     if (check_argument(arc, argv) && set_signal_handler_user(sa, sigmask)) {
-        /*  VARIABLE INITIALIZATION */
-        read_conf();
-        user_create(&current_user, configuration.so_buget_init, getpid(), &calc_balance, &update_cash_flow);
+
         /*--------------------------------------*/
         /*  CONNECTING TO THE USER REPORT QUEUE */
         /*--------------------------------------*/
@@ -177,7 +174,6 @@ int main(int arc, char const *argv[]) {
         /*TODO: wait for user in progress to empty with timeout*/
 #endif
         /*TODO: check for remaining transaction confirmed*/
-        DEBUG_MESSAGE("USER ENDED -----------------------------");
         advice_master_of_termination(TERMINATION_END_CORRECTLY);
         EXIT_PROCEDURE_USER(0);
     }
@@ -234,6 +230,7 @@ void signals_handler(int signum) {
             if (generate_transaction(&current_user, current_user.pid, shm_conf_pointer) < 0) {
                 ERROR_EXIT_SEQUENCE_USER("IMPOSSIBLE TO GENERATE TRANSACTION");
             }
+            if (send_to_node()<0){ERROR_MESSAGE("IMPOSISBLE TO SEND TO THE NODE");}
             DEBUG_NOTIFY_ACTIVITY_DONE("GENERATING A NEW TRANSACTION FROM SIG DONE");
         case SIGUSR2:
             master_msg_send(queue_master_id,&msg, INFO_BUDGET,NODE,current_user.pid,current_user.exec_state,TRUE, current_user.budget);
@@ -293,9 +290,9 @@ int send_to_node(void) {
     struct node_msg msg;
     struct Transaction t = queue_head(current_user.in_process);
     if (node_msg_snd(queue_node_id, &msg, shm_conf_pointer->nodes_snapshots[node_num][1], &t,
-                     current_user.pid, TRUE, configuration.so_retry) < 0) { return -1; }
+                     current_user.pid, TRUE, configuration.so_retry,shm_conf_pointer->nodes_snapshots[node_num][1]) < 0) { return -1; }
     queue_remove_head(current_user.in_process);/*removed if and only if has been sent*/
-#ifdef DEBUG
+#ifdef DEBUG_USER
     node_msg_print(&msg);
 #endif
     return 0;
@@ -317,10 +314,13 @@ void generating_transactions(void) {
     while (current_user.budget >=
             0) {
         DEBUG_MESSAGE("TRANSACTION ALLOWED");
+        getting_richer();
         check_for_transactions_confirmed();
         check_for_transactions_failed();
-        if (current_user.u_balance > 2 && generate_transaction(&current_user, current_user.pid, shm_conf_pointer) < 0) {
+        if (generate_transaction(&current_user, current_user.pid, shm_conf_pointer) < 0) {
+#ifdef DEBUG_USER
             ERROR_MESSAGE("IMPOSSIBLE TO GENERATE TRANSACTION");/*TODO: can be a simple advice, not a critical one*/
+#endif
         }
         gen_sleep.tv_nsec =
             (rand() % (configuration.so_max_trans_gen_nsec - configuration.so_min_trans_gen_nsec + 1)) +
@@ -342,21 +342,33 @@ void generating_transactions(void) {
 }
 
 Bool check_for_transactions_confirmed(void) {
-    struct user_msg *msg = malloc (sizeof(struct user_msg));
-    if (user_msg_receive(queue_user_id, msg, user_id) == 0) {
+    struct user_msg msg;
+    if (user_msg_receive(queue_user_id,&msg, user_id) == 0) {
         /*Messagge found*/
         current_user.to_wait_transaction--;
-        queue_remove(current_user.in_process, msg->t);
+        queue_remove(current_user.in_process, msg.t);
+        update_cash_flow(&current_user, &(msg.t));
         return TRUE;
     }
     return FALSE;
 }
 
 Bool check_for_transactions_failed(void) {
-    struct user_msg *msg = malloc(sizeof(struct user_msg));
-    if (user_msg_receive(queue_user_id, msg, user_id-MSG_TRANSACTION_FAILED_TYPE) == 0) {
+    struct user_msg msg;
+    if (user_msg_receive(queue_user_id,&msg, user_id-(DELTA_USER_MSG_TYPE-1)) == 0) {
         /*Take aknowledgement of transaction falure*/
-        queue_append(current_user.transactions_failed, msg->t);
+        current_user.to_wait_transaction--;
+        queue_append(current_user.transactions_failed, msg.t);
+        queue_remove(current_user.in_process, msg.t);
+        update_cash_flow(&current_user, &(msg.t));
+        return TRUE;
+    }
+    return FALSE;
+}
+Bool getting_richer(void){
+    struct user_msg msg;
+    if (user_msg_receive(queue_user_id, &msg, user_id-(DELTA_USER_MSG_TYPE-2)) == 0){
+        update_cash_flow(&current_user, &(msg.t));
         return TRUE;
     }
     return FALSE;

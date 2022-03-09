@@ -75,7 +75,7 @@ int create_transaction(struct Transaction *t, pid_t sender, pid_t receiver, floa
         return -1;
     }
     t->t_type = TRANSACTION_WAITING;
-    t->hops = 0;
+    t->hops = 0; /* User is not responsible for this value*/
     t->sender = sender;
     t->reciver = receiver;
     t->timestamp = timestamp;
@@ -111,7 +111,9 @@ static void empty_queue(Queue q) {
 }
 
 void queue_append(Queue q, struct Transaction t) {
+#ifdef DEBUG_USER
     DEBUG_NOTIFY_ACTIVITY_RUNNING("APPENDING TO TRANSACTION QUEUE A NEW TRANSACTION...");
+#endif
     struct node *new_node;
     new_node = (struct node *) malloc(sizeof(struct node));
     if (new_node == NULL) {
@@ -128,7 +130,9 @@ void queue_append(Queue q, struct Transaction t) {
         q->last = new_node;
     }
     q->transactions++;
+#ifdef DEBUG_USER
     DEBUG_NOTIFY_ACTIVITY_DONE("APPENDING TO TRANSACTION QUEUE A NEW TRANSACTION DONE");
+#endif
 }
 
 void queue_remove_head(Queue q) {
@@ -153,6 +157,7 @@ int queue_remove(Queue q, struct Transaction t) {
     append_to_node(iterable, iterable->next->next);
     free(iterable->next);
     q->transactions--;
+    return 0;
 }
 
 void append_to_node(struct node *where, struct node *to_append) {
@@ -175,16 +180,21 @@ struct Transaction queue_head(Queue q) {
     if (queue_is_empty(q) == FALSE)
         return q->first->t;
     else {
+#ifdef DEBUG_UNDERFLOW
         DEBUG_MESSAGE("queue_head in transaction: UNDERFLOW CALLED");
+#endif
         queue_underflow();
     }
 }
 
 struct Transaction queue_last(Queue q) {
-    if (queue_is_empty(q) == FALSE)
+    if (queue_is_empty(q) == FALSE){
         return q->last->t;
+    }
     else {
-        DEBUG_MESSAGE("queue_last in transaction: UNDERFLOW CALLED");
+#ifdef DEBUG_UNDERFLOW
+        DEBUG_MESSAGE("queue_head in transaction: UNDERFLOW CALLED");
+#endif
         queue_underflow();
     }
 }
@@ -196,7 +206,6 @@ Bool queue_is_empty(Queue q) {
 }
 
 static void queue_underflow(void) {
-    DEBUG_ERROR_MESSAGE("queue_underflow has been called");
     ERROR_MESSAGE("Invalid Operation on Queue empty");
     return;
 }

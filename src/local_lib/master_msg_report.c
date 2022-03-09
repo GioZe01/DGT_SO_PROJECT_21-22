@@ -40,8 +40,8 @@ void master_msg_report_print(const struct master_msg_report *self) {
 }
 int master_msg_send(int id, struct master_msg_report * self,long type,long proc_type, pid_t sender_pid, short int state, Bool create, float budget){
     if (create == TRUE){master_msg_report_create(self,type,proc_type,sender_pid, state, budget);}
-    while(msgsnd(id, self, sizeof(*self)-sizeof(long),0)<0){
-        if (errno != ENOMSG) return -1;
+    while(msgsnd(id, self, sizeof(struct master_msg_report)-sizeof(long),0)<0){
+        if (errno != EINTR) return -1;
     }
     return 0;
 }
