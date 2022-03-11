@@ -288,6 +288,7 @@ void signals_handler(int signum) {
     switch (signum) {
         case SIGINT:
             alarm(0);/*pending alarm removed*/
+            current_node.exec_state = PROC_STATE_TERMINATED;
             advice_master_of_termination(SIGNALS_OF_TERM_RECEIVED);
             EXIT_PROCEDURE_NODE(0);
             break;
@@ -355,10 +356,10 @@ void attach_to_shms(void) {
         advice_master_of_termination(IMPOSSIBLE_TO_CONNECT_TO_SHM);
         ERROR_EXIT_SEQUENCE_NODE("IMPOSSIBLE TO CONNECT TO THE SHM_MASTERBOOK");
     }
-    shm_conf_id = shmget(current_node.pid, sizeof(struct node_block), 0600);
+    shm_conf_id = shmget(current_node.pid, sizeof(struct node_block),IPC_CREAT | IPC_EXCL | 0600);
     if (shm_conf_id<0){
         advice_master_of_termination(IMPOSSIBLE_TO_CONNECT_TO_SHM);
-        ERROR_EXIT_SEQUENCE_NODE("IMPOSSIBLE TO ACCESS SHM BOOKMASTER");
+        ERROR_EXIT_SEQUENCE_NODE("IMPOSSIBLE TO CREATE NODE_TP_SHM");
     }
     shm_node_tp = shmat(shm_conf_id, NULL, 0);
     if(shm_node_tp == (void * )-1){
@@ -470,16 +471,13 @@ void unlock_masterbook_cell_access(void) {
 }
 
 Bool load_block(void) {
-    /*For safety reason is made a copy of the current node_tp_shm block inside the current struct
-     *rappresenting the node_proc
-     * */
     int sem_val = semctl(semaphore_tp_shm,0, GETVAL);
     if (sem_val==FULL){
-       array_to_queue(current_node.transactions_list, shm_node_tp->block_t);
-       if(semctl(semaphore_tp_shm,0,SETVAL, IS_EMPTY) < 0){
+        array_to_queue(current_node.transactions_list, shm_node_tp->block_t);
+        if(semctl(semaphore_tp_shm,0,SETVAL, IS_EMPTY) < 0){
             ERROR_MESSAGE("IMPOSSIBLE TO SET NODE TP SEM TO IS_EMPTY");
             return FALSE;
-       }
+        }
     }else if (sem_val < 0){
         ERROR_MESSAGE("IMPOSSIBLE TO RETRIVE VAL FROM TP SHM SEMAPHORE");
         return FALSE;
@@ -490,9 +488,9 @@ Bool load_block(void) {
 
 void advice_master_of_termination(int termination_type) {
     struct master_msg_report termination_report;
-   if (master_msg_send(queue_master_id, &termination_report, termination_type, NODE,current_node.pid, current_node.exec_state,TRUE, current_node.type.block.budget)<0){
-       ERROR_MESSAGE("IMPOSSIBLE TO ADVICE MASTER OF TERMINATION");
-   }
+    if (master_msg_send(queue_master_id, &termination_report, termination_type, NODE,current_node.pid, current_node.exec_state,TRUE, current_node.type.block.budget)<0){
+        ERROR_MESSAGE("IMPOSSIBLE TO ADVICE MASTER OF TERMINATION");
+    }
 }
 
 void acquire_semaphore_ids(void) {
@@ -530,7 +528,7 @@ void create_semaphore(void){
 }
 void create_tp_shm(void){
     DEBUG_NOTIFY_ACTIVITY_RUNNING("CREATION OF THE TP_SHM...");
-    shm_tp_id = shmget(current_node.pid, sizeof(struct node_block), IPC_CREAT | IPC_EXCL | 0600);
+    shm_tp_id = shmget(current_node.pid+current_node.node_id, sizeof(struct node_block), IPC_CREAT | IPC_EXCL | 0600);
     if (shm_tp_id < 0){
         ERROR_EXIT_SEQUENCE_NODE("IMPOSSIBLE TO CREATE NODE TP_SHM");
     }
@@ -559,7 +557,7 @@ void create_node_tp_proc(void){
        case 0: /*kid*/
            sprintf(argv_node_tp[1], "%d",node_configuration.so_tp_size);
            sprintf(argv_node_tp[2], "%d",current_node.node_id);
-           sprintf(argv_node_tp[3], "%d",current_node.pid);
+           sprintf(argv_node_tp[3], "%d",current_node.pid+current_node.node_id);
            execve(argv_node_tp[0],argv_node_tp,NULL);
            ERROR_EXIT_SEQUENCE_NODE("IMPOSSIBLE TO GENERATE NODE_TP");
            break;

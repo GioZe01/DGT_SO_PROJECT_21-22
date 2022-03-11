@@ -144,8 +144,10 @@ void queue_remove_head(Queue q) {
             q->first = q->first->next;
         free(temp);
         q->transactions--;
-    } else
+    } else{
         queue_underflow();
+        return;
+    }
 }
 
 int queue_remove(Queue q, struct Transaction t) {
@@ -206,7 +208,7 @@ Bool queue_is_empty(Queue q) {
 }
 
 static void queue_underflow(void) {
-    ERROR_MESSAGE("Invalid Operation on Queue empty");
+    ERROR_MESSAGE("INVALID OPERATION ON AN EMPTY QUEUE");
     return;
 }
 
@@ -257,6 +259,9 @@ void queue_print(Queue q) {
         transaction_print(iterable->t);
     }
     printf("----------------TRANSACTION LIST END--------------------\n");
+#ifdef DEBUG_NODE_TP
+    sleep(0.1); /* I know about nanosleep but sleep is fuster to write and np at this stage for debug*/
+#endif
 }
 
 void get_status(char char_type[80], int t_type) {
@@ -291,7 +296,7 @@ void transaction_print(struct Transaction t) {
 int get_num_transactions(Queue q) {
     if (queue_is_empty(q) == FALSE)
         return q->transactions;
-    return -1;
+    return 0;
 }
 
 int queue_to_array(Queue q, struct Transaction vector[]) {

@@ -138,10 +138,15 @@ int main(int argc, char const *argv[]) {
     if (check_arguments(argc, argv) == TRUE) {
         struct node_msg msg_rep;
         struct sigaction sa; /*Structure for handling signals */
+        int is_unsed_node = 0;
         set_signal_handlers(sa);
         /************************************
          *      SINC AND WAITING FASE       *
          * **********************************/
+        /*---------------------------*/
+        /*  SHM CONNECTION           */
+        /*---------------------------*/
+        attach_to_shms();
         /*---------------------------*/
         /*  SEMAPHORES ACQUISITION   */
         /*---------------------------*/
@@ -167,27 +172,36 @@ int main(int argc, char const *argv[]) {
                 ERROR_EXIT_SEQUENCE_NODE_TP("IMPOSSIBLE TO COMUNICATE WITH THE QUEUES");
             }
             if(info.msg_qnum >0){
-                printf("\n{DEBUG_NODE_TP}:= NUMBER OF MESSAGES : %d\n",info.msg_qnum);
+                printf("\n{DEBUG_NODE_TP}:= NUMBER OF TRANSACTION IN LIST: %d | NUMBER OF MESSAGES : %ld\n",get_num_transactions(current_node_tp.transactions_list),info.msg_qnum);
             }
 #endif
             process_node_transaction(&msg_rep);
             process_simple_transaction_type(&msg_rep);
+            if(msg_rep.sender_pid == -1){
+                is_unsed_node++;
+            }
 #ifdef DEBUG_NODE_TP
             if (msg_rep.sender_pid >=0 ){
                 node_msg_print(&msg_rep);
                 queue_print(current_node_tp.transactions_list);
                 struct timespec print_waiting_time;
-                print_waiting_time.tv_sec = 1;
-                print_waiting_time.tv_nsec = 0;
+                print_waiting_time.tv_sec = 0;
+                print_waiting_time.tv_nsec = 10000;
                 nanosleep(&print_waiting_time, (void *)NULL);
             }
 #endif
-            if (get_num_transactions(current_node_tp.transactions_list) >= SO_BLOCK_SIZE && load_block_to_shm() == FALSE) {
+            if (get_num_transactions(current_node_tp.transactions_list) >= SO_BLOCK_SIZE &&
+                    load_block_to_shm() == FALSE){
                 failure_shm++;
+
             }
         }
         if (failure_shm > MAX_FAILURE_SHM_LOADING) {
             ERROR_EXIT_SEQUENCE_NODE_TP("IMPOSSIBLE TO READ DATA FROM NODE_TP_SHM");
+        }
+        if(is_unsed_node >= MAX_UNSED_CICLE_OF_NODE_TP){
+            advice_master_of_termination(UNUSED_PROC);
+            ERROR_EXIT_SEQUENCE_NODE_TP("UNUSED NODE TP PROC");
         }
     }
     advice_master_of_termination(TERMINATION_END_CORRECTLY);
@@ -239,7 +253,9 @@ void process_simple_transaction_type(struct node_msg *msg_rep) {
             queue_append(current_node_tp.transactions_list, msg_rep->t);
         } else {/*TP_SIZE FULL*/
             struct user_msg *u_msg_rep =  (struct user_msg *) malloc(sizeof(struct user_msg));
+#ifdef DEBUG_NODE_TP
             DEBUG_ERROR_MESSAGE("NODE TRANSACTION FAILED");
+#endif
             u_msg_rep->t.t_type = TRANSACTION_FAILED;
             int queue_id_user_proc= get_queueid_by_pid(shm_conf_pointer_node,msg_rep->sender_pid,TRUE);
             if (queue_id_user_proc<0){
@@ -279,8 +295,8 @@ Bool load_block_to_shm(void) {
 }
 
 void update_block(void) {
-    int i;
-    for (i = 0; i < SO_BLOCK_SIZE; i++) {
+    int i= 0;
+    for (; i < SO_BLOCK_SIZE; i++) {
         shm_node_tp->block_t[i] = queue_head(current_node_tp.transactions_list);
         queue_remove_head(current_node_tp.transactions_list);
     }
@@ -305,6 +321,7 @@ void signals_handler(int signum) {
     switch (signum) {
         case SIGINT:
             alarm(0);/*pending alarm removed*/
+            current_node_tp.exec_state = PROC_STATE_TERMINATED;
             advice_master_of_termination(SIGNALS_OF_TERM_RECEIVED);
             EXIT_PROCEDURE_NODE_TP(0);
         case SIGALRM:
@@ -346,7 +363,7 @@ void free_sysVar_node_tp() {
     current_node_tp.exec_state = PROC_STATE_TERMINATED;
 }
 void attach_to_shms(void){
-    DEBUG_NOTIFY_ACTIVITY_RUNNING("ATTACHING TO SHM ...");
+    DEBUG_NOTIFY_ACTIVITY_RUNNING("{NODE_TP_PROC}:= ATTACHING TO SHM ...");
     int shm_conf_id = -1;/* id to the shm_conf*/
     shm_conf_id = shmget(SHM_CONFIGURATION, sizeof(struct shm_conf), 0600);
     if (shm_conf_id < 0) {
@@ -368,5 +385,5 @@ void attach_to_shms(void){
         advice_master_of_termination(IMPOSSIBLE_TO_CONNECT_TO_SHM);
         ERROR_EXIT_SEQUENCE_NODE_TP("IMPOSSIBLE TO CONNECT TO THE NODE_TP SHM");
     }
-    DEBUG_NOTIFY_ACTIVITY_DONE("ATTACHING TO SHM DONE");
+    DEBUG_NOTIFY_ACTIVITY_DONE("{DEBUG NODE PROC}:= ATTACHING TO SHM DONE");
 }

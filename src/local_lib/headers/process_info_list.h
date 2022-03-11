@@ -86,8 +86,9 @@ void terminator(ProcList self);
 /**
  * Wait for all proc to terminate
  * @param self list of all the proc to wait for
+ * @param queue_id id of the queue of master msg
  */
-void saving_private_ryan(ProcList self);
+void saving_private_ryan(ProcList self, int queue_id);
 
 /**
  * Return the number of active user_proc

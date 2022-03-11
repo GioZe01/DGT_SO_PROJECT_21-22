@@ -161,7 +161,6 @@ int send_sig_to_all(ProcList proc_list, int signal) {
         } else if (errno == EINTR) { continue; }
         else {
             return -1;
-            ERROR_MESSAGE("IMPOSSIBLE TO SEND TERMINATION SIGNAL TO KID");
         }
         num_proc_reciver++;
     }
@@ -200,18 +199,21 @@ void terminator(ProcList self) {
              */
             DEBUG_MESSAGE("PROC KILLED");
         } else {
-            if (errno == EINTR) { continue; }
+            if (tmp->p->proc_state == PROC_STATE_TERMINATED|| errno == EINTR) { continue; }
             ERROR_MESSAGE("IMPOSSIBLE TO SEND TERMINATION SIGNAL TO KID");
         }
     }
 }
 
-void saving_private_ryan(ProcList self) {
+void saving_private_ryan(ProcList self, int queue_id) {
     if (self->first == NULL) {
         return;
     }
     struct node *tmp = self->first;
+    struct master_msg_report msg_rep;
     for (; tmp != NULL; tmp = tmp->next) {
+        printf("\n WAITING \n");
+        check_msg_report(&msg_rep,queue_id,self);
         if (tmp->p->proc_state == PROC_STATE_RUNNING) {
             waitpid(tmp->p->pid, NULL, 0);
             tmp->p->proc_state = PROC_STATE_TERMINATED;
@@ -231,3 +233,4 @@ int get_num_of_user_proc_running(ProcList self){
     }
     return ris;
 }
+

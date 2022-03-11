@@ -31,12 +31,6 @@
 
 /* Support functions*/
 /*  ! All the following functions are capable of EXIT_PROCEDURE*/
-/**
- * Check for messages in the master msg_queue
- * @param msg_report pointer to the struct representing the msg in the master msg queue
- * @return -1 in case of FAILURE. 0 otherwise
- */
-int check_msg_report(struct master_msg_report *msg_report);
 
 /**
  * Create the shared memory for configuration purposes of kid processes
@@ -194,7 +188,7 @@ int main() {
         DEBUG_BLOCK_ACTION_END();
         alarm(1);
         while (simulation_end != 1) {
-            if (check_msg_report(&msg_repo) < 0) {
+            if (check_msg_report(&msg_repo, msg_report_id_master, proc_list) < 0) {
                 /*If a message arrive make the knowledge*/
                 ERROR_EXIT_SEQUENCE_MAIN("IMPOSSIBLE TO RETRIEVE INFO FROM MSG_QUEUE");
             }
@@ -373,13 +367,14 @@ void create_semaphores(void) {
 
 void wait_kids() {
     DEBUG_NOTIFY_ACTIVITY_RUNNING("WAITING KIDS...");
-    saving_private_ryan(proc_list);
+    saving_private_ryan(proc_list, msg_report_id_master);
     DEBUG_NOTIFY_ACTIVITY_DONE("WAITING KIDS DONE");
 }
 
 void kill_kids() {
     DEBUG_NOTIFY_ACTIVITY_RUNNING("KILLING KIDS...");
-    update_kids_info();
+    struct master_msg_report msg_rep;
+    check_msg_report(&msg_rep, msg_report_id_master, proc_list);
     terminator(proc_list);
     DEBUG_NOTIFY_ACTIVITY_DONE("KILLING KIDS DONE");
 }
@@ -464,20 +459,6 @@ void create_master_msg_report_queue(void) {
 
 }
 
-int check_msg_report(struct master_msg_report *msg_report) {
-    struct msqid_ds msg_rep_info;
-    if (msgctl(msg_report_id_master, IPC_STAT, &msg_rep_info) < 0) {
-        ERROR_MESSAGE("IMPOSSIBLE TO RETRIEVE MESSAGE QUEUE INFO");
-        return -1;
-    } else {
-        /*fetching all msg if present*/
-        if (msg_rep_info.msg_qnum != 0 &&
-            msgrcv(msg_report_id_master, msg_report, sizeof(*msg_report) - sizeof(long), 0, 0)) {
-            /*make_knowledge*/
-        }
-        return 0;
-    }
-}
 
 void create_users_msg_queue(void) {
     DEBUG_NOTIFY_ACTIVITY_RUNNING("CREATING MSG REPORT QUEUE FOR USERS....");

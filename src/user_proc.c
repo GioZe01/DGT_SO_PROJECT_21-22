@@ -111,7 +111,6 @@ struct shm_conf *shm_conf_pointer; /* Ref to the shm fir configuration of the us
 int main(int arc, char const *argv[]) {
     DEBUG_MESSAGE("USER PROCESS STARTED");
     struct sigaction sa;
-    struct user_msg msg_rep;
     int start_sem_value;
     sigset_t sigmask; /* sinal mask */
     srand(getpid());
@@ -223,6 +222,7 @@ void signals_handler(int signum) {
     switch (signum) {
         case SIGINT:
             alarm(0);/* pending alarm removed*/
+            current_user.exec_state = PROC_STATE_TERMINATED;
             advice_master_of_termination(SIGNALS_OF_TERM_RECEIVED);
             EXIT_PROCEDURE_USER(0);
         case SIGALRM: /*    Generate a new transaction  */
@@ -285,18 +285,22 @@ Bool read_conf() {
 }
 
 int send_to_node(void) {
-    DEBUG_NOTIFY_ACTIVITY_RUNNING("SENDING TRANSACTION TO THE NODE...");
-    int node_num = (rand() % (shm_conf_pointer->nodes_snapshots[0][0])) + 1;
-    struct node_msg msg;
-    struct Transaction t = queue_head(current_user.in_process);
-    if (node_msg_snd(queue_node_id, &msg, shm_conf_pointer->nodes_snapshots[node_num][1], &t,
-                     current_user.pid, TRUE, configuration.so_retry,shm_conf_pointer->nodes_snapshots[node_num][1]) < 0) { return -1; }
-    queue_remove_head(current_user.in_process);/*removed if and only if has been sent*/
+    if (get_num_transactions(current_user.in_process)>0){
+        DEBUG_NOTIFY_ACTIVITY_RUNNING("SENDING TRANSACTION TO THE NODE...");
+        int node_num = (rand() % (shm_conf_pointer->nodes_snapshots[0][0])) + 1;
+        struct node_msg msg;
+        struct Transaction t = queue_head(current_user.in_process);
+        if (node_msg_snd(queue_node_id, &msg, shm_conf_pointer->nodes_snapshots[node_num][1], &t,
+                    current_user.pid, TRUE, configuration.so_retry,shm_conf_pointer->nodes_snapshots[node_num][1]) < 0) { return -1; }
+        queue_remove_head(current_user.in_process);/*removed if and only if has been sent*/
 #ifdef DEBUG_USER
-    node_msg_print(&msg);
+        node_msg_print(&msg);
 #endif
-    return 0;
-
+        DEBUG_NOTIFY_ACTIVITY_DONE("SENDING TRANSACTION TO THE NODE DONE");
+        return 0;
+    }else{
+        return -1;
+    }
 }
 
 void attach_to_shm_conf(void) {
@@ -311,9 +315,10 @@ void attach_to_shm_conf(void) {
 
 void generating_transactions(void) {
     struct timespec gen_sleep;
-    while (current_user.budget >=
-            0) {
+    while (current_user.budget >= 0) {
+#ifdef DEBUG_USER
         DEBUG_MESSAGE("TRANSACTION ALLOWED");
+#endif
         getting_richer();
         check_for_transactions_confirmed();
         check_for_transactions_failed();
@@ -330,13 +335,14 @@ void generating_transactions(void) {
 #else
         /*SENDING TRANSACTION TO THE NODE*/
         if (send_to_node() < 0) {
+#ifdef DEBUG_USER
             ERROR_MESSAGE("IMPOSSIBLE TO SEND TO THE NODE");
+#endif
         }
         /*
          * TODO: check for the retry to send : can do with while then abort and notify master
          * */
 #endif
-
         nanosleep(&gen_sleep, (void *) NULL);
     }
 }

@@ -1,13 +1,16 @@
 
 #ifndef DGT_SO_PROJECT_21_22_MASTER_MSG_REPORT_H
 #define DGT_SO_PROJECT_21_22_MASTER_MSG_REPORT_H
-
+/* Std */
 #include <unistd.h>
+
+/* Local */
 #include "boolean.h"
+#include "process_info_list.h"
 
 typedef enum {
     PROC_STATE_INIT, PROC_STATE_RUNNING,PROC_STATE_TERMINATED,PROC_STATE_WAITING, PROC_STATE_NODE_SERV_TRANS
-} PROCSTATE;
+}PROCSTATE;
 /*  ABORT TYPE */
 typedef enum {
     TERMINATION_END_CORRECTLY,
@@ -15,7 +18,8 @@ typedef enum {
     IMPOSSIBLE_TO_CONNECT_TO_SHM,
     SIGNALS_OF_TERM_RECEIVED,
     INFO_BUDGET,
-} MSG_REPORT_TYPE;
+    UNUSED_PROC,
+}MSG_REPORT_TYPE;
 typedef enum {
     USER,
     NODE,
@@ -70,6 +74,15 @@ master_msg_send(int id, struct master_msg_report *self, long type, long proc_typ
 int master_msg_receive(int id, struct master_msg_report *self);
 
 /**
+ * Check for messages in the master msg_queue
+ * @param msg_report pointer to the struct representing the msg in the master msg queue
+ * @param msg_report_id_master id of the queue
+ * @param proc_list list of the process to check msg for
+ * @return -1 in case of FAILURE. 0 otherwise
+ */
+int check_msg_report(struct master_msg_report *msg_report, int msg_report_id_master, ProcList proc_list);
+
+/**
  * Retrive the message_node_report on the specified message queue
  * @warning the retriving operation is repeated until it succeed or errno != EINTR
  * @param id of the message queue
@@ -78,4 +91,12 @@ int master_msg_receive(int id, struct master_msg_report *self);
  */
 int master_msg_receive_info(int id, struct master_msg_report *self);
 
+/**
+ * Based on the given master msg, load and modify the data in proc list
+ * @param self the message
+ * @param list the list of process to be updated
+ * @return -2 in case of no sender pid in proc_list.-1 in case of wrong msg_type. 0 otherwise.
+ * TODO: Implement termination info in the list of proc (Cause that determined the termination)
+ **/
+int acknowledge(struct master_msg_report * self, ProcList list);
 #endif /*DGT_SO_PROJECT_21_22_MASTER_MSG_REPORT_H*/

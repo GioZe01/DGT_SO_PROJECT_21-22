@@ -40,5 +40,7 @@
 /*  GENERAL UTILITY MACRO*/
 #define REALLOC_MARGIN 10 /*delta in wich is not usefull to realloc TODO: make a function that calculate it*/
 #define MAX_FAILURE_SHM_LOADING 10
+#define MAX_UNSED_CICLE_OF_NODE_TP 10000
 #define MAX_WAITING_TIME_FOR_UPDATE 10000
+
 #endif /*DGT_SO_PROJECT_21_22_GLOB_H*/
