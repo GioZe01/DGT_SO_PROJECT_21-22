@@ -300,7 +300,7 @@ int get_num_transactions(Queue q) {
 }
 
 int queue_to_array(Queue q, struct Transaction vector[]) {
-    if (vector != NULL) {
+    if (vector != NULL || get_num_transactions(q)==0) {
         struct node *iterable = q->first;
         int i = 0;
         for (; iterable != NULL; iterable = iterable->next) {
@@ -317,7 +317,6 @@ int array_to_queue(Queue q, struct Transaction* vector){
     }
     int i = 0;
     for (;i<SO_BLOCK_SIZE; i++){
-    printf("\nValore transazione: %f\n", vector[i].amount);
         queue_append(q, vector[i]);
     }
     return 0;

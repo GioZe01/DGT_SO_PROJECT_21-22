@@ -299,7 +299,6 @@ void update_block(void) {
     int i= 0;
     for (; i < SO_BLOCK_SIZE; i++) {
         shm_node_tp->block_t[i] = queue_head(current_node_tp.transactions_list);
-        printf("\nNODETPValore transazione: %f\n", shm_node_tp->block_t[i].amount);
         queue_remove_head(current_node_tp.transactions_list);
     }
 }

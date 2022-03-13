@@ -377,7 +377,6 @@ void connect_to_queues(void) {
 int process_node_block() {
     /*Loading them into the node_block_transactions*/
     if (load_block() == FALSE) return -1;
-    printf("CHIAMATO %d\n", get_num_transactions(current_node.transactions_list));
     if (get_num_transactions(current_node.transactions_list)==SO_BLOCK_SIZE /* DID i got the correct num of transactions*/
             && current_node.type.block.calc_reward(&current_node, -1, TRUE, &current_block_reward)>=0){
         int num_of_shm_retry = 0;
