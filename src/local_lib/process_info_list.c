@@ -165,9 +165,6 @@ int send_sig_to_all(ProcList proc_list, int signal) {
         num_proc_reciver++;
     }
 
-#ifdef DEBUG
-    printf("SIG: %d HAS BEEN SENT TO: %d PROCESSES\n", signal, num_proc_reciver);
-#endif
     return num_proc_reciver;
 }
 
@@ -212,7 +209,6 @@ void saving_private_ryan(ProcList self, int queue_id) {
     struct node *tmp = self->first;
     struct master_msg_report msg_rep;
     for (; tmp != NULL; tmp = tmp->next) {
-        printf("\n WAITING \n");
         check_msg_report(&msg_rep,queue_id,self);
         if (tmp->p->proc_state == PROC_STATE_RUNNING) {
             waitpid(tmp->p->pid, NULL, 0);

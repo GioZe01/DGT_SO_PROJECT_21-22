@@ -315,8 +315,10 @@ int array_to_queue(Queue q, struct Transaction* vector){
     if (vector == NULL){
         return -1;
     }
-    for (;vector != NULL; vector++){
-        queue_append(q, *vector);
+    int i = 0;
+    for (;i<SO_BLOCK_SIZE; i++){
+    printf("\nValore transazione: %f\n", vector[i].amount);
+        queue_append(q, vector[i]);
     }
     return 0;
 }

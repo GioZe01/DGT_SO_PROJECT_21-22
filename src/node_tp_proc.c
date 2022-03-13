@@ -180,6 +180,7 @@ int main(int argc, char const *argv[]) {
             if(msg_rep.sender_pid == -1){
                 is_unsed_node++;
             }
+            /*
 #ifdef DEBUG_NODE_TP
             if (msg_rep.sender_pid >=0 ){
                 node_msg_print(&msg_rep);
@@ -189,7 +190,7 @@ int main(int argc, char const *argv[]) {
                 print_waiting_time.tv_nsec = 10000;
                 nanosleep(&print_waiting_time, (void *)NULL);
             }
-#endif
+#endif*/
             if (get_num_transactions(current_node_tp.transactions_list) >= SO_BLOCK_SIZE &&
                     load_block_to_shm() == FALSE){
                 failure_shm++;
@@ -298,6 +299,7 @@ void update_block(void) {
     int i= 0;
     for (; i < SO_BLOCK_SIZE; i++) {
         shm_node_tp->block_t[i] = queue_head(current_node_tp.transactions_list);
+        printf("\nNODETPValore transazione: %f\n", shm_node_tp->block_t[i].amount);
         queue_remove_head(current_node_tp.transactions_list);
     }
 }

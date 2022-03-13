@@ -180,7 +180,7 @@ int main(int argc, char const *argv[]) {
      * **********************************/
     read_conf_node(&node_configuration);
     node_proc_block_create(&current_node, getpid(), 0, SO_BLOCK_SIZE,
-            node_configuration.so_reward, &calc_reward);
+            node_configuration.so_reward, (Reward)&calc_reward);
     if (check_arguments(argc, argv) && set_signal_handler_node(sa, sigmask)) {
         /*-----------------------*/
         /*  CREATING SEMAPHORES  */
@@ -356,12 +356,7 @@ void attach_to_shms(void) {
         advice_master_of_termination(IMPOSSIBLE_TO_CONNECT_TO_SHM);
         ERROR_EXIT_SEQUENCE_NODE("IMPOSSIBLE TO CONNECT TO THE SHM_MASTERBOOK");
     }
-    shm_conf_id = shmget(current_node.pid, sizeof(struct node_block),IPC_CREAT | IPC_EXCL | 0600);
-    if (shm_conf_id<0){
-        advice_master_of_termination(IMPOSSIBLE_TO_CONNECT_TO_SHM);
-        ERROR_EXIT_SEQUENCE_NODE("IMPOSSIBLE TO CREATE NODE_TP_SHM");
-    }
-    shm_node_tp = shmat(shm_conf_id, NULL, 0);
+    shm_node_tp = shmat(shm_tp_id, NULL, 0);
     if(shm_node_tp == (void * )-1){
         advice_master_of_termination(IMPOSSIBLE_TO_CONNECT_TO_SHM);
         ERROR_EXIT_SEQUENCE_NODE("IMPOSSIBLE TO CONNECT TO THE NODE_TP SHM");
@@ -382,13 +377,15 @@ void connect_to_queues(void) {
 int process_node_block() {
     /*Loading them into the node_block_transactions*/
     if (load_block() == FALSE) return -1;
+    printf("CHIAMATO %d\n", get_num_transactions(current_node.transactions_list));
     if (get_num_transactions(current_node.transactions_list)==SO_BLOCK_SIZE /* DID i got the correct num of transactions*/
             && current_node.type.block.calc_reward(&current_node, -1, TRUE, &current_block_reward)>=0){
         int num_of_shm_retry = 0;
-       while(lock_shm_masterbook() == FALSE){
+        while(num_of_shm_retry < MAX_FAILURE_SHM_BOOKMASTER_LOCKING
+                && lock_shm_masterbook() == FALSE){
             num_of_shm_retry++;
-       }
-      /*TODO: send confirmed to all users*/
+        }
+        /*TODO: send confirmed to all users*/
     }
 
     return 0;
@@ -473,12 +470,16 @@ void unlock_masterbook_cell_access(void) {
 Bool load_block(void) {
     int sem_val = semctl(semaphore_tp_shm,0, GETVAL);
     if (sem_val==FULL){
-        array_to_queue(current_node.transactions_list, shm_node_tp->block_t);
+        struct Transaction *vector;
+        vector = shm_node_tp->block_t;
+        if (array_to_queue(current_node.transactions_list, vector)){
+            ERROR_MESSAGE("NULL TRANSACTION VECTOR");
+        }
         if(semctl(semaphore_tp_shm,0,SETVAL, IS_EMPTY) < 0){
             ERROR_MESSAGE("IMPOSSIBLE TO SET NODE TP SEM TO IS_EMPTY");
             return FALSE;
         }
-    }else if (sem_val < 0){
+    }else if (sem_val != IS_EMPTY){
         ERROR_MESSAGE("IMPOSSIBLE TO RETRIVE VAL FROM TP SHM SEMAPHORE");
         return FALSE;
     }

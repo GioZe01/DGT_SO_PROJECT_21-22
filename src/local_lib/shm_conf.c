@@ -31,7 +31,6 @@ void shm_copy_snapshots(int snapshot[][2], int *pids, int *queues_ids){
 }
 
 int get_queueid_by_pid(struct shm_conf *self, int pid, Bool in_users){
-    printf("\nCALLLED ......................................................... \n");
     int *snapshot;
     int ris = -1;
     if (in_users == TRUE){
@@ -39,9 +38,7 @@ int get_queueid_by_pid(struct shm_conf *self, int pid, Bool in_users){
     }else{
         snapshot = &self->nodes_snapshots[0][0];
     }
-    printf("\n FOR VALUE : %d \n", *snapshot);
     for(;snapshot != NULL; snapshot+=2){
-        printf("\n FOR VALUE : %d \n", *snapshot);
         if (*snapshot == pid){
             ris = *(snapshot+1);
             return ris;

@@ -241,7 +241,7 @@ void signals_handler(int signum) {
 }
 
 void advice_master_of_termination(int termination_type) {
-    struct master_msg_report termination_report;
+   struct master_msg_report termination_report;
    if (master_msg_send(queue_master_id, &termination_report, termination_type, NODE_TP,current_user.pid, current_user.exec_state,TRUE, current_user.budget)<0){
        ERROR_MESSAGE("IMPOSSIBLE TO ADVICE MASTER OF TERMINATION");
    }
@@ -315,7 +315,8 @@ void attach_to_shm_conf(void) {
 
 void generating_transactions(void) {
     struct timespec gen_sleep;
-    while (current_user.budget >= 0) {
+    int failed_gen_trans =0;
+    while (failed_gen_trans < configuration.so_retry && current_user.budget >= 0) {
 #ifdef DEBUG_USER
         DEBUG_MESSAGE("TRANSACTION ALLOWED");
 #endif
@@ -323,6 +324,7 @@ void generating_transactions(void) {
         check_for_transactions_confirmed();
         check_for_transactions_failed();
         if (generate_transaction(&current_user, current_user.pid, shm_conf_pointer) < 0) {
+            failed_gen_trans++;
 #ifdef DEBUG_USER
             ERROR_MESSAGE("IMPOSSIBLE TO GENERATE TRANSACTION");/*TODO: can be a simple advice, not a critical one*/
 #endif

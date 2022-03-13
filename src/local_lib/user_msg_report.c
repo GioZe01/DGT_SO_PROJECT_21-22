@@ -18,6 +18,9 @@ int user_msg_create(struct user_msg *self, long type, pid_t sender_pid, struct T
             self->t = *t;
             t->t_type = TRANSACTION_FAILED;
             break;
+        case MSG_TRANSACTION_INCOME_TYPE:
+            self->t= *t;
+            t->t_type = TRANSACTION_SUCCES;
         default:
             ERROR_MESSAGE("WRONG TYPE");
             return -1;
@@ -50,8 +53,8 @@ void user_msg_print(struct user_msg *self) {
 }
 
 int user_msg_snd(int id, struct user_msg *msg, long type, struct Transaction *t, pid_t sender, Bool create, int queue_id) {
-    if (create == TRUE) { user_msg_create(msg, CHECK_USER_TYPE(queue_id,type), sender, t); }
-    printf("ID RECEIVED: %d\n", id);
+    printf("\nUSER MSG TYPE : %d\n", CHECK_USER_TYPE(type,queue_id));
+    if (create == TRUE) { user_msg_create(msg, CHECK_USER_TYPE(type,queue_id), sender, t); }
     while (msgsnd(id, msg, sizeof(struct user_msg) - sizeof(long), 0) < 0) {
         if (errno != EINTR) return -1;
     }
