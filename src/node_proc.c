@@ -133,7 +133,7 @@ void unlock_masterbook_cell_access(void);
 /* Advice the master porc via master_message queue by sending a master_message
  * @param termination_type MSG_REPORT_TYPE type process termination occured
 */
-void advice_master_of_termination(int termination_type);
+void advice_master_of_termination(long termination_type);
 
 /*Extract randomly the time needed for processing from node_configuration
  *@return an integer that rappresent the time for processing
@@ -296,6 +296,13 @@ void signals_handler(int signum) {
             break;
         case SIGUSR2:
             master_msg_send(queue_master_id,&msg, INFO_BUDGET,NODE,current_node.pid,current_node.exec_state,TRUE, current_node.type.block.budget);
+            if(kill(current_node.type.block.kid_pid, SIGINT) >= 0 || errno ==  ESRCH) {
+#ifdef DEBUG_NODE
+                DEBUG_MESSAGE("SIGNALS SIGUSR2 SENT TO NODE_TP_KID");
+#endif
+            } else if (errno!=EINTR){
+                ERROR_MESSAGE("impossibile inviare il segnale di terminazione al processo figlio");
+            }
             break;
         default:
             break;
@@ -486,7 +493,7 @@ Bool load_block(void) {
 }
 
 
-void advice_master_of_termination(int termination_type) {
+void advice_master_of_termination(long termination_type) {
     struct master_msg_report termination_report;
     if (master_msg_send(queue_master_id, &termination_report, termination_type, NODE,current_node.pid, current_node.exec_state,TRUE, current_node.type.block.budget)<0){
         ERROR_MESSAGE("IMPOSSIBLE TO ADVICE MASTER OF TERMINATION");

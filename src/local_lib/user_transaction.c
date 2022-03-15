@@ -117,9 +117,6 @@ int generate_transaction(struct user_transaction *self, pid_t user_proc_pid, str
                 0) {
             ERROR_MESSAGE("FAILED ON TRANSACTION CREATION");
         }else{
-#ifdef DEBUG
-            transaction_print(t);
-#endif
             queue_append(self->in_process, t);
             if (self->update_cash_flow(self, &t) < 0) { ERROR_EXIT_SEQUENCE_USER("IMPOSSIBLE TO UPDATE CASH FLOW"); }
             self->to_wait_transaction++;

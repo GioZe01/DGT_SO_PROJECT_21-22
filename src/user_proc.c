@@ -6,6 +6,7 @@
 #include <errno.h>
 #include <unistd.h>
 #include <time.h>
+#include <string.h>
 /*  Sys Library */
 #include <sys/sem.h>
 #include <sys/msg.h>
@@ -28,7 +29,7 @@
 /* Advice the master porc via master_message queue by sending a master_message
  * @param termination_type MSG_REPORT_TYPE type process termination occured
 */
-void advice_master_of_termination(int termination_type);
+void advice_master_of_termination(long termination_type);
 
 /**
  * Connects to the differents queues: master, node's and user's
@@ -173,6 +174,7 @@ int main(int arc, char const *argv[]) {
         /*TODO: wait for user in progress to empty with timeout*/
 #endif
         /*TODO: check for remaining transaction confirmed*/
+        current_user.exec_state = PROC_STATE_TERMINATED;
         advice_master_of_termination(TERMINATION_END_CORRECTLY);
         EXIT_PROCEDURE_USER(0);
     }
@@ -212,6 +214,7 @@ Bool set_signal_handler_user(struct sigaction sa, sigset_t sigmask) {
         sigaction(SIGUSR1, &sa, NULL) < 0 ||
         sigaction(SIGUSR2, &sa, NULL) < 0) {
         ERROR_EXIT_SEQUENCE_USER("ERROR DURING THE CREATION OF THE SIG HANDLER ");
+        return FALSE;
     }
     return TRUE;
 }
@@ -225,6 +228,7 @@ void signals_handler(int signum) {
             current_user.exec_state = PROC_STATE_TERMINATED;
             advice_master_of_termination(SIGNALS_OF_TERM_RECEIVED);
             EXIT_PROCEDURE_USER(0);
+            break;
         case SIGALRM: /*    Generate a new transaction  */
             DEBUG_NOTIFY_ACTIVITY_RUNNING("GENERATING A NEW TRANSACTION FROM SIG...");
             if (generate_transaction(&current_user, current_user.pid, shm_conf_pointer) < 0) {
@@ -232,18 +236,20 @@ void signals_handler(int signum) {
             }
             if (send_to_node()<0){ERROR_MESSAGE("IMPOSISBLE TO SEND TO THE NODE");}
             DEBUG_NOTIFY_ACTIVITY_DONE("GENERATING A NEW TRANSACTION FROM SIG DONE");
+            break;
         case SIGUSR2:
-            master_msg_send(queue_master_id,&msg, INFO_BUDGET,NODE,current_user.pid,current_user.exec_state,TRUE, current_user.budget);
+            advice_master_of_termination(INFO_BUDGET);
             break;
         default:
             break;
     }
 }
 
-void advice_master_of_termination(int termination_type) {
+void advice_master_of_termination(long termination_type) {
    struct master_msg_report termination_report;
-   if (master_msg_send(queue_master_id, &termination_report, termination_type, NODE_TP,current_user.pid, current_user.exec_state,TRUE, current_user.budget)<0){
-       ERROR_MESSAGE("IMPOSSIBLE TO ADVICE MASTER OF TERMINATION");
+   if (master_msg_send(queue_master_id,&termination_report, termination_type, USER,current_user.pid, current_user.exec_state,TRUE, current_user.budget)<0){
+       char * error_string = strcat("IMPOSSIBLE TO ADVICE MASTER OF : %s",from_type_to_string(termination_type));
+       ERROR_MESSAGE(error_string);
    }
 }
 void free_mem_user() {

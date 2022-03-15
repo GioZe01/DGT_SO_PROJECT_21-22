@@ -45,7 +45,7 @@
 /* Advice the master porc via master_message queue by sending a master_message
  * @param termination_type MSG_REPORT_TYPE type process termination occured
 */
-void advice_master_of_termination(int termination_type);
+void advice_master_of_termination(long termination_type);
 
 /**
  * \brief Acquire the semaphore_id related to the node
@@ -227,7 +227,7 @@ Bool check_arguments(int argc, char const *argv[]) {
     return TRUE;
 }
 
-void advice_master_of_termination(int termination_type) {
+void advice_master_of_termination(long termination_type) {
     struct master_msg_report termination_report;
     if (master_msg_send(queue_master_id, &termination_report, termination_type, NODE_TP, current_node_tp.pid,
                         current_node_tp.exec_state, TRUE,-1) < 0) {

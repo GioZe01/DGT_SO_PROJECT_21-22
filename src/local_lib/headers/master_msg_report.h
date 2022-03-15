@@ -20,11 +20,13 @@ typedef enum {
     INFO_BUDGET,
     UNUSED_PROC,
 }MSG_REPORT_TYPE;
+
 typedef enum {
     USER,
     NODE,
     NODE_TP,
 } PROC_TYPE;
+
 struct master_msg_report {
     long type;
     long proc_type;
@@ -99,4 +101,25 @@ int master_msg_receive_info(int id, struct master_msg_report *self);
  * TODO: Implement termination info in the list of proc (Cause that determined the termination)
  **/
 int acknowledge(struct master_msg_report * self, ProcList list);
+
+/**
+ * Convert the given type into his relative string
+ * @param type the type of the message
+ * @return the string equivalent
+ */
+char * from_type_to_string(long type);
+
+/**
+ * Convert the given exec type into his equivalent string
+ * @param state current state of the proc
+ * @param string var in wich the method save the equivalent string
+ */
+void from_procstate_to_string(int state, char * string);
+
+/**
+ * Convert the given proc_type into his relative string
+ * @param proc_type the process type to be converted
+ * @return the equivalent string
+ */
+char * from_proctype_to_string(long proc_type);
 #endif /*DGT_SO_PROJECT_21_22_MASTER_MSG_REPORT_H*/

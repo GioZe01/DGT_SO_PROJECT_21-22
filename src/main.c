@@ -524,9 +524,12 @@ void update_kids_info(void){
     do{
         /*TODO: POSSIBLE INFITE WAITING CHECK FOR SIG*/
         master_msg_receive_info(msg_report_id_master, msg_rep);
+        master_msg_report_print(msg_rep);
         Proc proc_to_update = get_proc_from_pid(proc_list,msg_rep->sender_pid);
-        proc_to_update->budget = msg_rep->budget;
-        num_msg_to_wait_for--;
-    }while(num_msg_to_wait_for!=0);
+        if (proc_to_update!= NULL){proc_to_update->budget = msg_rep->budget;}
+        if(msg_rep->proc_type != NODE_TP){
+            num_msg_to_wait_for--;
+        }
+    }while(num_msg_to_wait_for>0);
     DEBUG_NOTIFY_ACTIVITY_DONE("RETRIVING INFO DONE");
 }
