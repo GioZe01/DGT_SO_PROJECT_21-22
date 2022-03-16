@@ -132,17 +132,22 @@ int master_msg_receive_info(int id, struct master_msg_report * self){
 }
 
 int acknowledge(struct master_msg_report * self, ProcList list){
+    /*HANDLE DIFFERENT TYPE OF MESSAGES*/
     long msg_type = self->type;
     int proc_type = self->proc_type;
+    if (proc_type == NODE_TP){
+        return 0;
+    }
     short int exec_state = self->state;
-    printf("PROC PID: %d\n", self->sender_pid);
     Proc proc_to_update = get_proc_from_pid(list,self->sender_pid);
     if (proc_to_update == NULL){
         return -2;
     }
+    printf("\nmsg_type_number = %ld\n", msg_type);
     switch(msg_type){
         case TERMINATION_END_CORRECTLY:
         case IMPOSSIBLE_TO_SEND_TRANSACTION:
+        case IMPOSSIBLE_TO_CONNECT_TO_SHM:
         case SIGNALS_OF_TERM_RECEIVED:
         case UNUSED_PROC:
         case INFO_BUDGET:

@@ -117,11 +117,13 @@ void print_list(ProcList self) {
 }
 
 void process_info_print(const Proc p) {
+    char state [80];
+    from_procstate_to_string(p->id_queue, state);
     if (p != NULL)
         printf("# pid : %d | proc_type : %s | proc_state : %s | budget : %f ",
                p->pid,
-               p->proc_type == PROC_TYPE_USER ? "User" : "Node",
-               p->proc_state == PROC_STATE_RUNNING ? "Running" : "Terminated",
+               from_proctype_to_string(p->proc_type),
+               state,
                p->budget
         );
     else
