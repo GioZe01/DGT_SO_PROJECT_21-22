@@ -122,7 +122,7 @@ int master_msg_receive(int id, struct master_msg_report * self){
     return 0;
 }
 int master_msg_receive_info(int id, struct master_msg_report * self){
-    if(msgrcv(id, self, sizeof(struct master_msg_report)-sizeof(long),INFO_BUDGET,0)<0){
+    if(msgrcv(id, self, sizeof(struct master_msg_report)-sizeof(long),INFO_BUDGET,IPC_NOWAIT)<0){
         if(errno == ENOMSG){
             return -2;
         }
@@ -135,6 +135,7 @@ int acknowledge(struct master_msg_report * self, ProcList list){
     long msg_type = self->type;
     int proc_type = self->proc_type;
     short int exec_state = self->state;
+    printf("PROC PID: %d\n", self->sender_pid);
     Proc proc_to_update = get_proc_from_pid(list,self->sender_pid);
     if (proc_to_update == NULL){
         return -2;
@@ -164,7 +165,7 @@ int check_msg_report(struct master_msg_report *msg_report, int msg_report_id_mas
         /*fetching all msg if present*/
         if (msg_rep_info.msg_qnum != 0 &&
             msgrcv(msg_report_id_master, msg_report, sizeof(*msg_report) - sizeof(long), 0, 0)>0) {
-            if (acknowledge(msg_report, proc_list)<0){
+            if (acknowledge(msg_report, proc_list)==-1){
                 ERROR_MESSAGE("IMPOSSIBLE TO MAKE THE ACKNOWLEDGE OF MASTER MESSAGE");
             }
         }

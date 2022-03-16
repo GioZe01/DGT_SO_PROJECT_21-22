@@ -518,9 +518,9 @@ void update_kids_info(void){
     DEBUG_NOTIFY_ACTIVITY_RUNNING("RETRIVING INFO ...");
     do{
         /*TODO: POSSIBLE INFITE WAITING CHECK FOR SIG*/
+     printf("-------------> NUMBER OF MSG TO WAIT FOR: %d\n", num_msg_to_wait_for);
         master_msg_receive_info(msg_report_id_master, msg_rep);
         master_msg_report_print(msg_rep);
-     printf("-------------> NUMBER OF MSG TO WAIT FOR: %d\n", num_msg_to_wait_for);
         Proc proc_to_update = get_proc_from_pid(proc_list,msg_rep->sender_pid);
         if (proc_to_update!= NULL){
             proc_to_update->budget = msg_rep->budget;
