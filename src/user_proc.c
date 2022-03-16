@@ -40,7 +40,7 @@ void connect_to_queues(void);
  * handler of the signal
  * @param signum type of signal to be handled
  */
-void signals_handler(int signum);
+void signals_handler_user(int signum);
 
 /**
  * Check the argc and argv to match with project specification
@@ -201,17 +201,11 @@ void connect_to_queues(void) {
 }
 
 Bool set_signal_handler_user(struct sigaction sa, sigset_t sigmask) {
-    DEBUG_NOTIFY_ACTIVITY_RUNNING("SETTING SIGNAL MASK...");
-    sigemptyset(&sigmask);/*Creating an empty mask*/
-    sigaddset(&sigmask, SIGALRM);/*Adding signal to the mask*/
-    DEBUG_NOTIFY_ACTIVITY_DONE("SETTING SIGNAL MASK DONE");
-
     memset(&sa, 0, sizeof(sa));
-    sa.sa_handler = signals_handler;
+    sa.sa_handler = signals_handler_user;
     sa.sa_mask = sigmask;
     if (sigaction(SIGINT, &sa, NULL) < 0 ||
         sigaction(SIGALRM, &sa, NULL) < 0 ||
-        sigaction(SIGUSR1, &sa, NULL) < 0 ||
         sigaction(SIGUSR2, &sa, NULL) < 0) {
         ERROR_EXIT_SEQUENCE_USER("ERROR DURING THE CREATION OF THE SIG HANDLER ");
         return FALSE;
@@ -219,7 +213,7 @@ Bool set_signal_handler_user(struct sigaction sa, sigset_t sigmask) {
     return TRUE;
 }
 
-void signals_handler(int signum) {
+void signals_handler_user(int signum) {
     DEBUG_SIGNAL("SIGNAL RECEIVED", signum);
     struct master_msg_report msg;
     switch (signum) {
@@ -239,6 +233,10 @@ void signals_handler(int signum) {
             break;
         case SIGUSR2:
             advice_master_of_termination(INFO_BUDGET);
+            if (current_user.exec_state == PROC_STATE_TERMINATED){
+            advice_master_of_termination(TERMINATION_END_CORRECTLY);
+                EXIT_PROCEDURE_USER(0);
+            }
             break;
         default:
             break;
@@ -247,10 +245,18 @@ void signals_handler(int signum) {
 
 void advice_master_of_termination(long termination_type) {
    struct master_msg_report termination_report;
-   if (master_msg_send(queue_master_id,&termination_report, termination_type, USER,current_user.pid, current_user.exec_state,TRUE, current_user.budget)<0){
+#ifdef DEBUG_USER
+   DEBUG_NOTIFY_ACTIVITY_RUNNING("{DEBUG_USER}:= ADVICING MASTER OF TERMINATION ....");
+#endif
+    if(master_msg_send(queue_master_id, &termination_report, termination_type, USER, current_user.pid,
+                        current_user.exec_state, TRUE,-1) < 0) {
        char * error_string = strcat("IMPOSSIBLE TO ADVICE MASTER OF : %s",from_type_to_string(termination_type));
        ERROR_MESSAGE(error_string);
-   }
+    }
+#ifdef DEBUG_USER
+   DEBUG_NOTIFY_ACTIVITY_DONE("{DEBUG_USER}:= ADVICING MASTER OF TERMINATION DONE");
+#endif
+   DEBUG_NOTIFY_ACTIVITY_DONE("{DEBUG_USER}:= ADVICING MASTER OF TERMINATION DONE");
 }
 void free_mem_user() {
     free_user(&current_user);

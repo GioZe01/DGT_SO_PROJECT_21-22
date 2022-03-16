@@ -56,11 +56,15 @@ void from_procstate_to_string(int state,char * string ){
             strcat(string, COLOR_GREEN_ANSI_CODE);
             strcat(string, "RUNNING");
             break;
+        case PROC_STATE_TERMINATED:
+            strcat(string, COLOR_RED_ANSI_CODE);
+            strcat(string, "ENDED");
+            break;
         case PROC_STATE_INIT:
-            string = "INIT";
+            strcat(string,"INIT");
             break;
         default:
-            string = "";
+            strcat(string,"ERROR");
             break;
     }
     strcat(string, COLOR_RESET_ANSI_CODE);
@@ -98,6 +102,11 @@ char * from_type_to_string(long type){
 }
 int master_msg_send(int id, struct master_msg_report * self,long type,long proc_type, pid_t sender_pid, short int state, Bool create, float budget){
     if (create == TRUE){master_msg_report_create(self,type,proc_type,sender_pid, state, budget);}
+#ifdef DEBUG_USER
+    char string [80];
+    from_procstate_to_string(self->state, string);
+    printf("\nqueue id: %d | process_type: %s | process_state: %s \n",id,from_proctype_to_string(self->proc_type), string);
+#endif
     while(msgsnd(id, self, sizeof(struct master_msg_report)-sizeof(long),0)<0){
         if (errno != EINTR)return -1;
     }
@@ -154,7 +163,7 @@ int check_msg_report(struct master_msg_report *msg_report, int msg_report_id_mas
     } else {
         /*fetching all msg if present*/
         if (msg_rep_info.msg_qnum != 0 &&
-            msgrcv(msg_report_id_master, msg_report, sizeof(*msg_report) - sizeof(long), 0, 0)<0) {
+            msgrcv(msg_report_id_master, msg_report, sizeof(*msg_report) - sizeof(long), 0, 0)>0) {
             if (acknowledge(msg_report, proc_list)<0){
                 ERROR_MESSAGE("IMPOSSIBLE TO MAKE THE ACKNOWLEDGE OF MASTER MESSAGE");
             }

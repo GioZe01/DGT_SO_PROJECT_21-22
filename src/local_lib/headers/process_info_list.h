@@ -56,9 +56,9 @@ Proc get_proc_from_queue_id(ProcList self, int id_queue);
  * Send the given signal to all proc saved via kill() method
  * @param proc_list the list of proced to receive the signal
  * @param signal signal to be sent
- * @return FALSE in case of failure. TRUE otherwise
+ * @return -1 in case of failure. the number of proc to wait responce for
  */
-Bool send_sig_to_all(ProcList proc_list,int signal);
+int send_sig_to_all(ProcList proc_list,int signal);
 /**
  * Print at console the specified list
  * @param self ref of the list to print_list

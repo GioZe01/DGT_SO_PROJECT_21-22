@@ -106,7 +106,7 @@ void process_simple_transaction_type(struct node_msg *msg_rep);
  * Set the handler for signals of the current main_proc
  * @param sa  describe the type of action to performed when a signal arrive
  */
-void set_signal_handlers(struct sigaction sa);
+void set_signal_handlers(struct sigaction sa,sigset_t sigmask);
 
 /*
  * Get new SO_BLOCK_SIZE transactions from the transaction_list in the current_node_tp
@@ -138,8 +138,9 @@ int main(int argc, char const *argv[]) {
     if (check_arguments(argc, argv) == TRUE) {
         struct node_msg msg_rep;
         struct sigaction sa; /*Structure for handling signals */
+        sigset_t sigmask;
         int is_unsed_node = 0;
-        set_signal_handlers(sa);
+        set_signal_handlers(sa,sigmask);
         /************************************
          *      SINC AND WAITING FASE       *
          * **********************************/
@@ -231,7 +232,8 @@ void advice_master_of_termination(long termination_type) {
     struct master_msg_report termination_report;
     if (master_msg_send(queue_master_id, &termination_report, termination_type, NODE_TP, current_node_tp.pid,
                         current_node_tp.exec_state, TRUE,-1) < 0) {
-        ERROR_MESSAGE("IMPOSSIBLE TO ADVICE MASTER OF TERMINATION");
+       char * error_string = strcat("IMPOSSIBLE TO ADVICE MASTER OF : %s",from_type_to_string(termination_type));
+       ERROR_MESSAGE(error_string);
     }
 }
 
@@ -303,9 +305,10 @@ void update_block(void) {
     }
 }
 
-void set_signal_handlers(struct sigaction sa) {
+void set_signal_handlers(struct sigaction sa,sigset_t sigmask) {
     memset(&sa, 0, sizeof(sa));
     sa.sa_handler = signals_handler;
+    sa.sa_mask = sigmask;
     if (sigaction(SIGUSR2, &sa, NULL) < 0 ||
         sigaction(SIGINT, &sa, NULL) < 0 ||
         sigaction(SIGTERM, &sa, NULL) < 0 ||
@@ -328,7 +331,10 @@ void signals_handler(int signum) {
         case SIGALRM:
             break;
         case SIGUSR2:
-            master_msg_send(queue_master_id,&msg, INFO_BUDGET,NODE,current_node_tp.pid,current_node_tp.exec_state,TRUE,-1);
+            master_msg_send(queue_master_id,&msg, INFO_BUDGET,NODE_TP,current_node_tp.pid,current_node_tp.exec_state,TRUE,-1);
+#ifdef DEBUG_NODE_TP
+            DEBUG_NOTIFY_ACTIVITY_DONE("{DEBUG_NODE_TP}:= REPLIED TO MASTER DONE");
+#endif
             break;
         default:
             break;

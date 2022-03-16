@@ -293,14 +293,9 @@ void set_signal_handlers(struct sigaction sa) {
     DEBUG_BLOCK_ACTION_END();
 }
 
-/**
- * Handler for the signals SIGINT, SIGTERM, SIGALARM
- * @param signum
- */
-void signals_handler(int signum) { /*TODO: Scrivere implementazione*/
+void signals_handler(int signum) {
     int old_errno;
     static int num_inv = 0;
-
     old_errno = errno;
     DEBUG_SIGNAL("SIGNAL RECEIVED", signum);
     switch (signum) {
@@ -525,8 +520,12 @@ void update_kids_info(void){
         /*TODO: POSSIBLE INFITE WAITING CHECK FOR SIG*/
         master_msg_receive_info(msg_report_id_master, msg_rep);
         master_msg_report_print(msg_rep);
+     printf("-------------> NUMBER OF MSG TO WAIT FOR: %d\n", num_msg_to_wait_for);
         Proc proc_to_update = get_proc_from_pid(proc_list,msg_rep->sender_pid);
-        if (proc_to_update!= NULL){proc_to_update->budget = msg_rep->budget;}
+        if (proc_to_update!= NULL){
+            proc_to_update->budget = msg_rep->budget;
+            proc_to_update->proc_state = msg_rep->state;
+        }
         if(msg_rep->proc_type != NODE_TP){
             num_msg_to_wait_for--;
         }

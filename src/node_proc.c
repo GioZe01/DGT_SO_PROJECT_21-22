@@ -264,11 +264,6 @@ Bool check_arguments(int argc, char const *argv[]) {
 }
 
 Bool set_signal_handler_node(struct sigaction sa, sigset_t sigmask) {
-/*    DEBUG_NOTIFY_ACTIVITY_RUNNING("SETTING SIGNAL MASK...");
-    sigemptyset(&sigmask);/*Creating an empty mask*/
-   /* sigaddset(&sigmask, SIGALRM);/*Adding signal to the mask*/
-    /*DEBUG_NOTIFY_ACTIVITY_DONE("SETTING SIGNAL MASK DONE");*/
-
     memset(&sa, 0, sizeof(sa));
     sa.sa_handler = signals_handler;
     sa.sa_mask = sigmask;
@@ -296,7 +291,10 @@ void signals_handler(int signum) {
             break;
         case SIGUSR2:
             master_msg_send(queue_master_id,&msg, INFO_BUDGET,NODE,current_node.pid,current_node.exec_state,TRUE, current_node.type.block.budget);
-            if(kill(current_node.type.block.kid_pid, SIGINT) >= 0 || errno ==  ESRCH) {
+#ifdef DEBUG_NODE
+            DEBUG_NOTIFY_ACTIVITY_DONE("{DEBUG_NODE}:= REPLIED TO MASTER DONE");
+#endif
+            if(kill(current_node.type.block.kid_pid, SIGUSR2) >= 0 || errno ==  ESRCH) {
 #ifdef DEBUG_NODE
                 DEBUG_MESSAGE("SIGNALS SIGUSR2 SENT TO NODE_TP_KID");
 #endif
@@ -496,7 +494,8 @@ Bool load_block(void) {
 void advice_master_of_termination(long termination_type) {
     struct master_msg_report termination_report;
     if (master_msg_send(queue_master_id, &termination_report, termination_type, NODE,current_node.pid, current_node.exec_state,TRUE, current_node.type.block.budget)<0){
-        ERROR_MESSAGE("IMPOSSIBLE TO ADVICE MASTER OF TERMINATION");
+       char * error_string = strcat("IMPOSSIBLE TO ADVICE MASTER OF : %s",from_type_to_string(termination_type));
+       ERROR_MESSAGE(error_string);
     }
 }
 
