@@ -1,5 +1,5 @@
-so_user_num=2
-so_nodes_num=1
+so_user_num=10
+so_nodes_num=2
 so_budget_init=1000
 so_reward=1
 so_min_trans_gen_nsec=1000000000

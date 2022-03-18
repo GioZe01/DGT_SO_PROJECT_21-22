@@ -1,4 +1,3 @@
-
 /* Std */
 #include <stdlib.h>
 #include <stdio.h>
@@ -118,7 +117,7 @@ void print_list(ProcList self) {
 
 void process_info_print(const Proc p) {
     char state [80];
-    from_procstate_to_string(p->id_queue, state);
+    from_procstate_to_string(p->proc_state, state);
     if (p != NULL)
         printf("# pid : %d | proc_type : %s | proc_state : %s | budget : %f ",
                p->pid,

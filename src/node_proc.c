@@ -120,15 +120,16 @@ void lock_to_fill_sem(void);
 /* Lock the current cell of the masterbook shm in which the node had written the block
  * @param i_cell_block_list index to be blocked
  */
-void lock_masterbook_cell_access(unsigned short int i_cell_block_list);
+void lock_masterbook_cell_access(int i_cell_block_list);
 
 /* Unlock the to_fill index saved in the shared_memory access
  */
-void unlock_to_fill_sem(void);
+void unlock_to_fill_sem();
 
-/* Unloack the current cell of the masterbook shm in which the node had written the block
+/* Unlock the current cell of the masterbook shm in which the node had written the block
+ * @param i_cell_block_list index to be blocked
  */
-void unlock_masterbook_cell_access(void);
+void unlock_masterbook_cell_access(int i_cell_block_list);
 
 /* Advice the master porc via master_message queue by sending a master_message
  * @param termination_type MSG_REPORT_TYPE type process termination occured
@@ -221,7 +222,7 @@ int main(int argc, char const *argv[]) {
         current_node.exec_state= PROC_STATE_RUNNING;
 
         /****************************************
-         *      PROCESSING OF TRANSACTION FASE  *
+         *   PROCESSING OF TRANSACTION FASE     *
          * **************************************/
         while (node_end != 1) {
             process_node_block();/*Implement the load from the shm*/
@@ -390,6 +391,7 @@ int process_node_block() {
             num_of_shm_retry++;
         }
         /*TODO: send confirmed to all users*/
+        adv_users_of_block();
     }
 
     return 0;
@@ -414,7 +416,7 @@ Bool lock_shm_masterbook(void) {
         return FALSE;
     }
     /*Unloacking the semaphore*/
-    unlock_masterbook_cell_access();
+    unlock_masterbook_cell_access(i_cell_block_list);
     unlock_to_fill_sem();
     DEBUG_NOTIFY_ACTIVITY_DONE("NODE:= LOCKING THE SHM FOR ADDING THE BLOCK DONE");
     return TRUE;
@@ -437,13 +439,13 @@ void lock_to_fill_sem(void) {
     }
 }
 
-void lock_masterbook_cell_access(unsigned short int i_cell_block_list) {
+void lock_masterbook_cell_access(int i_cell_block_list) {
     while (semaphore_lock(semaphore_masterbook_id, i_cell_block_list)) {
         /*TODO: fare refactoring nei due while*/
         if (errno == EINTR) {
             if (last_signal == SIGALRM) {
                 /**RICEZIONE DI SEGNALE*/
-                unlock_masterbook_cell_access();
+                unlock_masterbook_cell_access(i_cell_block_list);
                 /*Avvisare il main e il processo deve terminare*/
                 advice_master_of_termination(IMPOSSIBLE_TO_SEND_TRANSACTION);
             } else {
@@ -463,8 +465,8 @@ void unlock_to_fill_sem(void) {
     }
 }
 
-void unlock_masterbook_cell_access(void) {
-    while (semaphore_unlock(semaphore_masterbook_id, 0)) {
+void unlock_masterbook_cell_access(int i_cell_block_list) {
+    while (semaphore_unlock(semaphore_masterbook_id, i_cell_block_list)) {
         if (errno != EINTR) {
             ERROR_EXIT_SEQUENCE_NODE("ERROR DURING THE UNLOCK OF BOOKMASTER CELL");
         }
@@ -476,7 +478,7 @@ Bool load_block(void) {
     if (sem_val==FULL){
         struct Transaction *vector;
         vector = shm_node_tp->block_t;
-        if (array_to_queue(current_node.transactions_list, vector)){
+        if (array_to_queue(current_node.transactions_list, vector)<0){
             ERROR_MESSAGE("NULL TRANSACTION VECTOR");
         }
         if(semctl(semaphore_tp_shm,0,SETVAL, IS_EMPTY) < 0){

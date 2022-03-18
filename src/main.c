@@ -339,17 +339,11 @@ void create_semaphores(void) {
     DEBUG_NOTIFY_ACTIVITY_DONE("INITIALIZATION OF START_SEMAPHORE CHILDREN DONE");
     DEBUG_NOTIFY_ACTIVITY_RUNNING("CREATION OF MASTEBOOK ACCESS SEM....");
 
-    semaphore_masterbook_id = semget(SEMAPHORE_MASTER_BOOK_ACCESS_KEY, 1, IPC_CREAT | IPC_EXCL | 0600);
+    semaphore_masterbook_id = semget(SEMAPHORE_MASTER_BOOK_ACCESS_KEY,SO_REGISTRY_SIZE , IPC_CREAT | IPC_EXCL | 0600);
     if (semaphore_masterbook_id < 0) {
         ERROR_EXIT_SEQUENCE_MAIN("IMPOSSIBLE TO CREATE MASTERBOOK SEM");
     }
-    DEBUG_NOTIFY_ACTIVITY_DONE("CREATION OF MASTEBOOK ACCESS SEM...");
-    DEBUG_NOTIFY_ACTIVITY_RUNNING("INITIALIZATION OF MASTERBOOK ACCESS SEM....");
-    if (semctl(semaphore_masterbook_id, 0, SETVAL, SO_REGISTRY_SIZE) <
-            0) {
-        ERROR_EXIT_SEQUENCE_MAIN("IMPOSSIBLE TO INITIALISE SEMAPHORE START CHILDREN");
-    }
-    DEBUG_NOTIFY_ACTIVITY_DONE("INITIALIZATION OF MASTEBOOK ACCESS SEM....");
+    DEBUG_NOTIFY_ACTIVITY_DONE("CREATION OF MASTEBOOK ACCESS SEM DONE");
     DEBUG_BLOCK_ACTION_END();
 
     DEBUG_NOTIFY_ACTIVITY_RUNNING("CREATION OF TO_FILL SEM....");
@@ -508,6 +502,7 @@ void print_info(void){
 void update_kids_info(void){
     int num_msg_to_wait_for= -1;
     num_msg_to_wait_for= send_sig_to_all(proc_list, SIGUSR2);
+    num_msg_to_wait_for = num_msg_to_wait_for *2; /*WAIT FOR NODE_TP_PROC*/
     if(num_msg_to_wait_for<0){
         ERROR_MESSAGE("IMPOSSIBLE TO UPDATE KIDS INFO");
     }
@@ -517,16 +512,16 @@ void update_kids_info(void){
     struct master_msg_report * msg_rep = (struct master_msg_report *)malloc(sizeof(struct master_msg_report));
     DEBUG_NOTIFY_ACTIVITY_RUNNING("RETRIVING INFO ...");
     do{
+        msg_rep->sender_pid =-1;
         /*TODO: POSSIBLE INFITE WAITING CHECK FOR SIG*/
-     printf("-------------> NUMBER OF MSG TO WAIT FOR: %d\n", num_msg_to_wait_for);
         master_msg_receive_info(msg_report_id_master, msg_rep);
-        master_msg_report_print(msg_rep);
-        Proc proc_to_update = get_proc_from_pid(proc_list,msg_rep->sender_pid);
-        if (proc_to_update!= NULL){
-            proc_to_update->budget = msg_rep->budget;
-            proc_to_update->proc_state = msg_rep->state;
-        }
-        if(msg_rep->proc_type != NODE_TP){
+        if (msg_rep->sender_pid!=-1){
+            master_msg_report_print(msg_rep);
+            Proc proc_to_update = get_proc_from_pid(proc_list,msg_rep->sender_pid);
+            if (proc_to_update!= NULL){
+                proc_to_update->budget = msg_rep->budget;
+                proc_to_update->proc_state = msg_rep->state;
+            }
             num_msg_to_wait_for--;
         }
     }while(num_msg_to_wait_for>0);

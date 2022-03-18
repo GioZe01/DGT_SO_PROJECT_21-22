@@ -143,7 +143,6 @@ int acknowledge(struct master_msg_report * self, ProcList list){
     if (proc_to_update == NULL){
         return -2;
     }
-    printf("\nmsg_type_number = %ld\n", msg_type);
     switch(msg_type){
         case TERMINATION_END_CORRECTLY:
         case IMPOSSIBLE_TO_SEND_TRANSACTION:

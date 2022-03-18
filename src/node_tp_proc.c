@@ -173,7 +173,7 @@ int main(int argc, char const *argv[]) {
                 ERROR_EXIT_SEQUENCE_NODE_TP("IMPOSSIBLE TO COMUNICATE WITH THE QUEUES");
             }
             if(info.msg_qnum >0){
-                printf("\n{DEBUG_NODE_TP}:= NUMBER OF TRANSACTION IN LIST: %d | NUMBER OF MESSAGES : %ld\n",get_num_transactions(current_node_tp.transactions_list),info.msg_qnum);
+                printf("\n{DEBUG_NODE_TP} %d := NUMBER OF TRANSACTION IN LIST: %d | NUMBER OF MESSAGES : %ld\n",getpid(),get_num_transactions(current_node_tp.transactions_list),info.msg_qnum);
             }
 #endif
             process_node_transaction(&msg_rep);

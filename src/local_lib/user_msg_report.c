@@ -53,7 +53,6 @@ void user_msg_print(struct user_msg *self) {
 }
 
 int user_msg_snd(int id, struct user_msg *msg, long type, struct Transaction *t, pid_t sender, Bool create, int queue_id) {
-    printf("\nUSER MSG TYPE : %d\n", CHECK_USER_TYPE(type,queue_id));
     if (create == TRUE) { user_msg_create(msg, CHECK_USER_TYPE(type,queue_id), sender, t); }
     while (msgsnd(id, msg, sizeof(struct user_msg) - sizeof(long), 0) < 0) {
         if (errno != EINTR) return -1;

@@ -5,8 +5,8 @@
 /* Can be implemented in one variable using bitwise shifting, for reading purpose it's implemented
  * in the following way
  * */
-#define IS_EMPTY 0
-#define FULL 1
+#define IS_EMPTY 1
+#define FULL 2
 /**
  * To load this struct it's raccomanded to use a semaphore with a semval set to FULL from the writer
  * and reset to IS_EMPTY from the reader, in order to make data consistent.
