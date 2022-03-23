@@ -2,11 +2,12 @@
 #include <stdio.h>
 /* Local*/
 #include "headers/conf_shm.h"
+#include "headers/boolean.h"
 
 /* Helper function*/
 
 
-shm_conf_create(struct shm_conf *self, int *users_pids, int *users_queues_ids, int *nodes_pids, int *nodes_queues_ids) {
+int shm_conf_create(struct shm_conf *self, int *users_pids, int *users_queues_ids, int *nodes_pids, int *nodes_queues_ids) {
     shm_copy_snapshots(self->users_snapshots, users_pids, users_queues_ids);
     shm_copy_snapshots(self->nodes_snapshots, nodes_pids, nodes_queues_ids);
     return 0;
@@ -28,3 +29,21 @@ void shm_copy_snapshots(int snapshot[][2], int *pids, int *queues_ids){
         }
     }
 }
+
+int get_queueid_by_pid(struct shm_conf *self, int pid, Bool in_users){
+    int *snapshot;
+    int ris = -1;
+    if (in_users == TRUE){
+        snapshot = &self->users_snapshots[0][0];
+    }else{
+        snapshot = &self->nodes_snapshots[0][0];
+    }
+    for(;snapshot != NULL; snapshot+=2){
+        if (*snapshot == pid){
+            ris = *(snapshot+1);
+            return ris;
+        }
+    }
+    return ris;
+}
+

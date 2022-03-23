@@ -1,4 +1,3 @@
-#define _GNU_SOURCE
 #ifndef DGT_SO_PROJECT_21_22_USER_MSG_REPORT_H
 #define DGT_SO_PROJECT_21_22_USER_MSG_REPORT_H
 
@@ -6,9 +5,13 @@
 #include "transaction_list.h"
 #include "boolean.h"
 
-#define DELTA_USER_MSG_TYPE 2/*To give priority to single user*/
+#define DELTA_USER_MSG_TYPE 3/*To give priority to single user*/
 #define MSG_TRANSACTION_FAILED_TYPE 1
-#define MSG_TRANSACTION_CONFIRMED_TYPE 2
+#define MSG_TRANSACTION_INCOME_TYPE 2
+#define MSG_TRANSACTION_CONFIRMED_TYPE 3/*Default value*/
+
+#define CHECK_USER_TYPE(type_recived, queue_id) type_recived-queue_id == 0 ? MSG_TRANSACTION_CONFIRMED_TYPE : type_recived
+
 struct user_msg {
     long type;
     pid_t sender_pid;
@@ -39,9 +42,10 @@ void user_msg_print(struct user_msg *self);
  * @param data user_data to be sent
  * @param sender pid_t of the sender of this message
  * @param crete TRUE if u want to create it before sending.
+ * @param queue_id number rappresenting the current user into the message queue
  * @return -1 in case of failure, -1 otherwise
  */
-int user_msg_snd(int id, struct user_msg *msg, long type, struct Transaction *t, pid_t sender, Bool crete);
+int user_msg_snd(int id, struct user_msg *msg, long type, struct Transaction *t, pid_t sender, Bool crete, int queue_id);
 
 /**
  * Retrieve the message_user_report on the specified message queue

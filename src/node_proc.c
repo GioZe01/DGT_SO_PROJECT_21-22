@@ -29,21 +29,31 @@
 #include "local_lib/headers/conf_shm.h"
 #include "local_lib/headers/book_master_shm.h"
 #include "local_lib/headers/master_msg_report.h"
-#ifdef DEBUG
-
-#ifdef DEBUG_NODE
+#include "local_lib/headers/node_tp_shm.h"
 #include "local_lib/headers/debug_utility.h"
-#else
-#define DEBUG_NOTIFY_ACTIVITY_RUNNING(mex)
-#define DEBUG_NOTIFY_ACTIVITY_DONE(mex)
-#define DEBUG_MESSAGE(mex)
-#define DEBUG_SIGNAL(mex, signum)
-#define DEBUG_ERROR_MESSAGE(mex)
-#endif
-#endif
-
 
 /* Support Function*/
+
+/* TODO: refactoring of comments of the following process transaction*/
+/**
+ * If it finds node msg of type NODE_TRANSACTION it proccess them
+ * and make the aknowledgement
+ * @param msg_rep the messagge to be loaded if present in the queue
+ * */
+void process_node_transaction(struct node_msg *msg_rep);
+
+/*
+ * If it finds node msg of type TRANSACTION_TYPE it process them
+ * and make the aknowledgement adding them to the transaction_pool and the transaction_block if
+ * need
+ * @param msg_rep the messagge to be loaded if present in the queue
+ * */
+void process_simple_transaction_type(struct node_msg *msg_rep);
+
+/**
+ * Advice the users of the processed transactions, both receivers and senders
+ */
+void adv_users_of_block(void);
 
 /**
  * handler of the signal
@@ -75,24 +85,17 @@ Bool set_signal_handler_node(struct sigaction sa, sigset_t sigmask);
 Bool check_arguments(int argc, char const *argv[]);
 
 /**
- * Make the shm_conf_pointer points to the correct conf shm
+ * Create and Lunch the node transaction pool process
  */
-void attach_to_shm_conf(void);
+void create_node_tp_proc(void);
 
 /**
- * If it finds node msg of type NODE_TRANSACTION it proccess them
- * and make the aknowledgement
- * @param msg_rep the messagge to be loaded if present in the queue
- * */
-void process_node_transaction(struct node_msg *msg_rep);
-
-/**
- * if it finds node msg of type TRANSACTION_TYPE it process them
- * and make the aknowledgement adding them to the transaction_pool and the transaction_block if
- * need
- * @param msg_rep the messagge to be loaded if present in the queue
- * */
-void process_simple_transaction_type(struct node_msg *msg_rep);
+ * \brief Attach the current node to the related shms
+ * Specificcaly:
+ *  -book_master_shm
+ *  -node_tp_shm
+ */
+void attach_to_shms(void);
 
 /**
  * If node_transaction pool has at list node_block_size of transactions it load them in a transaction block
@@ -108,23 +111,23 @@ void connect_to_queues(void);
 
 /**
  * load block_size transactions from transaction pool into transaction block of the current node
- * @return
+ * @return TRUE if succeded, FALSE otherwise
  */
-Bool load_block();
+Bool load_block(void);
 
 /**
  * \brief Acquire the semaphore_id related to the node
- * In particular:
+ * Specificcaly:
  * - semaphore_start_id
  * - semaphore_masterbook_id
- * - semaphore_node_tp_shm_access TODO: to be implemented
+ * - semaphore_node_tp_shm_access
  */
 void acquire_semaphore_ids(void);
 
 /* Lock the shm book_master via masterbook_to_fill param and the cell to fill index.
- *
+ * @return FALSE in case of failure, TRUE otherwise
  */
-void lock_shm_masterbook(void);
+Bool lock_shm_masterbook(void);
 
 /* Lock the to_fill index saved in the shared_memory access
  */
@@ -137,49 +140,76 @@ void lock_masterbook_cell_access(int i_cell_block_list);
 
 /* Unlock the to_fill index saved in the shared_memory access
  */
-void unlock_to_fill_sem(void);
+void unlock_to_fill_sem();
 
-/* Unloack the current cell of the masterbook shm in which the node had written the block
+/* Unlock the current cell of the masterbook shm in which the node had written the block
+ * @param i_cell_block_list index to be blocked
  */
-void unlock_masterbook_cell_access(void);
+void unlock_masterbook_cell_access(int i_cell_block_list);
 
 /* Advice the master porc via master_message queue by sending a master_message
+ * @param termination_type MSG_REPORT_TYPE type process termination occured
 */
-void advice_master_of_termination(void);
+void advice_master_of_termination(long termination_type);
+
 /*Extract randomly the time needed for processing from node_configuration
  *@return an integer that rappresent the time for processing
  * */
-int get_time_processing(void);
+long int get_time_processing(void);
+
+/*
+ * Create the semaphores needed for the access regulation for this specific program
+ */
+void create_semaphore(void);
+
+/*
+ * Create the shmared memory for the tp (transaction pool) of the current node
+ * */
+void create_tp_shm(void);
 
 /* SysVar */
+int shm_tp_id = -1; /* Id of node_tp_shm*/
 int semaphore_start_id = -1; /*Id of the start semaphore arrays for sinc*/
 int semaphore_masterbook_id = -1; /*Id of the masterbook semaphore for accessing the block matrix*/
 int semaphore_to_fill_id = -1; /* Id of the masterbook to_fill access semaphore*/
+int semaphore_tp_shm = -1; /* Id of the tp_shm for accesing the current block to be processed*/
 int queue_node_id = -1;/* Identifier of the node queue id */
 int queue_user_id = -1; /* Identifier of the user queue id*/
-int node_end = 0; /* For value different from 0 the node proc must end*/
-int node_id = -1; /* Id of the current node into the snapshots vector*/
+int queue_master_id = -1; /* Identifier of the master queue id*/
+int node_end = 0; /* For values different from 0 the node proc must end*/
+float current_block_reward = 0; /* The current value of all node block reward*/
 int last_signal;
 struct node current_node; /* Current representation of the node*/
 struct conf node_configuration; /* Configuration File representation*/
 struct shm_conf *shm_conf_pointer_node; /* Ref to the shm for configuration of the node*/
 struct shm_book_master *shm_masterbook_pointer;/* Ref to the shm for the masterbook shm */
+struct node_block * shm_node_tp; /* Ref to the shm for the node_tp shm */
 
 int main(int argc, char const *argv[]) {
     DEBUG_MESSAGE("NODE PROCESS STARTED");
     struct sigaction sa;
     sigset_t sigmask;
+    int failure_shm = 0;
     DEBUG_MESSAGE("NODE STATE SET TO INIT");
     current_node.exec_state= PROC_STATE_INIT;
+    current_node.pid = getpid();
     /************************************
      *      CONFIGURATION FASE          *
      * **********************************/
+    read_conf_node(&node_configuration);
+    node_proc_block_create(&current_node, getpid(), 0, SO_BLOCK_SIZE,
+            node_configuration.so_reward, (Reward)&calc_reward);
     if (check_arguments(argc, argv) && set_signal_handler_node(sa, sigmask)) {
         struct node_msg msg_rep;
-        read_conf_node(&node_configuration);
-        node_create(&current_node, getpid(), 0, node_configuration.so_tp_size, SO_BLOCK_SIZE,
-                node_configuration.so_reward, &calc_reward);
-
+        int is_unsed_node = 0;
+        /*-----------------------*/
+        /*  CREATING SEMAPHORES  */
+        /*-----------------------*/
+        create_semaphore();
+        /*-----------------------*/
+        /*  CREATING SHM TP      */
+        /*-----------------------*/
+        create_tp_shm();
         /*-----------------------*/
         /*  CONNECTING TO QUEUES */
         /*-----------------------*/
@@ -187,7 +217,7 @@ int main(int argc, char const *argv[]) {
         /*-------------------------*/
         /*  SHARED MEM  CONFIG     */
         /*-------------------------*/
-        attach_to_shm_conf();
+        attach_to_shms();
         /************************************
          *      SINC AND WAITING FASE       *
          * **********************************/
@@ -196,6 +226,11 @@ int main(int argc, char const *argv[]) {
         /*---------------------------*/
         acquire_semaphore_ids();
 
+        /************************************
+         *      CREATING NODE_TP_PROC       *
+         * **********************************/
+        create_node_tp_proc();
+
         /*---------------------------*/
         /*  SEMAPHORES SINC..        */
         /*---------------------------*/
@@ -203,28 +238,42 @@ int main(int argc, char const *argv[]) {
         if (semaphore_wait_for_sinc(semaphore_start_id, 0) < 0) {
             ERROR_EXIT_SEQUENCE_NODE("IMPOSSIBLE TO WAIT FOR START");
         }
-        state = RUNNING_STATE;
+        current_node.exec_state= PROC_STATE_RUNNING;
 
         /****************************************
-         *      PROCESSING OF TRANSACTION FASE  *
+         *   PROCESSING OF TRANSACTION FASE     *
          * **************************************/
-        while (node_end != 1) {
-            /*TODO: verificare*/
+        while (node_end!= 1 && failure_shm < MAX_FAILURE_SHM_LOADING) {
+#ifdef DEBUG_NODE_TP
+            struct msqid_ds info;
+            if (msgctl(queue_node_id, IPC_STAT, &info)<0){
+                ERROR_EXIT_SEQUENCE_NODE_TP("IMPOSSIBLE TO COMUNICATE WITH THE QUEUES");
+            }
+            if(info.msg_qnum >0){
+                printf("\n{DEBUG_NODE_TP} %d := NUMBER OF TRANSACTION IN LIST: %d | NUMBER OF MESSAGES : %ld\n",getpid(),get_num_transactions(current_node_tp.transactions_list),info.msg_qnum);
+            }
+#endif
             process_node_transaction(&msg_rep);
             process_simple_transaction_type(&msg_rep);
-#ifdef DEBUG
-            node_msg_print(&msg_rep);
-            queue_print(current_node.transaction_pool);
-            struct timespec print_waiting_time;
-            print_waiting_time.tv_sec = 1;
-            print_waiting_time.tv_nsec = 0;
-            nanosleep(&print_waiting_time, (void *)NULL);
-#endif
-            if (get_num_transactions(current_node.transaction_pool) >= SO_BLOCK_SIZE && process_node_block()<0) {
-                printf("PROCESSING NODE BLOCKS---------------------\n");
+            if(msg_rep.sender_pid == -1){
+                is_unsed_node++;
+            }
+            if (get_num_transactions(current_node.transactions_block) >= SO_BLOCK_SIZE &&
+                    process_node_block() == FALSE){
+                failure_shm++;
+
             }
         }
+        if (failure_shm > MAX_FAILURE_SHM_LOADING) {
+            ERROR_EXIT_SEQUENCE_NODE_TP("IMPOSSIBLE TO READ DATA FROM NODE_TP_SHM");
+            advice_master_of_termination(UNUSED_PROC);
+        }
+        if(is_unsed_node >= MAX_UNSED_CICLE_OF_NODE_PROC){
+            advice_master_of_termination(UNUSED_PROC);
+            ERROR_EXIT_SEQUENCE_NODE_TP("UNUSED NODE TP PROC");
+        }
     }
+    advice_master_of_termination(TERMINATION_END_CORRECTLY);
     EXIT_PROCEDURE_NODE(0);
 }
 
@@ -250,51 +299,47 @@ Bool read_conf_node() {
     return TRUE;
 }
 
-/**
- * Calculate the balance of the current user_proc
- * @param budget the current budget that is available for the user_proc
- * @return the value of the balance
- */
 Bool check_arguments(int argc, char const *argv[]) {
     DEBUG_NOTIFY_ACTIVITY_RUNNING("CHECKING ARGC AND ARGV...");
     if (argc < 2) {
         ERROR_EXIT_SEQUENCE_NODE("MISSING ARGUMENT");
     }
-    node_id = atoi(argv[1]);
+    current_node.node_id = atoi(argv[1]);
     DEBUG_NOTIFY_ACTIVITY_DONE("CHECKING ARGC AND ARGV DONE");
     return TRUE;
 }
 
 Bool set_signal_handler_node(struct sigaction sa, sigset_t sigmask) {
-    DEBUG_NOTIFY_ACTIVITY_RUNNING("SETTING SIGNAL MASK...");
-    sigemptyset(&sigmask);/*Creating an empty mask*/
-    sigaddset(&sigmask, SIGALRM);/*Adding signal to the mask*/
-    DEBUG_NOTIFY_ACTIVITY_DONE("SETTING SIGNAL MASK DONE");
-
     memset(&sa, 0, sizeof(sa));
     sa.sa_handler = signals_handler;
     sa.sa_mask = sigmask;
     if (sigaction(SIGINT, &sa, NULL) < 0 ||
-        sigaction(SIGALRM, &sa, NULL) < 0
+        sigaction(SIGALRM, &sa, NULL) < 0 ||
+        sigaction(SIGUSR2, &sa, NULL) < 0
             ) {
         ERROR_EXIT_SEQUENCE_NODE("ERROR DURING THE CREATION OF THE SIG HANDLER ");
     }
     return TRUE;
 }
 
-/**
- * Set the signal handler and signal mask for the user_proc
- * @return TRUE if success, FALSE otherwise.
- */
 void signals_handler(int signum) {
     DEBUG_SIGNAL("SIGNAL RECEIVED ", signum);
     last_signal = signum;
+    struct master_msg_report msg;
     switch (signum) {
         case SIGINT:
-            /*TODO: avvisare main*/
             alarm(0);/*pending alarm removed*/
+            current_node.exec_state = PROC_STATE_TERMINATED;
+            advice_master_of_termination(SIGNALS_OF_TERM_RECEIVED);
             EXIT_PROCEDURE_NODE(0);
+            break;
         case SIGALRM:
+            break;
+        case SIGUSR2:
+            master_msg_send(queue_master_id,&msg, INFO_BUDGET,NODE,current_node.pid,current_node.exec_state,TRUE, current_node.type.block.budget);
+#ifdef DEBUG_NODE
+            DEBUG_NOTIFY_ACTIVITY_DONE("{DEBUG_NODE}:= REPLIED TO MASTER DONE");
+#endif
             break;
         default:
             break;
@@ -303,72 +348,116 @@ void signals_handler(int signum) {
 
 void free_sysVar_node() {
     int semaphore_start_value;
-    if (state == INIT_STATE && semaphore_start_id >= 0) {
+    /* If the process is in INIT STATE his termination can block the whole simulation. So it need to
+     * lock the sart semaphore.
+     * If the semaphore_start_id is impossible to retrive ( = -1) nothing can be done.
+     * */
+    if (current_node.exec_state== PROC_STATE_INIT && semaphore_start_id >= 0) {
         semaphore_start_value = semctl(semaphore_start_id, 0, GETVAL);
         if (semaphore_start_value < 0) ERROR_MESSAGE("IMPOSSIBLE TO RETRIEVE INFORMATION ON STARTING SEMAPHORE");
         else if (semaphore_start_value > 0 && (semaphore_lock(semaphore_start_id, 0) < 0)) {
             ERROR_MESSAGE("IMPOSSIBLE TO EXECUTE THE FREE SYS VAR (prob. sem_lock not set so cannot be closed)");
         }
     }
+    DEBUG_NOTIFY_ACTIVITY_RUNNING("REMOVING SEMAPHORE_TP_SHM...");
+    if(semaphore_tp_shm >= 0 && semctl(semaphore_tp_shm,0,IPC_RMID) < 0){
+        ERROR_MESSAGE("REMOVING PROCEDURE FOR TP SHM SEMAPHORE HAS FAILED");
+    }
+    DEBUG_NOTIFY_ACTIVITY_DONE("REMOVING SEMAPHORE_TP_SHM DONE");
+    DEBUG_NOTIFY_ACTIVITY_RUNNING("REMOVING TP_SHM ....");
+    if(shm_tp_id>= 0 && shmctl(shm_tp_id, IPC_RMID, NULL) < 0){
+        ERROR_MESSAGE("REMOVING PROCEDURE FOR TP SHM HAS FAILED");
+    }
+    DEBUG_NOTIFY_ACTIVITY_DONE("REMOVING TP_SHM DONE");
+    current_node.exec_state = PROC_STATE_TERMINATED;
 }
 
 void free_mem_node() {
     free_node(&current_node);
 }
 
-void attach_to_shm_conf(void) {
+void attach_to_shms(void) {
     DEBUG_NOTIFY_ACTIVITY_RUNNING("ATTACHING TO SHM...");
     int shm_conf_id = -1;/* id to the shm_conf*/
     shm_conf_id = shmget(SHM_CONFIGURATION, sizeof(struct shm_conf), 0600);
-    if (shm_conf_id < 0) { ERROR_EXIT_SEQUENCE_NODE("IMPOSSIBLE TO ACCESS SHM CONF"); }
+    if (shm_conf_id < 0) {
+        advice_master_of_termination(IMPOSSIBLE_TO_CONNECT_TO_SHM);
+        ERROR_EXIT_SEQUENCE_NODE("IMPOSSIBLE TO ACCESS SHM CONF");
+    }
     shm_conf_pointer_node = shmat(shm_conf_id, NULL, 0);
-    if (shm_conf_pointer_node == (void *) -1) { ERROR_EXIT_SEQUENCE_NODE("IMPOSSIBLE TO CONNECT TO SHM CONF"); }
+    if (shm_conf_pointer_node == (void *) -1) {
+        advice_master_of_termination(IMPOSSIBLE_TO_CONNECT_TO_SHM);
+        ERROR_EXIT_SEQUENCE_NODE("IMPOSSIBLE TO CONNECT TO SHM CONF");
+    }
     DEBUG_NOTIFY_ACTIVITY_DONE("ATTACHING TO SHM DONE");
     shm_conf_id = shmget(MASTER_BOOK_SHM_KEY, sizeof(struct shm_book_master), 0600);
+    if (shm_conf_id<0){
+        advice_master_of_termination(IMPOSSIBLE_TO_CONNECT_TO_SHM);
+        ERROR_EXIT_SEQUENCE_NODE("IMPOSSIBLE TO ACCESS SHM BOOKMASTER");
+    }
+    shm_masterbook_pointer = shmat(shm_conf_id, NULL, 0);
+    if (shm_masterbook_pointer == (void *)-1){
+        advice_master_of_termination(IMPOSSIBLE_TO_CONNECT_TO_SHM);
+        ERROR_EXIT_SEQUENCE_NODE("IMPOSSIBLE TO CONNECT TO THE SHM_MASTERBOOK");
+    }
+    shm_node_tp = shmat(shm_tp_id, NULL, 0);
+    if(shm_node_tp == (void * )-1){
+        advice_master_of_termination(IMPOSSIBLE_TO_CONNECT_TO_SHM);
+        ERROR_EXIT_SEQUENCE_NODE("IMPOSSIBLE TO CONNECT TO THE NODE_TP SHM");
+    }
+    DEBUG_NOTIFY_ACTIVITY_DONE("ATTACHING TO SHM DONE");
 }
 
-void process_node_transaction(struct node_msg *msg_rep) {
-    if (node_msg_receive(queue_node_id, msg_rep, node_id-MSG_NODE_ORIGIN_TYPE) == 0) {
-        /*Checking for transaction coming from node*/
-        DEBUG_MESSAGE("NODE TRANSACTION RECEIVED");
-        /*TODO: Implement incoming transaction from other node*/
-    }
-}
-
-void process_simple_transaction_type(struct node_msg *msg_rep) {
-    if (node_msg_receive(queue_node_id, msg_rep, node_id) == 0) {
-        DEBUG_MESSAGE("NODE TRANSACTION TYPE RECEIVED");
-        if (get_num_transactions(current_node.transaction_pool) < node_configuration.so_tp_size) {
-            queue_append(current_node.transaction_pool, msg_rep->t);
-        } else {
-            struct user_msg *u_msg_rep;
-            DEBUG_ERROR_MESSAGE("NODE TRANSACTION FAILED");
-            u_msg_rep->t.t_type = TRANSACTION_FAILED;
-            user_msg_snd(queue_user_id, u_msg_rep, MSG_TRANSACTION_FAILED_TYPE, &msg_rep->t, current_node.pid, TRUE);
-        }
-    }
-}
 
 void connect_to_queues(void) {
     queue_node_id = msgget(NODES_QUEUE_KEY, 0600);
     if (queue_node_id < 0) { ERROR_EXIT_SEQUENCE_NODE("IMPOSSIBLE TO CONNECT TO NODE MESSAGE QUEUE"); }
     queue_user_id = msgget(USERS_QUEUE_KEY, 0600);
     if (queue_user_id < 0) { ERROR_EXIT_SEQUENCE_NODE("IMPOSSIBLE TO CONNECT TO USER QUEUE"); }
+    queue_master_id = msgget(MASTER_QUEUE_KEY, 0600);
+    if (queue_master_id < 0){ERROR_EXIT_SEQUENCE_NODE("IMPOSSIBLE TO CONNECT TO MASTER QUEUE");}
 }
 
 int process_node_block() {
-        /*Loading them into the node_block_transactions*/
-        if (load_block() == FALSE) return -1;
-        current_node.calc_reward(&current_node, -1, TRUE);
-        struct Transaction t_vector[get_num_transactions(current_node.transaction_block)];
-        queue_to_array(current_node.transaction_block, t_vector);
-        /*TODO: insert it into the shm with sem_lock*/
-        lock_shm_masterbook();
+    /*Loading them into the node_block_transactions*/
+    if (    load_block() == TRUE &&
+            get_num_transactions(current_node.current_block)==SO_BLOCK_SIZE /* DID i got the correct num of transactions*/&&
+            current_node.calc_reward(&current_node, -1, TRUE, &current_block_reward)>=0){
+        int num_of_shm_retry = 0;
+        while(num_of_shm_retry < MAX_FAILURE_SHM_BOOKMASTER_LOCKING
+                && lock_shm_masterbook() == FALSE){
+            num_of_shm_retry++;
+        }
+        /*TODO: send confirmed to all users*/
+        adv_users_of_block();
+    }
+
     return 0;
 }
-
-void advice_master_of_termination(void) {
-
+Bool lock_shm_masterbook(void) {
+    DEBUG_NOTIFY_ACTIVITY_RUNNING("NODE:= LOCKING THE SHM FOR ADDING THE BLOCK...");
+    struct timespec trans_proc_sim;
+    trans_proc_sim.tv_sec = 0;
+    trans_proc_sim.tv_nsec = get_time_processing();
+    nanosleep(&trans_proc_sim, (void *) NULL);
+    lock_to_fill_sem();
+    unsigned short int i_cell_block_list = shm_masterbook_pointer->to_fill;
+    /*Inserting the block into the shm*/
+    shm_masterbook_pointer->to_fill += 1;
+    lock_masterbook_cell_access(i_cell_block_list);
+    struct Transaction block_list [get_num_transactions(current_node.current_block)];
+    queue_to_array(current_node.transactions_list,block_list);
+    if (insert_block(shm_masterbook_pointer,block_list) == 0){
+        current_node.budget = current_block_reward;
+    }else {
+        ERROR_MESSAGE("IMPOSSIBLE TO INSERT BLOCK");
+        return FALSE;
+    }
+    /*Unloacking the semaphore*/
+    unlock_masterbook_cell_access(i_cell_block_list);
+    unlock_to_fill_sem();
+    DEBUG_NOTIFY_ACTIVITY_DONE("NODE:= LOCKING THE SHM FOR ADDING THE BLOCK DONE");
+    return TRUE;
 }
 
 void lock_to_fill_sem(void) {
@@ -378,7 +467,7 @@ void lock_to_fill_sem(void) {
                 /**RICEZIONE DI SEGNALE*/
                 unlock_to_fill_sem();
                 /*Avvisare il main e il processo deve terminare*/
-                advice_master_of_termination();
+                advice_master_of_termination(IMPOSSIBLE_TO_SEND_TRANSACTION);
             } else {
                 continue;
             }
@@ -394,9 +483,9 @@ void lock_masterbook_cell_access(int i_cell_block_list) {
         if (errno == EINTR) {
             if (last_signal == SIGALRM) {
                 /**RICEZIONE DI SEGNALE*/
-                unlock_masterbook_cell_access();
+                unlock_masterbook_cell_access(i_cell_block_list);
                 /*Avvisare il main e il processo deve terminare*/
-                advice_master_of_termination();
+                advice_master_of_termination(IMPOSSIBLE_TO_SEND_TRANSACTION);
             } else {
                 continue;
             }
@@ -414,50 +503,31 @@ void unlock_to_fill_sem(void) {
     }
 }
 
-void unlock_masterbook_cell_access(void) {
-    while (semaphore_unlock(semaphore_masterbook_id, 0)) {
+void unlock_masterbook_cell_access(int i_cell_block_list) {
+    while (semaphore_unlock(semaphore_masterbook_id, i_cell_block_list)) {
         if (errno != EINTR) {
             ERROR_EXIT_SEQUENCE_NODE("ERROR DURING THE UNLOCK OF BOOKMASTER CELL");
         }
     }
 }
 
-void lock_shm_masterbook(void) {
-    DEBUG_NOTIFY_ACTIVITY_RUNNING("NODE:= LOCKING THE SHM FOR ADDING THE BLOCK...");
-    struct timespec trans_proc_sim;
-    trans_proc_sim.tv_sec = 0;
-    trans_proc_sim.tv_nsec = get_time_processing();
-    nanosleep(&trans_proc_sim, (void *) NULL);
-    lock_to_fill_sem();
-    int i_cell_block_list = shm_masterbook_pointer->to_fill;
-    /*Inserting the block into the shm*/
-    shm_masterbook_pointer->to_fill += 1;
-    lock_masterbook_cell_access(i_cell_block_list);
-    struct Transaction block_list [get_num_transactions(current_node.transaction_block)];
-    queue_to_array(current_node.transaction_block,&block_list);
-    insert_block(shm_masterbook_pointer,block_list);
-    /*Unloacking the semaphore*/
-    unlock_masterbook_cell_access();
-    unlock_to_fill_sem();
-    DEBUG_NOTIFY_ACTIVITY_DONE("NODE:= LOCKING THE SHM FOR ADDING THE BLOCK DONE");
+Bool load_block(void) {
+    if (queue_is_empty(current_node.transactions_list)==TRUE || get_num_transactions(current_node.transactions_list)<SO_BLOCK_SIZE){
+        return FALSE;
+    }
+    else {
+        copy_n_element(current_node.transactions_list, current_node.current_block, SO_BLOCK_SIZE);
+    }
+    return TRUE;
 }
 
-Bool load_block() {
-    /*Finish check*/
-    DEBUG_NOTIFY_ACTIVITY_RUNNING("NODE:= LOADING THE BLOCK FROM THE TRANSACTION POOL...");
-    int i;
-    for (i = 0; i < current_node.block_size - 1; i++) {
-        queue_append(current_node.transaction_block, queue_head(current_node.transaction_pool));
-        queue_remove_head(current_node.transaction_pool);
+
+void advice_master_of_termination(long termination_type) {
+    struct master_msg_report termination_report;
+    if (master_msg_send(queue_master_id, &termination_report, termination_type, NODE,current_node.pid, current_node.exec_state,TRUE, current_node.budget)<0){
+       char * error_string = strcat("IMPOSSIBLE TO ADVICE MASTER OF : %s",from_type_to_string(termination_type));
+       ERROR_MESSAGE(error_string);
     }
-    if (i == current_node.block_size - 2) {
-        struct Transaction node_transaction;
-        create_transaction(&node_transaction, SENDER_NODE_TRANSACTION, current_node.pid,
-                           queue_get_reward(current_node.transaction_block));
-        queue_append(current_node.transaction_block, node_transaction);
-    }
-    DEBUG_NOTIFY_ACTIVITY_DONE("NODE:= LOADING THE BLOCK FROM THE TRANSACTION POOL DONE");
-    return TRUE;
 }
 
 void acquire_semaphore_ids(void) {
@@ -476,9 +546,86 @@ void acquire_semaphore_ids(void) {
     }
 }
 
-int get_time_processing(void) {
+long int get_time_processing(void) {
     srand(getpid());
     return (rand() %
             (node_configuration.so_max_trans_gen_nsec - node_configuration.so_min_trans_proc_nsec + 1)) +
            node_configuration.so_min_trans_proc_nsec;
 }
+void create_semaphore(void){
+    DEBUG_NOTIFY_ACTIVITY_RUNNING("CREATION OF THE TP_SHM SEM...");
+    semaphore_tp_shm = semget(current_node.node_id,1, IPC_CREAT | IPC_EXCL | 0600);
+    if(semaphore_tp_shm < 0){
+        ERROR_EXIT_SEQUENCE_NODE("IMPOSSIBLE TO CREATE TP_SHM SEM");
+    }
+    if (semctl(semaphore_tp_shm, 0, SETVAL, IS_EMPTY)<0){
+       ERROR_EXIT_SEQUENCE_NODE("IMPOSSIBLE TO SET NODE TP SEM TO IS_EMPTY");
+    }
+    DEBUG_NOTIFY_ACTIVITY_DONE("CREATION OF THE TP_SHM SEM DONE");
+}
+void create_tp_shm(void){
+    DEBUG_NOTIFY_ACTIVITY_RUNNING("CREATION OF THE TP_SHM...");
+    shm_tp_id = shmget(current_node.pid+current_node.node_id, sizeof(struct node_block), IPC_CREAT | IPC_EXCL | 0600);
+    if (shm_tp_id < 0){
+        ERROR_EXIT_SEQUENCE_NODE("IMPOSSIBLE TO CREATE NODE TP_SHM");
+    }
+    DEBUG_NOTIFY_ACTIVITY_DONE("CREATION OF THE TP_SHM DONE");
+}
+
+void adv_users_of_block(void){
+    int sender_pid = -1;
+    int receiver_pid = -1;
+  while(queue_is_empty(current_node.transactions_list)==FALSE){
+            struct user_msg *u_msg_rep =  (struct user_msg *) malloc(sizeof(struct user_msg));
+            DEBUG_ERROR_MESSAGE("NODE TRANSACTION FAILED");
+            u_msg_rep->t.t_type = TRANSACTION_SUCCES;
+            struct Transaction t = queue_head(current_node.transactions_list);
+            sender_pid = t.sender;
+            receiver_pid = t.reciver;
+            int queue_id_user_proc= get_queueid_by_pid(shm_conf_pointer_node,sender_pid,TRUE);
+            if (queue_id_user_proc<0){
+                ERROR_MESSAGE("ILLIGAL PID INTO TRANSACTION, NO PIDS FOUND");
+                return;
+            }
+            user_msg_snd(queue_user_id, u_msg_rep, MSG_TRANSACTION_CONFIRMED_TYPE, &t, current_node.pid, TRUE, queue_id_user_proc);
+            queue_id_user_proc= get_queueid_by_pid(shm_conf_pointer_node,receiver_pid,TRUE);
+            if (queue_id_user_proc<0){
+                ERROR_MESSAGE("ILLIGAL PID INTO TRANSACTION, NO PIDS FOUND");
+                return;
+            }
+            user_msg_snd(queue_user_id, u_msg_rep, MSG_TRANSACTION_INCOME_TYPE, &t, current_node.pid, TRUE, queue_id_user_proc);
+  }
+}
+void process_simple_transaction_type(struct node_msg *msg_rep) {
+    if (node_msg_receive(queue_node_id, msg_rep, current_node.node_id) == 0) {
+        DEBUG_MESSAGE("NODE TRANSACTION TYPE RECEIVED");
+        if (get_num_transactions(current_node.transactions_list) < current_node.tp_size) {
+            queue_append(current_node.transactions_list, msg_rep->t);
+        } else {/*TP_SIZE FULL*/
+            struct user_msg *u_msg_rep =  (struct user_msg *) malloc(sizeof(struct user_msg));
+#ifdef DEBUG_NODE_TP
+            DEBUG_ERROR_MESSAGE("NODE TRANSACTION FAILED");
+#endif
+            u_msg_rep->t.t_type = TRANSACTION_FAILED;
+            int queue_id_user_proc= get_queueid_by_pid(shm_conf_pointer_node,msg_rep->sender_pid,TRUE);
+            if (queue_id_user_proc<0){
+                ERROR_MESSAGE("ILLIGAL PID INTO TRANSACTION, NO PIDS FOUND");
+                return;
+            }
+            user_msg_snd(queue_user_id, u_msg_rep, MSG_TRANSACTION_FAILED_TYPE, &msg_rep->t, current_node.pid, TRUE, queue_id_user_proc);
+        }
+    }else{
+        msg_rep->sender_pid =-1;
+    }
+}
+
+void process_node_transaction(struct node_msg *msg_rep) {
+    if (node_msg_receive(queue_node_id, msg_rep, current_node.node_id - MSG_NODE_ORIGIN_TYPE) == 0) {
+        /*Checking for transaction coming from node*/
+        DEBUG_MESSAGE("NODE TRANSACTION RECEIVED");
+        /*TODO: Implement incoming transaction from other node*/
+    }else{
+        msg_rep->sender_pid = -1;
+    }
+}
+

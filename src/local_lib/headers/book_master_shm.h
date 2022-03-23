@@ -9,7 +9,7 @@ union Block{
 };
 struct shm_book_master{
     union Block blocks [SO_REGISTRY_SIZE][2];
-    int to_fill; /*index free to be filled (need his own dedicated semaphore)*/
+    unsigned short int to_fill; /*index free to be filled (need his own dedicated semaphore)*/
 };
 /*          0                   1
  * 0    block_transactions      index   <-  ;

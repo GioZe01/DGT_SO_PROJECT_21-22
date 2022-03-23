@@ -28,7 +28,7 @@ void node_msg_print(struct node_msg *self) {
             printf("~ NODE_MSG | type: NODE ORIGIN | sender: %d ~\n", self->sender_pid);
             break;
         case MSG_TRANSACTION_TYPE:
-            printf("~ NODE_MSG | type: TRANSACTION TYPE | sender: %d ~\n", self->sender_pid);
+            printf("~ NODE_MSG | type: TRANSACTION TYPE | sender: %d | type: %ld ~\n", self->sender_pid, self->type);
             break;
         default:
             ERROR_MESSAGE("NODE MESSAGE TYPE NOT RECONIZED");
@@ -36,12 +36,15 @@ void node_msg_print(struct node_msg *self) {
     }
 }
 
-int node_msg_snd(int id, struct node_msg *msg, long type, struct Transaction *t, pid_t sender, Bool create) {
-    if (create == TRUE) { node_msg_create(msg, type, sender, t); }
-    while (msgsnd(id, msg, sizeof(*msg) - sizeof(long), 0) < 0) {
-        if (errno != ENOMSG) {
-            return -1;
-        }
+int node_msg_snd(int id, struct node_msg *msg, long type, struct Transaction *t, pid_t sender, Bool create, int so_retry, int queue_id) {
+    int retry = 0;
+    if (create == TRUE) { node_msg_create(msg, CHECK_DEFAULT(type,queue_id), sender, t); }
+    while (msgsnd(id, msg, sizeof(struct node_msg) - sizeof(long), 0) < 0 && retry <= so_retry ) {
+        if (errno != EINTR) return -1;
+        retry++;
+    }
+    if (retry == so_retry){
+        return -1;
     }
     return 0;
 }

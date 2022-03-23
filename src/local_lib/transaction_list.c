@@ -75,7 +75,7 @@ int create_transaction(struct Transaction *t, pid_t sender, pid_t receiver, floa
         return -1;
     }
     t->t_type = TRANSACTION_WAITING;
-    t->hops = 0;
+    t->hops = 0; /* User is not responsible for this value*/
     t->sender = sender;
     t->reciver = receiver;
     t->timestamp = timestamp;
@@ -111,7 +111,9 @@ static void empty_queue(Queue q) {
 }
 
 void queue_append(Queue q, struct Transaction t) {
+#ifdef DEBUG_USER
     DEBUG_NOTIFY_ACTIVITY_RUNNING("APPENDING TO TRANSACTION QUEUE A NEW TRANSACTION...");
+#endif
     struct node *new_node;
     new_node = (struct node *) malloc(sizeof(struct node));
     if (new_node == NULL) {
@@ -128,7 +130,9 @@ void queue_append(Queue q, struct Transaction t) {
         q->last = new_node;
     }
     q->transactions++;
+#ifdef DEBUG_USER
     DEBUG_NOTIFY_ACTIVITY_DONE("APPENDING TO TRANSACTION QUEUE A NEW TRANSACTION DONE");
+#endif
 }
 
 void queue_remove_head(Queue q) {
@@ -140,8 +144,10 @@ void queue_remove_head(Queue q) {
             q->first = q->first->next;
         free(temp);
         q->transactions--;
-    } else
+    } else{
         queue_underflow();
+        return;
+    }
 }
 
 int queue_remove(Queue q, struct Transaction t) {
@@ -153,6 +159,7 @@ int queue_remove(Queue q, struct Transaction t) {
     append_to_node(iterable, iterable->next->next);
     free(iterable->next);
     q->transactions--;
+    return 0;
 }
 
 void append_to_node(struct node *where, struct node *to_append) {
@@ -175,16 +182,21 @@ struct Transaction queue_head(Queue q) {
     if (queue_is_empty(q) == FALSE)
         return q->first->t;
     else {
+#ifdef DEBUG_UNDERFLOW
         DEBUG_MESSAGE("queue_head in transaction: UNDERFLOW CALLED");
+#endif
         queue_underflow();
     }
 }
 
 struct Transaction queue_last(Queue q) {
-    if (queue_is_empty(q) == FALSE)
+    if (queue_is_empty(q) == FALSE){
         return q->last->t;
+    }
     else {
-        DEBUG_MESSAGE("queue_last in transaction: UNDERFLOW CALLED");
+#ifdef DEBUG_UNDERFLOW
+        DEBUG_MESSAGE("queue_head in transaction: UNDERFLOW CALLED");
+#endif
         queue_underflow();
     }
 }
@@ -196,17 +208,17 @@ Bool queue_is_empty(Queue q) {
 }
 
 static void queue_underflow(void) {
-    DEBUG_ERROR_MESSAGE("queue_underflow has been called");
-    ERROR_MESSAGE("Invalid Operation on Queue empty");
+    ERROR_MESSAGE("INVALID OPERATION ON AN EMPTY QUEUE");
     return;
 }
 
-int queue_apt_amount_reward(Queue q, int percentage) {
+float queue_apt_amount_reward(Queue q, int percentage) {
     if (queue_is_empty(q) == TRUE) {
         ERROR_MESSAGE("CALL APT AMOUNT-REWARD ON EMPTY QUEUE");
         return -1;
     }
     struct node *first = q->first;
+    float total_reward = 0;
 
     for (; first != NULL; first = first->next) {
         first->t.reward = (float) (first->t.amount * ((float) percentage)) / 100;
@@ -215,8 +227,9 @@ int queue_apt_amount_reward(Queue q, int percentage) {
             return -1;
         }
         first->t.amount -= first->t.reward;
+        total_reward += first->t.reward;
     }
-    return 0;
+    return total_reward;
 }
 
 float queue_get_reward(Queue q) {
@@ -246,6 +259,9 @@ void queue_print(Queue q) {
         transaction_print(iterable->t);
     }
     printf("----------------TRANSACTION LIST END--------------------\n");
+#ifdef DEBUG_NODE_TP
+    sleep(0.1); /* I know about nanosleep but sleep is fuster to write and np at this stage for debug*/
+#endif
 }
 
 void get_status(char char_type[80], int t_type) {
@@ -280,18 +296,28 @@ void transaction_print(struct Transaction t) {
 int get_num_transactions(Queue q) {
     if (queue_is_empty(q) == FALSE)
         return q->transactions;
-    return -1;
+    return 0;
 }
 
 int queue_to_array(Queue q, struct Transaction vector[]) {
-    if (vector != NULL) {
+    if (vector != NULL || get_num_transactions(q)==0) {
         struct node *iterable = q->first;
-        int i;
-        for (i = 0; iterable != NULL; iterable = iterable->next) {
+        int i = 0;
+        for (; iterable != NULL; iterable = iterable->next) {
             vector[i] = iterable->t;
             i++;
         }
         return 0;
     }
     return -1;
+}
+int array_to_queue(Queue q, struct Transaction* vector){
+    if (vector == NULL){
+        return -1;
+    }
+    int i = 0;
+    for (;i<SO_BLOCK_SIZE; i++){
+        queue_append(q, vector[i]);
+    }
+    return 0;
 }

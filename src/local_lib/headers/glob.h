@@ -1,5 +1,3 @@
-
-
 #ifndef DGT_SO_PROJECT_21_22_GLOB_H
 #define DGT_SO_PROJECT_21_22_GLOB_H
 
@@ -8,6 +6,7 @@
 /*  EXCVE PATH   */
 #define PATH_TO_USER "build/bin/user"
 #define PATH_TO_NODE "build/bin/node"
+#define PATH_TO_NODE_TP "build/bin/node_tp"
 /*  NUM LIMIT OF PROCS */
 #define USERS_MAX 1000 /*Max users that can be saved in shm*/
 #define NODES_MAX 100    /*Max nodes that can be saved in shm*/
@@ -36,7 +35,11 @@
 #ifndef SO_BLOCK_SIZE
 #define SO_BLOCK_SIZE 10
 #endif
-/*  GENERAL UTILITY MACRO*/
+/*  GENERAL UTILITY MACROS*/
 #define REALLOC_MARGIN 10 /*delta in wich is not usefull to realloc TODO: make a function that calculate it*/
+#define MAX_FAILURE_SHM_LOADING 10
+#define MAX_UNSED_CICLE_OF_NODE_PROC 10000
+#define MAX_WAITING_TIME_FOR_UPDATE 10000
+#define MAX_FAILURE_SHM_BOOKMASTER_LOCKING 10
 
 #endif /*DGT_SO_PROJECT_21_22_GLOB_H*/
