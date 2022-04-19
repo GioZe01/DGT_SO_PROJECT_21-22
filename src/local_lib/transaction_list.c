@@ -322,7 +322,7 @@ int array_to_queue(Queue q, struct Transaction* vector){
     return 0;
 }
 
-Bool copy_n_transactions(Queue q, Queue r, int n) {
+Bool queue_copy_n_transactions(Queue q, Queue r, int n){
     if (n > q->transactions) {
         return FALSE;
     }
