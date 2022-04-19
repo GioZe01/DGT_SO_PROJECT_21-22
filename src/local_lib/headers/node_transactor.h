@@ -4,7 +4,7 @@
 
 #include "transaction_list.h"
 
-typedef float(*Reward)(struct node *self, int percentage, Bool use_default);
+typedef int(*Reward)(struct node *self, int percentage, Bool use_default, float * block_tot_reward);
 struct node {
     pid_t pid;
     int node_id; /* Index id of the node into the message queues for nodes*/

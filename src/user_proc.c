@@ -169,7 +169,10 @@ int main(int arc, char const *argv[]) {
         /****************************************
          *      GENERATION OF TRANSACTION FASE *
          * **************************************/
-        generating_transactions();
+        while (current_user.exec_state == PROC_STATE_RUNNING) {
+            generating_transactions();
+            getting_richer();
+        }
 #ifdef U_CASHING
         /*TODO: wait for user in progress to empty with timeout*/
 #endif
@@ -232,10 +235,10 @@ void signals_handler_user(int signum) {
             DEBUG_NOTIFY_ACTIVITY_DONE("GENERATING A NEW TRANSACTION FROM SIG DONE");
             break;
         case SIGUSR2:
-            advice_master_of_termination(INFO_BUDGET);
-            if (current_user.exec_state == PROC_STATE_TERMINATED){
-            advice_master_of_termination(TERMINATION_END_CORRECTLY);
-                EXIT_PROCEDURE_USER(0);
+            if(master_msg_send(queue_master_id, &msg, INFO_BUDGET, USER, current_user.pid,
+                        current_user.exec_state, TRUE,-1) < 0) {
+                char * error_string = strcat("IMPOSSIBLE TO ADVICE MASTER OF : %s",from_type_to_string(INFO_BUDGET));
+                ERROR_MESSAGE(error_string);
             }
             break;
         default:
@@ -244,19 +247,20 @@ void signals_handler_user(int signum) {
 }
 
 void advice_master_of_termination(long termination_type) {
-   struct master_msg_report termination_report;
+    struct master_msg_report termination_report;
 #ifdef DEBUG_USER
-   DEBUG_NOTIFY_ACTIVITY_RUNNING("{DEBUG_USER}:= ADVICING MASTER OF TERMINATION ....");
+    DEBUG_NOTIFY_ACTIVITY_RUNNING("{DEBUG_USER}:= ADVICING MASTER OF TERMINATION ....");
 #endif
+    current_user.exec_state = PROC_STATE_TERMINATED;
     if(master_msg_send(queue_master_id, &termination_report, termination_type, USER, current_user.pid,
-                        current_user.exec_state, TRUE,-1) < 0) {
-       char * error_string = strcat("IMPOSSIBLE TO ADVICE MASTER OF : %s",from_type_to_string(termination_type));
-       ERROR_MESSAGE(error_string);
+                current_user.exec_state, TRUE,-1) < 0) {
+        char * error_string = strcat("IMPOSSIBLE TO ADVICE MASTER OF : %s",from_type_to_string(termination_type));
+        ERROR_MESSAGE(error_string);
     }
 #ifdef DEBUG_USER
-   DEBUG_NOTIFY_ACTIVITY_DONE("{DEBUG_USER}:= ADVICING MASTER OF TERMINATION DONE");
+    DEBUG_NOTIFY_ACTIVITY_DONE("{DEBUG_USER}:= ADVICING MASTER OF TERMINATION DONE");
 #endif
-   DEBUG_NOTIFY_ACTIVITY_DONE("{DEBUG_USER}:= ADVICING MASTER OF TERMINATION DONE");
+    DEBUG_NOTIFY_ACTIVITY_DONE("{DEBUG_USER}:= ADVICING MASTER OF TERMINATION DONE");
 }
 void free_mem_user() {
     free_user(&current_user);

@@ -27,6 +27,7 @@ void master_msg_report_print(const struct master_msg_report *self) {
     char state_string [80];
     switch (self->type) {
         case IMPOSSIBLE_TO_SEND_TRANSACTION:
+        case IMPOSSIBLE_TO_COMUNICATE_WITH_QUEUE:
         case IMPOSSIBLE_TO_CONNECT_TO_SHM:
             switch (self->state) {
                 case PROC_STATE_WAITING:
@@ -76,8 +77,6 @@ char * from_proctype_to_string(long proc_type){
             return "USER";
         case NODE:
             return "NODE";
-        case NODE_TP:
-            return "NODE_TP";
         default:
             return "UNDEFINED PROC TYPE";
     }
@@ -88,6 +87,8 @@ char * from_type_to_string(long type){
             return "TERMINATION END CORRECTLY";
         case IMPOSSIBLE_TO_SEND_TRANSACTION:
             return "IMPOSSIBLE TO SEND TRANSACTION";
+        case IMPOSSIBLE_TO_COMUNICATE_WITH_QUEUE:
+            return "IMPOSSIBLE TO COMUNICATE WITH QUEUE";
         case IMPOSSIBLE_TO_CONNECT_TO_SHM:
             return "IMPOSSIBLE TO CONNECT TO SHM";
         case SIGNALS_OF_TERM_RECEIVED:
@@ -135,9 +136,6 @@ int acknowledge(struct master_msg_report * self, ProcList list){
     /*HANDLE DIFFERENT TYPE OF MESSAGES*/
     long msg_type = self->type;
     int proc_type = self->proc_type;
-    if (proc_type == NODE_TP){
-        return 0;
-    }
     short int exec_state = self->state;
     Proc proc_to_update = get_proc_from_pid(list,self->sender_pid);
     if (proc_to_update == NULL){
@@ -147,6 +145,7 @@ int acknowledge(struct master_msg_report * self, ProcList list){
         case TERMINATION_END_CORRECTLY:
         case IMPOSSIBLE_TO_SEND_TRANSACTION:
         case IMPOSSIBLE_TO_CONNECT_TO_SHM:
+        case IMPOSSIBLE_TO_COMUNICATE_WITH_QUEUE:
         case SIGNALS_OF_TERM_RECEIVED:
         case UNUSED_PROC:
         case INFO_BUDGET:
@@ -167,8 +166,9 @@ int check_msg_report(struct master_msg_report *msg_report, int msg_report_id_mas
         return -1;
     } else {
         /*fetching all msg if present*/
-        if (msg_rep_info.msg_qnum != 0 &&
-            msgrcv(msg_report_id_master, msg_report, sizeof(*msg_report) - sizeof(long), 0, 0)>0) {
+        while (msg_rep_info.msg_qnum != 0 &&
+            msgrcv(msg_report_id_master, msg_report, sizeof(*msg_report) - sizeof(long), 0, 0)>0 &&
+            msgctl(msg_report_id_master, IPC_STAT, &msg_rep_info) >= 0) {
             if (acknowledge(msg_report, proc_list)==-1){
                 ERROR_MESSAGE("IMPOSSIBLE TO MAKE THE ACKNOWLEDGE OF MASTER MESSAGE");
             }
@@ -176,3 +176,5 @@ int check_msg_report(struct master_msg_report *msg_report, int msg_report_id_mas
         return 0;
     }
 }
+
+

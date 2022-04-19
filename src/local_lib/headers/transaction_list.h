@@ -100,7 +100,6 @@ int get_num_transactions(Queue q);
  */
 int queue_to_array(Queue q, struct Transaction* vector);
 
-
 /**
  * From the given vector load the data into the given queue
  * @param q the queue to load the data from
@@ -108,4 +107,13 @@ int queue_to_array(Queue q, struct Transaction* vector);
  * @return -1 in case of failure. 0 otherwise
  */
 int array_to_queue(Queue q, struct Transaction* vector);
+
+/**
+ * Copy n transactions from queue q to queue r and remove them from q
+ * @param q the queue to copy from
+ * @param r the queue to copy to
+ * @param n the number of transactions to copy
+ * @return FALSE in case of failure. TRUE otherwise
+ */
+Bool queue_copy_n_transactions(Queue q, Queue r, int n);
 #endif /*DGT_SO_PROJECT_21_22_TRANSACTION_LIST_H*/

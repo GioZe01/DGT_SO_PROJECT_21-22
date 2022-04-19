@@ -332,7 +332,7 @@ void create_semaphores(void) {
     DEBUG_NOTIFY_ACTIVITY_DONE("CREATION OF START_SEMAPHORE CHILDREN DONE");
 
     DEBUG_NOTIFY_ACTIVITY_RUNNING("INITIALIZATION OF START_SEMAPHORE CHILDREN....");
-    if (semctl(semaphore_start_id, 0, SETVAL, simulation_conf.so_user_num + (2*simulation_conf.so_nodes_num))<
+    if (semctl(semaphore_start_id, 0, SETVAL, simulation_conf.so_user_num + (simulation_conf.so_nodes_num))<
             0) {
         ERROR_EXIT_SEQUENCE_MAIN("IMPOSSIBLE TO INITIALISE SEMAPHORE START CHILDREN");
     }
@@ -500,16 +500,20 @@ void print_info(void){
     printf("============== END INFO ===========\n");
 }
 void update_kids_info(void){
+    DEBUG_BLOCK_ACTION_START("UPDATE KIDS INFO");
+    DEBUG_NOTIFY_ACTIVITY_RUNNING("UPDATING KIDS INFO....");
+    struct master_msg_report * msg_rep = (struct master_msg_report *)malloc(sizeof(struct master_msg_report));
+    check_msg_report(msg_rep, msg_report_id_master, proc_list);
     int num_msg_to_wait_for= -1;
     num_msg_to_wait_for= send_sig_to_all(proc_list, SIGUSR2);
-    num_msg_to_wait_for = num_msg_to_wait_for *2; /*WAIT FOR NODE_TP_PROC*/
+    num_msg_to_wait_for = num_msg_to_wait_for;
+    printf("NUM MSG TO WAIT FOR: %d\n", num_msg_to_wait_for);
     if(num_msg_to_wait_for<0){
         ERROR_MESSAGE("IMPOSSIBLE TO UPDATE KIDS INFO");
     }
     else if (num_msg_to_wait_for== 0){
         DEBUG_MESSAGE("NO PROCESS TO UPDATE");
     }
-    struct master_msg_report * msg_rep = (struct master_msg_report *)malloc(sizeof(struct master_msg_report));
     DEBUG_NOTIFY_ACTIVITY_RUNNING("RETRIVING INFO ...");
     do{
         msg_rep->sender_pid =-1;

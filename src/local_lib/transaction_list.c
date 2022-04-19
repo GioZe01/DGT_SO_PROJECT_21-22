@@ -321,3 +321,16 @@ int array_to_queue(Queue q, struct Transaction* vector){
     }
     return 0;
 }
+
+Bool copy_n_transactions(Queue q, Queue r, int n) {
+    if (n > q->transactions) {
+        return FALSE;
+    }
+    struct node *iterable = q->first;
+    for (; iterable != NULL && n > 0; iterable = iterable->next) {
+        queue_append(r, iterable->t);
+        queue_remove(q, iterable->t);
+        n--;
+    }
+    return TRUE;
+}

@@ -11,14 +11,14 @@
 typedef enum {
     PROC_STATE_INIT, PROC_STATE_RUNNING,PROC_STATE_TERMINATED,PROC_STATE_WAITING, PROC_STATE_NODE_SERV_TRANS
 }PROCSTATE;
-/*  ABORT TYPE */
 typedef enum {
     TERMINATION_END_CORRECTLY = 1,
     IMPOSSIBLE_TO_SEND_TRANSACTION = 2,
     IMPOSSIBLE_TO_CONNECT_TO_SHM = 3,
-    SIGNALS_OF_TERM_RECEIVED = 4,
-    INFO_BUDGET = 5,
-    UNUSED_PROC = 6,
+    IMPOSSIBLE_TO_COMUNICATE_WITH_QUEUE = 4,
+    SIGNALS_OF_TERM_RECEIVED = 5,
+    INFO_BUDGET = 6,
+    UNUSED_PROC = 7,
 }MSG_REPORT_TYPE;
 
 typedef enum {
@@ -71,6 +71,7 @@ master_msg_send(int id, struct master_msg_report *self, long type, long proc_typ
  * @warning the retriving operation is repeated until it succeed or errno != EINTR
  * @param id of the message queue
  * @param msg to be caught
+ * @param type of the message, see MSG_REPORT_ABORTED_PROC as exmp.
  * @return -2 in case of no msg on queue. -1 in case of failure. 0 otherwise
  */
 int master_msg_receive(int id, struct master_msg_report *self);
