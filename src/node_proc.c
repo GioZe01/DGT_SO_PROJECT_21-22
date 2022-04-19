@@ -37,9 +37,9 @@
 
 /* TODO: refactoring of comments of the following process transaction*/
 /**
- * If it finds node msg of type NODE_TRANSACTION it proccess them
- * and make the aknowledgement
- * @param msg_rep the messagge to be loaded if present in the queue
+ * If it finds node msg of type NODE_TRANSACTION it process them
+ * and make the acknowledgement
+ * @param msg_rep the message to be loaded if present in the queue
  * */
 void process_node_transaction(struct node_msg *msg_rep);
 
@@ -101,19 +101,19 @@ void attach_to_shms(void);
 int process_node_block();
 
 /**
- * Connects to the differents queues: master, node's and user's
+ * Connects to the different queues: master, node's and user's
  * */
 void connect_to_queues(void);
 
 /**
  * load block_size transactions from transaction pool into transaction block of the current node
- * @return TRUE if succeded, FALSE otherwise
+ * @return TRUE if succeeded, FALSE otherwise
  */
 Bool load_block(void);
 
 /**
  * \brief Acquire the semaphore_id related to the node
- * Specificcaly:
+ * Specifically:
  * - semaphore_start_id
  * - semaphore_masterbook_id
  * - semaphore_node_tp_shm_access
@@ -144,12 +144,12 @@ void unlock_to_fill_sem();
 void unlock_masterbook_cell_access(int i_cell_block_list);
 
 /* Advice the master porc via master_message queue by sending a master_message
- * @param termination_type MSG_REPORT_TYPE type process termination occured
+ * @param termination_type MSG_REPORT_TYPE type process termination occurred
 */
 void advice_master_of_termination(long termination_type);
 
 /*Extract randomly the time needed for processing from node_configuration
- *@return an integer that rappresent the time for processing
+ *@return an integer that represent the time for processing
  * */
 long int get_time_processing(void);
 
@@ -179,8 +179,12 @@ struct node current_node; /* Current representation of the node*/
 struct conf node_configuration; /* Configuration File representation*/
 struct shm_conf *shm_conf_pointer_node; /* Ref to the shm for configuration of the node*/
 struct shm_book_master *shm_masterbook_pointer;/* Ref to the shm for the masterbook shm */
+<<<<<<< HEAD
 struct node_block * shm_node_tp; /* Ref to the shm for the node_tp shm */
 Bool printed = FALSE;
+=======
+struct node_block *shm_node_tp; /* Ref to the shm for the node_tp shm */
+>>>>>>> origin/mrgntp
 
 int main(int argc, char const *argv[]) {
     DEBUG_MESSAGE("NODE PROCESS STARTED");
@@ -188,14 +192,19 @@ int main(int argc, char const *argv[]) {
     sigset_t sigmask;
     int failure_shm = 0;
     DEBUG_MESSAGE("NODE STATE SET TO INIT");
-    current_node.exec_state= PROC_STATE_INIT;
+    current_node.exec_state = PROC_STATE_INIT;
     current_node.pid = getpid();
     /************************************
      *      CONFIGURATION FASE          *
      * **********************************/
     read_conf_node(&node_configuration);
+<<<<<<< HEAD
     node_create(&current_node, getpid(), -1, 0, SO_BLOCK_SIZE,
             node_configuration.so_reward,node_configuration.so_tp_size, (Reward)&calc_reward);
+=======
+    node_create(&current_node, getpid(), 0, SO_BLOCK_SIZE,
+                node_configuration.so_reward, node_configuration.so_tp_size, (Reward) &calc_reward);
+>>>>>>> origin/mrgntp
     if (check_arguments(argc, argv) && set_signal_handler_node(sa, sigmask)) {
         struct node_msg msg_rep;
         int is_unsed_node = 0;
@@ -230,15 +239,24 @@ int main(int argc, char const *argv[]) {
         if (semaphore_wait_for_sinc(semaphore_start_id, 0) < 0) {
             ERROR_EXIT_SEQUENCE_NODE("IMPOSSIBLE TO WAIT FOR START");
         }
+<<<<<<< HEAD
         current_node.exec_state= PROC_STATE_RUNNING;
         DEBUG_MESSAGE("NODE PROCESS RUNNING");
+=======
+        current_node.exec_state = PROC_STATE_RUNNING;
+>>>>>>> origin/mrgntp
 
         /****************************************
          *   PROCESSING OF TRANSACTION FASE     *
          * **************************************/
+<<<<<<< HEAD
         while (node_end!= 1 && failure_shm < MAX_FAILURE_SHM_LOADING) {
             /*
 #ifdef DEBUG_NODE
+=======
+        while (node_end != 1 && failure_shm < MAX_FAILURE_SHM_LOADING) {
+#ifdef DEBUG_NODE_TP
+>>>>>>> origin/mrgntp
             struct msqid_ds info;
             if (msgctl(queue_node_id, IPC_STAT, &info)<0){
                 advice_master_of_termination(IMPOSSIBLE_TO_COMUNICATE_WITH_QUEUE);
@@ -251,11 +269,19 @@ int main(int argc, char const *argv[]) {
 */
             process_node_transaction(&msg_rep);
             process_simple_transaction_type(&msg_rep);
+<<<<<<< HEAD
             if(msg_rep.sender_pid == -1){ /**default value of sender_pid is -1, if it is -1 it means that the transaction is not valid*/
                 is_unsed_node++;
             }
             if (get_num_transactions(current_node.transactions_pool) >= SO_BLOCK_SIZE &&
                     process_node_block() == FALSE){
+=======
+            if (msg_rep.sender_pid == -1) {
+                is_unsed_node++;
+            }
+            if (get_num_transactions(current_node.transactions_block) >= SO_BLOCK_SIZE &&
+                process_node_block() == FALSE) {
+>>>>>>> origin/mrgntp
                 failure_shm++;
             }
         }
@@ -263,7 +289,7 @@ int main(int argc, char const *argv[]) {
             ERROR_EXIT_SEQUENCE_NODE("IMPOSSIBLE TO READ DATA FROM NODE_TP_SHM");
             advice_master_of_termination(UNUSED_PROC);
         }
-        if(is_unsed_node >= MAX_UNSED_CICLE_OF_NODE_PROC){
+        if (is_unsed_node >= MAX_UNSED_CICLE_OF_NODE_PROC) {
             advice_master_of_termination(UNUSED_PROC);
             ERROR_EXIT_SEQUENCE_NODE("UNUSED NODE TP PROC");
         }
@@ -332,7 +358,12 @@ void signals_handler(int signum) {
         case SIGALRM:
             break;
         case SIGUSR2:
+<<<<<<< HEAD
             master_msg_send(queue_master_id,&msg, INFO_BUDGET,NODE,current_node.pid,current_node.exec_state,TRUE, current_node.budget);
+=======
+            master_msg_send(queue_master_id, &msg, INFO_BUDGET, NODE, current_node.pid, current_node.exec_state, TRUE,
+                            current_node.type.block.budget);
+>>>>>>> origin/mrgntp
 #ifdef DEBUG_NODE
             DEBUG_NOTIFY_ACTIVITY_DONE("{DEBUG_NODE}:= REPLIED TO MASTER DONE");
 #endif
@@ -348,7 +379,7 @@ void free_sysVar_node() {
      * lock the sart semaphore.
      * If the semaphore_start_id is impossible to retrive ( = -1) nothing can be done.
      * */
-    if (current_node.exec_state== PROC_STATE_INIT && semaphore_start_id >= 0) {
+    if (current_node.exec_state == PROC_STATE_INIT && semaphore_start_id >= 0) {
         semaphore_start_value = semctl(semaphore_start_id, 0, GETVAL);
         if (semaphore_start_value < 0) ERROR_MESSAGE("IMPOSSIBLE TO RETRIEVE INFORMATION ON STARTING SEMAPHORE");
         else if (semaphore_start_value > 0 && (semaphore_lock(semaphore_start_id, 0) < 0)) {
@@ -356,12 +387,12 @@ void free_sysVar_node() {
         }
     }
     DEBUG_NOTIFY_ACTIVITY_RUNNING("REMOVING SEMAPHORE_TP_SHM...");
-    if(semaphore_tp_shm >= 0 && semctl(semaphore_tp_shm,0,IPC_RMID) < 0){
+    if (semaphore_tp_shm >= 0 && semctl(semaphore_tp_shm, 0, IPC_RMID) < 0) {
         ERROR_MESSAGE("REMOVING PROCEDURE FOR TP SHM SEMAPHORE HAS FAILED");
     }
     DEBUG_NOTIFY_ACTIVITY_DONE("REMOVING SEMAPHORE_TP_SHM DONE");
     DEBUG_NOTIFY_ACTIVITY_RUNNING("REMOVING TP_SHM ....");
-    if(shm_tp_id>= 0 && shmctl(shm_tp_id, IPC_RMID, NULL) < 0){
+    if (shm_tp_id >= 0 && shmctl(shm_tp_id, IPC_RMID, NULL) < 0) {
         ERROR_MESSAGE("REMOVING PROCEDURE FOR TP SHM HAS FAILED");
     }
     DEBUG_NOTIFY_ACTIVITY_DONE("REMOVING TP_SHM DONE");
@@ -387,17 +418,17 @@ void attach_to_shms(void) {
     }
     DEBUG_NOTIFY_ACTIVITY_DONE("ATTACHING TO SHM DONE");
     shm_conf_id = shmget(MASTER_BOOK_SHM_KEY, sizeof(struct shm_book_master), 0600);
-    if (shm_conf_id<0){
+    if (shm_conf_id < 0) {
         advice_master_of_termination(IMPOSSIBLE_TO_CONNECT_TO_SHM);
         ERROR_EXIT_SEQUENCE_NODE("IMPOSSIBLE TO ACCESS SHM BOOKMASTER");
     }
     shm_masterbook_pointer = shmat(shm_conf_id, NULL, 0);
-    if (shm_masterbook_pointer == (void *)-1){
+    if (shm_masterbook_pointer == (void *) -1) {
         advice_master_of_termination(IMPOSSIBLE_TO_CONNECT_TO_SHM);
         ERROR_EXIT_SEQUENCE_NODE("IMPOSSIBLE TO CONNECT TO THE SHM_MASTERBOOK");
     }
     shm_node_tp = shmat(shm_tp_id, NULL, 0);
-    if(shm_node_tp == (void * )-1){
+    if (shm_node_tp == (void *) -1) {
         advice_master_of_termination(IMPOSSIBLE_TO_CONNECT_TO_SHM);
         ERROR_EXIT_SEQUENCE_NODE("IMPOSSIBLE TO CONNECT TO THE NODE_TP SHM");
     }
@@ -411,17 +442,23 @@ void connect_to_queues(void) {
     queue_user_id = msgget(USERS_QUEUE_KEY, 0600);
     if (queue_user_id < 0) { ERROR_EXIT_SEQUENCE_NODE("IMPOSSIBLE TO CONNECT TO USER QUEUE"); }
     queue_master_id = msgget(MASTER_QUEUE_KEY, 0600);
-    if (queue_master_id < 0){ERROR_EXIT_SEQUENCE_NODE("IMPOSSIBLE TO CONNECT TO MASTER QUEUE");}
+    if (queue_master_id < 0) { ERROR_EXIT_SEQUENCE_NODE("IMPOSSIBLE TO CONNECT TO MASTER QUEUE"); }
 }
 
 int process_node_block() {
     /*Loading them into the node_block_transactions*/
     if (load_block() == TRUE &&
+<<<<<<< HEAD
             get_num_transactions(current_node.transactions_block)==SO_BLOCK_SIZE /* DID i got the correct num of transactions*/&&
             current_node.calc_reward(&current_node, -1, TRUE, &current_block_reward)>=0){
+=======
+        get_num_transactions(current_node.current_block) ==
+        SO_BLOCK_SIZE /* DID i got the correct num of transactions*/&&
+        current_node.calc_reward(&current_node, -1, TRUE, &current_block_reward) >= 0) {
+>>>>>>> origin/mrgntp
         int num_of_shm_retry = 0;
-        while(num_of_shm_retry < MAX_FAILURE_SHM_BOOKMASTER_LOCKING
-                && lock_shm_masterbook() == FALSE){
+        while (num_of_shm_retry < MAX_FAILURE_SHM_BOOKMASTER_LOCKING
+               && lock_shm_masterbook() == FALSE) {
             num_of_shm_retry++;
         }
         /*send confirmed to all users*/
@@ -430,6 +467,7 @@ int process_node_block() {
 
     return 0;
 }
+
 Bool lock_shm_masterbook(void) {
     DEBUG_NOTIFY_ACTIVITY_RUNNING("NODE:= LOCKING THE SHM FOR ADDING THE BLOCK...");
     struct timespec trans_proc_sim;
@@ -441,11 +479,17 @@ Bool lock_shm_masterbook(void) {
     /*Inserting the block into the shm*/
     shm_masterbook_pointer->to_fill += 1;
     lock_masterbook_cell_access(i_cell_block_list);
+<<<<<<< HEAD
     struct Transaction block_list [get_num_transactions(current_node.transactions_block)];
     queue_to_array(current_node.transactions_block,block_list);
     if (insert_block(shm_masterbook_pointer,block_list) == 0){
+=======
+    struct Transaction block_list[get_num_transactions(current_node.current_block)];
+    queue_to_array(current_node.transactions_list, block_list);
+    if (insert_block(shm_masterbook_pointer, block_list) == 0) {
+>>>>>>> origin/mrgntp
         current_node.budget = current_block_reward;
-    }else {
+    } else {
         ERROR_MESSAGE("IMPOSSIBLE TO INSERT BLOCK");
         return FALSE;
     }
@@ -508,20 +552,36 @@ void unlock_masterbook_cell_access(int i_cell_block_list) {
 }
 
 Bool load_block(void) {
+<<<<<<< HEAD
     if (queue_is_empty(current_node.transactions_block)==FALSE|| get_num_transactions(current_node.transactions_pool)<SO_BLOCK_SIZE){
         return FALSE;
     }
     queue_copy_n_transactions(current_node.transactions_pool, current_node.transactions_block, SO_BLOCK_SIZE);
+=======
+    if (queue_is_empty(current_node.transactions_list) == TRUE ||
+        get_num_transactions(current_node.transactions_list) < SO_BLOCK_SIZE) {
+        return FALSE;
+    } else {
+        copy_n_element(current_node.transactions_list, current_node.current_block, SO_BLOCK_SIZE);
+    }
+>>>>>>> origin/mrgntp
     return TRUE;
 }
 
 
 void advice_master_of_termination(long termination_type) {
     struct master_msg_report termination_report;
+<<<<<<< HEAD
     current_node.exec_state = PROC_STATE_TERMINATED;
     if (master_msg_send(queue_master_id, &termination_report, termination_type, NODE,current_node.pid, current_node.exec_state,TRUE, current_node.budget)<0){
        char * error_string = strcat("IMPOSSIBLE TO ADVICE MASTER OF : %s",from_type_to_string(termination_type));
        ERROR_MESSAGE(error_string);
+=======
+    if (master_msg_send(queue_master_id, &termination_report, termination_type, NODE, current_node.pid,
+                        current_node.exec_state, TRUE, current_node.budget) < 0) {
+        char *error_string = strcat("IMPOSSIBLE TO ADVICE MASTER OF : %s", from_type_to_string(termination_type));
+        ERROR_MESSAGE(error_string);
+>>>>>>> origin/mrgntp
     }
 }
 
@@ -547,29 +607,32 @@ long int get_time_processing(void) {
             (node_configuration.so_max_trans_gen_nsec - node_configuration.so_min_trans_proc_nsec + 1)) +
            node_configuration.so_min_trans_proc_nsec;
 }
-void create_semaphore(void){
+
+void create_semaphore(void) {
     DEBUG_NOTIFY_ACTIVITY_RUNNING("CREATION OF THE TP_SHM SEM...");
-    semaphore_tp_shm = semget(current_node.node_id,1, IPC_CREAT | IPC_EXCL | 0600);
-    if(semaphore_tp_shm < 0){
+    semaphore_tp_shm = semget(current_node.node_id, 1, IPC_CREAT | IPC_EXCL | 0600);
+    if (semaphore_tp_shm < 0) {
         ERROR_EXIT_SEQUENCE_NODE("IMPOSSIBLE TO CREATE TP_SHM SEM");
     }
-    if (semctl(semaphore_tp_shm, 0, SETVAL, IS_EMPTY)<0){
-       ERROR_EXIT_SEQUENCE_NODE("IMPOSSIBLE TO SET NODE TP SEM TO IS_EMPTY");
+    if (semctl(semaphore_tp_shm, 0, SETVAL, IS_EMPTY) < 0) {
+        ERROR_EXIT_SEQUENCE_NODE("IMPOSSIBLE TO SET NODE TP SEM TO IS_EMPTY");
     }
     DEBUG_NOTIFY_ACTIVITY_DONE("CREATION OF THE TP_SHM SEM DONE");
 }
-void create_tp_shm(void){
+
+void create_tp_shm(void) {
     DEBUG_NOTIFY_ACTIVITY_RUNNING("CREATION OF THE TP_SHM...");
-    shm_tp_id = shmget(current_node.pid+current_node.node_id, sizeof(struct node_block), IPC_CREAT | IPC_EXCL | 0600);
-    if (shm_tp_id < 0){
+    shm_tp_id = shmget(current_node.pid + current_node.node_id, sizeof(struct node_block), IPC_CREAT | IPC_EXCL | 0600);
+    if (shm_tp_id < 0) {
         ERROR_EXIT_SEQUENCE_NODE("IMPOSSIBLE TO CREATE NODE TP_SHM");
     }
     DEBUG_NOTIFY_ACTIVITY_DONE("CREATION OF THE TP_SHM DONE");
 }
 
-void adv_users_of_block(void){
+void adv_users_of_block(void) {
     int sender_pid = -1;
     int receiver_pid = -1;
+<<<<<<< HEAD
   while(queue_is_empty(current_node.transactions_block)==FALSE){
             struct user_msg *u_msg_rep =  (struct user_msg *) malloc(sizeof(struct user_msg));
             DEBUG_ERROR_MESSAGE("NODE TRANSACTION FAILED");
@@ -592,27 +655,53 @@ void adv_users_of_block(void){
             printf("NODE %d TRANSACTION SUCCES SEND TO %d AND %d\n",current_node.pid,sender_pid,receiver_pid);
             queue_remove_head(current_node.transactions_block);
   }
+=======
+    while (queue_is_empty(current_node.transactions_list) == FALSE) {
+        struct user_msg *u_msg_rep = (struct user_msg *) malloc(sizeof(struct user_msg));
+        DEBUG_ERROR_MESSAGE("NODE TRANSACTION FAILED");
+        u_msg_rep->t.t_type = TRANSACTION_SUCCES;
+        struct Transaction t = queue_head(current_node.transactions_list);
+        sender_pid = t.sender;
+        receiver_pid = t.reciver;
+        int queue_id_user_proc = get_queueid_by_pid(shm_conf_pointer_node, sender_pid, TRUE);
+        if (queue_id_user_proc < 0) {
+            ERROR_MESSAGE("ILLIGAL PID INTO TRANSACTION, NO PIDS FOUND");
+            return;
+        }
+        user_msg_snd(queue_user_id, u_msg_rep, MSG_TRANSACTION_CONFIRMED_TYPE, &t, current_node.pid, TRUE,
+                     queue_id_user_proc);
+        queue_id_user_proc = get_queueid_by_pid(shm_conf_pointer_node, receiver_pid, TRUE);
+        if (queue_id_user_proc < 0) {
+            ERROR_MESSAGE("ILLIGAL PID INTO TRANSACTION, NO PIDS FOUND");
+            return;
+        }
+        user_msg_snd(queue_user_id, u_msg_rep, MSG_TRANSACTION_INCOME_TYPE, &t, current_node.pid, TRUE,
+                     queue_id_user_proc);
+    }
+>>>>>>> origin/mrgntp
 }
+
 void process_simple_transaction_type(struct node_msg *msg_rep) {
     if (node_msg_receive(queue_node_id, msg_rep, current_node.node_id) == 0) {
         DEBUG_MESSAGE("NODE TRANSACTION TYPE RECEIVED");
         if (get_num_transactions(current_node.transactions_pool) < current_node.tp_size) {
             queue_append(current_node.transactions_pool, msg_rep->t);
         } else {/*TP_SIZE FULL*/
-            struct user_msg *u_msg_rep =  (struct user_msg *) malloc(sizeof(struct user_msg));
+            struct user_msg *u_msg_rep = (struct user_msg *) malloc(sizeof(struct user_msg));
 #ifdef DEBUG_NODE_TP
             DEBUG_ERROR_MESSAGE("NODE TRANSACTION FAILED");
 #endif
             u_msg_rep->t.t_type = TRANSACTION_FAILED;
-            int queue_id_user_proc= get_queueid_by_pid(shm_conf_pointer_node,msg_rep->sender_pid,TRUE);
-            if (queue_id_user_proc<0){
+            int queue_id_user_proc = get_queueid_by_pid(shm_conf_pointer_node, msg_rep->sender_pid, TRUE);
+            if (queue_id_user_proc < 0) {
                 ERROR_MESSAGE("ILLIGAL PID INTO TRANSACTION, NO PIDS FOUND");
                 return;
             }
-            user_msg_snd(queue_user_id, u_msg_rep, MSG_TRANSACTION_FAILED_TYPE, &msg_rep->t, current_node.pid, TRUE, queue_id_user_proc);
+            user_msg_snd(queue_user_id, u_msg_rep, MSG_TRANSACTION_FAILED_TYPE, &msg_rep->t, current_node.pid, TRUE,
+                         queue_id_user_proc);
         }
-    }else{
-        msg_rep->sender_pid =-1;
+    } else {
+        msg_rep->sender_pid = -1;
     }
 }
 
@@ -620,8 +709,13 @@ void process_node_transaction(struct node_msg *msg_rep) {
     /*TODO: Implement incoming transaction from other node*/
     if (node_msg_receive(queue_node_id, msg_rep, current_node.node_id - MSG_NODE_ORIGIN_TYPE) == 0) {
         DEBUG_MESSAGE("NODE TRANSACTION RECEIVED");
+<<<<<<< HEAD
         queue_append(current_node.transactions_pool, msg_rep->t);
     }else{
+=======
+        /*TODO: Implement incoming transaction from other node*/
+    } else {
+>>>>>>> origin/mrgntp
         msg_rep->sender_pid = -1;
     }
 }
