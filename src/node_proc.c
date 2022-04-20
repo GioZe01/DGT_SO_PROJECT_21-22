@@ -281,6 +281,7 @@ Bool check_arguments(int argc, char const *argv[]) {
     if (argc < 2) {
         ERROR_EXIT_SEQUENCE_NODE("MISSING ARGUMENT");
     }
+    current_node.node_id = atoi(argv[1]);
     DEBUG_NOTIFY_ACTIVITY_DONE("CHECKING ARGC AND ARGV DONE");
     return TRUE;
 }
@@ -525,6 +526,7 @@ void adv_users_of_block(void){
     int receiver_pid = -1;
     while(queue_is_empty(current_node.transactions_block)==FALSE){
         struct user_msg *u_msg_rep =  (struct user_msg *) malloc(sizeof(struct user_msg));
+        DEBUG_ERROR_MESSAGE("NODE TRANSACTION FAILED");
         u_msg_rep->t.t_type = TRANSACTION_SUCCES;
         struct Transaction t = queue_head(current_node.transactions_block);
         sender_pid = t.sender;

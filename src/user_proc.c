@@ -172,7 +172,6 @@ int main(int arc, char const *argv[]) {
         while (current_user.exec_state == PROC_STATE_RUNNING) {
             generating_transactions();
             getting_richer();
-            printf("USER %d: GENERATING TRANSACTIONS\n", current_user.pid);
         }
 #ifdef U_CASHING
         /*TODO: wait for user in progress to empty with timeout*/
