@@ -525,7 +525,6 @@ void adv_users_of_block(void){
     int receiver_pid = -1;
     while(queue_is_empty(current_node.transactions_block)==FALSE){
         struct user_msg *u_msg_rep =  (struct user_msg *) malloc(sizeof(struct user_msg));
-        DEBUG_ERROR_MESSAGE("NODE TRANSACTION FAILED");
         u_msg_rep->t.t_type = TRANSACTION_SUCCES;
         struct Transaction t = queue_head(current_node.transactions_block);
         sender_pid = t.sender;
@@ -542,7 +541,7 @@ void adv_users_of_block(void){
             return;
         }
         user_msg_snd(queue_user_id, u_msg_rep, MSG_TRANSACTION_INCOME_TYPE, &t, current_node.pid, TRUE, queue_id_user_proc);
-        update_budget(&current_node);
+        current_node.budget += current_block_reward;
         queue_remove_head(current_node.transactions_block);
     }
 }

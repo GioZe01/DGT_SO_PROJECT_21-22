@@ -108,7 +108,7 @@ int user_id = -1; /*Id of the current user into the snapshots vectors*/
 struct user_transaction current_user; /* Current representation of the user*/
 struct conf configuration; /* Configuration File representation */
 struct shm_conf *shm_conf_pointer; /* Ref to the shm fir configuration of the user*/
-
+int printercounter = 0; /* Counter of the number of print*/
 int main(int arc, char const *argv[]) {
     DEBUG_MESSAGE("USER PROCESS STARTED");
     struct sigaction sa;
@@ -172,6 +172,7 @@ int main(int arc, char const *argv[]) {
         while (current_user.exec_state == PROC_STATE_RUNNING) {
             generating_transactions();
             getting_richer();
+            printf("USER %d: GENERATING TRANSACTIONS\n", current_user.pid);
         }
 #ifdef U_CASHING
         /*TODO: wait for user in progress to empty with timeout*/
@@ -379,7 +380,7 @@ Bool check_for_transactions_confirmed(void) {
 
 Bool check_for_transactions_failed(void) {
     struct user_msg msg;
-    if (user_msg_receive(queue_user_id,&msg, user_id-(DELTA_USER_MSG_TYPE-1)) == 0) {
+    if (user_msg_receive(queue_user_id,&msg, (user_id-2)) == 0) {
         /*Take aknowledgement of transaction falure*/
         current_user.to_wait_transaction--;
         queue_append(current_user.transactions_failed, msg.t);

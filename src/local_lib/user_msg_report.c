@@ -62,6 +62,7 @@ int user_msg_receive(int id, struct user_msg *msg, long type) {
         }
         return -1;
     }
+    printf("MESSAGE RECEIVED\n");
     return 0;
 }
 int check_user_type(int type_given, int queue_id){

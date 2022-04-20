@@ -35,7 +35,7 @@ struct user_snapshot {
     float outcomes;
     float expected_out;
 };/*Structure to be saved in sharedmemory*/
-/*struct user_snapshot* get_user_snapshot(struct user_transaction self);/*TODO: verifica snapshot se ritornare puntatore o no per salvare in shm*/
+
 /**
  * Initialize the user_transaction to default value with entries set as budget given
  * @param self current user

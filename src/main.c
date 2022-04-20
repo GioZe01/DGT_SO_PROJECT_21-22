@@ -5,7 +5,6 @@
 /* Sys  */
 #include <sys/ipc.h>
 #include <sys/sem.h>
-#include <sys/wait.h>
 #include <sys/msg.h>
 #include <sys/shm.h>
 /*  General */
@@ -486,9 +485,6 @@ void create_masterbook() {
         ERROR_EXIT_SEQUENCE_MAIN("IMPOSSIBLE TO CREATE THE SHARED MEM FOR MASTERBOOK");
     }
     shm_masterbook_pointer = shmat(shm_masterbook_id, NULL, 0);
-    if (shm_masterbook_id == (void*)-1) {
-        ERROR_EXIT_SEQUENCE_MAIN("IMPOSSIBLE TO CONNECT TO THE MASTERBOOK SHM");
-    }
     DEBUG_NOTIFY_ACTIVITY_DONE("CREATING THE MASTER BOOK DOONE");
     DEBUG_BLOCK_ACTION_END();
 }

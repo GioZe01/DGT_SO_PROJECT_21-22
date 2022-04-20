@@ -102,7 +102,7 @@ int load_configuration(struct conf *self) {
         fclose(conf_file);
         return -4;
     }
-    if (self->so_reward > 1) { /*Vorrebbe dire che con una transazione da max budget non puoi pagare le spese*/
+    if (self->so_reward > 100) { /*Vorrebbe dire che con una transazione da max budget non puoi pagare le spese*/
         fclose(conf_file);
         return -5;
     }
