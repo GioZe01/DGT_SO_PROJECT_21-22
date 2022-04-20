@@ -300,7 +300,7 @@ int get_num_transactions(Queue q) {
 }
 
 int queue_to_array(Queue q, struct Transaction vector[]) {
-    if (vector != NULL || get_num_transactions(q)==0) {
+    if (get_num_transactions(q)==0) {
         struct node *iterable = q->first;
         int i = 0;
         for (; iterable != NULL; iterable = iterable->next) {

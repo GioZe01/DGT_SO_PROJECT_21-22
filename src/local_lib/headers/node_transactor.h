@@ -22,9 +22,11 @@ struct node {
  * Initialize the node with the given param, and the transaction list as empty
  * @param self node to be initialized
  * @param node_pid pid of the node proc associated with this struct
+ * @param node_id id of the node
  * @param budget initial budget of the node
  * @param tp_size size of the transaction pool
  * @param block_size size of the transaction block
+ * @param percentage percentage of the budget to be used for the reward
  * @param calc_reward pointer to function that calculate the reward
  */
 void node_create(struct node *self, pid_t node_pid, int node_id, float budget, int tp_size, int block_size, float percentage,Reward calc_reward);

@@ -184,8 +184,8 @@ int main(int argc, char const *argv[]) {
      *      CONFIGURATION FASE          *
      * **********************************/
     read_conf_node(&node_configuration);
-    node_create(&current_node, getpid(), -1, 0, SO_BLOCK_SIZE,
-            node_configuration.so_reward,node_configuration.so_tp_size, (Reward)&calc_reward);
+    node_create(&current_node, getpid(),-1, 0, node_configuration.so_tp_size,SO_BLOCK_SIZE,
+            node_configuration.so_reward, (Reward)&calc_reward);
     if (check_arguments(argc, argv) && set_signal_handler_node(sa, sigmask)) {
         struct node_msg msg_rep;
         int is_unsed_node = 0;
