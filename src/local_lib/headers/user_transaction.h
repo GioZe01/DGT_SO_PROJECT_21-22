@@ -97,4 +97,11 @@ int generate_transaction(struct user_transaction *self, pid_t user_proc_pid,stru
  */
 int queue_remove(Queue q, struct Transaction t);
 
+/**
+ * Extract randomly a node id from 0 up to nodes_num
+ * @param nodes_num limit for random extraction
+ * @return the random id extracted
+ */
+int extract_node(int nodes_num);
+
 #endif /*DGT_SO_PROJECT_21_22_USER_TRANSACTION_H*/

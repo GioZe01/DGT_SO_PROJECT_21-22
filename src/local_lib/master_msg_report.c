@@ -17,10 +17,7 @@ void master_msg_report_create(struct master_msg_report *self, long type,long pro
     self->proc_type = proc_type;
     self->sender_pid = sender_pid;
     self->state = state;
-    if (type == INFO_BUDGET){
-        self->budget = budget;
-    }
-    self->budget = 0;
+    self->budget = budget;
 }
 
 void master_msg_report_print(const struct master_msg_report *self) {
@@ -32,18 +29,18 @@ void master_msg_report_print(const struct master_msg_report *self) {
             switch (self->state) {
                 case PROC_STATE_WAITING:
                 case PROC_STATE_NODE_SERV_TRANS:
-                    printf("[MASTER_MSG_REPORT]  := msg_type: %s%s%s%s | porc_type: %s | sender: %d | state: %s%s%d%s \n", COLOR_RESET_ANSI_CODE,
-                           COLOR_RED_ANSI_CODE, from_type_to_string(self->type),COLOR_RESET_ANSI_CODE,from_proctype_to_string(self->proc_type),self-> sender_pid,COLOR_RESET_ANSI_CODE, COLOR_YELLOW_ANSI_CODE ,self->state, COLOR_RESET_ANSI_CODE);
+                    printf("[MASTER_MSG_REPORT]  := msg_type: %s%s%s%s | porc_type: %s | sender: %d | state: %s%s%d%s | budget : %f\n", COLOR_RESET_ANSI_CODE,
+                           COLOR_RED_ANSI_CODE, from_type_to_string(self->type),COLOR_RESET_ANSI_CODE,from_proctype_to_string(self->proc_type),self-> sender_pid,COLOR_RESET_ANSI_CODE, COLOR_YELLOW_ANSI_CODE ,self->state, COLOR_RESET_ANSI_CODE, self->budget);
                     break;
                 default:
-                    printf("[MASTER_MSG_REPORT]  := msg_type: %s%s%s%s | porc_type: %s  | sender: %d | state: %d \n", COLOR_RESET_ANSI_CODE,
-                           COLOR_RED_ANSI_CODE, from_type_to_string(self->type), COLOR_RESET_ANSI_CODE,from_proctype_to_string(self->proc_type),self->sender_pid, self->state);
+                    printf("[MASTER_MSG_REPORT]  := msg_type: %s%s%s%s | porc_type: %s  | sender: %d | state: %d | budget: %f\n", COLOR_RESET_ANSI_CODE,
+                           COLOR_RED_ANSI_CODE, from_type_to_string(self->type), COLOR_RESET_ANSI_CODE,from_proctype_to_string(self->proc_type),self->sender_pid, self->state, self->budget);
                     break;
             }
             break;
         default:
             from_procstate_to_string(self->state, state_string);
-            printf("[MASTER_MSG_REPORT]  := msg_type: %s | proc_type: %s | sender: %d | state: %s \n", from_type_to_string(self->type),from_proctype_to_string(self->proc_type) ,self->sender_pid,state_string);
+            printf("[MASTER_MSG_REPORT]  := msg_type: %s | proc_type: %s | sender: %d | state: %s | budget: %f\n", from_type_to_string(self->type),from_proctype_to_string(self->proc_type) ,self->sender_pid,state_string, self->budget);
     }
 }
 void from_procstate_to_string(int state,char * string ){
@@ -133,7 +130,6 @@ int master_msg_receive_info(int id, struct master_msg_report * self){
 }
 
 int acknowledge(struct master_msg_report * self, ProcList list){
-    /*HANDLE DIFFERENT TYPE OF MESSAGES*/
     long msg_type = self->type;
     int proc_type = self->proc_type;
     short int exec_state = self->state;

@@ -20,12 +20,6 @@
 #define DEBUG_ERROR_MESSAGE(mex)
 #endif
 
-/**
- * Extract randomly a node id from 0 up to nodes_num
- * @param nodes_num limit for random extraction
- * @return the random id extracted
- */
-int extract_node(int nodes_num);
 
 /**
  * Select a user pid from the vector pointer users_num randomly
@@ -135,9 +129,6 @@ pid_t extract_user(int users_num[][2]) {
     /* DEBUG_NOTIFY_ACTIVITY_RUNNING("EXTRACTING USER FROM SNAPSHOTS...");*/
     int max = users_num[0][0];
     int e = (rand() % max) + 1;
-    while (users_num[e + 1][0] == NULL) {
-        e = (rand() % max) + 1;
-    }
     /*DEBUG_NOTIFY_ACTIVITY_DONE("EXTRACTING USER FROM SNAPSHOTS DONE");*/
     return users_num[e][0];
 }

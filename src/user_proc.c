@@ -236,7 +236,7 @@ void signals_handler_user(int signum) {
             break;
         case SIGUSR2:
             if(master_msg_send(queue_master_id, &msg, INFO_BUDGET, USER, current_user.pid,
-                        current_user.exec_state, TRUE,-1) < 0) {
+                        current_user.exec_state, TRUE,current_user.budget) < 0) {
                 char * error_string = strcat("IMPOSSIBLE TO ADVICE MASTER OF : %s",from_type_to_string(INFO_BUDGET));
                 ERROR_MESSAGE(error_string);
             }
@@ -253,7 +253,7 @@ void advice_master_of_termination(long termination_type) {
 #endif
     current_user.exec_state = PROC_STATE_TERMINATED;
     if(master_msg_send(queue_master_id, &termination_report, termination_type, USER, current_user.pid,
-                current_user.exec_state, TRUE,-1) < 0) {
+                current_user.exec_state, TRUE,current_user.budget) < 0) {
         char * error_string = strcat("IMPOSSIBLE TO ADVICE MASTER OF : %s",from_type_to_string(termination_type));
         ERROR_MESSAGE(error_string);
     }
@@ -303,7 +303,7 @@ Bool read_conf() {
 int send_to_node(void) {
     if (get_num_transactions(current_user.in_process)>0){
         DEBUG_NOTIFY_ACTIVITY_RUNNING("SENDING TRANSACTION TO THE NODE...");
-        int node_num = (rand() % (shm_conf_pointer->nodes_snapshots[0][0])) + 1;
+        int node_num = extract_node(shm_conf_pointer->nodes_snapshots[0][0]);
         struct node_msg msg;
         struct Transaction t = queue_head(current_user.in_process);
         if (node_msg_snd(queue_node_id, &msg, shm_conf_pointer->nodes_snapshots[node_num][1], &t,
@@ -391,7 +391,8 @@ Bool check_for_transactions_failed(void) {
 }
 Bool getting_richer(void){
     struct user_msg msg;
-    if (user_msg_receive(queue_user_id, &msg, user_id-(DELTA_USER_MSG_TYPE-2)) == 0){
+    if (user_msg_receive(queue_user_id, &msg, user_id-1) == 0){
+        printf("\n\nentrato\n\n\n");
         update_cash_flow(&current_user, &(msg.t));
         return TRUE;
     }

@@ -10,8 +10,6 @@
 #define MSG_TRANSACTION_INCOME_TYPE 2
 #define MSG_TRANSACTION_CONFIRMED_TYPE 3/*Default value*/
 
-#define CHECK_USER_TYPE(type_recived, queue_id) type_recived-queue_id == 0 ? MSG_TRANSACTION_CONFIRMED_TYPE : type_recived
-
 struct user_msg {
     long type;
     pid_t sender_pid;

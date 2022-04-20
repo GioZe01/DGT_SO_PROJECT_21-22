@@ -507,7 +507,6 @@ void update_kids_info(void){
     int num_msg_to_wait_for= -1;
     num_msg_to_wait_for= send_sig_to_all(proc_list, SIGUSR2);
     num_msg_to_wait_for = num_msg_to_wait_for;
-    printf("NUM MSG TO WAIT FOR: %d\n", num_msg_to_wait_for);
     if(num_msg_to_wait_for<0){
         ERROR_MESSAGE("IMPOSSIBLE TO UPDATE KIDS INFO");
     }

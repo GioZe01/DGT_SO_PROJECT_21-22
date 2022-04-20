@@ -326,11 +326,15 @@ Bool queue_copy_n_transactions(Queue q, Queue r, int n){
     if (n > q->transactions) {
         return FALSE;
     }
+    int to_remove= n;
     struct node *iterable = q->first;
     for (; iterable != NULL && n > 0; iterable = iterable->next) {
         queue_append(r, iterable->t);
-        queue_remove(q, iterable->t);
         n--;
+    }
+    /*remove the transactions from q*/
+    for (; to_remove > 0; to_remove--) {
+        queue_remove_head(q);
     }
     return TRUE;
 }
