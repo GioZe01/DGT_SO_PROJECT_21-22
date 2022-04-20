@@ -136,18 +136,14 @@ void queue_append(Queue q, struct Transaction t) {
 }
 
 void queue_remove_head(Queue q) {
-    if (queue_is_empty(q) == FALSE) {
-        struct node *temp = q->first;
-        if (q->first == q->last)
-            q->first = q->last = NULL;
-        else
-            q->first = q->first->next;
-        free(temp);
-        q->transactions--;
-    } else{
+    if (queue_is_empty(q) == TRUE) {
         queue_underflow();
         return;
     }
+    struct node *to_remove = q->first;
+    q->first = q->first->next;
+    free(to_remove);
+    q->transactions--;
 }
 
 int queue_remove(Queue q, struct Transaction t) {
