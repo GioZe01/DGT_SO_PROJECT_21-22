@@ -21,7 +21,7 @@
 #endif
 
 void node_create(struct node *self, pid_t node_pid, int node_id, float budget, int tp_size, int block_size, float percentage,Reward calc_reward){
-   self->budget = budget;
+    self->budget = budget;
     self->block_size = block_size;
     self->calc_reward = calc_reward;
     self->percentage = percentage;

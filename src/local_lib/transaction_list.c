@@ -136,7 +136,7 @@ void queue_append(Queue q, struct Transaction t) {
 }
 
 void queue_remove_head(Queue q) {
-    if (queue_is_empty(q) == TRUE) {
+    if (queue_is_empty(q) == TRUE || q->first == NULL) {
         queue_underflow();
         return;
     }
