@@ -212,7 +212,7 @@ static void queue_underflow(void) {
     return;
 }
 
-float queue_apt_amount_reward(Queue q, int percentage) {
+float queue_apt_amount_reward(Queue q, float percentage) {
     if (queue_is_empty(q) == TRUE) {
         ERROR_MESSAGE("CALL APT AMOUNT-REWARD ON EMPTY QUEUE");
         return -1;
@@ -221,7 +221,7 @@ float queue_apt_amount_reward(Queue q, int percentage) {
     float total_reward = 0;
 
     for (; first != NULL; first = first->next) {
-        first->t.reward = (float) (first->t.amount * ((float) percentage)) / 100;
+        first->t.reward = (first->t.amount * (percentage))/ 100;
         if (first->t.reward < 0) {
             ERROR_MESSAGE("NEGATIVE REWARD, CHECK VALUES");
             return -1;

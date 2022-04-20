@@ -13,7 +13,7 @@ struct conf {
     int so_user_num;
     int so_nodes_num;
     float so_buget_init;
-    int so_reward;
+    float so_reward;
     long so_min_trans_gen_nsec;
     long so_max_trans_gen_nsec;
     int so_retry;

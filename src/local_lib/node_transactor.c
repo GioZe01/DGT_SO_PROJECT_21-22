@@ -20,7 +20,7 @@
 #define DEBUG_ERROR_MESSAGE(mex)
 #endif
 
-void node_create(struct node*self, pid_t node_pid,int node_id,float budget, int block_size,int percentage,int tp_size, Reward calc_reward){
+void node_create(struct node *self, pid_t node_pid, int node_id, float budget, int tp_size, int block_size, float percentage,Reward calc_reward){
    self->budget = budget;
     self->block_size = block_size;
     self->calc_reward = calc_reward;
@@ -57,7 +57,7 @@ int update_budget(struct node *self) {
 }
 
 
-int calc_reward(struct node* self, int percentage, Bool use_default, float * block_tot_reward){
+int calc_reward(struct node* self, float percentage, Bool use_default, float * block_tot_reward){
     switch (use_default) {
         case TRUE:
             *block_tot_reward = queue_apt_amount_reward(self->transactions_block, self->percentage);

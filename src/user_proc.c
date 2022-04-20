@@ -392,7 +392,6 @@ Bool check_for_transactions_failed(void) {
 Bool getting_richer(void){
     struct user_msg msg;
     if (user_msg_receive(queue_user_id, &msg, user_id-1) == 0){
-        printf("\n\nentrato\n\n\n");
         update_cash_flow(&current_user, &(msg.t));
         return TRUE;
     }

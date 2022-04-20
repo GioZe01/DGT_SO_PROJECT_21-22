@@ -43,7 +43,7 @@ int load_configuration(struct conf *self) {
         fclose(conf_file);
         return -1;
     }
-    if (fscanf(conf_file, "so_reward=%d ", &self->so_reward) == EOF) {
+    if (fscanf(conf_file, "so_reward=%f ", &self->so_reward) == EOF) {
         fclose(conf_file);
         return -1;
     }

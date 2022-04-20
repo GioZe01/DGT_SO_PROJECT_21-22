@@ -385,7 +385,7 @@ int process_node_block() {
     /*Loading them into the node_block_transactions*/
     if (load_block() == TRUE &&
             get_num_transactions(current_node.transactions_block)==SO_BLOCK_SIZE /* DID i got the correct num of transactions*/&&
-            current_node.calc_reward(&current_node, -1, TRUE, &current_block_reward)>=0){
+            current_node.calc_reward(&current_node, current_node.percentage, TRUE, &current_block_reward)>=0){
         int num_of_shm_retry = 0;
         while(num_of_shm_retry < MAX_FAILURE_SHM_BOOKMASTER_LOCKING
                 && lock_shm_masterbook() == FALSE){
@@ -490,7 +490,6 @@ Bool load_block(void) {
 
 void advice_master_of_termination(long termination_type) {
     struct master_msg_report termination_report;
-    printf("NODE:= ADVICE TO MASTER OF TERMINATION, %ld\n", termination_type);
     current_node.exec_state = PROC_STATE_TERMINATED;
     if (master_msg_send(queue_master_id, &termination_report, termination_type, NODE,current_node.pid, current_node.exec_state,TRUE, current_node.budget)<0){
        char * error_string = strcat("IMPOSSIBLE TO ADVICE MASTER OF : %s",from_type_to_string(termination_type));
