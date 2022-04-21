@@ -31,6 +31,13 @@
 /* Support functions*/
 /*  ! All the following functions are capable of EXIT_PROCEDURE*/
 
+
+/**
+ * \brief Check if masterbook is full or not. If full, return FALSE, else TRUE. Check if there're
+ * enough process running to fill the masterbook.
+ */
+Bool check_runnability();
+
 /**
  * Create the shared memory for configuration purposes of kid processes
  */
@@ -80,6 +87,16 @@ void create_nodes_msg_queue(void);
 int create_nodes_proc(int *nodes_pids, int *nodes_queues_ids);
 
 /**
+ * \brief Get the string related to the simulation end code
+ */
+char* get_end_simulation_msg();
+
+/**
+ * \brief End the simulation by killing all the processes and cleaning the shared memory
+ */
+void end_simulation();
+
+/**
  * Print all the information requested by the project specification
  */
 void print_info(void);
@@ -112,7 +129,7 @@ struct conf simulation_conf; /*Structure representing the configuration present 
 ProcList proc_list; /* Pointer to a linked list of all proc generated*/
 struct shm_conf *shm_conf_pointer; /* Pointer to the shm_conf structure in shared memory*/
 struct shm_book_master *shm_masterbook_pointer; /* Pointer to the shm_masterbook structure in shared memory*/
-int simulation_end = 0; /* For value different from 0 the simulation must end*/
+int simulation_end = -1; /* For value different >= 0 the simulation must end*/
 int shm_conf_id = -1; /* Id of the shm for the configuration of the node*/
 int shm_masterbook_id = -1; /* Id of the shm for the master book */
 int msg_report_id_master = -1;/* Identifier for message queue for master communication*/
@@ -186,10 +203,14 @@ int main() {
         DEBUG_MESSAGE("WAITING DONE");
         DEBUG_BLOCK_ACTION_END();
         alarm(1);
-        while (simulation_end != 1) {
-            if (check_msg_report(&msg_repo, msg_report_id_master, proc_list) < 0) {
+        while (simulation_end <0) {
+
+            if (check_runnability()== FALSE||check_msg_report(&msg_repo, msg_report_id_master, proc_list) < 0) {
                 /*If a message arrive make the knowledge*/
-                ERROR_EXIT_SEQUENCE_MAIN("IMPOSSIBLE TO RETRIEVE INFO FROM MSG_QUEUE");
+                ERROR_MESSAGE("IMPOSSIBLE TO RUN SIMULATION");
+                end_simulation();
+            }else{
+                master_msg_report_print(&msg_repo);
             }
         }
         printf("====TIME FINISHED====\n");
@@ -525,4 +546,43 @@ void update_kids_info(void){
         }
     }while(num_msg_to_wait_for>0);
     DEBUG_NOTIFY_ACTIVITY_DONE("RETRIVING INFO DONE");
+}
+
+
+Bool check_runnability(){
+    DEBUG_BLOCK_ACTION_START("CHECK RUNNABILITY");
+    DEBUG_NOTIFY_ACTIVITY_RUNNING("CHECKING RUNNABILITY....");
+    int num_user_proc_running = get_num_of_user_proc_running(proc_list);
+    if ( shm_masterbook_pointer->to_fill >= SO_REGISTRY_SIZE ||
+            num_user_proc_running <= 0){
+        simulation_end = 1;
+        return FALSE;
+    }
+    else{
+        return TRUE;
+    }
+}
+
+void end_simulation(){
+    printf("Simulation %s \n", get_end_simulation_msg());
+    kill_kids();
+    wait_kids();
+}
+
+char* get_end_simulation_msg(){
+    switch(simulation_end){
+        case SIMULATION_END_BY_USER:
+            return "END BY USER";
+        case SIMULATION_END_BY_TIME:
+            return "END BY TIME";
+        case SIMULATION_END_BY_NO_PROC_RUNNING:
+            return "END BY NO PROCESS RUNNING";
+        case SIMULATION_END_BY_SO_REGISTRY_FULL:
+            return "END BY SO REGISTRY FULL";
+        case SIMULATION_END_PROPERLY_TERMINATED:
+            return "END PROPERLY TERMINATED";
+        default:
+            return "UNKNOWN";
+
+    }
 }

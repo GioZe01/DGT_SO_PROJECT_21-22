@@ -219,18 +219,6 @@ int main(int argc, char const *argv[]) {
          *   PROCESSING OF TRANSACTION FASE     *
          * **************************************/
         while (node_end!= 1 && failure_shm < MAX_FAILURE_SHM_LOADING) {
-            /*
-#ifdef DEBUG_NODE
-            struct msqid_ds info;
-            if (msgctl(queue_node_id, IPC_STAT, &info)<0){
-                advice_master_of_termination(IMPOSSIBLE_TO_COMUNICATE_WITH_QUEUE);
-                ERROR_EXIT_SEQUENCE_NODE("IMPOSSIBLE TO COMUNICATE WITH THE QUEUES");
-            }
-            if(info.msg_qnum >0){
-                printf("\n{DEBUG_NODE_TP} %d := NUMBER OF TRANSACTION IN LIST: %d | NUMBER OF MESSAGES : %ld\n",getpid(),get_num_transactions(current_node.transactions_block),info.msg_qnum);
-            }
-#endif
-*/
             process_node_transaction(&msg_rep);
             process_simple_transaction_type(&msg_rep);
             if(msg_rep.sender_pid == -1){ /**default value of sender_pid is -1, if it is -1 it means that the transaction is not valid*/
