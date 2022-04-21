@@ -307,7 +307,7 @@ int send_to_node(void) {
         int node_num = extract_node(shm_conf_pointer->nodes_snapshots[0][0]);
         struct node_msg msg;
         struct Transaction t = queue_head(current_user.in_process);
-        if (node_msg_snd(queue_node_id, &msg, shm_conf_pointer->nodes_snapshots[node_num][1], &t,
+        if (node_msg_snd(queue_node_id, &msg, MSG_TRANSACTION_TYPE, &t,
                     current_user.pid, TRUE, configuration.so_retry,shm_conf_pointer->nodes_snapshots[node_num][1]) < 0) { return -1; }
         queue_remove_head(current_user.in_process);/*removed if and only if has been sent*/
 #ifdef DEBUG_USER

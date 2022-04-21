@@ -7,16 +7,10 @@
 #include "headers/node_msg_report.h"
 #include "headers/simulation_errors.h"
 
+int check_default(long type, int queue_id);
+
 int node_msg_create(struct node_msg *self, long type, pid_t sender_pid, struct Transaction *t) {
-    switch (type) {
-        case MSG_NODE_ORIGIN_TYPE:
-        case MSG_TRANSACTION_TYPE:
-            self->t = *t;
-            break;
-        default:
-            ERROR_MESSAGE("WRONG TYPE");
-            return -1;
-    }
+    self->t = *t;
     self->type = type;
     self->sender_pid = sender_pid;
     return 0;
@@ -38,7 +32,7 @@ void node_msg_print(struct node_msg *self) {
 
 int node_msg_snd(int id, struct node_msg *msg, long type, struct Transaction *t, pid_t sender, Bool create, int so_retry, int queue_id) {
     int retry = 0;
-    if (create == TRUE) { node_msg_create(msg, CHECK_DEFAULT(type,queue_id), sender, t); }
+    if (create == TRUE) { node_msg_create(msg, check_default(type,queue_id), sender, t); }
     while (msgsnd(id, msg, sizeof(struct node_msg) - sizeof(long), 0) < 0 && retry <= so_retry ) {
         if (errno != EINTR) return -1;
         retry++;
@@ -57,4 +51,16 @@ int node_msg_receive(int id, struct node_msg *msg, long type) {
         return -1;
     }
     return 0;
+}
+
+int check_default(long type, int queue_id) {
+    switch (type) {
+        case MSG_NODE_ORIGIN_TYPE:
+            return queue_id-1;
+        case MSG_TRANSACTION_TYPE:
+            return queue_id;
+        default:
+            ERROR_MESSAGE("WRONG TYPE");
+            return -1;
+    }
 }
