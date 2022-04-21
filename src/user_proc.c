@@ -344,18 +344,19 @@ void generating_transactions(void) {
 #ifdef DEBUG_USER
             ERROR_MESSAGE("IMPOSSIBLE TO GENERATE TRANSACTION");/*TODO: can be a simple advice, not a critical one*/
 #endif
-        }
-        gen_sleep.tv_nsec =
-            (rand() % (configuration.so_max_trans_gen_nsec - configuration.so_min_trans_gen_nsec + 1)) +
-            configuration.so_min_trans_gen_nsec;
+        }else{
+            gen_sleep.tv_nsec =
+                (rand() % (configuration.so_max_trans_gen_nsec - configuration.so_min_trans_gen_nsec + 1)) +
+                configuration.so_min_trans_gen_nsec;
 #ifdef U_CASHING
-        /*TODO: make cashing*/
+            /*TODO: make cashing*/
 #else
-        /*SENDING TRANSACTION TO THE NODE*/
-        if (send_to_node() < 0) {
+            /*SENDING TRANSACTION TO THE NODE*/
+            if (send_to_node() < 0) {
 #ifdef DEBUG_USER
-            ERROR_MESSAGE("IMPOSSIBLE TO SEND TO THE NODE");
+                ERROR_MESSAGE("IMPOSSIBLE TO SEND TO THE NODE");
 #endif
+            }
         }
         /*
          * TODO: check for the retry to send : can do with while then abort and notify master

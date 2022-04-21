@@ -79,13 +79,13 @@ void print_cashflow(struct user_transaction * self){
 }
 
 int update_cash_flow(struct user_transaction *self, struct Transaction *t) {
-    if (self->pid == t->reciver && t->t_type == TRANSACTION_SUCCES) { /*Getting reaches*/
+    if (self->pid == t->reciver && t->t_type == TRANSACTION_SUCCES) {
         self->cash_flow.entries += t->amount;
         self->budget += t->amount;
         return 0;
     } else if (self->pid == t->sender && t->t_type == TRANSACTION_SUCCES) {
-        self->budget -= t->amount;
         self->cash_flow.outcomes += t->amount;
+        self->budget -= t->amount;
         self->expected_out -= t->amount;
         return 0;
     } else if (self->pid == t->sender && t->t_type == TRANSACTION_FAILED) {
@@ -139,5 +139,9 @@ int extract_node(int nodes_num) {
 
 
 float gen_amount(struct user_transaction *user) {
-    return ((float)rand()/(float)RAND_MAX)*(float)(user->budget);
+    float ris = (rand()/(float)RAND_MAX)*user->budget;
+    if (user->budget - ris < 0) {
+        return 0;
+    }
+    return ris;
 }

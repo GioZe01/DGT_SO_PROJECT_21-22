@@ -480,7 +480,7 @@ Bool load_block(void) {
     if (queue_is_empty(current_node.transactions_block)==FALSE|| get_num_transactions(current_node.transactions_pool)<SO_BLOCK_SIZE){
         return FALSE;
     }
-
+    /*Loading the transactions from the pool to the block*/
     if (queue_copy_n_transactions(current_node.transactions_pool, current_node.transactions_block, SO_BLOCK_SIZE)== TRUE){
         return TRUE;
     }else
