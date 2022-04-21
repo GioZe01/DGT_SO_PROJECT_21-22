@@ -249,6 +249,7 @@ int main(int argc, char const *argv[]) {
             advice_master_of_termination(UNUSED_PROC);
             ERROR_EXIT_SEQUENCE_NODE("UNUSED NODE TP PROC");
         }
+        sleep(100);
     }
     advice_master_of_termination(TERMINATION_END_CORRECTLY);
     EXIT_PROCEDURE_NODE(0);
@@ -541,7 +542,6 @@ void adv_users_of_block(void){
             return;
         }
         user_msg_snd(queue_user_id, u_msg_rep, MSG_TRANSACTION_INCOME_TYPE, &t, current_node.pid, TRUE, queue_id_user_proc);
-        printf("\n\n ======= TRANSACTION SENT TO USER %d AND RECIVER: %d  amount: %f reward: %f=================\n\n",sender_pid,receiver_pid, t.amount, t.reward);
         queue_remove_head(current_node.transactions_block);
     }
     current_node.budget += current_block_reward;

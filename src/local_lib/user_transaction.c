@@ -134,7 +134,7 @@ pid_t extract_user(int users_num[][2]) {
 }
 
 int extract_node(int nodes_num) {
-    return (rand() % (nodes_num + 1));
+    return (rand() % (nodes_num )+1);
 }
 
 

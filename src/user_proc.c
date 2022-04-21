@@ -303,6 +303,7 @@ Bool read_conf() {
 int send_to_node(void) {
     if (get_num_transactions(current_user.in_process)>0){
         DEBUG_NOTIFY_ACTIVITY_RUNNING("SENDING TRANSACTION TO THE NODE...");
+        srand(getpid());
         int node_num = extract_node(shm_conf_pointer->nodes_snapshots[0][0]);
         struct node_msg msg;
         struct Transaction t = queue_head(current_user.in_process);
