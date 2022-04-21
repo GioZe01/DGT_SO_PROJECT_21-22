@@ -71,28 +71,24 @@ double  calc_balance(struct user_transaction *self) {
     return value;
 }
 void print_cashflow(struct user_transaction * self){
-    printf("\n======= USER %d CASHFLOW =======\n", self->pid);
-    printf("\n ENTRIES: %f \n",self->cash_flow.entries);
-    printf("\n OUTCOMES: %f \n", self->cash_flow.outcomes);
-    printf("\n expected_out: %f \n", self->expected_out);
-    printf("\n======= END ====================\n");
+    printf("[%d]-> budget: %f, ENTRIES: %f, OUTCOMES: %f, expected_out: %f  \n",getpid(),self->budget, self->cash_flow.entries, self->cash_flow.outcomes, self->expected_out);
 }
 
-int update_cash_flow(struct user_transaction *self, struct Transaction *t) {
-    if (self->pid == t->reciver && t->t_type == TRANSACTION_SUCCES) {
-        self->cash_flow.entries += t->amount;
-        self->budget += t->amount;
+int update_cash_flow(struct user_transaction *self, struct Transaction t) {
+    if (self->pid == t.reciver && t.t_type == TRANSACTION_SUCCES) {
+        self->cash_flow.entries += t.amount;
+        self->budget += t.amount;
         return 0;
-    } else if (self->pid == t->sender && t->t_type == TRANSACTION_SUCCES) {
-        self->cash_flow.outcomes += t->amount;
-        self->budget -= t->amount;
-        self->expected_out -= t->amount;
+    } else if (self->pid == t.sender && t.t_type == TRANSACTION_SUCCES) {
+        self->cash_flow.outcomes += t.amount;
+        self->budget -= t.amount;
+        self->expected_out -= t.amount;
         return 0;
-    } else if (self->pid == t->sender && t->t_type == TRANSACTION_FAILED) {
-        self->cash_flow.outcomes -= t->amount;
+    } else if (self->pid == t.sender && t.t_type == TRANSACTION_FAILED) {
+        self->cash_flow.outcomes -= t.amount;
         return 0;
-    } else if (self->pid == t->sender && t->t_type == TRANSACTION_WAITING) {
-        self->expected_out += t->amount;
+    } else if (self->pid == t.sender && t.t_type == TRANSACTION_WAITING) {
+        self->expected_out += t.amount;
         return 0;
     }
     return -1;
@@ -104,15 +100,19 @@ int generate_transaction(struct user_transaction *self, pid_t user_proc_pid, str
     float amount;
     if (check_balance(self) == TRUE) {
         amount = gen_amount(self);
-        if (amount == 0|| self->expected_out + amount > self->budget){
+        if (amount == 0|| self->expected_out + amount > self->budget || self->budget - self->expected_out <= 0) {
             return -1;
         }
-        if (create_transaction(&t, user_proc_pid, extract_user(shm_conf->users_snapshots),amount)<
+        int receiver = extract_user(shm_conf->users_snapshots);
+        while (receiver == self->pid) {
+            receiver = extract_user(shm_conf->users_snapshots);
+        }
+        if (create_transaction(&t, user_proc_pid, receiver,amount)<
                 0) {
             ERROR_MESSAGE("FAILED ON TRANSACTION CREATION");
         }else{
             queue_append(self->in_process, t);
-            if (self->update_cash_flow(self, &t) < 0) { ERROR_EXIT_SEQUENCE_USER("IMPOSSIBLE TO UPDATE CASH FLOW"); }
+            if (self->update_cash_flow(self, t) < 0) { ERROR_EXIT_SEQUENCE_USER("IMPOSSIBLE TO UPDATE CASH FLOW"); }
             self->to_wait_transaction++;
             /* DEBUG_NOTIFY_ACTIVITY_DONE("GENERATING THE TRANSACTION DONE"); */
             return 0;
@@ -139,7 +139,7 @@ int extract_node(int nodes_num) {
 
 
 float gen_amount(struct user_transaction *user) {
-    float ris = (rand()/(float)RAND_MAX)*user->budget;
+    float ris = (rand()/(float)RAND_MAX)*(user->budget-user->expected_out);
     if (user->budget - ris < 0) {
         return 0;
     }

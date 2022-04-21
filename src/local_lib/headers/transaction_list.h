@@ -116,4 +116,10 @@ int array_to_queue(Queue q, struct Transaction* vector);
  * @return FALSE in case of failure. TRUE otherwise
  */
 Bool queue_copy_n_transactions(Queue q, Queue r, int n);
+
+/**
+ * Tells whether or not the given queue is empty or not
+ * @param q the queue to perform the check on
+ */
+void empty_queue(Queue q);
 #endif /*DGT_SO_PROJECT_21_22_TRANSACTION_LIST_H*/

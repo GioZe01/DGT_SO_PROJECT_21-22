@@ -8,7 +8,7 @@
 
 typedef double (*Balance)(struct user_transaction* self);
 
-typedef int (*CalcCashFlow)(struct user_transaction*self, struct Transaction *t);
+typedef int (*CalcCashFlow)(struct user_transaction*self, struct Transaction t);
 
 typedef struct {
     float entries;
@@ -79,7 +79,7 @@ void print_cashflow(struct user_transaction * self);
  * @param self current user
  * @return -1 in case of failure, 0 otherwise
  */
-int update_cash_flow(struct user_transaction *self, struct Transaction *t);
+int update_cash_flow(struct user_transaction *self, struct Transaction t);
 
 /**
  * Generate a new transaction for the self user and add it to in_progress queue of the transaction

@@ -372,7 +372,7 @@ Bool check_for_transactions_confirmed(void) {
         /*Messagge found*/
         current_user.to_wait_transaction--;
         queue_remove(current_user.in_process, msg.t);
-        update_cash_flow(&current_user, &(msg.t));
+        current_user.update_cash_flow(&current_user, msg.t);
         return TRUE;
     }
     return FALSE;
@@ -385,7 +385,7 @@ Bool check_for_transactions_failed(void) {
         current_user.to_wait_transaction--;
         queue_append(current_user.transactions_failed, msg.t);
         queue_remove(current_user.in_process, msg.t);
-        update_cash_flow(&current_user, &(msg.t));
+        current_user.update_cash_flow(&current_user, msg.t);
         return TRUE;
     }
     return FALSE;
@@ -393,7 +393,7 @@ Bool check_for_transactions_failed(void) {
 Bool getting_richer(void){
     struct user_msg msg;
     if (user_msg_receive(queue_user_id, &msg, user_id-1) == 0){
-        update_cash_flow(&current_user, &(msg.t));
+        current_user.update_cash_flow(&current_user, msg.t);
         return TRUE;
     }
     return FALSE;

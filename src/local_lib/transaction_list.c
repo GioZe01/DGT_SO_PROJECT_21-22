@@ -46,11 +46,6 @@ static void queue_underflow(void);
  */
 void get_status(char char_type[80], int t_type);
 
-/**
- * Tells whether or not the given queue is empty or not
- * @param q the queue to perform the check on
- */
-static void empty_queue(Queue q);
 
 /**
  * Compare to transaction
@@ -104,7 +99,7 @@ void queue_destroy(Queue q) {
     DEBUG_NOTIFY_ACTIVITY_DONE("REMOVING ITEM FROM TRANSACTION QUEUE COMPLETED ");
 }
 
-static void empty_queue(Queue q) {
+void empty_queue(Queue q) {
     while (queue_is_empty(q) == FALSE) {
         queue_remove_head(q);
     }

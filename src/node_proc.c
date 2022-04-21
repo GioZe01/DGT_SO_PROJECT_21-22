@@ -525,9 +525,8 @@ void adv_users_of_block(void){
     int receiver_pid = -1;
     while(queue_is_empty(current_node.transactions_block)==FALSE){
         struct user_msg *u_msg_rep =  (struct user_msg *) malloc(sizeof(struct user_msg));
-        DEBUG_ERROR_MESSAGE("NODE TRANSACTION FAILED");
-        u_msg_rep->t.t_type = TRANSACTION_SUCCES;
         struct Transaction t = queue_head(current_node.transactions_block);
+        t.t_type = TRANSACTION_SUCCES;
         sender_pid = t.sender;
         receiver_pid = t.reciver;
         int queue_id_user_proc= get_queueid_by_pid(shm_conf_pointer_node,sender_pid,TRUE);
@@ -542,9 +541,10 @@ void adv_users_of_block(void){
             return;
         }
         user_msg_snd(queue_user_id, u_msg_rep, MSG_TRANSACTION_INCOME_TYPE, &t, current_node.pid, TRUE, queue_id_user_proc);
-        current_node.budget += current_block_reward;
+        printf("\n\n ======= TRANSACTION SENT TO USER %d AND RECIVER: %d  amount: %f reward: %f=================\n\n",sender_pid,receiver_pid, t.amount, t.reward);
         queue_remove_head(current_node.transactions_block);
     }
+    current_node.budget += current_block_reward;
 }
 void process_simple_transaction_type(struct node_msg *msg_rep) {
     if (node_msg_receive(queue_node_id, msg_rep, current_node.node_id) == 0) {
@@ -552,6 +552,7 @@ void process_simple_transaction_type(struct node_msg *msg_rep) {
         if (get_num_transactions(current_node.transactions_pool) < current_node.tp_size) {
             queue_append(current_node.transactions_pool, msg_rep->t);
         } else {/*TP_SIZE FULL*/
+            printf("TP_SIZE FULL\n");
             struct user_msg *u_msg_rep =  (struct user_msg *) malloc(sizeof(struct user_msg));
 #ifdef DEBUG_NODE_TP
             DEBUG_ERROR_MESSAGE("NODE TRANSACTION FAILED");

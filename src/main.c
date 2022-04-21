@@ -310,7 +310,7 @@ void signals_handler(int signum) {
                 print_info();
                 /*Printing infos*/
                 if (num_inv == simulation_conf.so_sim_sec) simulation_end = 1;
-                else alarm(1);
+                else alarm(2);
                 /*TODO: METTO IN PAUSA I NODI vedere se mettere anche in pausa i processi user*/
             }
             break;
