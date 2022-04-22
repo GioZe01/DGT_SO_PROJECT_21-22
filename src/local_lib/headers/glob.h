@@ -8,8 +8,10 @@
 #define PATH_TO_NODE "build/bin/node"
 #define PATH_TO_NODE_TP "build/bin/node_tp"
 
-/*  NUM LIMIT OF PROCS */
-
+/**! \defgroup NUM LIMIT OF PROCS
+ *  \brief defines the number of processes
+ *  \{
+ */
 /*! \def USERS_MAX
  * \brief The number of processes that can be created
  */
@@ -18,9 +20,13 @@
  * \brief The number of processes that can be created
  */
 #define NODES_MAX 100
+/**! \} */
 
-/*  SINCRONIZATION KEY values from 60 to 70*/
-
+/**! \defgroup SINCRONIZATION KEY
+ * \brief The key used to synchronize the processes
+ * values ranges from 60 to 70
+ */
+/**@{*/
 /*! \def SEMAPHORE_SINC_KEY_START
  * \brief The first key for the sincronization semaphore sincronization
  */
@@ -33,8 +39,13 @@
  * \brief The key for the masterbook semaphore for to_fill shm param
  */
 #define SEMAPHORE_MASTER_BOOK_TO_FILL_KEY 0X62
-/*  QUEUE KEY  values from 71 to 80*/
+/**@}*/
 
+/**! \defgroup QUEUE KEY
+ * \brief The key for the queue semaphore
+ * values ranges from 71 to 80
+ */
+/**@{*/
 /*! \def MASTER_QUEUE_KEY
  * \brief The key for the master report queue
  */
@@ -47,8 +58,13 @@
  * \brief The key for the node report queue
  */
 #define NODES_QUEUE_KEY 0x73
+/**@}*/
 
-/*  SHARED MEM. KEY values from 81 to 90*/
+/**! \defgroup SHARED MEM. KEY
+ * \brief The key for the shared memory
+ * values ranges from 81 to 90
+ */
+/**@{*/
 /*! \def SHM_CONFIGURATION
  * \brief The key for the shm dedicated to the configuration
  */
@@ -57,8 +73,12 @@
  * \brief The key for the shm dedicated to the master book
  */
 #define MASTER_BOOK_SHM_KEY 0x82
+/**@}*/
 
-/*  COLOR DEFINITION    */
+/**! \defgroup COLOR DEFINITION
+ * \brief The color definition for the output in AnsiCode
+ */
+/**@{*/
 /*! \def COLOR_RED_ANSI_CODE
  * \brief The color red in ansi code
  */
@@ -83,14 +103,21 @@
  * \brief The color reset in ansi code
  */
 #define COLOR_RESET_ANSI_CODE "\x1b[0m"
+/**@}*/
 
 /**! \defgroup AT COMPILATION TIME DEFINITION
  * \brief The definition of the variables at compilation time modified by the user
  */
 /**@{*/
+/**! \def SO_REGISTRY_SIZE
+ * \brief The size of the registry of the shared objects
+ */
 #ifndef SO_REGISTRY_SIZE
 #define SO_REGISTRY_SIZE 100
 #endif
+/**! \def SO_BLOCK_SIZE
+ * \brief The size of the block of the shared objects
+ */
 #ifndef SO_BLOCK_SIZE
 #define SO_BLOCK_SIZE 10
 #endif
