@@ -5,7 +5,6 @@
 #include "glob.h"
 #include "boolean.h"
 
-
 struct shm_conf {
     int users_snapshots[USERS_MAX][2];
     int nodes_snapshots[NODES_MAX][3];

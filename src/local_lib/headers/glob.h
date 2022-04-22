@@ -7,12 +7,31 @@
 #define PATH_TO_USER "build/bin/user"
 #define PATH_TO_NODE "build/bin/node"
 #define PATH_TO_NODE_TP "build/bin/node_tp"
+
 /*  NUM LIMIT OF PROCS */
-#define USERS_MAX 1000 /*Max users that can be saved in shm*/
-#define NODES_MAX 100    /*Max nodes that can be saved in shm*/
+
+/*! \def USERS_MAX
+ * \brief The number of processes that can be created
+ */
+#define USERS_MAX 1000
+/*! \def NODES_MAX
+ * \brief The number of processes that can be created
+ */
+#define NODES_MAX 100
+
 /*  SINCRONIZATION KEY values from 60 to 70*/
+
+/*! \def SEMAPHORE_SINC_KEY_START
+ * \brief The first key for the sincronization semaphore sincronization
+ */
 #define SEMAPHORE_SINC_KEY_START 0x60
+/*! \def SEMAPHORE_MASTER_BOOK_ACCESS_KEY
+ * \brief The key for the masterbook semaphore for single block access
+ */
 #define SEMAPHORE_MASTER_BOOK_ACCESS_KEY 0x61 /*For single block access*/
+/*! \def SEMAPHORE_MASTER_BOOK_TO_FILL_KEY
+ * \brief The key for the masterbook semaphore for to_fill shm param
+ */
 #define SEMAPHORE_MASTER_BOOK_TO_FILL_KEY 0X62 /*For to_fill shm param look for def into shm_masterbook*/
 /*  QUEUE KEY  values from 71 to 80*/
 #define MASTER_QUEUE_KEY 0x71
