@@ -83,13 +83,18 @@
  * \brief The color reset in ansi code
  */
 #define COLOR_RESET_ANSI_CODE "\x1b[0m"
-/*AT COMPILATION TIME DEFINITION*/
+
+/**! \defgroup AT COMPILATION TIME DEFINITION
+ * \brief The definition of the variables at compilation time modified by the user
+ */
+/**@{*/
 #ifndef SO_REGISTRY_SIZE
 #define SO_REGISTRY_SIZE 100
 #endif
 #ifndef SO_BLOCK_SIZE
 #define SO_BLOCK_SIZE 10
 #endif
+/**@}*/
 /*  GENERAL UTILITY MACROS*/
 #define REALLOC_MARGIN 10 /**< delta in wich is not usefull to realloc TODO: make a function that calculate it*/
 #define MAX_FAILURE_SHM_LOADING 1000 /**< max number of times that the shm loading can fail*/
