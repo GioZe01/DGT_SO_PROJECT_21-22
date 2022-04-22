@@ -5,9 +5,10 @@
 #include "glob.h"
 #include "boolean.h"
 
+
 struct shm_conf {
     int users_snapshots[USERS_MAX][2];
-    int nodes_snapshots[NODES_MAX][2];
+    int nodes_snapshots[NODES_MAX][3];
 };
 
 /**
@@ -24,6 +25,7 @@ int shm_conf_create(struct shm_conf *self, int *users_pids, int *users_queues_id
  * @param self
  */
 void shm_conf_print(struct shm_conf *self);
+
 /**
  * Copy the two pointers given into 2d pointer
  * @param snapshot the 2d matrix
@@ -33,7 +35,7 @@ void shm_conf_print(struct shm_conf *self);
 void shm_copy_snapshots(int snapshot[][2], int *pids, int *queues_ids);
 
 /**
- * /brief Get the queue id from the given shm conf and the pid
+ * @brief Get the queue id from the given shm conf and the pid
  * TODO: Implement a non linear search
  * @param self the shm conf
  * @param pid the pid to search for

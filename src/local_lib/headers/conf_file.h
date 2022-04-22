@@ -7,7 +7,8 @@
 
 #define CONFIGURATION_FILE_PATH "conf"
 
-struct conf {
+struct conf
+{
     /*TODO: Verificare tipi*/
     /*TODO: Finire di scrivere la configurazione -> potrebbe arrivare da socket*/
     int so_user_num;
@@ -25,7 +26,7 @@ struct conf {
 };
 
 /**
- * \brief Load the configuration in the conf struct specified
+ * @brief Load the configuration in the conf struct specified
  * Load the configuration present in the configuration file
  * \attentionWarning Negative number are automatically converted to positive !
  * @param self
@@ -38,6 +39,5 @@ struct conf {
  * 5) -5 if node rewards is max for budget init; TODO: vedere se si vuole bloccare fin da subito considerando worst case e se negative buget safe è da fare o no
  */
 int load_configuration(struct conf *self);
-
 
 #endif /*DGT_SO_PROJECT_21_22_CONF_FILE_H*/
