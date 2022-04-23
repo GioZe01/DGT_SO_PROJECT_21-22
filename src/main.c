@@ -42,6 +42,7 @@ Bool check_runnability();
  */
 void create_shm_conf(void);
 
+
 /**
  * Create the shared memory for the master-book
  */
@@ -89,6 +90,13 @@ int create_nodes_proc(int *nodes_pids, int *nodes_queues_ids);
  * @brief Get the string related to the simulation end code
  */
 char *get_end_simulation_msg();
+
+/**
+ * @brief Return an array of int with the friends of each nodes in the simulation
+ * @param nodes pointer to an array of int with the nodes in the simulation (in 0 index there's
+ * the number of nodes)
+ */
+int * generate_nodes_friends_array(int * nodes);
 
 /**
  * @brief End the simulation by killing all the processes and cleaning the shared memory
@@ -189,9 +197,16 @@ int main()
         {
             ERROR_MESSAGE("IMPOSSIBLE TO CREATE NODES PROC");
         }
+        /**
+         * Generate the array of friends for each nodes and save it into a local array
+         */
         DEBUG_BLOCK_ACTION_END();
         DEBUG_NOTIFY_ACTIVITY_RUNNING("SHM INITIALIZING...");
-        if (shm_conf_create(shm_conf_pointer, users_pids, users_queues_ids, nodes_pids, nodes_queues_ids) < 0)
+        /*-------------------------------*/
+        /*  INITIALIZING THE SHM         */
+        /*-------------------------------*/
+        int * nodes_friends = generate_nodes_friends_array(nodes_queues_ids);
+        if (shm_conf_create(shm_conf_pointer, users_pids, users_queues_ids, nodes_pids, nodes_queues_ids, nodes_friends) < 0)
         {
             ERROR_EXIT_SEQUENCE_MAIN("FAILED ON SHM_CONF INITIALIZING");
         }
@@ -664,4 +679,14 @@ char *get_end_simulation_msg()
     default:
         return "UNKNOWN";
     }
+}
+int * generate_nodes_friends_array(int * nodes){
+    int * nodes_friends = (int *)malloc(sizeof(int) * nodes[0]);
+    int i = 1;
+    nodes_friends [0] = nodes[0];
+    for (; i < nodes[0]; i++)
+    {
+        nodes_friends[i] = rand_int_n_exclude(nodes[0], i);
+    }
+    return nodes_friends;
 }

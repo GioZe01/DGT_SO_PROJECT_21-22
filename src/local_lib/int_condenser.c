@@ -1,16 +1,22 @@
 #include <stdio.h>
 #include <stdlib.h>
+/**
+ * @brief Check if there is a 1 int the given position
+ * @param n the number to check
+ * @param posistion the position to check
+ * @return 1 if there is a 1 in the given position, 0 otherwise
+ */
+int check_bit(int n, int position){
+    return (n >> position) & 1;
+}
 
 int rand_int(int n) {
-    /**make sure n is positive*/
     if (n < 0) {
         n = -n;
     }
-    /**make sure n is not 0*/
     if (n == 0) {
         return 0;
     }
-    /**generate a random number*/
     return rand() % n;
 }
 
@@ -32,7 +38,6 @@ int rand_int_n(int n) {
     int i, r;
     int res = 0;
     for (i = 0; get_ones(res)<n; i++) {
-        /**make sure that is not already set*/
         do {
             r = rand_int(32);
         } while (r & (1 << i));
@@ -41,3 +46,21 @@ int rand_int_n(int n) {
     return res;
 }
 
+int rand_int_n_exclude(int n, int exclude){
+    int i, r;
+    int res = 0;
+    for (i = 0; get_ones(res)<n; i++) {
+        do {
+            r = rand_int(32);
+        } while (r & (1 << i) || r == exclude);
+        res |= 1 << r;
+    }
+    return res;
+}
+int rand_int_n_pos(int n) {
+    int position = rand_int(32);
+    while (check_bit(n, position)) {
+        position = rand_int(32);
+    }
+    return position+1;
+}

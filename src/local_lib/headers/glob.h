@@ -3,10 +3,14 @@
 
 #include <unistd.h>
 #include "sys/types.h"
-/*  EXCVE PATH   */
+/**! \defgroup EXCVE PATH
+ * \brief Path to be  used in excve function
+ */
+/**@{*/
 #define PATH_TO_USER "build/bin/user"
 #define PATH_TO_NODE "build/bin/node"
 #define PATH_TO_NODE_TP "build/bin/node_tp"
+/**@}*/
 
 /**! \defgroup NUM LIMIT OF PROCS
  *  \brief defines the number of processes
@@ -21,6 +25,7 @@
  */
 #define NODES_MAX 100
 /**! \} */
+
 
 /**! \defgroup SINCRONIZATION KEY
  * \brief The key used to synchronize the processes

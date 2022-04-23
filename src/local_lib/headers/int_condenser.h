@@ -26,6 +26,29 @@ int get_ones(int n);
  * @brief Initialize a integer number with 1 in n random positions and 0 elsewhere
  * @param n The n positions to be set to 1
  * @return A random number with n 1s and the rest 0
+ * @warning rand is done on 32 bits
  */
 int rand_int_n(int n);
+
+/**
+ * @brief Initialize a integer number with 1 in n random positions excluding the one given and 0 elsewhere
+ * @param n The n positions to be set to 1
+ * @param exclude The position to be excluded
+ * @return A random number with n 1s and the rest 0
+ * @warning rand is done on 32 bits
+ */
+int rand_int_n_exclude(int n, int exclude);
+
+/**
+ * @brief Return the position of a randomly chosen 1 in the given number
+ * @param n The number
+ * @return The position of a randomly chosen 1 in the given number
+ */
+int get_rand_one(int n);
+/**
+ * @brief Get a random 1 position in the given number
+ * @param n The number
+ * @return The position of a random 1 in the given number
+ */
+int rand_int_n_pos(int n);
 #endif //DGT_SO_PROJECT_21_22_INT_CONDENSER_H

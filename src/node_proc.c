@@ -31,6 +31,7 @@
 #include "local_lib/headers/node_tp_shm.h"
 #include "local_lib/headers/debug_utility.h"
 #include "local_lib/headers/transaction_list.h"
+#include "local_lib/headers/int_condenser.h"
 
 /* Support Function*/
 
@@ -163,6 +164,7 @@ int queue_master_id = -1;         /* Identifier of the master queue id*/
 int node_end = 0;                 /* For values different from 0 the node proc must end*/
 float current_block_reward = 0;   /* The current value of all node block reward*/
 int last_signal;
+int friends = -1;
 struct node current_node;                       /* Current representation of the node*/
 struct conf node_configuration;                 /* Configuration File representation*/
 struct shm_conf *shm_conf_pointer_node;         /* Ref to the shm for configuration of the node*/
@@ -302,25 +304,35 @@ void signals_handler(int signum)
 {
     DEBUG_SIGNAL("SIGNAL RECEIVED ", signum);
     last_signal = signum;
-    struct master_msg_report msg;
+    struct master_msg_report master_msg;
     switch (signum)
     {
-    case SIGINT:
-        alarm(0); /*pending alarm removed*/
-        current_node.exec_state = PROC_STATE_TERMINATED;
-        advice_master_of_termination(SIGNALS_OF_TERM_RECEIVED);
-        EXIT_PROCEDURE_NODE(0);
-        break;
-    case SIGALRM:
-        break;
-    case SIGUSR2:
-        master_msg_send(queue_master_id, &msg, INFO_BUDGET, NODE, current_node.pid, current_node.exec_state, TRUE, current_node.budget);
+        case SIGINT:
+            alarm(0); /*pending alarm removed*/
+            current_node.exec_state = PROC_STATE_TERMINATED;
+            advice_master_of_termination(SIGNALS_OF_TERM_RECEIVED);
+            EXIT_PROCEDURE_NODE(0);
+            break;
+        case SIGALRM:
+            alarm (1);
+            /**
+             * select a transaction from the pool and send it to a friend node into the message queue
+             */
+            struct node_msg node_msg;
+            int node_id = rand_int_n_pos(friends);
+            struct Transaction t = queue_head(current_node.transactions_pool);
+            node_msg_snd(queue_node_id, &node_msg, MSG_NODE_ORIGIN_TYPE, &t, current_node.pid, TRUE, node_configuration.so_retry, shm_conf_pointer_node->nodes_snapshots[node_id][2]);
+            printf("NODE %d SENT TRANSACTION %f TO NODE %d\n", current_node.node_id, t.amount, node_id);
+            queue_remove_head(current_node.transactions_pool);
+            break;
+        case SIGUSR2:
+            master_msg_send(queue_master_id, &master_msg, INFO_BUDGET, NODE, current_node.pid, current_node.exec_state, TRUE, current_node.budget);
 #ifdef DEBUG_NODE
-        DEBUG_NOTIFY_ACTIVITY_DONE("{DEBUG_NODE}:= REPLIED TO MASTER DONE");
+            DEBUG_NOTIFY_ACTIVITY_DONE("{DEBUG_NODE}:= REPLIED TO MASTER DONE");
 #endif
-        break;
-    default:
-        break;
+            break;
+        default:
+            break;
     }
 }
 
@@ -365,6 +377,7 @@ void attach_to_shms(void)
         advice_master_of_termination(IMPOSSIBLE_TO_CONNECT_TO_SHM);
         ERROR_EXIT_SEQUENCE_NODE("IMPOSSIBLE TO CONNECT TO SHM CONF");
     }
+    friends = shm_conf_pointer_node->nodes_snapshots[get_node_position_by_pid(shm_conf_pointer_node,current_node.pid)];
     DEBUG_NOTIFY_ACTIVITY_DONE("ATTACHING TO SHM DONE");
     shm_conf_id = shmget(MASTER_BOOK_SHM_KEY, sizeof(struct shm_book_master), 0600);
     if (shm_conf_id < 0)
