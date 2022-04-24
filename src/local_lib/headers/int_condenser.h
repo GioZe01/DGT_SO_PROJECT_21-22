@@ -25,19 +25,21 @@ int get_ones(int n);
 /**
  * @brief Initialize a integer number with 1 in n random positions and 0 elsewhere
  * @param n The n positions to be set to 1
+ * @param max The max value of 1s in the number
  * @return A random number with n 1s and the rest 0
  * @warning rand is done on 32 bits
  */
-int rand_int_n(int n);
+int rand_int_n(int n, int max);
 
 /**
  * @brief Initialize a integer number with 1 in n random positions excluding the one given and 0 elsewhere
  * @param n The n positions to be set to 1
  * @param exclude The position to be excluded
+ * @param max The max value of 1s in the number
  * @return A random number with n 1s and the rest 0
  * @warning rand is done on 32 bits
  */
-int rand_int_n_exclude(int n, int exclude);
+int rand_int_n_exclude(int n, int exclude, int max);
 
 /**
  * @brief Return the position of a randomly chosen 1 in the given number

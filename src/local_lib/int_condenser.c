@@ -34,24 +34,24 @@ int get_ones(int n) {
     return res;
 }
 
-int rand_int_n(int n) {
+int rand_int_n(int n, int max) {
     int i, r;
     int res = 0;
     for (i = 0; get_ones(res)<n; i++) {
         do {
-            r = rand_int(32);
+            r = rand_int(max);
         } while (r & (1 << i));
         res |= 1 << r;
     }
     return res;
 }
 
-int rand_int_n_exclude(int n, int exclude){
+int rand_int_n_exclude(int n, int exclude, int max){
     int i, r;
     int res = 0;
     for (i = 0; get_ones(res)<n; i++) {
         do {
-            r = rand_int(32);
+            r = rand_int(max);
         } while (r & (1 << i) || r == exclude);
         res |= 1 << r;
     }

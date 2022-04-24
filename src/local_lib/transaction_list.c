@@ -62,6 +62,16 @@ Bool compare_transaction(struct Transaction t1, struct Transaction t2);
  */
 void append_to_node(struct node *where, struct node *to_append);
 
+struct Transaction create_empty_transaction(void){
+    struct Transaction t;
+    t.t_type = -1;
+    t.amount= -1;
+    t.reward = -1;
+    t.hops = -1;
+    t.sender = -1;
+    return t;
+}
+
 int create_transaction(struct Transaction *t, pid_t sender, pid_t receiver, float amount) {
     struct timespec timestamp;
     DEBUG_NOTIFY_ACTIVITY_RUNNING("CREATING A TRANSACTION...");

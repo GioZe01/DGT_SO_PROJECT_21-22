@@ -122,4 +122,10 @@ Bool queue_copy_n_transactions(Queue q, Queue r, int n);
  * @param q the queue to perform the check on
  */
 void empty_queue(Queue q);
+
+/**
+ * Create a empty transaction
+ * @return the empty transaction
+ */
+struct Transaction create_empty_transaction(void);
 #endif /*DGT_SO_PROJECT_21_22_TRANSACTION_LIST_H*/

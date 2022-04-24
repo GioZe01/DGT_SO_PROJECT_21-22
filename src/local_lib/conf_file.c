@@ -75,6 +75,15 @@ int load_configuration(struct conf *self) {
         fclose(conf_file);
         return -1;
     }
+    if (fscanf(conf_file, "so_num_friends=%hd", &self->so_num_friends) == EOF) {
+        fclose(conf_file);
+        return -1;
+    }
+    if (fscanf(conf_file, "so_hops=%d ", &self->so_hops) == EOF) {
+        fclose(conf_file);
+        return -1;
+    }
+
     DEBUG_NOTIFY_ACTIVITY_DONE("LOADING CONFIGURATION DONE");
     DEBUG_NOTIFY_ACTIVITY_RUNNING("CHECKING CONF VALUE....");
     /*Checks for -2*/
@@ -88,7 +97,9 @@ int load_configuration(struct conf *self) {
         self->so_tp_size <= 0 ||
         self->so_min_trans_proc_nsec <= 0 ||
         self->so_max_trans_proc_nsec <= 0 ||
-        self->so_sim_sec <= 0){
+        self->so_sim_sec <= 0 ||
+        self->so_num_friends<0 ||
+        self->so_hops <0){
         fclose(conf_file);
         return -2;}
     /*Checks for -3*/
@@ -98,7 +109,8 @@ int load_configuration(struct conf *self) {
     }
     /*Checks for -4*/
     if (self->so_min_trans_proc_nsec > self->so_max_trans_proc_nsec ||
-        self->so_min_trans_gen_nsec > self->so_max_trans_gen_nsec) {
+        self->so_min_trans_gen_nsec > self->so_max_trans_gen_nsec ||
+        self->so_num_friends > self->so_nodes_num) {
         fclose(conf_file);
         return -4;
     }

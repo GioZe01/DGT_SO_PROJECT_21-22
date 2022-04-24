@@ -9,11 +9,15 @@
 
 int check_default(long type, int queue_id);
 
-int node_msg_create(struct node_msg *self, long type, pid_t sender_pid, struct Transaction *t, Bool is_node_origin) {
-    if (is_node_origin == TRUE){
+int node_msg_create(struct node_msg *self, long type, pid_t sender_pid, struct Transaction *t, int message_type) {
+    if (message_type== MSG_NODE_ORIGIN_TYPE){
         t->hops++;
     }
-    self->t = *t;
+    if (message_type != MSG_MASTER_ORIGIN_ID){
+        self->t = *t;
+    }else{
+        self->t = create_empty_transaction();
+    }
     self->type = type;
     self->sender_pid = sender_pid;
     return 0;
@@ -26,6 +30,9 @@ void node_msg_print(struct node_msg *self) {
             break;
         case MSG_TRANSACTION_TYPE:
             printf("~ NODE_MSG | type: TRANSACTION TYPE | sender: %d | type: %ld ~\n", self->sender_pid, self->type);
+            break;
+        case MSG_MASTER_ORIGIN_ID:
+            printf("~ NODE_MSG | type: MASTER ORIGIN ID | sender: %d~\n", self->sender_pid);
             break;
         default:
             ERROR_MESSAGE("NODE MESSAGE TYPE NOT RECONIZED");
@@ -58,6 +65,8 @@ int node_msg_receive(int id, struct node_msg *msg, long type) {
 
 int check_default(long type, int queue_id) {
     switch (type) {
+        case MSG_MASTER_ORIGIN_ID:
+            return queue_id-2;
         case MSG_NODE_ORIGIN_TYPE:
             return queue_id-1;
         case MSG_TRANSACTION_TYPE:

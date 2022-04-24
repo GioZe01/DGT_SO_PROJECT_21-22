@@ -22,6 +22,8 @@ struct conf
     long so_min_trans_proc_nsec;
     long so_max_trans_proc_nsec;
     long so_sim_sec;
+    short int so_num_friends;
+    int so_hops;
     /*TODO: aggiungere per versione max 30*/
 };
 

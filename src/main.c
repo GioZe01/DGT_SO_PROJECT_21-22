@@ -686,7 +686,7 @@ int * generate_nodes_friends_array(int * nodes){
     nodes_friends [0] = nodes[0];
     for (; i < nodes[0]; i++)
     {
-        nodes_friends[i] = rand_int_n_exclude(nodes[0], i);
+        nodes_friends[i] = rand_int_n_exclude(simulation_conf.so_num_friends, i, nodes[0]);
     }
     return nodes_friends;
 }

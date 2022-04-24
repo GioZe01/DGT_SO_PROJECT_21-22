@@ -33,7 +33,7 @@
 #include "local_lib/headers/transaction_list.h"
 #include "local_lib/headers/int_condenser.h"
 
-/* Support Function*/
+/* Support Functions*/
 
 /* TODO: refactoring of comments of the following process transaction*/
 /**
@@ -163,8 +163,8 @@ int queue_user_id = -1;           /* Identifier of the user queue id*/
 int queue_master_id = -1;         /* Identifier of the master queue id*/
 int node_end = 0;                 /* For values different from 0 the node proc must end*/
 float current_block_reward = 0;   /* The current value of all node block reward*/
-int last_signal;
-int friends = -1;
+int last_signal;                  /* Last signal received*/
+int friends = -1;                 /* Number of friends of the node*/
 struct node current_node;                       /* Current representation of the node*/
 struct conf node_configuration;                 /* Configuration File representation*/
 struct shm_conf *shm_conf_pointer_node;         /* Ref to the shm for configuration of the node*/
@@ -293,6 +293,7 @@ Bool set_signal_handler_node(struct sigaction sa, sigset_t sigmask)
     sa.sa_mask = sigmask;
     if (sigaction(SIGINT, &sa, NULL) < 0 ||
         sigaction(SIGALRM, &sa, NULL) < 0 ||
+        sigaction(SIGUSR1, &sa, NULL) < 0 ||
         sigaction(SIGUSR2, &sa, NULL) < 0)
     {
         ERROR_EXIT_SEQUENCE_NODE("ERROR DURING THE CREATION OF THE SIG HANDLER ");
@@ -305,6 +306,8 @@ void signals_handler(int signum)
     DEBUG_SIGNAL("SIGNAL RECEIVED ", signum);
     last_signal = signum;
     struct master_msg_report master_msg;
+    struct node_msg node_msg;
+    struct Transaction * t;
     switch (signum)
     {
         case SIGINT:
@@ -318,12 +321,18 @@ void signals_handler(int signum)
             /**
              * select a transaction from the pool and send it to a friend node into the message queue
              */
-            struct node_msg node_msg;
             int node_id = rand_int_n_pos(friends);
-            struct Transaction t = queue_head(current_node.transactions_pool);
-            node_msg_snd(queue_node_id, &node_msg, MSG_NODE_ORIGIN_TYPE, &t, current_node.pid, TRUE, node_configuration.so_retry, shm_conf_pointer_node->nodes_snapshots[node_id][2]);
-            printf("NODE %d SENT TRANSACTION %f TO NODE %d\n", current_node.node_id, t.amount, node_id);
+            *t = queue_head(current_node.transactions_pool);
+            node_msg_snd(queue_node_id, &node_msg, MSG_NODE_ORIGIN_TYPE, t, current_node.pid, TRUE, node_configuration.so_retry, shm_conf_pointer_node->nodes_snapshots[node_id][2]);
+            printf("NODE %d SENT TRANSACTION %f TO NODE %d\n", current_node.node_id, t->amount, node_id);
             queue_remove_head(current_node.transactions_pool);
+            break;
+        case SIGUSR1:
+            /**
+             * Receive new friends from master and update the friends list
+             */
+            node_msg_receive(queue_node_id,&node_msg, MSG_MASTER_ORIGIN_ID);
+            friends |= node_msg.sender_pid;
             break;
         case SIGUSR2:
             master_msg_send(queue_master_id, &master_msg, INFO_BUDGET, NODE, current_node.pid, current_node.exec_state, TRUE, current_node.budget);
