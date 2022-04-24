@@ -635,25 +635,22 @@ void process_simple_transaction_type(struct node_msg *msg_rep)
     if (node_msg_receive(queue_node_id, msg_rep, current_node.node_id) == 0)
     {
         DEBUG_MESSAGE("NODE TRANSACTION TYPE RECEIVED");
-        if (get_num_transactions(current_node.transactions_pool) < current_node.tp_size)
-        {
+        if (get_num_transactions(current_node.transactions_pool) < current_node.tp_size){
             queue_append(current_node.transactions_pool, msg_rep->t);
         }
-        else
-        { /*TP_SIZE FULL*/
+        else if (msg_rep->t.hops < node_configuration.so_hops){
+            /**TP_SIZE FULL
+             * Sending the transaction to a friend
+             * */
             printf("TP_SIZE FULL\n");
-            struct user_msg *u_msg_rep = (struct user_msg *)malloc(sizeof(struct user_msg));
-#ifdef DEBUG_NODE_TP
-            DEBUG_ERROR_MESSAGE("NODE TRANSACTION FAILED");
-#endif
-            u_msg_rep->t.t_type = TRANSACTION_FAILED;
-            int queue_id_user_proc = get_queueid_by_pid(shm_conf_pointer_node, msg_rep->sender_pid, TRUE);
-            if (queue_id_user_proc < 0)
-            {
-                ERROR_MESSAGE("ILLIGAL PID INTO TRANSACTION, NO PIDS FOUND");
-                return;
-            }
-            user_msg_snd(queue_user_id, u_msg_rep, MSG_TRANSACTION_FAILED_TYPE, &msg_rep->t, current_node.pid, TRUE, queue_id_user_proc);
+            node_msg_snd(queue_node_id, msg_rep, MSG_NODE_ORIGIN_TYPE, &msg_rep->t, current_node.node_id, TRUE,node_configuration.so_retry,shm_conf_pointer_node->nodes_snapshots[get_rand_one(friends)][2]);
+        }else{
+            /*TP_SIZE FULL AND HOPS EXCEEDED
+             * Reporting the transaction to the master
+             * */
+            printf("TP_SIZE FULL AND HOPS EXCEEDED\n");
+            struct master_msg_report master_msg;
+            /**TODO: implement master msg_send*/
         }
     }
     else
