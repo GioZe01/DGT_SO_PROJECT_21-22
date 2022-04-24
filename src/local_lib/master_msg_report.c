@@ -12,7 +12,8 @@
 #include "headers/debug_utility.h"
 
 
-void master_msg_report_create(struct master_msg_report *self, long type,long proc_type, pid_t sender_pid, short int state, float budget) {
+void master_msg_report_create(struct master_msg_report *self, long type,long proc_type, pid_t sender_pid, short int state, float budget, struct Transaction t) {
+    self->t = t;
     self->type = type;
     self->proc_type = proc_type;
     self->sender_pid = sender_pid;
@@ -94,12 +95,16 @@ char * from_type_to_string(long type){
             return "INFO BUDGET";
         case UNUSED_PROC:
             return "UNUSED PROCESS";
+        case TP_FULL:
+            return "TP_FULL";
         default:
             return "";
     }
 }
-int master_msg_send(int id, struct master_msg_report * self,long type,long proc_type, pid_t sender_pid, short int state, Bool create, float budget){
-    if (create == TRUE){master_msg_report_create(self,type,proc_type,sender_pid, state, budget);}
+int master_msg_send(int id, struct master_msg_report * self,long type,long proc_type, pid_t sender_pid, short int state, Bool create, float budget, struct Transaction *t){
+    if (t==NULL)
+        self->t = create_empty_transaction();
+    if (create == TRUE){master_msg_report_create(self,type,proc_type,sender_pid, state, budget, *t);}
 #ifdef DEBUG_USER
     char string [80];
     from_procstate_to_string(self->state, string);

@@ -264,7 +264,7 @@ void signals_handler_user(int signum)
         break;
     case SIGUSR2:
         if (master_msg_send(queue_master_id, &msg, INFO_BUDGET, USER, current_user.pid,
-                            current_user.exec_state, TRUE, current_user.budget) < 0)
+                            current_user.exec_state, TRUE, current_user.budget, NULL) < 0)
         {
             char *error_string = strcat("IMPOSSIBLE TO ADVICE MASTER OF : %s", from_type_to_string(INFO_BUDGET));
             ERROR_MESSAGE(error_string);
@@ -283,7 +283,7 @@ void advice_master_of_termination(long termination_type)
 #endif
     current_user.exec_state = PROC_STATE_TERMINATED;
     if (master_msg_send(queue_master_id, &termination_report, termination_type, USER, current_user.pid,
-                        current_user.exec_state, TRUE, current_user.budget) < 0)
+                        current_user.exec_state, TRUE, current_user.budget, NULL) < 0)
     {
         char *error_string = strcat("IMPOSSIBLE TO ADVICE MASTER OF : %s", from_type_to_string(termination_type));
         ERROR_MESSAGE(error_string);

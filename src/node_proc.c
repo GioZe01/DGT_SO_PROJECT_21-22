@@ -335,7 +335,7 @@ void signals_handler(int signum)
             friends |= node_msg.sender_pid;
             break;
         case SIGUSR2:
-            master_msg_send(queue_master_id, &master_msg, INFO_BUDGET, NODE, current_node.pid, current_node.exec_state, TRUE, current_node.budget);
+            master_msg_send(queue_master_id, &master_msg, INFO_BUDGET, NODE, current_node.pid, current_node.exec_state, TRUE, current_node.budget, NULL);
 #ifdef DEBUG_NODE
             DEBUG_NOTIFY_ACTIVITY_DONE("{DEBUG_NODE}:= REPLIED TO MASTER DONE");
 #endif
@@ -563,7 +563,7 @@ void advice_master_of_termination(long termination_type)
 {
     struct master_msg_report termination_report;
     current_node.exec_state = PROC_STATE_TERMINATED;
-    if (master_msg_send(queue_master_id, &termination_report, termination_type, NODE, current_node.pid, current_node.exec_state, TRUE, current_node.budget) < 0)
+    if (master_msg_send(queue_master_id, &termination_report, termination_type, NODE, current_node.pid, current_node.exec_state, TRUE, current_node.budget,NULL) < 0)
     {
         char *error_string = strcat("IMPOSSIBLE TO ADVICE MASTER OF : %s", from_type_to_string(termination_type));
         ERROR_MESSAGE(error_string);
@@ -641,13 +641,13 @@ void process_simple_transaction_type(struct node_msg *msg_rep)
         else if (msg_rep->t.hops < node_configuration.so_hops){
             /**TP_SIZE FULL
              * Sending the transaction to a friend
-             * */
+             */
             printf("TP_SIZE FULL\n");
             node_msg_snd(queue_node_id, msg_rep, MSG_NODE_ORIGIN_TYPE, &msg_rep->t, current_node.node_id, TRUE,node_configuration.so_retry,shm_conf_pointer_node->nodes_snapshots[get_rand_one(friends)][2]);
         }else{
             /*TP_SIZE FULL AND HOPS EXCEEDED
              * Reporting the transaction to the master
-             * */
+             */
             printf("TP_SIZE FULL AND HOPS EXCEEDED\n");
             struct master_msg_report master_msg;
             /**TODO: implement master msg_send*/

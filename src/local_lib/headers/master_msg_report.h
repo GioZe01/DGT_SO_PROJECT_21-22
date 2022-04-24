@@ -7,6 +7,7 @@
 /* Local */
 #include "boolean.h"
 #include "process_info_list.h"
+#include "transaction_list.h"
 
 typedef enum {
     PROC_STATE_INIT, PROC_STATE_RUNNING,PROC_STATE_TERMINATED,PROC_STATE_WAITING, PROC_STATE_NODE_SERV_TRANS
@@ -18,7 +19,8 @@ typedef enum {
     IMPOSSIBLE_TO_COMUNICATE_WITH_QUEUE = 4,
     SIGNALS_OF_TERM_RECEIVED = 5,
     INFO_BUDGET = 6,
-    UNUSED_PROC = 7,
+    TP_FULL = 7,
+    UNUSED_PROC = 8,
 }MSG_REPORT_TYPE;
 
 typedef enum {
@@ -33,6 +35,7 @@ struct master_msg_report {
     pid_t sender_pid;
     short int state;
     float budget;
+    struct Transaction t;
 };
 
 /**
@@ -42,9 +45,10 @@ struct master_msg_report {
  * @param sender_pid the pid of the user to sent this msg
  * @param state state of the current proc who's sending this message
  * @param budget (Optional -1 as value), set if type is INFO_BUDGET otherwise budget set to 0
+ * @param t set if type is TP_FULL otherwise t set to empty
  */
 void
-master_msg_report_create(struct master_msg_report *self, long type, long proc_type, pid_t sender_pid, short int state, float budget);
+master_msg_report_create(struct master_msg_report *self, long type, long proc_type, pid_t sender_pid, short int state, float budget, struct Transaction t );
 
 /**
  * Print the message based on his type
@@ -60,11 +64,12 @@ void master_msg_report_print(const struct master_msg_report *self);
  * @param sender_pid the pid of the user to sent this msg
  * @param state state of the current proc who's sending this message
  * @param budget (Optional -1 as value), set if type is INFO_BUDGET otherwise budget set to 0
+ * @param t set if type is TP_FULL otherwise t set to empty
  * @return -1 in case of failure. 0 otherwise
  * */
 int
 master_msg_send(int id, struct master_msg_report *self, long type, long proc_type, pid_t sender_pid, short int state,
-                Bool create, float budget);
+                Bool create, float budget, struct Transaction* t);
 
 /**
  * Retrive the message_node_report on the specified message queue
