@@ -177,7 +177,11 @@ int check_msg_report(struct master_msg_report *msg_report, int msg_report_id_mas
                 ERROR_MESSAGE("IMPOSSIBLE TO MAKE THE ACKNOWLEDGE OF MASTER MESSAGE");
             }
         }
-        return 0;
+        if (msg_rep_info.msg_qnum == 0) {
+            return 0;
+        } else {
+            return 2;
+        }
     }
 }
 

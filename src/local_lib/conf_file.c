@@ -75,7 +75,7 @@ int load_configuration(struct conf *self) {
         fclose(conf_file);
         return -1;
     }
-    if (fscanf(conf_file, "so_num_friends=%hd", &self->so_num_friends) == EOF) {
+    if (fscanf(conf_file, "so_num_friends=%hd ", &self->so_num_friends) == EOF) {
         fclose(conf_file);
         return -1;
     }

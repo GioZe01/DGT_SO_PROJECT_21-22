@@ -307,7 +307,7 @@ void signals_handler(int signum)
     last_signal = signum;
     struct master_msg_report master_msg;
     struct node_msg node_msg;
-    struct Transaction * t;
+    struct Transaction t;
     switch (signum)
     {
         case SIGINT:
@@ -322,9 +322,9 @@ void signals_handler(int signum)
              * select a transaction from the pool and send it to a friend node into the message queue
              */
             int node_id = rand_int_n_pos(friends);
-            *t = queue_head(current_node.transactions_pool);
-            node_msg_snd(queue_node_id, &node_msg, MSG_NODE_ORIGIN_TYPE, t, current_node.pid, TRUE, node_configuration.so_retry, shm_conf_pointer_node->nodes_snapshots[node_id][2]);
-            printf("NODE %d SENT TRANSACTION %f TO NODE %d\n", current_node.node_id, t->amount, node_id);
+            t = queue_head(current_node.transactions_pool);
+            node_msg_snd(queue_node_id, &node_msg, MSG_NODE_ORIGIN_TYPE, &t, current_node.pid, TRUE, node_configuration.so_retry, shm_conf_pointer_node->nodes_snapshots[node_id][2]);
+            printf("NODE %d SENT TRANSACTION %f TO NODE %d\n", current_node.node_id, t.amount, node_id);
             queue_remove_head(current_node.transactions_pool);
             break;
         case SIGUSR1:

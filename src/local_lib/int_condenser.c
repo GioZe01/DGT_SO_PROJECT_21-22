@@ -23,6 +23,13 @@ int rand_int(int n) {
 int rand_int_range(int min, int max) {
     return rand() % (max - min + 1) + min;
 }
+int get_rand_one(int n){
+    int i = rand_int(n);
+    while(check_bit(i,0) == 0){
+        i = rand_int(n);
+    }
+    return i;
+}
 
 int get_ones(int n) {
     int i, res = 0;

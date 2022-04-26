@@ -257,7 +257,9 @@ int main()
                 send_sig_to_all_nodes(proc_list,SIGUSR1,TRUE);
                 send_msg_to_all_nodes(new_node_id,simulation_conf.so_retry,proc_list, shm_conf_pointer->nodes_snapshots[0][0], TRUE);
             }
-            else{
+            else if (msg_rep_value == 2){
+                printf("\n");
+                printf("called\n");
                 master_msg_report_print(&msg_repo);
             }
         }
@@ -680,6 +682,8 @@ void end_simulation()
     printf("Simulation %s \n", get_end_simulation_msg());
     kill_kids();
     wait_kids();
+    free_mem();
+    free_sysVar();
 }
 
 char *get_end_simulation_msg()

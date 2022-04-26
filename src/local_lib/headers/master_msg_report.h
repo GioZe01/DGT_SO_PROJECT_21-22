@@ -86,7 +86,7 @@ int master_msg_receive(int id, struct master_msg_report *self);
  * @param msg_report pointer to the struct representing the msg in the master msg queue
  * @param msg_report_id_master id of the queue
  * @param proc_list list of the process to check msg for
- * @return -1 in case of FAILURE. 0 otherwise
+ * @return -1 in case of FAILURE. 2 in case of msg found. 0 otherwise
  */
 int check_msg_report(struct master_msg_report *msg_report, int msg_report_id_master, ProcList proc_list);
 
