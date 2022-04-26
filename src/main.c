@@ -139,6 +139,16 @@ void signals_handler(int signum);
  */
 void update_kids_info(void);
 
+/**
+ * @brief Lock the semaphore for to fill masterbook shared memory
+ */
+void lock_to_fill_sem(void);
+
+/**
+ * @brief unlock the semaphore to fill the master book
+ */
+void unlock_to_fill_sem(void);
+
 /* Variables*/
 struct conf simulation_conf;                    /*Structure representing the configuration present in the conf file*/
 ProcList proc_list;                             /* Pointer to a linked list of all proc generated*/
@@ -153,6 +163,7 @@ int msg_report_id_nodes = -1;                   /* Identifier for message queue 
 int semaphore_start_id = -1;                    /* Id of the start semaphore arrays for sinc*/
 int semaphore_masterbook_id = -1;               /* Id of the masterbook semaphore for accessing the block matrix */
 int semaphore_to_fill_id = -1;                  /* Id of the masterbook to_fill access semaphore*/
+int last_signal = -1;                           /* Last signal received*/
 pid_t main_pid;                                 /*pid of the current proc*/
 
 int main()
@@ -380,6 +391,7 @@ void set_signal_handlers(struct sigaction sa)
 
 void signals_handler(int signum)
 {
+    last_signal = signum;
     int old_errno;
     static int num_inv = 0;
     old_errno = errno;
@@ -407,7 +419,7 @@ void signals_handler(int signum)
             if (num_inv == simulation_conf.so_sim_sec)
                 simulation_end = 1;
             else
-                alarm(2);
+                alarm(1);
             /*TODO: METTO IN PAUSA I NODI vedere se mettere anche in pausa i processi user*/
         }
         break;
@@ -616,11 +628,13 @@ void create_masterbook()
 }
 void print_info(void)
 {
+    lock_to_fill_sem();
     printf("============== INFO ============== \n");
     printf("Number of node active: %d\n", get_num_of_user_proc_running(proc_list));
     print_list(proc_list);
     printf("\nTO FILL SHM VALUE: %d\n", shm_masterbook_pointer->to_fill);
     printf("============== END INFO ===========\n");
+    unlock_to_fill_sem();
 }
 void update_kids_info(void)
 {
@@ -665,14 +679,22 @@ Bool check_runnability()
     DEBUG_BLOCK_ACTION_START("CHECK RUNNABILITY");
     DEBUG_NOTIFY_ACTIVITY_RUNNING("CHECKING RUNNABILITY....");
     int num_user_proc_running = get_num_of_user_proc_running(proc_list);
-    if (shm_masterbook_pointer->to_fill >= SO_REGISTRY_SIZE ||
-        num_user_proc_running <= 0)
+    lock_to_fill_sem();
+    if (shm_masterbook_pointer->to_fill >= SO_REGISTRY_SIZE)
     {
-        simulation_end = 1;
+        simulation_end = SIMULATION_END_BY_SO_REGISTRY_FULL;
+        unlock_to_fill_sem();
+        return FALSE;
+    }
+    else if (num_user_proc_running <= 0)
+    {
+        simulation_end = SIMULATION_END_BY_NO_PROC_RUNNING;
+        unlock_to_fill_sem();
         return FALSE;
     }
     else
     {
+        unlock_to_fill_sem();
         return TRUE;
     }
 }
@@ -682,8 +704,6 @@ void end_simulation()
     printf("Simulation %s \n", get_end_simulation_msg());
     kill_kids();
     wait_kids();
-    free_mem();
-    free_sysVar();
 }
 
 char *get_end_simulation_msg()
@@ -733,5 +753,39 @@ int create_node_proc(int new_node_id){
             free(argv_node[1]);
             DEBUG_MESSAGE("NEW NODE PROCESS CREATED");
             return new_node_pid;
+    }
+}
+void lock_to_fill_sem(void)
+{
+    while (semctl(semaphore_to_fill_id, shm_masterbook_pointer->to_fill, GETVAL) < 0 && semaphore_lock(semaphore_to_fill_id, shm_masterbook_pointer->to_fill) < 0)
+    {
+        if (errno == EINTR || semctl(semaphore_to_fill_id, 0, GETVAL) < 0)
+        {
+            if (last_signal == SIGALRM)
+            {
+                /* RICEZIONE DI SEGNALE*/
+                unlock_to_fill_sem();
+                ERROR_EXIT_SEQUENCE_MAIN("IMPOSSIBLE TO LOCK TO FILL SEM");
+            }
+            else
+            {
+                continue;
+            }
+        }
+        else
+        {
+            ERROR_EXIT_SEQUENCE_MAIN("ERROR WHILE TRYING TO EXEC LOCK ON TO_FILL ACCESS SEM");
+        }
+    }
+}
+void unlock_to_fill_sem(void)
+{
+    printf("\nSEMAPHORE VALUE: %d \n",semctl(semaphore_to_fill_id, shm_masterbook_pointer->to_fill, GETVAL));
+    while (semaphore_unlock(semaphore_to_fill_id, shm_masterbook_pointer->to_fill) < 0)
+    {
+        if (errno != EINTR)
+        {
+            ERROR_EXIT_SEQUENCE_MAIN("ERROR DURING THE UNLOCK OF THE SEMAPHORE");
+        }
     }
 }

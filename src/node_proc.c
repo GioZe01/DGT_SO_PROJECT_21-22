@@ -338,7 +338,8 @@ void signals_handler(int signum)
             /**
              * Inform master of the node state
              */
-            master_msg_send(queue_master_id, &master_msg, INFO_BUDGET, NODE, current_node.pid, current_node.exec_state, TRUE, current_node.budget, NULL);
+            t = create_empty_transaction();
+            master_msg_send(queue_master_id, &master_msg, INFO_BUDGET, NODE, current_node.pid, current_node.exec_state, TRUE, current_node.budget,&t);
 #ifdef DEBUG_NODE
             DEBUG_NOTIFY_ACTIVITY_DONE("{DEBUG_NODE}:= REPLIED TO MASTER DONE");
 #endif
@@ -475,7 +476,7 @@ Bool lock_shm_masterbook(void)
 
 void lock_to_fill_sem(void)
 {
-    while (semctl(semaphore_to_fill_id, 0, GETVAL) < 0 && semaphore_lock(semaphore_to_fill_id, 0) < 0)
+    while (semaphore_lock(semaphore_to_fill_id, shm_masterbook_pointer->to_fill) < 0)
     {
         if (errno == EINTR || semctl(semaphore_to_fill_id, 0, GETVAL) < 0)
         {
@@ -527,7 +528,7 @@ void lock_masterbook_cell_access(int i_cell_block_list)
 
 void unlock_to_fill_sem(void)
 {
-    while (semaphore_unlock(semaphore_to_fill_id, 0) < 0)
+    while (semaphore_unlock(semaphore_to_fill_id, shm_masterbook_pointer->to_fill) < 0)
     {
         if (errno != EINTR)
         {
@@ -566,7 +567,8 @@ void advice_master_of_termination(long termination_type)
 {
     struct master_msg_report termination_report;
     current_node.exec_state = PROC_STATE_TERMINATED;
-    if (master_msg_send(queue_master_id, &termination_report, termination_type, NODE, current_node.pid, current_node.exec_state, TRUE, current_node.budget,NULL) < 0)
+    struct Transaction t = create_empty_transaction();
+    if (master_msg_send(queue_master_id, &termination_report, termination_type, NODE, current_node.pid, current_node.exec_state, TRUE, current_node.budget,&t) < 0)
     {
         char *error_string = strcat("IMPOSSIBLE TO ADVICE MASTER OF : %s", from_type_to_string(termination_type));
         ERROR_MESSAGE(error_string);
@@ -668,7 +670,23 @@ void process_node_transaction(struct node_msg *msg_rep)
     if (node_msg_receive(queue_node_id, msg_rep, current_node.node_id - MSG_NODE_ORIGIN_TYPE) == 0)
     {
         DEBUG_MESSAGE("NODE TRANSACTION RECEIVED");
-        queue_append(current_node.transactions_pool, msg_rep->t);
+        if (get_num_transactions(current_node.transactions_pool) < current_node.tp_size){
+            queue_append(current_node.transactions_pool, msg_rep->t);
+        }
+        else if (msg_rep->t.hops < node_configuration.so_hops){
+            /**TP_SIZE FULL
+             * Sending the transaction to a friend
+             */
+            printf("TP_SIZE FULL\n");
+            node_msg_snd(queue_node_id, msg_rep, MSG_NODE_ORIGIN_TYPE, &msg_rep->t, current_node.node_id, TRUE,node_configuration.so_retry,shm_conf_pointer_node->nodes_snapshots[get_rand_one(friends)][2]);
+        }else{
+            /*TP_SIZE FULL AND HOPS EXCEEDED
+             * Reporting the transaction to the master
+             */
+            printf("TP_SIZE FULL AND HOPS EXCEEDED\n");
+            struct master_msg_report master_msg;
+            master_msg_send(queue_master_id, &master_msg,TP_FULL, NODE, current_node.pid, current_node.exec_state, TRUE, current_node.budget, &msg_rep->t);
+        }
     }
     else
     {

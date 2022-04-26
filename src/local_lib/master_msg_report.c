@@ -103,8 +103,6 @@ char * from_type_to_string(long type){
     }
 }
 int master_msg_send(int id, struct master_msg_report * self,long type,long proc_type, pid_t sender_pid, short int state, Bool create, float budget, struct Transaction *t){
-    if (t==NULL)
-        self->t = create_empty_transaction();
     if (create == TRUE){master_msg_report_create(self,type,proc_type,sender_pid, state, budget, *t);}
 #ifdef DEBUG_USER
     char string [80];

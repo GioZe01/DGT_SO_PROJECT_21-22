@@ -242,36 +242,38 @@ void signals_handler_user(int signum)
 {
     DEBUG_SIGNAL("SIGNAL RECEIVED", signum);
     struct master_msg_report msg;
+    struct Transaction  t;
     switch (signum)
     {
-    case SIGINT:
-        alarm(0); /* pending alarm removed*/
-        current_user.exec_state = PROC_STATE_TERMINATED;
-        advice_master_of_termination(SIGNALS_OF_TERM_RECEIVED);
-        EXIT_PROCEDURE_USER(0);
-        break;
-    case SIGALRM: /*    Generate a new transaction  */
-        DEBUG_NOTIFY_ACTIVITY_RUNNING("GENERATING A NEW TRANSACTION FROM SIG...");
-        if (generate_transaction(&current_user, current_user.pid, shm_conf_pointer) < 0)
-        {
-            ERROR_EXIT_SEQUENCE_USER("IMPOSSIBLE TO GENERATE TRANSACTION");
-        }
-        if (send_to_node() < 0)
-        {
-            ERROR_MESSAGE("IMPOSISBLE TO SEND TO THE NODE");
-        }
-        DEBUG_NOTIFY_ACTIVITY_DONE("GENERATING A NEW TRANSACTION FROM SIG DONE");
-        break;
-    case SIGUSR2:
-        if (master_msg_send(queue_master_id, &msg, INFO_BUDGET, USER, current_user.pid,
-                            current_user.exec_state, TRUE, current_user.budget, NULL) < 0)
-        {
-            char *error_string = strcat("IMPOSSIBLE TO ADVICE MASTER OF : %s", from_type_to_string(INFO_BUDGET));
-            ERROR_MESSAGE(error_string);
-        }
-        break;
-    default:
-        break;
+        case SIGINT:
+            alarm(0); /* pending alarm removed*/
+            current_user.exec_state = PROC_STATE_TERMINATED;
+            advice_master_of_termination(SIGNALS_OF_TERM_RECEIVED);
+            EXIT_PROCEDURE_USER(0);
+            break;
+        case SIGALRM: /*    Generate a new transaction  */
+            DEBUG_NOTIFY_ACTIVITY_RUNNING("GENERATING A NEW TRANSACTION FROM SIG...");
+            if (generate_transaction(&current_user, current_user.pid, shm_conf_pointer) < 0)
+            {
+                ERROR_EXIT_SEQUENCE_USER("IMPOSSIBLE TO GENERATE TRANSACTION");
+            }
+            if (send_to_node() < 0)
+            {
+                ERROR_MESSAGE("IMPOSISBLE TO SEND TO THE NODE");
+            }
+            DEBUG_NOTIFY_ACTIVITY_DONE("GENERATING A NEW TRANSACTION FROM SIG DONE");
+            break;
+        case SIGUSR2:
+            t = create_empty_transaction();
+            if (master_msg_send(queue_master_id, &msg, INFO_BUDGET, USER, current_user.pid,
+                        current_user.exec_state, TRUE, current_user.budget, &t) < 0)
+            {
+                char *error_string = strcat("IMPOSSIBLE TO ADVICE MASTER OF : %s", from_type_to_string(INFO_BUDGET));
+                ERROR_MESSAGE(error_string);
+            }
+            break;
+        default:
+            break;
     }
 }
 
@@ -282,8 +284,9 @@ void advice_master_of_termination(long termination_type)
     DEBUG_NOTIFY_ACTIVITY_RUNNING("{DEBUG_USER}:= ADVICING MASTER OF TERMINATION ....");
 #endif
     current_user.exec_state = PROC_STATE_TERMINATED;
+    struct Transaction t = create_empty_transaction();
     if (master_msg_send(queue_master_id, &termination_report, termination_type, USER, current_user.pid,
-                        current_user.exec_state, TRUE, current_user.budget, NULL) < 0)
+                        current_user.exec_state, TRUE, current_user.budget, &t) < 0)
     {
         char *error_string = strcat("IMPOSSIBLE TO ADVICE MASTER OF : %s", from_type_to_string(termination_type));
         ERROR_MESSAGE(error_string);
