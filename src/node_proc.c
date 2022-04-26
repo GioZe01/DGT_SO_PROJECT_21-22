@@ -476,7 +476,7 @@ Bool lock_shm_masterbook(void)
 
 void lock_to_fill_sem(void)
 {
-    while (semaphore_lock(semaphore_to_fill_id, shm_masterbook_pointer->to_fill) < 0)
+    while (semaphore_lock(semaphore_to_fill_id, 0) < 0)
     {
         if (errno == EINTR || semctl(semaphore_to_fill_id, 0, GETVAL) < 0)
         {
@@ -502,7 +502,7 @@ void lock_to_fill_sem(void)
 
 void lock_masterbook_cell_access(int i_cell_block_list)
 {
-    while (semctl(semaphore_masterbook_id, i_cell_block_list, GETVAL) < 0 && semaphore_lock(semaphore_masterbook_id, i_cell_block_list) < 0)
+    while (semaphore_lock(semaphore_masterbook_id, i_cell_block_list) < 0)
     {
         /*TODO: fare refactoring nei due while*/
         if (errno == EINTR || semctl(semaphore_masterbook_id, i_cell_block_list, GETVAL) < 0)
@@ -528,7 +528,7 @@ void lock_masterbook_cell_access(int i_cell_block_list)
 
 void unlock_to_fill_sem(void)
 {
-    while (semaphore_unlock(semaphore_to_fill_id, shm_masterbook_pointer->to_fill) < 0)
+    while (semaphore_unlock(semaphore_to_fill_id, 0) < 0)
     {
         if (errno != EINTR)
         {

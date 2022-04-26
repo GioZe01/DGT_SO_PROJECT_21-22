@@ -455,6 +455,7 @@ void create_semaphores(void)
     {
         ERROR_EXIT_SEQUENCE_MAIN("IMPOSSIBLE TO CREATE MASTERBOOK SEM");
     }
+    semctl(semaphore_masterbook_id, 0, SETVAL, 1);
     DEBUG_NOTIFY_ACTIVITY_DONE("CREATION OF MASTEBOOK ACCESS SEM DONE");
     DEBUG_BLOCK_ACTION_END();
 
@@ -464,6 +465,7 @@ void create_semaphores(void)
     {
         ERROR_EXIT_SEQUENCE_MAIN("IMPOSSIBLE TO CREATE TO_FILL SEM");
     }
+    semctl(semaphore_to_fill_id, 0, SETVAL, 1);
     DEBUG_NOTIFY_ACTIVITY_DONE("CREATION OF TO_FILL DONE");
 }
 
@@ -757,7 +759,7 @@ int create_node_proc(int new_node_id){
 }
 void lock_to_fill_sem(void)
 {
-    while (semctl(semaphore_to_fill_id, shm_masterbook_pointer->to_fill, GETVAL) < 0 && semaphore_lock(semaphore_to_fill_id, shm_masterbook_pointer->to_fill) < 0)
+    while ( semctl(semaphore_to_fill_id, 0, GETVAL) <0 && semaphore_lock(semaphore_to_fill_id, shm_masterbook_pointer->to_fill) < 0)
     {
         if (errno == EINTR || semctl(semaphore_to_fill_id, 0, GETVAL) < 0)
         {
@@ -780,8 +782,7 @@ void lock_to_fill_sem(void)
 }
 void unlock_to_fill_sem(void)
 {
-    printf("\nSEMAPHORE VALUE: %d \n",semctl(semaphore_to_fill_id, shm_masterbook_pointer->to_fill, GETVAL));
-    while (semaphore_unlock(semaphore_to_fill_id, shm_masterbook_pointer->to_fill) < 0)
+    while ( semaphore_unlock(semaphore_to_fill_id, 0) < 0)
     {
         if (errno != EINTR)
         {
