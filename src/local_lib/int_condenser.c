@@ -64,3 +64,6 @@ int rand_int_n_pos(int n) {
     }
     return position+1;
 }
+int set_one(int n, int pos){
+    return n | (1 << pos);
+}

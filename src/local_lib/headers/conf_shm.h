@@ -1,4 +1,3 @@
-
 #ifndef DGT_SO_PROJECT_21_22_CONF_SHM_H
 #define DGT_SO_PROJECT_21_22_CONF_SHM_H
 
@@ -67,4 +66,14 @@ int get_queueid_by_pid(struct shm_conf *self, int pid, Bool in_users);
  * @return -1 in case of no pid found, the value otherwise
  */
 int get_node_position_by_pid(struct shm_conf *self, int pid);
+
+/**
+ * @brief Add a new node to the shm conf nodes_snapshots
+ * @param self the shm conf
+ * @param pid the pid of the node
+ * @param queue_id the queue id of the node
+ * @param friends the friends of the node
+ * @return TRUE in case of success, FALSE otherwise
+ */
+Bool shm_conf_add_node(struct shm_conf *self, int pid, int queue_id, int friends);
 #endif /*DGT_SO_PROJECT_21_22_CONF_SHM_H*/

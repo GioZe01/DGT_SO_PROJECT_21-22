@@ -6,6 +6,7 @@
 #include <sys/msg.h>
 #include "headers/node_msg_report.h"
 #include "headers/simulation_errors.h"
+#include "headers/transaction_list.h"
 
 int check_default(long type, int queue_id);
 

@@ -12,6 +12,7 @@
 #include "headers/process_info_list.h"
 #include "headers/simulation_errors.h"
 #include "headers/master_msg_report.h" /*imported for proc state enum type*/
+#include "headers/node_msg_report.h"
 
 #ifdef DEBUG
 
@@ -236,3 +237,77 @@ int get_num_of_user_proc_running(ProcList self){
     return ris;
 }
 
+int send_sig_to_all_nodes(ProcList proc_list,int signal, Bool exclude_last){
+    struct node *tmp = proc_list->first;
+    struct node *last = proc_list->last;
+    int num_proc_reciver = 0;
+    if (exclude_last == TRUE){
+        for (; tmp != NULL; tmp = tmp->next) {
+            if (tmp->p->proc_type == PROC_TYPE_NODE && tmp->p->pid != last->p->pid && tmp->p->proc_state == PROC_STATE_RUNNING && (kill(tmp->p->pid, signal) >= 0 || errno == ESRCH)){
+                /**
+                 * errno == ESRCH is allowed because it might be that the proc intrest is terminated and
+                 * the termination has not been read by main, in this case need wait on the proc to update the proc-list
+                 * state
+                 */
+#ifdef DEBUG_MAIN
+                char string [80];
+                from_procstate_to_string(tmp->p->proc_state,string);
+                printf ("\n{DEBUG_MAIN}:= SENT SIGNAL TO : process type: %s, proc exec_State: %s\n", from_proctype_to_string(tmp->p->proc_type),string);
+#endif
+                DEBUG_MESSAGE("SIGNAL SENT TO THE PROCESS");
+                num_proc_reciver++;
+            } else if (errno == EINTR || tmp->p->proc_state == PROC_STATE_TERMINATED) { continue; }
+            else {
+                return -1;
+            }
+        }
+    }
+    else{
+        for (; tmp != NULL; tmp = tmp->next) {
+            if (tmp->p->proc_type == PROC_TYPE_NODE && tmp->p->proc_state == PROC_STATE_RUNNING && (kill(tmp->p->pid, signal) >= 0 || errno == ESRCH)){
+                /**
+                 * errno == ESRCH is allowed because it might be that the proc intrest is terminated and
+                 * the termination has not been read by main, in this case need wait on the proc to update the proc-list
+                 * state
+                 */
+#ifdef DEBUG_MAIN
+                char string [80];
+                from_procstate_to_string(tmp->p->proc_state,string);
+                printf ("\n{DEBUG_MAIN}:= SENT SIGNAL TO : process type: %s, proc exec_State: %s\n", from_proctype_to_string(tmp->p->proc_type),string);
+#endif
+                DEBUG_MESSAGE("SIGNAL SENT TO THE PROCESS");
+                num_proc_reciver++;
+            } else if (errno == EINTR || tmp->p->proc_state == PROC_STATE_TERMINATED) { continue; }
+            else {
+                return -1;
+            }
+        }
+    }
+    return num_proc_reciver;
+}
+
+Bool send_msg_to_all_nodes(int queue_id, int retry, ProcList proc_list, int node_id, Bool exclude_last){
+    struct node *tmp = proc_list->first;
+    struct node *last = proc_list->last;
+    int num_proc_reciver = 0;
+    if (exclude_last == TRUE){
+        for (; tmp != NULL; tmp = tmp->next) {
+            if (tmp->p->proc_type == PROC_TYPE_NODE && tmp->p->pid != last->p->pid && tmp->p->proc_state == PROC_STATE_RUNNING){
+                struct node_msg msg;
+                struct Transaction*t = (struct Transaction*)malloc(sizeof(struct Transaction));
+                t->sender = node_id;
+                node_msg_snd(queue_id,&msg, MSG_MASTER_ORIGIN_ID, t, getpid(), TRUE, retry, tmp->p->id_queue);
+            }
+        }
+    }else{
+        for (; tmp != NULL; tmp = tmp->next) {
+            if (tmp->p->proc_type == PROC_TYPE_NODE && tmp->p->proc_state == PROC_STATE_RUNNING){
+                struct node_msg msg;
+                struct Transaction*t = (struct Transaction*)malloc(sizeof(struct Transaction));
+                t->sender = node_id;
+                node_msg_snd(queue_id,&msg, MSG_MASTER_ORIGIN_ID, t, getpid(), TRUE, retry, tmp->p->id_queue);
+            }
+        }
+    }
+    return TRUE;
+}

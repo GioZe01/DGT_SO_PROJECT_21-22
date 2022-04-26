@@ -31,6 +31,7 @@
 /* Support functions*/
 /*  ! All the following functions are capable of EXIT_PROCEDURE*/
 
+
 /**
  * @brief Check if masterbook is full or not. If full, return FALSE, else TRUE. Check if there're
  * enough process running to fill the masterbook.
@@ -41,6 +42,13 @@ Bool check_runnability();
  * Create the shared memory for configuration purposes of kid processes
  */
 void create_shm_conf(void);
+
+/**
+ * Create a node_proc as support friend process in case of TP_FULL
+ * @param node_id The queue_id of the node to be created
+ * @return The pid of the created process
+ */
+int create_node_proc(int new_node_id);
 
 
 /**
@@ -229,15 +237,27 @@ int main()
         alarm(1);
         while (simulation_end < 0)
         {
-
-            if (check_runnability() == FALSE || check_msg_report(&msg_repo, msg_report_id_master, proc_list) < 0)
+            int msg_rep_value= check_msg_report(&msg_repo, msg_report_id_master, proc_list);
+            if (check_runnability() == FALSE || msg_rep_value< 0)
             {
                 /*If a message arrive make the knowledge*/
                 ERROR_MESSAGE("IMPOSSIBLE TO RUN SIMULATION");
                 end_simulation();
             }
-            else
-            {
+            else if (msg_rep_value == 1){
+                /**TODO: CHECK IF THE MESSAGE IS CORRECT, AND RUN A NEW NODE AND SEND HIM THE GIVEN TRANSACTION*/
+                int new_node_id = shm_conf_pointer->nodes_snapshots[shm_conf_pointer->nodes_snapshots[0][0]][2]+DELTA_NODE_MSG_TYPE;
+                int new_node_pid= create_node_proc(new_node_id);
+                int new_node_friends = rand_int_n_exclude(new_node_id, new_node_id, shm_conf_pointer->nodes_snapshots[0][0]);
+                shm_conf_add_node(shm_conf_pointer, new_node_pid,new_node_id, new_node_friends);
+                struct node_msg node_msg;
+                node_msg.t.hops = 0;
+                node_msg_snd(msg_report_id_nodes, &node_msg,MSG_TRANSACTION_TYPE, &msg_repo.t,main_pid,TRUE, simulation_conf.so_retry,new_node_id);
+                /*Send the signal SIGUSR1 to all the nodes*/
+                send_sig_to_all_nodes(proc_list,SIGUSR1,TRUE);
+                send_msg_to_all_nodes(new_node_id,simulation_conf.so_retry,proc_list, shm_conf_pointer->nodes_snapshots[0][0], TRUE);
+            }
+            else{
                 master_msg_report_print(&msg_repo);
             }
         }
@@ -305,7 +325,7 @@ int create_nodes_proc(int *nodes_pids, int *nodes_queues_ids)
     for (; i < simulation_conf.so_nodes_num; i++)
     {
         char *argv_node[] = {PATH_TO_NODE, NULL, NULL}; /*Future addon*/
-        argv_node[1] = (char *)malloc(11 * sizeof(char));
+        argv_node[1] = (char *)malloc(11 * sizeof(char));/**< 11 is the number of characters INT_MAX+1*/
         switch (node_pid = fork())
         {
         case -1:
@@ -689,4 +709,25 @@ int * generate_nodes_friends_array(int * nodes){
         nodes_friends[i] = rand_int_n_exclude(simulation_conf.so_num_friends, i, nodes[0]);
     }
     return nodes_friends;
+}
+int create_node_proc(int new_node_id){
+    pid_t new_node_pid;
+    char * argv_node[]={PATH_TO_NODE, NULL,NULL};
+    /*Add the new node id to argv_node and run the new node process*/
+    argv_node[1] = (char *)malloc(sizeof(char) * 11 );
+    sprintf(argv_node[1], "%d", new_node_id);
+    switch(new_node_pid = fork())
+    {
+        case -1:
+            ERROR_EXIT_SEQUENCE_MAIN("IMPOSSIBLE TO FORK NEW NODE PROCESS");
+        case 0:
+            execv(PATH_TO_NODE, argv_node);
+            ERROR_EXIT_SEQUENCE_MAIN("IMPOSSIBLE TO EXEC NEW NODE PROCESS");
+        default:
+            insert_in_list(proc_list, new_node_pid, PROC_TYPE_NODE, new_node_id);
+            /*Free the memory allocated for the argv_node*/
+            free(argv_node[1]);
+            DEBUG_MESSAGE("NEW NODE PROCESS CREATED");
+            return new_node_pid;
+    }
 }

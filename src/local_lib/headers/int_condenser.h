@@ -47,10 +47,19 @@ int rand_int_n_exclude(int n, int exclude, int max);
  * @return The position of a randomly chosen 1 in the given number
  */
 int get_rand_one(int n);
+
 /**
  * @brief Get a random 1 position in the given number
  * @param n The number
  * @return The position of a random 1 in the given number
  */
 int rand_int_n_pos(int n);
+
+/**
+ * @brief Insert a 1 in the given position in the given number
+ * @param n The number
+ * @param pos The position
+ * @return The number with a 1 in the given position
+ */
+int set_one(int n, int pos);
 #endif //DGT_SO_PROJECT_21_22_INT_CONDENSER_H

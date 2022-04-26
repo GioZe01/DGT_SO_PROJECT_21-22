@@ -10,6 +10,7 @@
 #include "headers/process_info_list.h"
 #include "headers/simulation_errors.h"
 #include "headers/debug_utility.h"
+#include "headers/transaction_list.h"
 
 
 void master_msg_report_create(struct master_msg_report *self, long type,long proc_type, pid_t sender_pid, short int state, float budget, struct Transaction t) {
@@ -155,6 +156,8 @@ int acknowledge(struct master_msg_report * self, ProcList list){
             }
             proc_to_update->proc_state= exec_state;
             break;
+            case TP_FULL:
+            return 1;
         default:
             return -1;
     }

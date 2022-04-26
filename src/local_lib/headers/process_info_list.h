@@ -59,6 +59,16 @@ Proc get_proc_from_queue_id(ProcList self, int id_queue);
  * @return -1 in case of failure. the number of proc to wait responce for
  */
 int send_sig_to_all(ProcList proc_list,int signal);
+
+/**
+ * Send the given signal to the process with type node
+ * @param proc_list the list of proced to receive the signal
+ * @param signal signal to be sent
+ * @param exclude_last if TRUE the last node will not receive the signal
+ * @return -1 in case of failure. the number of proc to wait responce for
+ */
+int send_sig_to_all_nodes(ProcList proc_list,int signal, Bool exclude_last);
+
 /**
  * Print at console the specified list
  * @param self ref of the list to print_list
@@ -96,5 +106,15 @@ void saving_private_ryan(ProcList self, int queue_id);
  */
 int get_num_of_user_proc_running(ProcList self);
 
+
+/**
+ * @brief send a msg with the new node id to all the other nodes
+ * @param queue_id id of the queue to snd the msg on
+ * @param retry number of retry to send the single msg
+ * @param node_id the new node id
+ * @exclude_last exclude the last node from the list
+ * @return FALSE in case of FAILURE, TRUE otherwise
+ */
+Bool send_msg_to_all_nodes(int queue_id,int retry,  ProcList proc_list, int node_id, Bool exclude_last);
 /*TODO: implementare budget maggiore get -> vedere se fare una hash table di processi*/
 #endif /*DGT_SO_PROJECT_21_22_PROCESS_INFO_LIST_H*/

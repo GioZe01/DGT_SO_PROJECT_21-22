@@ -332,9 +332,12 @@ void signals_handler(int signum)
              * Receive new friends from master and update the friends list
              */
             node_msg_receive(queue_node_id,&node_msg, MSG_MASTER_ORIGIN_ID);
-            friends |= node_msg.sender_pid;
+            friends = set_one(friends, node_msg.sender_pid);
             break;
         case SIGUSR2:
+            /**
+             * Inform master of the node state
+             */
             master_msg_send(queue_master_id, &master_msg, INFO_BUDGET, NODE, current_node.pid, current_node.exec_state, TRUE, current_node.budget, NULL);
 #ifdef DEBUG_NODE
             DEBUG_NOTIFY_ACTIVITY_DONE("{DEBUG_NODE}:= REPLIED TO MASTER DONE");
@@ -650,7 +653,7 @@ void process_simple_transaction_type(struct node_msg *msg_rep)
              */
             printf("TP_SIZE FULL AND HOPS EXCEEDED\n");
             struct master_msg_report master_msg;
-            /**TODO: implement master msg_send*/
+            master_msg_send(queue_master_id, &master_msg,TP_FULL, NODE, current_node.pid, current_node.exec_state, TRUE, current_node.budget, &msg_rep->t);
         }
     }
     else
