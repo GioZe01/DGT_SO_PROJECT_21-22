@@ -274,11 +274,7 @@ int main()
                 master_msg_report_print(&msg_repo);
             }
         }
-        printf("====TIME FINISHED====\n");
-        kill_kids();
-        /*TODO: verifica messaggi di report*/
-        wait_kids();
-        /*TODO: final printing*/
+        end_simulation();
     }
     free_mem();
     free_sysVar();
@@ -396,16 +392,13 @@ void signals_handler(int signum)
     static int num_inv = 0;
     old_errno = errno;
     DEBUG_SIGNAL("SIGNAL RECEIVED", signum);
-    switch (signum)
-    {
+    switch (signum){
     case SIGINT:
     case SIGTERM:
-        if (getpid() == main_pid)
-        {
+        if (getpid() == main_pid){
             EXIT_PROCEDURE_MAIN(0);
         }
-        else
-        {
+        else{
             exit(0);
         }
     case SIGALRM:
@@ -416,8 +409,11 @@ void signals_handler(int signum)
             update_kids_info();
             print_info();
             /*Printing infos*/
-            if (num_inv == simulation_conf.so_sim_sec)
-                simulation_end = 1;
+            if (num_inv == simulation_conf.so_sim_sec){
+                simulation_end = SIMULATION_END_BY_TIME;
+                end_simulation();
+                break;
+            }
             else
                 alarm(1);
             /*TODO: METTO IN PAUSA I NODI vedere se mettere anche in pausa i processi user*/
@@ -704,6 +700,9 @@ void end_simulation()
     printf("Simulation %s \n", get_end_simulation_msg());
     kill_kids();
     wait_kids();
+    free_mem();
+    free_sysVar();
+    exit(0);
 }
 
 char *get_end_simulation_msg()

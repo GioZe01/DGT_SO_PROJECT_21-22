@@ -128,4 +128,12 @@ void empty_queue(Queue q);
  * @return the empty transaction
  */
 struct Transaction create_empty_transaction(void);
+
+/**
+ * Copy the given transaction into the given transaction
+ * @param t the transaction to copy from
+ * @param t_copy the transaction to copy to
+ * @return -1 in case of failure 0 otherwise
+ */
+int copy_transaction(struct Transaction t, struct Transaction* t_copy);
 #endif /*DGT_SO_PROJECT_21_22_TRANSACTION_LIST_H*/

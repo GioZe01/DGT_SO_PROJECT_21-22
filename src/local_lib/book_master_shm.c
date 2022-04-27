@@ -19,7 +19,6 @@ int shm_book_master_create(struct shm_book_master *self) {
 }
 
 int insert_block(struct shm_book_master * self, struct Transaction block_t[SO_BLOCK_SIZE]){
-    printf("Inserting block %f\n", block_t[0].amount);
     if(self!=NULL){
         copy_trasaction_blocks(self->blocks[self->to_fill][0].block_t, block_t);
         self->blocks[self->to_fill][1].index=self->to_fill;

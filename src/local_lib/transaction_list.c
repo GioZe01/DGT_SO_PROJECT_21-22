@@ -305,11 +305,11 @@ int get_num_transactions(Queue q) {
 }
 
 int queue_to_array(Queue q, struct Transaction vector[]) {
-    if (get_num_transactions(q)==0) {
+    if (get_num_transactions(q)>0) {
         struct node *iterable = q->first;
         int i = 0;
         for (; iterable != NULL; iterable = iterable->next) {
-            vector[i] = iterable->t;
+            copy_transaction(iterable->t, &vector[i]);
             i++;
         }
         return 0;
@@ -343,3 +343,15 @@ Bool queue_copy_n_transactions(Queue q, Queue r, int n){
     }
     return TRUE;
 }
+
+int copy_transaction(struct Transaction t, struct Transaction *t_copy) {
+    t_copy->sender = t.sender;
+    t_copy->reciver = t.reciver;
+    t_copy->amount = t.amount;
+    t_copy->hops = t.hops;
+    t_copy->reward = t.reward;
+    t_copy->t_type = t.t_type;
+    t_copy->timestamp = t.timestamp;
+    return 0;
+}
+
