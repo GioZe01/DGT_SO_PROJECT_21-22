@@ -165,7 +165,7 @@ int semaphore_masterbook_id = -1;               /* Id of the masterbook semaphor
 int semaphore_to_fill_id = -1;                  /* Id of the masterbook to_fill access semaphore*/
 int last_signal = -1;                           /* Last signal received*/
 pid_t main_pid;                                 /*pid of the current proc*/
-
+Bool printed = FALSE;
 int main()
 {
     main_pid = getpid();
@@ -759,20 +759,11 @@ int create_node_proc(int new_node_id){
 }
 void lock_to_fill_sem(void)
 {
-    while ( semctl(semaphore_to_fill_id, 0, GETVAL) <0 && semaphore_lock(semaphore_to_fill_id, shm_masterbook_pointer->to_fill) < 0)
+    while (semaphore_lock(semaphore_to_fill_id, 0) < 0)
     {
         if (errno == EINTR || semctl(semaphore_to_fill_id, 0, GETVAL) < 0)
         {
-            if (last_signal == SIGALRM)
-            {
-                /* RICEZIONE DI SEGNALE*/
-                unlock_to_fill_sem();
-                ERROR_EXIT_SEQUENCE_MAIN("IMPOSSIBLE TO LOCK TO FILL SEM");
-            }
-            else
-            {
                 continue;
-            }
         }
         else
         {
