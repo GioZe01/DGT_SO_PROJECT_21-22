@@ -163,8 +163,8 @@ int send_sig_to_all(ProcList proc_list, int signal) {
         char string [80];
         from_procstate_to_string(tmp->p->proc_state,string);
         printf ("\n{DEBUG_MAIN}:= SENT SIGNAL TO : process type: %s, proc exec_State: %s\n", from_proctype_to_string(tmp->p->proc_type),string);
-#endif
             DEBUG_MESSAGE("SIGNAL SENT TO THE PROCESS");
+#endif
          num_proc_reciver++;
         } else if (errno == EINTR || tmp->p->proc_state == PROC_STATE_TERMINATED) { continue; }
         else {
@@ -253,8 +253,8 @@ int send_sig_to_all_nodes(ProcList proc_list,int signal, Bool exclude_last){
                 char string [80];
                 from_procstate_to_string(tmp->p->proc_state,string);
                 printf ("\n{DEBUG_MAIN}:= SENT SIGNAL TO : process type: %s, proc exec_State: %s\n", from_proctype_to_string(tmp->p->proc_type),string);
-#endif
                 DEBUG_MESSAGE("SIGNAL SENT TO THE PROCESS");
+#endif
                 num_proc_reciver++;
             } else if (errno == EINTR || tmp->p->proc_state == PROC_STATE_TERMINATED) { continue; }
             else {
@@ -274,8 +274,8 @@ int send_sig_to_all_nodes(ProcList proc_list,int signal, Bool exclude_last){
                 char string [80];
                 from_procstate_to_string(tmp->p->proc_state,string);
                 printf ("\n{DEBUG_MAIN}:= SENT SIGNAL TO : process type: %s, proc exec_State: %s\n", from_proctype_to_string(tmp->p->proc_type),string);
-#endif
                 DEBUG_MESSAGE("SIGNAL SENT TO THE PROCESS");
+#endif
                 num_proc_reciver++;
             } else if (errno == EINTR || tmp->p->proc_state == PROC_STATE_TERMINATED) { continue; }
             else {

@@ -630,13 +630,11 @@ void create_masterbook()
 }
 void print_info(void)
 {
-    lock_to_fill_sem();
     printf("============== INFO ============== \n");
     printf("Number of node active: %d\n", get_num_of_user_proc_running(proc_list));
     print_list(proc_list);
     printf("\nTO FILL SHM VALUE: %d\n", shm_masterbook_pointer->to_fill);
     printf("============== END INFO ===========\n");
-    unlock_to_fill_sem();
 }
 void update_kids_info(void)
 {
@@ -759,9 +757,10 @@ int create_node_proc(int new_node_id){
 }
 void lock_to_fill_sem(void)
 {
+    DEBUG_NOTIFY_ACTIVITY_RUNNING("LOCKING TO FILL SEMAPHORE");
     while (semaphore_lock(semaphore_to_fill_id, 0) < 0)
     {
-        if (errno == EINTR || semctl(semaphore_to_fill_id, 0, GETVAL) < 0)
+        if (errno == EINTR)
         {
                 continue;
         }
@@ -770,14 +769,17 @@ void lock_to_fill_sem(void)
             ERROR_EXIT_SEQUENCE_MAIN("ERROR WHILE TRYING TO EXEC LOCK ON TO_FILL ACCESS SEM");
         }
     }
+    DEBUG_NOTIFY_ACTIVITY_DONE("LOCKING TO FILL SEMAPHORE DONE");
 }
 void unlock_to_fill_sem(void)
 {
-    while ( semaphore_unlock(semaphore_to_fill_id, 0) < 0)
+    DEBUG_NOTIFY_ACTIVITY_RUNNING("UNLOCKING TO FILL SEMAPHORE");
+    while (semaphore_unlock(semaphore_to_fill_id, 0) < 0)
     {
         if (errno != EINTR)
         {
             ERROR_EXIT_SEQUENCE_MAIN("ERROR DURING THE UNLOCK OF THE SEMAPHORE");
         }
     }
+    DEBUG_NOTIFY_ACTIVITY_DONE("UNLOCKING TO FILL SEMAPHORE DONE");
 }

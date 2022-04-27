@@ -209,7 +209,7 @@ int main(int argc, char const *argv[])
         /*  SEMAPHORES SINC..        */
         /*---------------------------*/
         DEBUG_MESSAGE("NODE READY, ON START_SEM");
-        if (semaphore_wait_for_sinc(semaphore_start_id, 0) < 0)
+        if ( semctl(semaphore_start_id, 0, GETVAL) > 0 && semaphore_wait_for_sinc(semaphore_start_id, 0) < 0)
         {
             ERROR_EXIT_SEQUENCE_NODE("IMPOSSIBLE TO WAIT FOR START");
         }
@@ -476,18 +476,17 @@ Bool lock_shm_masterbook(void)
 
 void lock_to_fill_sem(void)
 {
+    DEBUG_NOTIFY_ACTIVITY_RUNNING("NODE:= LOCKING THE SEMAPHORE TO FILL THE SHM...");
     while (semaphore_lock(semaphore_to_fill_id, 0) < 0)
     {
-        if (errno == EINTR || semctl(semaphore_to_fill_id, 0, GETVAL) < 0)
+        if (errno == EINTR )
         {
             if (last_signal == SIGALRM)
             {
-                /* RICEZIONE DI SEGNALE*/
                 unlock_to_fill_sem();
-                /*Avvisare il main e il processo deve terminare*/
                 advice_master_of_termination(IMPOSSIBLE_TO_SEND_TRANSACTION);
-            }
-            else
+                ERROR_EXIT_SEQUENCE_NODE("IMPOSSIBLE_TO_SEND_TRANSACTION");
+            }else
             {
                 continue;
             }
@@ -498,14 +497,14 @@ void lock_to_fill_sem(void)
             ERROR_EXIT_SEQUENCE_NODE("ERROR WHILE TRYING TO EXEC LOCK ON TO_FILL ACCESS SEM");
         }
     }
+    DEBUG_NOTIFY_ACTIVITY_DONE("NODE:= LOCKING THE SEMAPHORE TO FILL THE SHM DONE");
 }
 
 void lock_masterbook_cell_access(int i_cell_block_list)
 {
     while (semaphore_lock(semaphore_masterbook_id, i_cell_block_list) < 0)
     {
-        /*TODO: fare refactoring nei due while*/
-        if (errno == EINTR || semctl(semaphore_masterbook_id, i_cell_block_list, GETVAL) < 0)
+        if (errno == EINTR)
         {
             if (last_signal == SIGALRM)
             {
@@ -528,6 +527,7 @@ void lock_masterbook_cell_access(int i_cell_block_list)
 
 void unlock_to_fill_sem(void)
 {
+    DEBUG_NOTIFY_ACTIVITY_RUNNING("NODE:= UNLOCKING THE SEMAPHORE TO FILL THE SHM...");
     while (semaphore_unlock(semaphore_to_fill_id, 0) < 0)
     {
         if (errno != EINTR)
@@ -535,6 +535,7 @@ void unlock_to_fill_sem(void)
             ERROR_EXIT_SEQUENCE_NODE("ERROR DURING THE UNLOCK OF THE SEMAPHORE");
         }
     }
+    DEBUG_NOTIFY_ACTIVITY_DONE("NODE:= UNLOCKING THE SEMAPHORE TO FILL THE SHM DONE");
 }
 
 void unlock_masterbook_cell_access(int i_cell_block_list)

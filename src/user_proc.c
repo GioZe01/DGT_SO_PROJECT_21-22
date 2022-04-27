@@ -344,7 +344,9 @@ int send_to_node(void)
 {
     if (get_num_transactions(current_user.in_process) > 0)
     {
+#ifdef DEBUG_USER
         DEBUG_NOTIFY_ACTIVITY_RUNNING("SENDING TRANSACTION TO THE NODE...");
+#endif
         srand(getpid());
         int node_num = extract_node(shm_conf_pointer->nodes_snapshots[0][0]);
         struct node_msg msg;
@@ -357,8 +359,8 @@ int send_to_node(void)
         queue_remove_head(current_user.in_process); /*removed if and only if has been sent*/
 #ifdef DEBUG_USER
         node_msg_print(&msg);
-#endif
         DEBUG_NOTIFY_ACTIVITY_DONE("SENDING TRANSACTION TO THE NODE DONE");
+#endif
         return 0;
     }
     else

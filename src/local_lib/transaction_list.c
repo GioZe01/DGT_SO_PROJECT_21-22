@@ -74,7 +74,9 @@ struct Transaction create_empty_transaction(void){
 
 int create_transaction(struct Transaction *t, pid_t sender, pid_t receiver, float amount) {
     struct timespec timestamp;
+#ifdef DEBUG_USER
     DEBUG_NOTIFY_ACTIVITY_RUNNING("CREATING A TRANSACTION...");
+#endif
     if (clock_gettime(CLOCK_REALTIME, &timestamp) < 0) {
         ERROR_MESSAGE("IMPOSSIBLE TO RETRIEVE CLOCK_TIME");
         return -1;
@@ -86,7 +88,9 @@ int create_transaction(struct Transaction *t, pid_t sender, pid_t receiver, floa
     t->timestamp = timestamp;
     t->amount = amount;
     t->reward = 0; /* Is not responsible*/
+#ifdef DEBUG_USER
     DEBUG_NOTIFY_ACTIVITY_DONE("CREATING A TRANSACTION DONE");
+#endif
     return 0;
 }
 
