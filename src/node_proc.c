@@ -306,7 +306,9 @@ Bool set_signal_handler_node(struct sigaction sa, sigset_t sigmask)
 
 void signals_handler(int signum)
 {
+#ifdef DEBUG_NODE_
     DEBUG_SIGNAL("SIGNAL RECEIVED ", signum);
+#endif
     last_signal = signum;
     struct master_msg_report master_msg;
     struct node_msg node_msg;
@@ -463,7 +465,7 @@ Bool lock_shm_masterbook(void)
     queue_to_array(current_node.transactions_block, block_list);
     if (insert_block(shm_masterbook_pointer, block_list) == 0)
     {
-        current_node.budget = current_block_reward;
+        current_node.budget += current_block_reward;
     }
     else
     {

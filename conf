@@ -1,13 +1,13 @@
-so_user_num=100
-so_nodes_num=10
+so_user_num=10
+so_nodes_num=2
 so_budget_init=1000
 so_reward=1
 so_min_trans_gen_nsec=1000000000
 so_max_trans_gen_nsec=2000000000
 so_retry=20
-so_tp_size=1000
+so_tp_size=10
 so_min_trans_proc_nsec=10000000
 so_max_trans_proc_nsec=20000000
 so_sim_sec=10
-so_num_friends=3
+so_num_friends=1
 so_hops=10

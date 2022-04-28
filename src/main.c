@@ -680,8 +680,6 @@ void update_kids_info(void)
 
 Bool check_runnability()
 {
-    DEBUG_BLOCK_ACTION_START("CHECK RUNNABILITY");
-    DEBUG_NOTIFY_ACTIVITY_RUNNING("CHECKING RUNNABILITY....");
     int num_user_proc_running = get_num_of_user_proc_running(proc_list);
     lock_to_fill_sem();
     if (shm_masterbook_pointer->to_fill >= SO_REGISTRY_SIZE)
@@ -762,7 +760,6 @@ int create_node_proc(int new_node_id){
 }
 void lock_to_fill_sem(void)
 {
-    DEBUG_NOTIFY_ACTIVITY_RUNNING("LOCKING TO FILL SEMAPHORE");
     while (semaphore_lock(semaphore_to_fill_id, 0) < 0)
     {
         if (errno == EINTR)
@@ -774,11 +771,9 @@ void lock_to_fill_sem(void)
             ERROR_EXIT_SEQUENCE_MAIN("ERROR WHILE TRYING TO EXEC LOCK ON TO_FILL ACCESS SEM");
         }
     }
-    DEBUG_NOTIFY_ACTIVITY_DONE("LOCKING TO FILL SEMAPHORE DONE");
 }
 void unlock_to_fill_sem(void)
 {
-    DEBUG_NOTIFY_ACTIVITY_RUNNING("UNLOCKING TO FILL SEMAPHORE");
     while (semaphore_unlock(semaphore_to_fill_id, 0) < 0)
     {
         if (errno != EINTR)
@@ -786,5 +781,4 @@ void unlock_to_fill_sem(void)
             ERROR_EXIT_SEQUENCE_MAIN("ERROR DURING THE UNLOCK OF THE SEMAPHORE");
         }
     }
-    DEBUG_NOTIFY_ACTIVITY_DONE("UNLOCKING TO FILL SEMAPHORE DONE");
 }
