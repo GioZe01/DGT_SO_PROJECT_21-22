@@ -1,4 +1,5 @@
 #include <stdio.h>
+#include <sys/sem.h>
 /*Local Imports*/
 #include "headers/book_master_shm.h"
 #include "headers/glob.h"
@@ -9,10 +10,13 @@
  * @param block2 transactions block vector
  */
 void copy_trasaction_blocks(struct Transaction block1 [SO_BLOCK_SIZE], struct Transaction block2[SO_BLOCK_SIZE]);
-int shm_book_master_create(struct shm_book_master *self) {
+int shm_book_master_create(struct shm_book_master *self, int sem_access_id) {
     int i;
     for (i = 0; i < SO_REGISTRY_SIZE; i++) {
         self->blocks[i][1].index = i;
+        if (semctl(sem_access_id, i, SETVAL, 1) < 0) {
+            return -1;
+        }
     }
     self->to_fill = 0;
     return 0;

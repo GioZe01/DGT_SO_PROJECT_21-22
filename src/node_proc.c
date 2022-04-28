@@ -193,10 +193,6 @@ int main(int argc, char const *argv[])
         /*  CONNECTING TO QUEUES */
         /*-----------------------*/
         connect_to_queues();
-        /*-------------------------*/
-        /*  SHARED MEM  CONFIG     */
-        /*-------------------------*/
-        attach_to_shms();
         /************************************
          *      SINC AND WAITING FASE       *
          * **********************************/
@@ -209,12 +205,19 @@ int main(int argc, char const *argv[])
         /*  SEMAPHORES SINC..        */
         /*---------------------------*/
         DEBUG_MESSAGE("NODE READY, ON START_SEM");
-        if ( semctl(semaphore_start_id, 0, GETVAL) > 0 && semaphore_wait_for_sinc(semaphore_start_id, 0) < 0)
+        int sem_val = semctl(semaphore_start_id, 0, GETVAL);
+        if (sem_val <0){ ERROR_EXIT_SEQUENCE_NODE ("IMPOSSIBLE TO ACCESS START SEMAPHORE INFO");}
+        if (( sem_val!=0&& semaphore_lock(semaphore_start_id, 0)<0) || semaphore_wait_for_sinc(semaphore_start_id, 0) < 0)
         {
             ERROR_EXIT_SEQUENCE_NODE("IMPOSSIBLE TO WAIT FOR START");
         }
         current_node.exec_state = PROC_STATE_RUNNING;
         DEBUG_MESSAGE("NODE PROCESS RUNNING");
+
+        /*-------------------------*/
+        /*  SHARED MEM  CONFIG     */
+        /*-------------------------*/
+        attach_to_shms();
 
         /****************************************
          *   PROCESSING OF TRANSACTION FASE     *
@@ -390,7 +393,7 @@ void attach_to_shms(void)
         advice_master_of_termination(IMPOSSIBLE_TO_CONNECT_TO_SHM);
         ERROR_EXIT_SEQUENCE_NODE("IMPOSSIBLE TO CONNECT TO SHM CONF");
     }
-    friends = shm_conf_pointer_node->nodes_snapshots[get_node_position_by_pid(shm_conf_pointer_node,current_node.pid)];
+    friends = shm_conf_pointer_node->nodes_snapshots[get_node_position_by_pid(shm_conf_pointer_node,current_node.pid)][2];
     DEBUG_NOTIFY_ACTIVITY_DONE("ATTACHING TO SHM DONE");
     shm_conf_id = shmget(MASTER_BOOK_SHM_KEY, sizeof(struct shm_book_master), 0600);
     if (shm_conf_id < 0)
@@ -452,7 +455,7 @@ Bool lock_shm_masterbook(void)
     trans_proc_sim.tv_nsec = get_time_processing();
     nanosleep(&trans_proc_sim, (void *)NULL);
     lock_to_fill_sem();
-    unsigned short int i_cell_block_list = shm_masterbook_pointer->to_fill;
+    int i_cell_block_list = shm_masterbook_pointer->to_fill;
     /*Inserting the block into the shm*/
     shm_masterbook_pointer->to_fill += 1;
     lock_masterbook_cell_access(i_cell_block_list);
@@ -477,6 +480,7 @@ Bool lock_shm_masterbook(void)
 void lock_to_fill_sem(void)
 {
     DEBUG_NOTIFY_ACTIVITY_RUNNING("NODE:= LOCKING THE SEMAPHORE TO FILL THE SHM...");
+    printf("sem value LOCKING %d\n",semctl(semaphore_to_fill_id, 0, GETVAL));
     while (semaphore_lock(semaphore_to_fill_id, 0) < 0)
     {
         if (errno == EINTR )
@@ -535,6 +539,7 @@ void unlock_to_fill_sem(void)
             ERROR_EXIT_SEQUENCE_NODE("ERROR DURING THE UNLOCK OF THE SEMAPHORE");
         }
     }
+    printf("sem value UNLOCKING  %d\n",semctl(semaphore_to_fill_id, 0, GETVAL));
     DEBUG_NOTIFY_ACTIVITY_DONE("NODE:= UNLOCKING THE SEMAPHORE TO FILL THE SHM DONE");
 }
 
@@ -582,10 +587,6 @@ void acquire_semaphore_ids(void)
     if (semaphore_start_id < 0)
     {
         ERROR_EXIT_SEQUENCE_NODE("IMPOSSIBLE TO OBTAIN ID OF START SEM");
-    }
-    if (semaphore_lock(semaphore_start_id, 0) < 0)
-    {
-        ERROR_EXIT_SEQUENCE_NODE("IMPOSSIBLE TO OBTAIN THE START SEMAPHORE");
     }
     semaphore_masterbook_id = semget(SEMAPHORE_MASTER_BOOK_ACCESS_KEY, 1, 0);
     if (semaphore_masterbook_id < 0)

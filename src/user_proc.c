@@ -135,10 +135,6 @@ int main(int arc, char const *argv[])
         /*  CONNECTING TO THE USER REPORT QUEUE */
         /*--------------------------------------*/
         connect_to_queues();
-        /*-------------------------*/
-        /*  SHARED MEM  CONFIG     */
-        /*-------------------------*/
-        attach_to_shm_conf();
 
         /************************************
          *      SINC AND WAITING FASE       *
@@ -172,6 +168,10 @@ int main(int arc, char const *argv[])
             ERROR_EXIT_SEQUENCE_USER("ERROR DURING WAITING START_SEMAPHORE UNLOCK");
         }
         current_user.exec_state = PROC_STATE_RUNNING;
+        /*-------------------------*/
+        /*  SHARED MEM  CONFIG     */
+        /*-------------------------*/
+        attach_to_shm_conf();
 
         /****************************************
          *      GENERATION OF TRANSACTION FASE *

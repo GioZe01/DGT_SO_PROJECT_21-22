@@ -9,7 +9,7 @@ union Block{
 };
 struct shm_book_master{
     union Block blocks [SO_REGISTRY_SIZE][2];
-    unsigned short int to_fill; /*index free to be filled (need his own dedicated semaphore)*/
+    int to_fill; /*index free to be filled (need his own dedicated semaphore)*/
 };
 /*          0                   1
  * 0    block_transactions      index   <-  ;
@@ -17,9 +17,10 @@ struct shm_book_master{
 /**
  * Load all the index in col 2 of blocks
  * @param self the shm to create
+ * @param sem_access_id the id of the semaphore to access the shm value
  * @return -1 in case of Failure. 0 otherwise
  */
-int shm_book_master_create(struct shm_book_master * self);
+int shm_book_master_create(struct shm_book_master * self, int sem_access_id);
 /**
  * Print at console the given book_master
  * @param self the book_master to be printed

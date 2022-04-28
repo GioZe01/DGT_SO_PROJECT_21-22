@@ -101,10 +101,11 @@ char *get_end_simulation_msg();
 
 /**
  * @brief Return an array of int with the friends of each nodes in the simulation
+ * @param nodes_friends pointer to an array of int to be filled with the generated once
  * @param nodes pointer to an array of int with the nodes in the simulation (in 0 index there's
  * the number of nodes)
  */
-int * generate_nodes_friends_array(int * nodes);
+void generate_nodes_friends_array(int * nodes_friends, int * nodes);
 
 /**
  * @brief End the simulation by killing all the processes and cleaning the shared memory
@@ -224,7 +225,8 @@ int main()
         /*-------------------------------*/
         /*  INITIALIZING THE SHM         */
         /*-------------------------------*/
-        int * nodes_friends = generate_nodes_friends_array(nodes_queues_ids);
+        int * nodes_friends = (int *)malloc(sizeof(int) * nodes_queues_ids[0]);
+        generate_nodes_friends_array(nodes_friends, nodes_queues_ids);
         if (shm_conf_create(shm_conf_pointer, users_pids, users_queues_ids, nodes_pids, nodes_queues_ids, nodes_friends) < 0)
         {
             ERROR_EXIT_SEQUENCE_MAIN("FAILED ON SHM_CONF INITIALIZING");
@@ -451,7 +453,7 @@ void create_semaphores(void)
     {
         ERROR_EXIT_SEQUENCE_MAIN("IMPOSSIBLE TO CREATE MASTERBOOK SEM");
     }
-    semctl(semaphore_masterbook_id, 0, SETVAL, 1);
+    semctl(semaphore_masterbook_id, 0, SETALL, 1);
     DEBUG_NOTIFY_ACTIVITY_DONE("CREATION OF MASTEBOOK ACCESS SEM DONE");
     DEBUG_BLOCK_ACTION_END();
 
@@ -621,6 +623,10 @@ void create_masterbook()
         ERROR_EXIT_SEQUENCE_MAIN("IMPOSSIBLE TO CREATE THE SHARED MEM FOR MASTERBOOK");
     }
     shm_masterbook_pointer = shmat(shm_masterbook_id, NULL, 0);
+    if (shm_book_master_create(shm_masterbook_pointer, semaphore_masterbook_id) == -1)
+    {
+        ERROR_EXIT_SEQUENCE_MAIN("IMPOSSIBLE TO CREATE THE MASTERBOOK");
+    }
     DEBUG_NOTIFY_ACTIVITY_DONE("CREATING THE MASTER BOOK DOONE");
     DEBUG_BLOCK_ACTION_END();
 }
@@ -657,7 +663,9 @@ void update_kids_info(void)
         master_msg_receive_info(msg_report_id_master, msg_rep);
         if (msg_rep->sender_pid != -1)
         {
+#ifdef DEBUG_MAIN
             master_msg_report_print(msg_rep);
+#endif
             Proc proc_to_update = get_proc_from_pid(proc_list, msg_rep->sender_pid);
             if (proc_to_update != NULL)
             {
@@ -723,15 +731,13 @@ char *get_end_simulation_msg()
         return "UNKNOWN";
     }
 }
-int * generate_nodes_friends_array(int * nodes){
-    int * nodes_friends = (int *)malloc(sizeof(int) * nodes[0]);
+void generate_nodes_friends_array(int * nodes_friends, int * nodes){
     int i = 1;
     nodes_friends [0] = nodes[0];
     for (; i < nodes[0]; i++)
     {
         nodes_friends[i] = rand_int_n_exclude(simulation_conf.so_num_friends, i, nodes[0]);
     }
-    return nodes_friends;
 }
 int create_node_proc(int new_node_id){
     pid_t new_node_pid;
