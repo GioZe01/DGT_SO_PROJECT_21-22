@@ -480,7 +480,6 @@ Bool lock_shm_masterbook(void)
 void lock_to_fill_sem(void)
 {
     DEBUG_NOTIFY_ACTIVITY_RUNNING("NODE:= LOCKING THE SEMAPHORE TO FILL THE SHM...");
-    printf("sem value LOCKING %d\n",semctl(semaphore_to_fill_id, 0, GETVAL));
     while (semaphore_lock(semaphore_to_fill_id, 0) < 0)
     {
         if (errno == EINTR )
@@ -539,7 +538,6 @@ void unlock_to_fill_sem(void)
             ERROR_EXIT_SEQUENCE_NODE("ERROR DURING THE UNLOCK OF THE SEMAPHORE");
         }
     }
-    printf("sem value UNLOCKING  %d\n",semctl(semaphore_to_fill_id, 0, GETVAL));
     DEBUG_NOTIFY_ACTIVITY_DONE("NODE:= UNLOCKING THE SEMAPHORE TO FILL THE SHM DONE");
 }
 
