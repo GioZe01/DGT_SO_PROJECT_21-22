@@ -250,7 +250,7 @@ int main()
         alarm(1);
         while (simulation_end < 0)
         {
-            int msg_rep_value= check_msg_report(&msg_repo, msg_report_id_master, proc_list);
+            int msg_rep_value = check_msg_report(&msg_repo, msg_report_id_master, proc_list);
             if (check_runnability() == FALSE || msg_rep_value< 0)
             {
                 /*If a message arrive make the knowledge*/

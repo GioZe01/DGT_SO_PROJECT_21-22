@@ -181,9 +181,6 @@ int main(int arc, char const *argv[])
             generating_transactions();
             getting_richer();
         }
-#ifdef U_CASHING
-        /*TODO: wait for user in progress to empty with timeout*/
-#endif
         /*TODO: check for remaining transaction confirmed*/
         current_user.exec_state = PROC_STATE_TERMINATED;
         advice_master_of_termination(TERMINATION_END_CORRECTLY);
@@ -267,9 +264,10 @@ void signals_handler_user(int signum)
             break;
         case SIGUSR2:
             t = create_empty_transaction();
-            printf("\n\n current user: %d  budget: %f expect_out : %f\n", current_user.pid, current_user.budget, current_user.expected_out);
+     /*       printf("\n\n current user: %d  budget: %f entries: %f outcomes: %f expect_out : %f\n", current_user.pid, current_user.budget,current_user.cash_flow.entries, current_user.cash_flow.outcomes,current_user.expected_out);
+      */
             if (master_msg_send(queue_master_id, &msg, INFO_BUDGET, USER, current_user.pid,
-                        current_user.exec_state, TRUE, current_user.budget-current_user.expected_out, &t) < 0)
+                        current_user.exec_state, TRUE, current_user.budget, &t) < 0)
             {
                 char *error_string = strcat("IMPOSSIBLE TO ADVICE MASTER OF : %s", from_type_to_string(INFO_BUDGET));
                 ERROR_MESSAGE(error_string);

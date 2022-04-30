@@ -26,13 +26,7 @@
 #define DEBUG_ERROR_MESSAGE(mex)
 #endif
 
-/*  Helper Funciton*/
-void process_info_print(const Proc p);
-
-void proc_list_remove_head(ProcList self);
-
-void proc_list_underflow();
-
+/* Struct definitions */
 struct node {
     Proc p;
     struct node *next;
@@ -42,6 +36,44 @@ struct processes_info_list {
     struct node *last;
     int num_proc;
 };
+
+/*  Helper Funciton */
+
+/**
+ * @brief Split head into two sublists
+ * @param head The head of the list
+ * @param frontRef A pointer to the head of the first sublist
+ * @param backRef A pointer to the head of the second sublist
+ */
+void frontBackSplit(struct node *head, struct node **frontRef, struct node **backRef);
+
+/**
+ * @brief Merge Sort the list
+ * @param head The head of the list
+ */
+void mergeSort(struct node **head);
+
+/**
+ * @brief Merge two sublists
+ * @param frontHead The head of the first sublist
+ * @param backHead The head of the second sublist
+ * @return The head of the merged sublist
+ */
+struct node *sortedMerge(struct node *frontHead, struct node *backHead);
+
+/**
+ * @brief print the process
+ * @param p The process to print
+ */
+void process_info_print(const Proc p);
+
+/**
+ * @brief remove the head of the list
+ * @param self The list to remove the head from
+ */
+void proc_list_remove_head(ProcList self);
+
+void proc_list_underflow();
 
 ProcList proc_list_create() {
     ProcList p = malloc(sizeof(struct processes_info_list));
@@ -107,14 +139,34 @@ Proc get_proc_from_pid(ProcList self, pid_t pid) {
 
 void print_list(ProcList self) {
     DEBUG_NOTIFY_ACTIVITY_RUNNING("PRINTING PROCESS LIST...");
-    struct node *tmp = self->first;
-    for (; tmp != NULL; tmp = tmp->next) {
-        process_info_print(tmp->p);
-        if (tmp->next != NULL) printf("\n");
+    mergeSort(&self->first);
+    if (self->num_proc > MAX_PROC_TO_PRINT){
+        /* Print the min budget */
+        struct node *tmp = self->first;
+        int i;
+        int num_proc = self->num_proc;
+        for (i=0; tmp != NULL; tmp = tmp->next) {
+            if (i< MAX_PROC_TO_PRINT/2) {
+                process_info_print(tmp->p);
+                printf("\n");
+            }else if (i>= num_proc - MAX_PROC_TO_PRINT/2){
+                process_info_print(tmp->p);
+                printf("\n");
+            }
+            i++;
+        }
+
+    }else{
+        struct node *tmp = self->first;
+        for (; tmp != NULL; tmp = tmp->next) {
+            process_info_print(tmp->p);
+            if (tmp->next != NULL) printf("\n");
+        }
     }
     printf("\n");
     DEBUG_NOTIFY_ACTIVITY_DONE("PRINTING PROCESS LIST ENDED");
 }
+
 
 void process_info_print(const Proc p) {
     char state [80];
@@ -223,6 +275,9 @@ void saving_private_ryan(ProcList self, int queue_id) {
         }
     }
 }
+int get_num_of_proc(ProcList self) {
+    return self->num_proc;
+}
 int get_num_of_user_proc_running(ProcList self){
     if (self->first == NULL){
         return 0;
@@ -310,4 +365,60 @@ Bool send_msg_to_all_nodes(int queue_id, int retry, ProcList proc_list, int node
         }
     }
     return TRUE;
+}
+
+void mergeSort(struct node **head_ref){
+    struct node * head = *head_ref;
+    struct node * sublist1;
+    struct node * sublist2;
+    if ((head == NULL) || (head->next == NULL)){
+        return;
+    }
+    frontBackSplit(head, &sublist1, &sublist2);
+    mergeSort(&sublist1);
+    mergeSort(&sublist2);
+    *head_ref = sortedMerge(sublist1, sublist2);
+}
+
+
+void frontBackSplit(struct node *head, struct node **frontRef, struct node **backRef) {
+    struct node *fast;
+    struct node *slow;
+    if (head == NULL || head->next == NULL) {
+        *frontRef = head;
+        *backRef = NULL;
+    } else {
+        slow = head;
+        fast = head->next;
+        while (fast != NULL) {
+            fast = fast->next;
+            if (fast != NULL) {
+                slow = slow->next;
+                fast = fast->next;
+            }
+        }
+        *frontRef = head;
+        *backRef = slow->next;
+        slow->next = NULL;
+    }
+}
+
+
+struct node *sortedMerge(struct node *frontHead, struct node *backHead){
+    struct node *result = NULL;
+    if (frontHead == NULL) {
+        return backHead;
+    }
+    else if (backHead == NULL) {
+        return frontHead;
+    }
+    if (frontHead->p->budget < backHead->p->budget) {
+        result = frontHead;
+        result->next = sortedMerge(frontHead->next, backHead);
+    }
+    else {
+        result = backHead;
+        result->next = sortedMerge(frontHead, backHead->next);
+    }
+    return result;
 }

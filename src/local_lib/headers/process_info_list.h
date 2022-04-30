@@ -70,10 +70,12 @@ int send_sig_to_all(ProcList proc_list,int signal);
 int send_sig_to_all_nodes(ProcList proc_list,int signal, Bool exclude_last);
 
 /**
- * Print at console the specified list
+ * Print at console the specified list if the list is too big (MAX_PROC_TO_PRINT into glob.h) it will print the processes with the highest budget
  * @param self ref of the list to print_list
+ * @warning the list is sorted by budget
  */
 void print_list(ProcList self);
+
 /**
  * Free the memory from the list
  * @param self ref. to the list to free
@@ -101,11 +103,16 @@ void terminator(ProcList self);
 void saving_private_ryan(ProcList self, int queue_id);
 
 /**
+ * @brief Return the number of proc in the list
+ * @param self the list to search in
+ */
+int get_num_of_proc(ProcList self);
+
+/**
  * Return the number of active user_proc
  * @return integer rappresenting the number of active user
  */
 int get_num_of_user_proc_running(ProcList self);
-
 
 /**
  * @brief send a msg with the new node id to all the other nodes

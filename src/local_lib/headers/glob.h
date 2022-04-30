@@ -133,6 +133,7 @@
 #define MAX_UNSED_CICLE_OF_NODE_PROC 10000000 /**< max number of times that the node process can be unused*/
 #define MAX_WAITING_TIME_FOR_UPDATE 10000 /**< max number of times for updating a specific sys call*/
 #define MAX_FAILURE_SHM_BOOKMASTER_LOCKING 10 /**< max number of times that the shm locking can fail*/
+#define MAX_PROC_TO_PRINT 10 /**< max number of processes to print*/
 
 /*SIMULATION END TYPES*/
 /*! \enum SIMULATION_END_TYPE
