@@ -35,20 +35,20 @@ void shm_conf_print(struct shm_conf *self);
 
 /**
  * Copy the two pointers given into 2d pointer
- * @param snapshot the 2d matrix rappresenting the users
+ * @param snapshot pointer to the users snapshot
  * @param pids the pointer that's gonna to fill column 0
  * @param queues_ids  the pointer that's gonna fill column 1
  */
-void shm_copy_snapshots_users(int snapshot[][2], int *pids, int *queues_ids);
+void shm_copy_snapshots_users(int (* snapshot)[2], int *pids, int *queues_ids);
 
 /**
  * Copy the two pointers given into 3d pointer
- * @param snapshot the 3d matrix rappresenting the nodes
+ * @param snapshot pointer to the nodes snapshot
  * @param pids the pointer that's gonna to fill column 0
  * @param queues_ids  the pointer that's gonna fill column 1
  * @param friends the pointer that's gonna fill column 2. If NULL is not filled the column
  */
-void shm_copy_snapshots_nodes(int snapshot[][3], int *pids, int *queues_ids, int *friends);
+void shm_copy_snapshots_nodes(int (* snapshot)[3], int *pids, int *queues_ids, int *friends);
 
 /**
  * @brief Get the queue id from the given shm conf and the pid

@@ -24,9 +24,9 @@ int rand_int_range(int min, int max) {
     return rand() % (max - min + 1) + min;
 }
 int get_rand_one(int n){
-    int i = rand_int(n);
-    while(check_bit(i,0) == 0){
-        i = rand_int(n);
+    int i = rand_int(32);
+    while(check_bit(n,i) == 0){
+        i = rand_int(32);
     }
     return i;
 }

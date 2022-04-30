@@ -19,16 +19,16 @@ void shm_conf_print(struct shm_conf *self) {
     printf("|| nodes_snapshots: %d\n", self->nodes_snapshots[0][0]);
     printf("===========================================\n");
 }
-void shm_copy_snapshots_users(int snapshot[][2], int *pids, int *queues_ids){
-    int row, column;
+void shm_copy_snapshots_users(int (* snapshot)[2], int *pids, int *queues_ids){
+    int row;
     for (row = 0; row < pids[0]+1; row++) {
         snapshot[row][0] = pids[row];
         snapshot[row][1] = queues_ids[row];
     }
 }
 
-void shm_copy_snapshots_nodes(int snapshot[][3], int *pids, int *queues_ids, int *friends){
-    int row, column;
+void shm_copy_snapshots_nodes(int (* snapshot)[3], int *pids, int *queues_ids, int *friends){
+    int row;
     for (row = 0; row < pids[0]+1; row++) {
         snapshot[row][0] = pids[row];
         snapshot[row][1] = queues_ids[row];
@@ -40,7 +40,7 @@ int get_queueid_by_pid(struct shm_conf *self, int pid, Bool in_users){
     int *snapshot;
     int ris = -1;
     if (in_users == TRUE){
-        snapshot = &self->users_snapshots[0][0];
+        snapshot = &self->users_snapshots[1][0];
         for(;snapshot != NULL; snapshot+=2){
             if (*snapshot == pid){
                 ris = *(snapshot+1);
@@ -48,7 +48,7 @@ int get_queueid_by_pid(struct shm_conf *self, int pid, Bool in_users){
             }
         }
     }else{
-        snapshot = &self->nodes_snapshots[0][0];
+        snapshot = &self->nodes_snapshots[1][0];
         for(;snapshot != NULL; snapshot+=3){
             if (*snapshot == pid){
                 ris = *(snapshot+1);
@@ -64,11 +64,11 @@ int get_node_position_by_pid(struct shm_conf *self, int pid){
     int *snapshot;
     int ris = -1;
     snapshot = &(self->nodes_snapshots[0][0]);
-    for(;snapshot != NULL; snapshot+=3){
+    for(ris = 0;snapshot != NULL; snapshot+=3){
         if (*snapshot == pid){
-            ris = *(snapshot+1);
             return ris;
         }
+        ris++;
     }
     return ris;
 }
