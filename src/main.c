@@ -371,8 +371,10 @@ int create_nodes_proc(int *nodes_pids, int *nodes_queues_ids)
 
 void set_signal_handlers(struct sigaction sa)
 {
+#ifdef DEBUG_MAIN
     DEBUG_BLOCK_ACTION_START("SIGNAL HANDLERS");
     DEBUG_NOTIFY_ACTIVITY_RUNNING("SETTING SIGNALS HANDLERS...");
+#endif
     memset(&sa, 0, sizeof(sa)); /*initialize the structure*/
     sa.sa_handler = signals_handler;
     if (sigaction(SIGTSTP, &sa, NULL) < 0 ||
@@ -383,17 +385,21 @@ void set_signal_handlers(struct sigaction sa)
         ERROR_MESSAGE("ERROR SETTING SIGNAL HANDLERS");
         EXIT_PROCEDURE_MAIN(EXIT_FAILURE);
     }
+#ifdef DEBUG_MAIN
     DEBUG_NOTIFY_ACTIVITY_DONE("SETTING HANDLERS DONE");
     DEBUG_BLOCK_ACTION_END();
+#endif
 }
 
 void signals_handler(int signum)
 {
+#ifdef DEBUG_MAIN
+    DEBUG_SIGNAL("SIGNAL RECEIVED", signum);
+#endif
     last_signal = signum;
     int old_errno;
     static int num_inv = 0;
     old_errno = errno;
-    DEBUG_SIGNAL("SIGNAL RECEIVED", signum);
     switch (signum){
     case SIGINT:
     case SIGTERM:
@@ -536,8 +542,10 @@ void free_sysVar()
 
 Bool read_conf(void)
 {
+#ifdef DEBUG_MAIN
     DEBUG_BLOCK_ACTION_START("READING CONF");
     DEBUG_NOTIFY_ACTIVITY_RUNNING("READING CONFIGURATION...");
+#endif
     switch (load_configuration(&simulation_conf))
     {
     case 0:
@@ -555,8 +563,10 @@ Bool read_conf(void)
     default:
         return FALSE;
     }
+#ifdef DEBUG_MAIN
     DEBUG_NOTIFY_ACTIVITY_DONE("READING CONFIGURATION DONE");
     DEBUG_BLOCK_ACTION_END();
+#endif
     return TRUE;
 }
 

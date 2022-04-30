@@ -120,8 +120,9 @@ int main(int arc, char const *argv[])
     /************************************
      *      CONFIGURATION FASE          *
      * **********************************/
-
+#ifdef DEBUG_USER
     DEBUG_MESSAGE("USER STATE IS SET TO INIT");
+#endif
     current_user.exec_state = PROC_STATE_INIT;
 
     /*  VARIABLE INITIALIZATION */
@@ -192,13 +193,17 @@ int main(int arc, char const *argv[])
 
 Bool check_argument(int argc, char const *argv[])
 {
+#ifdef DEBUG_USER
     DEBUG_NOTIFY_ACTIVITY_RUNNING("CHECKING ARGC AND ARGV...");
+#endif
     if (argc < 2)
     {
         ERROR_EXIT_SEQUENCE_USER("MISSING ARGUMENT");
     }
     user_id = atoi(argv[1]);
+#ifdef DEBUG_USER
     DEBUG_NOTIFY_ACTIVITY_DONE("CHECKING ARGC AND ARGV DONE");
+#endif
     return TRUE;
 }
 void connect_to_queues(void)
@@ -319,7 +324,9 @@ void free_sysVar_user()
 
 Bool read_conf()
 {
+#ifdef DEBUG_USER
     DEBUG_NOTIFY_ACTIVITY_RUNNING("LOADING CONFIGURATION...");
+#endif
     switch (load_configuration(&configuration))
     {
     case 0:
@@ -337,7 +344,9 @@ Bool read_conf()
     default:
         return FALSE;
     }
+#ifdef DEBUG_USER
     DEBUG_NOTIFY_ACTIVITY_DONE("CONFIGURATION LOADED");
+#endif
     return TRUE;
 }
 
@@ -372,7 +381,9 @@ int send_to_node(void)
 
 void attach_to_shm_conf(void)
 {
+#ifdef DEBUG_USER
     DEBUG_NOTIFY_ACTIVITY_RUNNING("ATTACHING TO SHM...");
+#endif
     int shm_conf_id; /* id to the shm_conf*/
     shm_conf_id = shmget(SHM_CONFIGURATION, sizeof(struct shm_conf), 0600);
     if (shm_conf_id < 0)
@@ -384,7 +395,9 @@ void attach_to_shm_conf(void)
     {
         ERROR_EXIT_SEQUENCE_USER("IMPOSSIBLE TO CONNECT TO SHM CONF");
     }
+#ifdef DEBUG_USER
     DEBUG_NOTIFY_ACTIVITY_DONE("ATTACHING TO SHM DONE");
+#endif
 }
 
 void generating_transactions(void)

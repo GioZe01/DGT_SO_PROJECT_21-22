@@ -138,7 +138,6 @@ Proc get_proc_from_pid(ProcList self, pid_t pid) {
 
 
 void print_list(ProcList self) {
-    DEBUG_NOTIFY_ACTIVITY_RUNNING("PRINTING PROCESS LIST...");
     mergeSort(&self->first);
     if (self->num_proc > MAX_PROC_TO_PRINT){
         /* Print the min budget */
@@ -164,7 +163,6 @@ void print_list(ProcList self) {
         }
     }
     printf("\n");
-    DEBUG_NOTIFY_ACTIVITY_DONE("PRINTING PROCESS LIST ENDED");
 }
 
 

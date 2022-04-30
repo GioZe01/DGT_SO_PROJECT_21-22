@@ -43,13 +43,14 @@
  * */
 void process_node_transaction(struct node_msg *msg_rep);
 
-/*
+/**
  * If it finds node msg of type TRANSACTION_TYPE it process them
  * and make the aknowledgement adding them to the transaction_pool and the transaction_block if
  * need
  * @param msg_rep the messagge to be loaded if present in the queue
- * */
-void process_simple_transaction_type(struct node_msg *msg_rep);
+ * @return -1 if the transaction is not added to the pool or handled correctly
+ */
+int process_simple_transaction_type(struct node_msg *msg_rep);
 
 /**
  * Advice the users of the processed transactions, both receivers and senders
@@ -110,6 +111,12 @@ void connect_to_queues(void);
  * @return TRUE if succeded, FALSE otherwise
  */
 Bool load_block(void);
+
+/**
+ * @brief Load n simple from the queue of the current node
+ * Where n is chosen randomly between 1 and so_tp_size
+ */
+void load_simple_transaction(struct node_msg * msg_rep);
 
 /**
  * @brief Acquire the semaphore_id related to the node
@@ -224,6 +231,7 @@ int main(int argc, char const *argv[])
          * **************************************/
         while (node_end != 1 && failure_shm < MAX_FAILURE_SHM_LOADING)
         {
+            load_simple_transaction(&msg_rep);
             process_node_transaction(&msg_rep);
             process_simple_transaction_type(&msg_rep);
             if (msg_rep.sender_pid == -1)
@@ -336,6 +344,7 @@ void signals_handler(int signum)
             /**
              * Receive new friends from master and update the friends list
              */
+            printf("\n\n\n\n\n\n\n\n\nNODE MESSAGE ARRIVED\n\n");
             node_msg_receive(queue_node_id,&node_msg, MSG_MASTER_ORIGIN_ID);
             friends = set_one(friends, node_msg.sender_pid);
             break;
@@ -381,7 +390,10 @@ void free_mem_node()
 
 void attach_to_shms(void)
 {
+#ifdef DEBUG_NODE
     DEBUG_NOTIFY_ACTIVITY_RUNNING("ATTACHING TO SHM...");
+#endif
+
     int shm_conf_id = -1; /* id to the shm_conf*/
     shm_conf_id = shmget(SHM_CONFIGURATION, sizeof(struct shm_conf), 0600);
     if (shm_conf_id < 0)
@@ -409,7 +421,9 @@ void attach_to_shms(void)
         advice_master_of_termination(IMPOSSIBLE_TO_CONNECT_TO_SHM);
         ERROR_EXIT_SEQUENCE_NODE("IMPOSSIBLE TO CONNECT TO THE SHM_MASTERBOOK");
     }
+#ifdef DEBUG_NODE
     DEBUG_NOTIFY_ACTIVITY_DONE("ATTACHING TO SHM DONE");
+#endif
 }
 
 void connect_to_queues(void)
@@ -451,7 +465,9 @@ int process_node_block()
 }
 Bool lock_shm_masterbook(void)
 {
+#ifdef DEBUG_NODE
     DEBUG_NOTIFY_ACTIVITY_RUNNING("NODE:= LOCKING THE SHM FOR ADDING THE BLOCK...");
+#endif
     struct timespec trans_proc_sim;
     trans_proc_sim.tv_sec = 0;
     trans_proc_sim.tv_nsec = get_time_processing();
@@ -475,13 +491,17 @@ Bool lock_shm_masterbook(void)
     /*Unloacking the semaphore*/
     unlock_masterbook_cell_access(i_cell_block_list);
     unlock_to_fill_sem();
+#ifdef DEBUG_NODE
     DEBUG_NOTIFY_ACTIVITY_DONE("NODE:= LOCKING THE SHM FOR ADDING THE BLOCK DONE");
+#endif
     return TRUE;
 }
 
 void lock_to_fill_sem(void)
 {
+#ifdef DEBUG_NODE
     DEBUG_NOTIFY_ACTIVITY_RUNNING("NODE:= LOCKING THE SEMAPHORE TO FILL THE SHM...");
+#endif
     while (semaphore_lock(semaphore_to_fill_id, 0) < 0)
     {
         if (errno == EINTR )
@@ -502,7 +522,9 @@ void lock_to_fill_sem(void)
             ERROR_EXIT_SEQUENCE_NODE("ERROR WHILE TRYING TO EXEC LOCK ON TO_FILL ACCESS SEM");
         }
     }
+#ifdef DEBUG_NODE
     DEBUG_NOTIFY_ACTIVITY_DONE("NODE:= LOCKING THE SEMAPHORE TO FILL THE SHM DONE");
+#endif
 }
 
 void lock_masterbook_cell_access(int i_cell_block_list)
@@ -532,7 +554,9 @@ void lock_masterbook_cell_access(int i_cell_block_list)
 
 void unlock_to_fill_sem(void)
 {
+#ifdef DEBUG_NODE
     DEBUG_NOTIFY_ACTIVITY_RUNNING("NODE:= UNLOCKING THE SEMAPHORE TO FILL THE SHM...");
+#endif
     while (semaphore_unlock(semaphore_to_fill_id, 0) < 0)
     {
         if (errno != EINTR)
@@ -540,7 +564,9 @@ void unlock_to_fill_sem(void)
             ERROR_EXIT_SEQUENCE_NODE("ERROR DURING THE UNLOCK OF THE SEMAPHORE");
         }
     }
+#ifdef DEBUG_NODE
     DEBUG_NOTIFY_ACTIVITY_DONE("NODE:= UNLOCKING THE SEMAPHORE TO FILL THE SHM DONE");
+#endif
 }
 
 void unlock_masterbook_cell_access(int i_cell_block_list)
@@ -637,11 +663,13 @@ void adv_users_of_block(void)
     }
     current_node.budget += current_block_reward;
 }
-void process_simple_transaction_type(struct node_msg *msg_rep)
+int process_simple_transaction_type(struct node_msg *msg_rep)
 {
     if (node_msg_receive(queue_node_id, msg_rep, current_node.node_id) == 0)
     {
+#ifdef DEBUG_NODE
         DEBUG_MESSAGE("NODE TRANSACTION TYPE RECEIVED");
+#endif
         if (get_num_transactions(current_node.transactions_pool) < current_node.tp_size){
             queue_append(current_node.transactions_pool, msg_rep->t);
         }
@@ -663,7 +691,9 @@ void process_simple_transaction_type(struct node_msg *msg_rep)
     else
     {
         msg_rep->sender_pid = -1;
+        return -1;
     }
+    return 0;
 }
 
 void process_node_transaction(struct node_msg *msg_rep)
@@ -693,5 +723,12 @@ void process_node_transaction(struct node_msg *msg_rep)
     else
     {
         msg_rep->sender_pid = -1;
+    }
+}
+
+void load_simple_transaction(struct node_msg * msg_rep){
+    int to_load = rand_int_range(0, current_node.tp_size);
+    while (to_load > 0 && process_simple_transaction_type(msg_rep)!=-1){
+        to_load--;
     }
 }
