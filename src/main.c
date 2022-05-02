@@ -259,7 +259,7 @@ int main()
             }
             else if (msg_rep_value == 1){
                 /**TODO: CHECK IF THE MESSAGE IS CORRECT, AND RUN A NEW NODE AND SEND HIM THE GIVEN TRANSACTION*/
-                int new_node_id = shm_conf_pointer->nodes_snapshots[shm_conf_pointer->nodes_snapshots[0][0]][2]+DELTA_NODE_MSG_TYPE;
+                int new_node_id = shm_conf_pointer->nodes_snapshots[shm_conf_pointer->nodes_snapshots[0][0]][1]+DELTA_NODE_MSG_TYPE;
                 int new_node_pid= create_node_proc(new_node_id);
                 int new_node_friends = rand_int_n_exclude(new_node_id, new_node_id, shm_conf_pointer->nodes_snapshots[0][0]);
                 shm_conf_add_node(shm_conf_pointer, new_node_pid,new_node_id, new_node_friends);
@@ -459,7 +459,6 @@ void create_semaphores(void)
     {
         ERROR_EXIT_SEQUENCE_MAIN("IMPOSSIBLE TO CREATE MASTERBOOK SEM");
     }
-    semctl(semaphore_masterbook_id, 0, SETALL, 1);
     DEBUG_NOTIFY_ACTIVITY_DONE("CREATION OF MASTEBOOK ACCESS SEM DONE");
     DEBUG_BLOCK_ACTION_END();
 
@@ -658,7 +657,6 @@ void update_kids_info(void)
     }
     int num_msg_to_wait_for = -1;
     num_msg_to_wait_for = send_sig_to_all(proc_list, SIGUSR2);
-    num_msg_to_wait_for = num_msg_to_wait_for;
     if (num_msg_to_wait_for < 0)
     {
         ERROR_MESSAGE("IMPOSSIBLE TO UPDATE KIDS INFO");
@@ -695,22 +693,18 @@ void update_kids_info(void)
 Bool check_runnability()
 {
     int num_user_proc_running = get_num_of_user_proc_running(proc_list);
-    lock_to_fill_sem();
     if (shm_masterbook_pointer->to_fill >= SO_REGISTRY_SIZE)
     {
         simulation_end = SIMULATION_END_BY_SO_REGISTRY_FULL;
-        unlock_to_fill_sem();
         return FALSE;
     }
     else if (num_user_proc_running <= 0)
     {
         simulation_end = SIMULATION_END_BY_NO_PROC_RUNNING;
-        unlock_to_fill_sem();
         return FALSE;
     }
     else
     {
-        unlock_to_fill_sem();
         return TRUE;
     }
 }
