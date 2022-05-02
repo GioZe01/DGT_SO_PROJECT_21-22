@@ -45,6 +45,7 @@ int rand_int_n_exclude(int n, int exclude, int max);
  * @brief Return the position of a randomly chosen 1 in the given number
  * @param n The number
  * @return The position of a randomly chosen 1 in the given number
+ * @warning rand is done on 32 bits
  */
 int get_rand_one(int n);
 

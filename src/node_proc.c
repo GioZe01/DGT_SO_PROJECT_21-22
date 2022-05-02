@@ -176,6 +176,7 @@ struct node current_node;                       /* Current representation of the
 struct conf node_configuration;                 /* Configuration File representation*/
 struct shm_conf *shm_conf_pointer_node;         /* Ref to the shm for configuration of the node*/
 struct shm_book_master *shm_masterbook_pointer; /* Ref to the shm for the masterbook shm */
+int number_of_insertion = 0;                    /* Number of insertion in the masterbook shm TODO: To remove*/
 
 int main(int argc, char const *argv[])
 {
@@ -229,8 +230,13 @@ int main(int argc, char const *argv[])
         /****************************************
          *   PROCESSING OF TRANSACTION FASE     *
          * **************************************/
+        alarm(1);
         while (node_end != 1 && failure_shm < MAX_FAILURE_SHM_LOADING)
         {
+            if (current_node.node_id == 6){
+                printf("node id %d\n", current_node.node_id);
+                printf("\n[%d] current number of transactions in the node: %d\n", current_node.node_id, get_num_transactions(current_node.transactions_pool));
+            }
             load_simple_transaction(&msg_rep);
             process_node_transaction(&msg_rep);
             process_simple_transaction_type(&msg_rep);
@@ -331,14 +337,16 @@ void signals_handler(int signum)
             break;
         case SIGALRM:
             alarm (1);
-            /**
-             * select a transaction from the pool and send it to a friend node into the message queue
-             */
-            int node_id = rand_int_n_pos(friends);
-            t = queue_head(current_node.transactions_pool);
-            node_msg_snd(queue_node_id, &node_msg, MSG_NODE_ORIGIN_TYPE, &t, current_node.pid, TRUE, node_configuration.so_retry, shm_conf_pointer_node->nodes_snapshots[node_id][2]);
-            printf("NODE %d SENT TRANSACTION %f TO NODE %d\n", current_node.node_id, t.amount, node_id);
-            queue_remove_head(current_node.transactions_pool);
+            if (get_num_transactions(current_node.transactions_pool) > 0)
+            {
+                /**
+                 * select a transaction from the pool and send it to a friend node into the message queue
+                 */
+                int friend = shm_conf_pointer_node->nodes_snapshots[get_rand_one(friends)][1];
+                t = queue_head(current_node.transactions_pool);
+                node_msg_snd(queue_node_id, &node_msg, MSG_NODE_ORIGIN_TYPE, &t, current_node.node_id, TRUE,node_configuration.so_retry,friend);
+                queue_remove_head(current_node.transactions_pool);
+            }
             break;
         case SIGUSR1:
             /**
@@ -482,7 +490,9 @@ Bool lock_shm_masterbook(void)
     queue_to_array(current_node.transactions_block, block_list);
     if (insert_block(shm_masterbook_pointer, block_list) == 0)
     {
+        number_of_insertion++;
         current_node.budget += current_block_reward;
+/*        printf("\n\n Node %d number of inserton = %d\n\n", current_node.node_id, number_of_insertion);*/
     }
     else
     {
@@ -678,9 +688,7 @@ int process_simple_transaction_type(struct node_msg *msg_rep)
             /**TP_SIZE FULL
              * Sending the transaction to a friend
              */
-            printf("TP_SIZE FULL\n");
             int friend = shm_conf_pointer_node->nodes_snapshots[get_rand_one(friends)][1];
-            printf( "SENDING TO FRIEND %d\n", friend);
             node_msg_snd(queue_node_id, msg_rep, MSG_NODE_ORIGIN_TYPE, &msg_rep->t, current_node.node_id, TRUE,node_configuration.so_retry,friend);
         }else{
             /*TP_SIZE FULL AND HOPS EXCEEDED
@@ -713,7 +721,8 @@ void process_node_transaction(struct node_msg *msg_rep)
              * Sending the transaction to a friend
              */
             printf("TP_SIZE FULL NODE\n");
-            node_msg_snd(queue_node_id, msg_rep, MSG_NODE_ORIGIN_TYPE, &msg_rep->t, current_node.node_id, TRUE,node_configuration.so_retry,shm_conf_pointer_node->nodes_snapshots[get_rand_one(friends)][2]);
+            int friend = shm_conf_pointer_node->nodes_snapshots[get_rand_one(friends)][1];
+            node_msg_snd(queue_node_id, msg_rep, MSG_NODE_ORIGIN_TYPE, &msg_rep->t, current_node.node_id, TRUE,node_configuration.so_retry,friend);
         }else{
             /*TP_SIZE FULL AND HOPS EXCEEDED
              * Reporting the transaction to the master

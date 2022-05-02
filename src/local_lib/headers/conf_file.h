@@ -38,7 +38,7 @@ struct conf
  * 2) -2 if a params does't respect type def. or some internal logic of the simulations ex: no budgets
  * 3) -3 if at least two users and one node
  * 4) -4 min max not respected in time params
- * 5) -5 if node rewards is max for budget init; TODO: vedere se si vuole bloccare fin da subito considerando worst case e se negative buget safe è da fare o no
+ * 5) -5 if node rewards is max for budget init. Or so_num_friends > MAX_FRIENDS
  */
 int load_configuration(struct conf *self);
 

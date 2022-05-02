@@ -28,6 +28,9 @@ int get_rand_one(int n){
     while(check_bit(n,i) == 0){
         i = rand_int(32);
     }
+    if (i == 0) {
+        return 1;
+    }
     return i;
 }
 

@@ -439,7 +439,7 @@ void generating_transactions(void)
          * TODO: check for the retry to send : can do with while then abort and notify master
          * */
 #endif
-            nanosleep(&gen_sleep, (void *)NULL);
+        nanosleep(&gen_sleep, (void *)NULL);
         }
     }
 

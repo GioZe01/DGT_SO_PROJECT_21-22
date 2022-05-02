@@ -653,7 +653,9 @@ void update_kids_info(void)
     DEBUG_BLOCK_ACTION_START("UPDATE KIDS INFO");
     DEBUG_NOTIFY_ACTIVITY_RUNNING("UPDATING KIDS INFO....");
     struct master_msg_report *msg_rep = (struct master_msg_report *)malloc(sizeof(struct master_msg_report));
-    check_msg_report(msg_rep, msg_report_id_master, proc_list);
+    if (check_msg_report(msg_rep, msg_report_id_master, proc_list)==1){
+        ERROR_MESSAGE("MESSAGE TP FULL ACKNOWLEDGED\n");
+    }
     int num_msg_to_wait_for = -1;
     num_msg_to_wait_for = send_sig_to_all(proc_list, SIGUSR2);
     num_msg_to_wait_for = num_msg_to_wait_for;
@@ -676,13 +678,15 @@ void update_kids_info(void)
 #ifdef DEBUG_MAIN
             master_msg_report_print(msg_rep);
 #endif
-            Proc proc_to_update = get_proc_from_pid(proc_list, msg_rep->sender_pid);
-            if (proc_to_update != NULL)
-            {
-                proc_to_update->budget = msg_rep->budget;
-                proc_to_update->proc_state = msg_rep->state;
+            if (acknowledge(msg_rep, proc_list) == 1){
+                ERROR_MESSAGE("MESSAGE TP FULL ACKNOWLEDGED\n");
             }
             num_msg_to_wait_for--;
+        }else{
+            if (check_msg_report(msg_rep, msg_report_id_master, proc_list)==1){
+                ERROR_MESSAGE("MESSAGE TP FULL ACKNOWLEDGED\n");
+            }
+            num_msg_to_wait_for = send_sig_to_all(proc_list, SIGUSR2);
         }
     } while (num_msg_to_wait_for > 0);
     DEBUG_NOTIFY_ACTIVITY_DONE("RETRIVING INFO DONE");
@@ -748,6 +752,7 @@ void generate_nodes_friends_array(int * nodes_friends, int * nodes){
     }
 }
 int create_node_proc(int new_node_id){
+    printf("\n\n\nCREATING NODE %d\n", new_node_id);
     pid_t new_node_pid;
     char * argv_node[]={PATH_TO_NODE, NULL,NULL};
     /*Add the new node id to argv_node and run the new node process*/

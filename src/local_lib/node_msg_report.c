@@ -43,7 +43,7 @@ void node_msg_print(struct node_msg *self) {
 
 int node_msg_snd(int id, struct node_msg *msg, long type, struct Transaction *t, pid_t sender, Bool create, int so_retry, int queue_id) {
     int retry = 0;
-    if (create == TRUE) { node_msg_create(msg, check_default(type,queue_id), sender, t, (type == MSG_NODE_ORIGIN_TYPE) ? TRUE: FALSE); }
+    if (create == TRUE) { node_msg_create(msg, check_default(type,queue_id), sender, t, type); }
     while (msgsnd(id, msg, sizeof(struct node_msg) - sizeof(long), 0) < 0 && retry <= so_retry ) {
         if (errno != EINTR) return -1;
         retry++;
