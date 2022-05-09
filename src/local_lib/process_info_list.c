@@ -190,7 +190,6 @@ int send_sig_to_all(ProcList proc_list, int signal) {
     struct node *tmp = proc_list->first;
     int num_proc_reciver = 0;
     for (; tmp != NULL; tmp = tmp->next) {
-        printf ("Sending signal %d to pid %d\n", signal, tmp->p->pid);
         if (tmp->p->proc_state == PROC_STATE_RUNNING && (kill(tmp->p->pid, signal) >= 0 || errno == ESRCH)) {
             /**
              * errno == ESRCH is allowed because it might be that the proc intrest is terminated and

@@ -21,7 +21,7 @@ void shm_conf_print(struct shm_conf *self) {
 }
 void shm_copy_snapshots_users(int (* snapshot)[2], int *pids, int *queues_ids){
     int row;
-    for (row = 1; row < pids[0]+1; row++) {
+    for (row = 0; row < pids[0]+1; row++) {
         snapshot[row][0] = pids[row];
         snapshot[row][1] = queues_ids[row];
     }
@@ -29,7 +29,7 @@ void shm_copy_snapshots_users(int (* snapshot)[2], int *pids, int *queues_ids){
 
 void shm_copy_snapshots_nodes(int (* snapshot)[3], int *pids, int *queues_ids, int *friends){
     int row;
-    for (row = 1; row < pids[0]+1; row++) {
+    for (row = 0; row < pids[0]+1; row++) {
         snapshot[row][0] = pids[row];
         snapshot[row][1] = queues_ids[row];
         snapshot[row][2] = friends[row];

@@ -168,20 +168,21 @@ pid_t main_pid;                                 /*pid of the current proc*/
 Bool printed = FALSE;
 
 int main() {
+    /*  Local Var Declaration   */
+    struct sigaction sa; /*Structure for handling signals */
+    struct master_msg_report msg_repo;
+    int *users_pids;       /*in 0 position is saved the actual size of the array of pids saved in the pointer*/
+    int *nodes_pids;       /*in 0 position is saved the actual size of the array of pids saved in the pointer*/
+    int *users_queues_ids; /*in 0 position is saved the actual size of the array of ids saved in the pointer*/
+    int *nodes_queues_ids; /*in 0 position is saved the actual size of the array of ids saved in the pointer*/
+    int number_of_nodes = -1; /*Number of nodes in the network*/
     main_pid = getpid();
     if (read_conf() == TRUE) {
-        /*  Local Var Declaration   */
-        struct sigaction sa; /*Structure for handling signals */
-        struct master_msg_report msg_repo;
-        int *users_pids;       /*in 0 position is saved the actual size of the array of pids saved in the pointer*/
-        int *nodes_pids;       /*in 0 position is saved the actual size of the array of pids saved in the pointer*/
-        int *users_queues_ids; /*in 0 position is saved the actual size of the array of ids saved in the pointer*/
-        int *nodes_queues_ids; /*in 0 position is saved the actual size of the array of ids saved in the pointer*/
         /* Pointers allocation  */
-        users_pids = (int *) malloc(sizeof(int) * (simulation_conf.so_user_num + 1));
-        nodes_pids = (int *) malloc(sizeof(int) * (simulation_conf.so_nodes_num + 1));
-        users_queues_ids = (int *) malloc(sizeof(int) * (simulation_conf.so_user_num + 1));
-        nodes_queues_ids = (int *) malloc(sizeof(int) * (simulation_conf.so_nodes_num + 1));
+        users_pids = malloc(sizeof(int) * (simulation_conf.so_user_num + 1));
+        nodes_pids = malloc(sizeof(int) * (simulation_conf.so_nodes_num + 1));
+        users_queues_ids = malloc(sizeof(int) * (simulation_conf.so_user_num + 1));
+        nodes_queues_ids = malloc(sizeof(int) * (simulation_conf.so_nodes_num + 1));
         /************************************
          *      CONFIGURATION FASE          *
          * ***********************************/
@@ -212,15 +213,17 @@ int main() {
         if (create_nodes_proc(nodes_pids, nodes_queues_ids) < 0) {
             ERROR_MESSAGE("IMPOSSIBLE TO CREATE NODES PROC");
         }
-        /**
-         * Generate the array of friends for each nodes and save it into a local array
-         */
+
         DEBUG_BLOCK_ACTION_END();
         DEBUG_NOTIFY_ACTIVITY_RUNNING("SHM INITIALIZING...");
         /*-------------------------------*/
         /*  INITIALIZING THE SHM         */
         /*-------------------------------*/
-        int *nodes_friends = malloc(sizeof(int) * nodes_queues_ids[0] +1);
+        number_of_nodes = nodes_queues_ids[0];
+        if (number_of_nodes < 0) {
+            ERROR_EXIT_SEQUENCE_MAIN("IMPOSSIBLE TO CREATE NODES FRIENDS");
+        }
+        int *nodes_friends = malloc(sizeof(int) * (number_of_nodes + 1));
         generate_nodes_friends_array(nodes_friends, nodes_queues_ids);
         if (shm_conf_create(shm_conf_pointer, users_pids, users_queues_ids, nodes_pids, nodes_queues_ids,
                             nodes_friends) < 0) {
@@ -405,6 +408,7 @@ void signals_handler(int signum) {
         case SIGALRM:
             if (getpid() == main_pid) {
                 num_inv++;
+                printf("\n%d\n", num_inv);
                 /*request info from kids */
                 update_kids_info();
                 print_info();
@@ -642,6 +646,7 @@ void update_kids_info(void) {
             num_msg_to_wait_for--;
         }
     } while (num_msg_to_wait_for > 0);
+    free(msg_rep);
     DEBUG_NOTIFY_ACTIVITY_DONE("RETRIVING INFO DONE");
 }
 

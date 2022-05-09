@@ -105,9 +105,13 @@ int generate_transaction(struct user_transaction *self, pid_t user_proc_pid, str
             return -1;
         }
         int receiver = extract_user(shm_conf->users_snapshots);
+        if (receiver == -1) {
+            return -1;
+        }
         while (receiver == self->pid) {
             receiver = extract_user(shm_conf->users_snapshots);
         }
+
         if (create_transaction(&t, user_proc_pid, receiver, amount) <
             0) {
             ERROR_MESSAGE("FAILED ON TRANSACTION CREATION");
@@ -130,6 +134,9 @@ int generate_transaction(struct user_transaction *self, pid_t user_proc_pid, str
 
 pid_t extract_user(int users_num[][2]) {
     /* DEBUG_NOTIFY_ACTIVITY_RUNNING("EXTRACTING USER FROM SNAPSHOTS...");*/
+    if (users_num[0][0] == 0) {
+        return -1;
+    }
     int max = users_num[0][0];
     int e = (rand() % max) + 1;
     /*DEBUG_NOTIFY_ACTIVITY_DONE("EXTRACTING USER FROM SNAPSHOTS DONE");*/

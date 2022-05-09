@@ -175,7 +175,6 @@ int main(int arc, char const *argv[]) {
          * **************************************/
         while (current_user.exec_state == PROC_STATE_RUNNING) {
             generating_transactions();
-            printf("\n Dio cane");
             getting_richer();
         }
         /*TODO: check for remaining transaction confirmed*/
@@ -250,7 +249,9 @@ void signals_handler_user(int signum) {
             DEBUG_NOTIFY_ACTIVITY_DONE("GENERATING A NEW TRANSACTION FROM SIG DONE");
             break;
         case SIGUSR2:
-            printf("\n\n MESSAGE SENT current user: %d  budget: %f entries: %f outcomes: %f expect_out : %f\n", current_user.pid, current_user.budget, current_user.cash_flow.entries, current_user.cash_flow.outcomes, current_user.expected_out);
+            printf("\n\n MESSAGE SENT current user: %d  budget: %f entries: %f outcomes: %f expect_out : %f\n",
+                   current_user.pid, current_user.budget, current_user.cash_flow.entries,
+                   current_user.cash_flow.outcomes, current_user.expected_out);
             t = create_empty_transaction();
             printf("\n\n current user: %d  budget: %f entries: %f outcomes: %f expect_out : %f\n", current_user.pid,
                    current_user.budget, current_user.cash_flow.entries, current_user.cash_flow.outcomes,
@@ -280,7 +281,7 @@ void advice_master_of_termination(long termination_type) {
         ERROR_MESSAGE(error_string);
     }
 #ifdef DEBUG_USER
-    DEBUG_NOTIFY_ACTIVITY_DONE("{DEBUG_USER}:= ADVICING MASTER OF TERMINATION DONE");
+        DEBUG_NOTIFY_ACTIVITY_DONE("{DEBUG_USER}:= ADVICING MASTER OF TERMINATION DONE");
 #endif
     DEBUG_NOTIFY_ACTIVITY_DONE("{DEBUG_USER}:= ADVICING MASTER OF TERMINATION DONE");
 }
@@ -374,8 +375,6 @@ void generating_transactions(void) {
     struct timespec gen_sleep;
     int failed_gen_trans = 0;
     while (failed_gen_trans < configuration.so_retry && current_user.budget >= 0) {
-
-
 #ifdef DEBUG_USER
         DEBUG_MESSAGE("TRANSACTION ALLOWED");
 #endif
@@ -385,7 +384,6 @@ void generating_transactions(void) {
 
         if (generate_transaction(&current_user, current_user.pid, shm_conf_pointer) < 0) {
             failed_gen_trans++;
-
 #ifdef DEBUG_USER
             ERROR_MESSAGE("IMPOSSIBLE TO GENERATE TRANSACTION"); /*TODO: can be a simple advice, not a critical one*/
 #endif
@@ -403,9 +401,11 @@ void generating_transactions(void) {
                 ERROR_MESSAGE("IMPOSSIBLE TO SEND TO THE NODE");
 #endif
             }
-        }
+
 #endif
-        nanosleep(&gen_sleep, (void *) NULL);
+
+            nanosleep(&gen_sleep, (void *) NULL);
+        }
     }
 }
 
