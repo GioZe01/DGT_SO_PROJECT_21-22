@@ -17,6 +17,6 @@
  * and reset to IS_EMPTY from the reader, in order to make data consistent.
  */
 struct node_block{
-    struct Transaction block_t[SO_BLOCK_SIZE]; /**!< Array of transactions */
+    struct Transaction block_t[SO_BLOCK_SIZE]; /**! Array of transactions */
 };
 #endif/*DGT_SO_PROJECT_21_22_NODE_TP_SHM_H*/

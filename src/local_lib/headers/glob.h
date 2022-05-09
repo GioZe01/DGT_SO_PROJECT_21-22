@@ -14,8 +14,9 @@
 
 /**! \defgroup NUM LIMIT OF PROCS
  *  \brief defines the number of processes
- *  \{
  */
+/**@{*/
+
 /*! \def USERS_MAX
  * \brief The number of processes that can be created
  */
@@ -24,8 +25,8 @@
  * \brief The number of processes that can be created
  */
 #define NODES_MAX 100
-/**! \} */
-
+/**@} */
+/**#{main}*/
 
 /**! \defgroup SINCRONIZATION KEY
  * \brief The key used to synchronize the processes
@@ -112,6 +113,7 @@
 
 /**! \defgroup AT COMPILATION TIME DEFINITION
  * \brief The definition of the variables at compilation time modified by the user
+ *
  */
 /**@{*/
 /**! \def SO_REGISTRY_SIZE
@@ -128,7 +130,7 @@
 #endif
 /**@}*/
 /*  GENERAL UTILITY MACROS*/
-#define REALLOC_MARGIN 10 /**< delta in wich is not usefull to realloc TODO: make a function that calculate it*/
+#define REALLOC_MARGIN 10 /*!< delta in wich is not usefull to realloc TODO: make a function that calculate it*/
 #define MAX_FAILURE_SHM_LOADING 1000 /**< max number of times that the shm loading can fail*/
 #define MAX_UNSED_CICLE_OF_NODE_PROC 10000000 /**< max number of times that the node process can be unused*/
 #define MAX_WAITING_TIME_FOR_UPDATE 10000 /**< max number of times for updating a specific sys call*/
@@ -140,7 +142,7 @@
 /*! \enum SIMULATION_END_TYPE
  * \brief The type of the simulation that can occured
  */
-enum SIMULATION_END_TYPE{
+enum SIMULATION_END_TYPE {
     SIMULATION_END_BY_USER, /**< The simulation is ended by the user*/
     SIMULATION_END_BY_TIME, /**< The simulation is ended by the time*/
     SIMULATION_END_BY_SO_REGISTRY_FULL, /**< The simulation is ended by the registry full*/

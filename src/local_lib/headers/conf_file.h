@@ -5,7 +5,7 @@
 
 #include "boolean.h"
 
-#define CONFIGURATION_FILE_PATH "conf"
+#define CONFIGURATION_FILE_PATH "/home/golia/CLionProjects/DGT_SO_PROJECT_21-22/conf"
 
 struct conf
 {

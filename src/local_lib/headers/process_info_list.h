@@ -10,34 +10,48 @@ typedef enum {
     PROC_TYPE_USER, PROC_TYPE_NODE,
 } PROCTYPE;
 
-struct ProcessInfo{
+struct ProcessInfo {
     pid_t pid;
     int id_queue;/*Id for calculating range type of a user*/
     short int proc_state;
     short int proc_type;
     float budget;/*TODO: verificare se basta*/
 };
-typedef struct ProcessInfo * Proc;
-typedef struct processes_info_list * ProcList;
+typedef struct ProcessInfo *Proc;
+typedef struct processes_info_list *ProcList;
 
 /**
  * Create the ProcList Linked list
- * @return the linked list created
- * */
+ * @param list the list to be created
+ * @return FALSE if the list is not created, TRUE otherwise
+ */
 ProcList proc_list_create();
+
+/**
+ * Create and initialize a new Proc
+ * @param pid the pid of the proc
+ * @param id_queue the id of the queue of the proc
+ * @param proc_state the state of the proc
+ * @param proc_type the type of the proc
+ * @param budget the budget of the proc
+ * @return the new proc
+ */
+Proc proc_create(pid_t pid, int id_queue, short int proc_state, short int proc_type, float budget);
+
 /**
  * Insert the new process and initialize it in running mode
  * @param self the next of the list to be linked with
- * @param pid process id of the proc to be rappresented int the struct list
- * @param type proc_type ex: PROC_TYPE_USER or PROC_TYPE_NODE
- * @return the new linked list with the structure inserted
+ * @param proc the proc to be inserted
+ * @return FALSE if the process is not inserted, TRUE otherwise
  */
-void insert_in_list(ProcList self, pid_t pid, short int type, int id_queue);
+Bool insert_in_list(ProcList self, Proc proc);
+
 /**
  * Check if the ProcList is empty
  * @return TRUE if is empty, FALSE otherwise
  * */
 Bool proc_list_is_empty(const ProcList self);
+
 /**
  * Return the process inside the list associated with the pid given as param
  * @param self the list to search in
@@ -45,6 +59,7 @@ Bool proc_list_is_empty(const ProcList self);
  * @return the element with the specified pid if found. Otherwise NULL
  */
 Proc get_proc_from_pid(ProcList self, pid_t pid);
+
 /**
  * Return the process inside the list associated with the id_queue given as param
  * @param self the list to search in
@@ -52,13 +67,14 @@ Proc get_proc_from_pid(ProcList self, pid_t pid);
  * @return the element with the specified pid if found. Otherwise NULL
  */
 Proc get_proc_from_queue_id(ProcList self, int id_queue);
+
 /**
  * Send the given signal to all proc saved via kill() method
  * @param proc_list the list of proced to receive the signal
  * @param signal signal to be sent
  * @return -1 in case of failure. the number of proc to wait responce for
  */
-int send_sig_to_all(ProcList proc_list,int signal);
+int send_sig_to_all(ProcList proc_list, int signal);
 
 /**
  * Send the given signal to the process with type node
@@ -67,7 +83,7 @@ int send_sig_to_all(ProcList proc_list,int signal);
  * @param exclude_last if TRUE the last node will not receive the signal
  * @return -1 in case of failure. the number of proc to wait responce for
  */
-int send_sig_to_all_nodes(ProcList proc_list,int signal, Bool exclude_last);
+int send_sig_to_all_nodes(ProcList proc_list, int signal, Bool exclude_last);
 
 /**
  * Print at console the specified list if the list is too big (MAX_PROC_TO_PRINT into glob.h) it will print the processes with the highest budget
@@ -81,6 +97,7 @@ void print_list(ProcList self);
  * @param self ref. to the list to free
  */
 void list_free(ProcList self);
+
 /**
  * Change the flag state of a record in the list
  * @param self ref. of the list
@@ -122,6 +139,6 @@ int get_num_of_user_proc_running(ProcList self);
  * @exclude_last exclude the last node from the list
  * @return FALSE in case of FAILURE, TRUE otherwise
  */
-Bool send_msg_to_all_nodes(int queue_id,int retry,  ProcList proc_list, int node_id, Bool exclude_last);
+Bool send_msg_to_all_nodes(int queue_id, int retry, ProcList proc_list, int node_id, Bool exclude_last);
 /*TODO: implementare budget maggiore get -> vedere se fare una hash table di processi*/
 #endif /*DGT_SO_PROJECT_21_22_PROCESS_INFO_LIST_H*/
