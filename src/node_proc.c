@@ -88,7 +88,7 @@ Bool read_conf_node();
  * @param sigmask the mask to be applied
  * @return FALSE in case of FAILURE, TRUE otherwise
  */
-Bool set_signal_handler_node(struct sigaction sa, sigset_t sigmask);
+Bool set_signal_handler_node(struct sigaction sa, sigset_t sig_mask);
 
 /**
  * Check the argc and argv to match with project specification
@@ -173,7 +173,6 @@ void advice_master_of_termination(long termination_type);
 long int get_time_processing(void);
 
 /* SysVar */
-int shm_tp_id = -1;               /* Id of node_tp_shm*/
 int semaphore_start_id = -1;      /*Id of the start semaphore arrays for sinc*/
 int semaphore_masterbook_id = -1; /*Id of the masterbook semaphore for accessing the block matrix*/
 int semaphore_to_fill_id = -1;    /* Id of the masterbook to_fill access semaphore*/
@@ -194,7 +193,6 @@ int number_of_insertion = 0;                    /* Number of insertion in the ma
 int main(int argc, char const *argv[]) {
     DEBUG_MESSAGE("NODE PROCESS STARTED");
     struct sigaction sa;
-    sigset_t sigmask;
     int failure_shm = 0;
     DEBUG_MESSAGE("NODE STATE SET TO INIT");
     current_node.exec_state = PROC_STATE_INIT;
@@ -205,7 +203,7 @@ int main(int argc, char const *argv[]) {
     read_conf_node(&node_configuration);
     node_create(&current_node, getpid(), -1, 0, node_configuration.so_tp_size, SO_BLOCK_SIZE,
                 node_configuration.so_reward, (Reward) &calc_reward);
-    if (check_arguments(argc, argv) && set_signal_handler_node(sa, sigmask)) {
+    if (check_arguments(argc, argv) && set_signal_handler_node(sa, current_mask)) {
         struct node_msg msg_rep;
         int is_unsed_node = 0;
         /*-----------------------*/
@@ -302,11 +300,11 @@ Bool check_arguments(int argc, char const *argv[]) {
     return TRUE;
 }
 
-Bool set_signal_handler_node(struct sigaction sa, sigset_t sigmask) {
+Bool set_signal_handler_node(struct sigaction sa, sigset_t sig_mask) {
     DEBUG_NOTIFY_ACTIVITY_RUNNING("SETTING SIGNAL HANDLER...");
     memset(&sa, 0, sizeof(sa));
     sa.sa_handler = signals_handler;
-    sa.sa_mask = sigmask;
+    sa.sa_mask = sig_mask;
     if (sigaction(SIGINT, &sa, NULL) < 0 ||
         sigaction(SIGALRM, &sa, NULL) < 0 ||
         sigaction(SIGUSR1, &sa, NULL) < 0 ||
@@ -332,7 +330,6 @@ void signals_handler(int signum) {
             EXIT_PROCEDURE_NODE(0);
             break;
         case SIGALRM:
-            alarm(1);
             if (get_num_transactions(current_node.transactions_pool) > 0) {
                 /**
                  * select a transaction from the pool and send it to a friend node into the message queue
@@ -343,6 +340,7 @@ void signals_handler(int signum) {
                              node_configuration.so_retry, friend);
                 queue_remove_head(current_node.transactions_pool);
             }
+            alarm(1);
             break;
         case SIGUSR1:
             /**
@@ -558,14 +556,14 @@ Bool load_block(void) {
     if (queue_is_empty(current_node.transactions_block) == FALSE ||
         get_num_transactions(current_node.transactions_pool) < SO_BLOCK_SIZE) {
 
-        ris= FALSE;
+        ris = FALSE;
     }
     /*Loading the transactions from the pool to the block*/
     if (queue_copy_n_transactions(current_node.transactions_pool, current_node.transactions_block, SO_BLOCK_SIZE) ==
         TRUE) {
-        ris= TRUE;
+        ris = TRUE;
     } else
-        ris= FALSE;
+        ris = FALSE;
     /* Unblock signal */
     unblock_signal(SIGALRM);
     unblock_signal(SIGUSR2);
@@ -652,7 +650,6 @@ int process_simple_transaction_type(struct node_msg *msg_rep) {
             /*TP_SIZE FULL AND HOPS EXCEEDED
              * Reporting the transaction to the master
              */
-            printf("TP_SIZE FULL AND HOPS EXCEEDED\n");
             struct master_msg_report master_msg;
             master_msg_send(queue_master_id, &master_msg, TP_FULL, NODE, current_node.pid, current_node.exec_state,
                             TRUE, current_node.budget, &msg_rep->t);

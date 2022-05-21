@@ -126,7 +126,7 @@ Bool read_conf(void);
  * Set the handler for signals of the current main_proc
  * @param sa  describe the type of action to performed when a signal arrive
  */
-void set_signal_handlers(struct sigaction sa);
+void set_signal_handlers(struct sigaction sa, sigset_t sig_mask);
 
 /**
  * handler of the signal
@@ -149,9 +149,28 @@ void lock_to_fill_sem(void);
  */
 void unlock_to_fill_sem(void);
 
+/**
+ * @brief Block the given signal
+ * @param sig signal to be blocked
+ */
+void block_signal(int sig);
+
+/**
+ * @brief Unblock the given signal
+ * @param sig signal to be unblocked
+ */
+void unblock_signal(int sig);
+
+/**
+ * @brief handle the message queue of type TP_FULL
+ * @param msg_repo message to be handled
+ */
+void tp_full_handler(struct master_msg_report msg_repo);
+
 /* Variables*/
-struct conf simulation_conf;                    /**< Structure representing the configuration present in the conf file*/
-ProcList proc_list;                             /**< Pointer to a linked list of all proc generated*/
+struct conf simulation_conf;                    /* Structure representing the configuration present in the conf file*/
+ProcList proc_list;                             /* Pointer to a linked list of all proc generated*/
+sigset_t current_mask;                          /* Current mask of the node*/
 struct shm_conf *shm_conf_pointer;              /* Pointer to the shm_conf structure in shared memory*/
 struct shm_book_master *shm_masterbook_pointer; /* Pointer to the shm_masterbook structure in shared memory*/
 int simulation_end = -1;                        /* For value different >= 0 the simulation must end*/
@@ -165,7 +184,6 @@ int semaphore_masterbook_id = -1;               /* Id of the masterbook semaphor
 int semaphore_to_fill_id = -1;                  /* Id of the masterbook to_fill access semaphore*/
 int last_signal = -1;                           /* Last signal received*/
 pid_t main_pid;                                 /*pid of the current proc*/
-Bool printed = FALSE;
 
 int main() {
     /*  Local Var Declaration   */
@@ -187,7 +205,7 @@ int main() {
          *      CONFIGURATION FASE          *
          * ***********************************/
         proc_list = proc_list_create();
-        set_signal_handlers(sa);
+        set_signal_handlers(sa, current_mask);
         create_semaphores();
         create_masterbook();
         create_shm_conf();
@@ -253,21 +271,8 @@ int main() {
                 ERROR_MESSAGE("IMPOSSIBLE TO RUN SIMULATION");
                 end_simulation();
             } else if (msg_rep_value == 1) {
-                /**TODO: CHECK IF THE MESSAGE IS CORRECT, AND RUN A NEW NODE AND SEND HIM THE GIVEN TRANSACTION*/
-                int new_node_id = shm_conf_pointer->nodes_snapshots[shm_conf_pointer->nodes_snapshots[0][0]][1] +
-                                  DELTA_NODE_MSG_TYPE;
-                int new_node_pid = create_node_proc(new_node_id);
-                int new_node_friends = rand_int_n_exclude(new_node_id, new_node_id,
-                                                          shm_conf_pointer->nodes_snapshots[0][0]);
-                shm_conf_add_node(shm_conf_pointer, new_node_pid, new_node_id, new_node_friends);
-                struct node_msg node_msg;
-                node_msg.t.hops = 0;
-                node_msg_snd(msg_report_id_nodes, &node_msg, MSG_TRANSACTION_TYPE, &msg_repo.t, main_pid, TRUE,
-                             simulation_conf.so_retry, new_node_id);
-                /*Send the signal SIGUSR1 to all the nodes*/
-                send_sig_to_all_nodes(proc_list, SIGUSR1, TRUE);
-                send_msg_to_all_nodes(new_node_id, simulation_conf.so_retry, proc_list,
-                                      shm_conf_pointer->nodes_snapshots[0][0], TRUE);
+                tp_full_handler(msg_repo);
+
             } else if (msg_rep_value == 2) {
                 printf("\n");
                 printf("called\n");
@@ -369,13 +374,14 @@ int create_nodes_proc(int *nodes_pids, int *nodes_queues_ids) {
     return 0;
 }
 
-void set_signal_handlers(struct sigaction sa) {
+void set_signal_handlers(struct sigaction sa, sigset_t sig_mask) {
 #ifdef DEBUG_MAIN
     DEBUG_BLOCK_ACTION_START("SIGNAL HANDLERS");
     DEBUG_NOTIFY_ACTIVITY_RUNNING("SETTING SIGNALS HANDLERS...");
 #endif
     memset(&sa, 0, sizeof(sa)); /*initialize the structure*/
     sa.sa_handler = signals_handler;
+    sa.sa_mask = sig_mask;
     if (sigaction(SIGTSTP, &sa, NULL) < 0 ||
         sigaction(SIGINT, &sa, NULL) < 0 ||
         sigaction(SIGTERM, &sa, NULL) < 0 ||
@@ -408,7 +414,6 @@ void signals_handler(int signum) {
         case SIGALRM:
             if (getpid() == main_pid) {
                 num_inv++;
-                printf("\n%d\n", num_inv);
                 /*request info from kids */
                 update_kids_info();
                 print_info();
@@ -620,7 +625,7 @@ void update_kids_info(void) {
     DEBUG_NOTIFY_ACTIVITY_RUNNING("UPDATING KIDS INFO....");
     struct master_msg_report *msg_rep = malloc(sizeof(struct master_msg_report));
     if (check_msg_report(msg_rep, msg_report_id_master, proc_list) == 1) {
-        ERROR_MESSAGE("MESSAGE TP FULL ACKNOWLEDGED\n");
+        tp_full_handler(*msg_rep);
     }
     int num_msg_to_wait_for = -1;
     num_msg_to_wait_for = send_sig_to_all(proc_list, SIGUSR2);
@@ -698,7 +703,6 @@ void generate_nodes_friends_array(int *nodes_friends, int *nodes) {
 }
 
 int create_node_proc(int new_node_id) {
-    printf("\n\n\nCREATING NODE %d\n", new_node_id);
     pid_t new_node_pid;
     char *argv_node[] = {PATH_TO_NODE, NULL, NULL};
     Proc p;
@@ -737,4 +741,42 @@ void unlock_to_fill_sem(void) {
             ERROR_EXIT_SEQUENCE_MAIN("ERROR DURING THE UNLOCK OF THE SEMAPHORE");
         }
     }
+}
+
+void tp_full_handler(struct master_msg_report msg_repo) {
+    block_signal(SIGALRM);
+    int new_node_id = shm_conf_pointer->nodes_snapshots[shm_conf_pointer->nodes_snapshots[0][0]][1] +
+                      DELTA_NODE_MSG_TYPE;
+    int new_node_pid = create_node_proc(new_node_id);
+    int new_node_friends = rand_int_n_exclude(simulation_conf.so_num_friends,
+                                              shm_conf_pointer->nodes_snapshots[0][0] + 1,
+                                              shm_conf_pointer->nodes_snapshots[0][0]);
+    if (shm_conf_add_node(shm_conf_pointer, new_node_pid, new_node_id, new_node_friends) == FALSE) {
+        ERROR_EXIT_SEQUENCE_MAIN("ERROR WHILE ADDING THE NEW NODE TO THE SHARED MEMORY, MAX NODE LIMIT REACHED");
+    }
+    printf("NODE %d CREATED\n", shm_conf_pointer->nodes_snapshots[shm_conf_pointer->nodes_snapshots[0][0]][1]);
+    printf("SIGNAL SIGUSR1 SENT TO ALL NODES\n");
+    struct node_msg node_msg;
+    node_msg.t.hops = 0;
+    node_msg_snd(msg_report_id_nodes, &node_msg, MSG_TRANSACTION_TYPE, &msg_repo.t, main_pid, TRUE,
+                 simulation_conf.so_retry, new_node_id);
+    /*Send the signal SIGUSR1 to all the nodes*/
+    send_sig_to_all_nodes(proc_list, SIGUSR1, TRUE);
+    send_msg_to_all_nodes(new_node_id, simulation_conf.so_retry, proc_list,
+                          shm_conf_pointer->nodes_snapshots[shm_conf_pointer->nodes_snapshots[0][0]][1], TRUE);
+    unblock_signal(SIGALRM);
+}
+
+void block_signal(int sig) {
+    sigset_t mask;
+    sigemptyset(&mask);
+    sigaddset(&mask, sig);
+    sigprocmask(SIG_BLOCK, &mask, &current_mask);
+}
+
+void unblock_signal(int sig) {
+    sigset_t mask;
+    sigemptyset(&mask);
+    sigaddset(&mask, sig);
+    sigprocmask(SIG_UNBLOCK, &mask, &current_mask);
 }

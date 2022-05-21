@@ -18,12 +18,12 @@ MKDIR_P = mkdir -p
 
 #DEBUG DEBUG_NODE
 # DEFINITION AT COMP TIME
-_DEF_COMP_TIME = SO_BLOCK_SIZE=10 SO_REGISTRY_SIZE=1000 _FORTIFY_SOURCE=2 _GNU_SOURCE DEBUG #DEBUG_USER #DEBUG_NODE
+_DEF_COMP_TIME = SO_BLOCK_SIZE=10 SO_REGISTRY_SIZE=1000 _FORTIFY_SOURCE=2 _GNU_SOURCE #DEBUG #DEBUG_USER #DEBUG_NODE
 DEF_COMP_TIME = $(patsubst %, -D%, $(_DEF_COMP_TIME))
 
 
 
-# Dipendenze
+# Dependencies
 _DEPENDENCIES_MAIN =  glob.h conf_file.h boolean.h simulation_errors.h debug_utility.h process_info_list.h semaphore.h user_msg_report.h master_msg_report.h node_msg_report.h shm_conf.h book_master_shm.h int_condenser.h transaction_list.h
 DEPENDENCIES_MAIN = $(patsubst %, $(SOURCE_HEADERS_DIR)/%, $(_DEPENDENCIES_MAIN))
 _DEPENDENCIES_USER = conf_file.h boolean.h simulation_errors.h debug_utility.h semaphore.h process_info_list.h transaction_list.h user_transaction.h user_msg_report.h glob.h master_msg_report.h node_msg_report.h shm_conf.h book_master_shm.h int_condenser.h

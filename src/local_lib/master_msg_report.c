@@ -163,6 +163,7 @@ int acknowledge(struct master_msg_report * self, ProcList list){
 }
 int check_msg_report(struct master_msg_report *msg_report, int msg_report_id_master, ProcList proc_list) {
     struct msqid_ds msg_rep_info;
+    int ris;
     if (msgctl(msg_report_id_master, IPC_STAT, &msg_rep_info) < 0) {
         DEBUG_ERROR_MESSAGE("IMPOSSIBLE TO RETRIEVE MESSAGE QUEUE INFO");
         return -1;
@@ -171,8 +172,12 @@ int check_msg_report(struct master_msg_report *msg_report, int msg_report_id_mas
         while (msg_rep_info.msg_qnum != 0 &&
             msgrcv(msg_report_id_master, msg_report, sizeof(*msg_report) - sizeof(long), 0, 0)>0 &&
             msgctl(msg_report_id_master, IPC_STAT, &msg_rep_info) >= 0) {
-            if (acknowledge(msg_report, proc_list)==-1){
+            ris = acknowledge(msg_report, proc_list);
+            if (ris==-1){
                 ERROR_MESSAGE("IMPOSSIBLE TO MAKE THE ACKNOWLEDGE OF MASTER MESSAGE");
+            }
+            else if (ris==1){
+                return 1;
             }
         }
         if (msg_rep_info.msg_qnum == 0) {

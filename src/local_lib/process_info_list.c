@@ -208,7 +208,6 @@ int send_sig_to_all(ProcList proc_list, int signal) {
             return -1;
         }
     }
-    printf("Number of processes reciver: %d\n", num_proc_reciver);
     return num_proc_reciver;
 }
 
