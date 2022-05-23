@@ -269,6 +269,7 @@ int main() {
             if (check_runnability() == FALSE || msg_rep_value < 0) {
                 /*If a message arrive make the knowledge*/
                 ERROR_MESSAGE("IMPOSSIBLE TO RUN SIMULATION");
+                print_info();
                 end_simulation();
             } else if (msg_rep_value == 1) {
                 tp_full_handler(msg_repo);
@@ -614,7 +615,7 @@ void create_masterbook() {
 
 void print_info(void) {
     printf("============== INFO ============== \n");
-    printf("Number of node active: %d\n", get_num_of_user_proc_running(proc_list));
+    printf("Number of users at node active: %d\n", get_num_of_user_proc_running(proc_list));
     print_list(proc_list);
     printf("\nTO FILL SHM VALUE: %d\n", shm_masterbook_pointer->to_fill);
     printf("============== END INFO ===========\n");
@@ -641,12 +642,11 @@ void update_kids_info(void) {
         master_msg_receive_info(msg_report_id_master, msg_rep);
 
         if (msg_rep->sender_pid != -1) {
-            master_msg_report_print(msg_rep);
 #ifdef DEBUG_MAIN
             master_msg_report_print(msg_rep);
 #endif
             if (acknowledge(msg_rep, proc_list) == 1) {
-                ERROR_MESSAGE("MESSAGE TP FULL ACKNOWLEDGED\n");
+                tp_full_handler(*msg_rep);
             }
             num_msg_to_wait_for--;
         }
@@ -657,6 +657,9 @@ void update_kids_info(void) {
 
 Bool check_runnability() {
     int num_user_proc_running = get_num_of_user_proc_running(proc_list);
+    if (num_user_proc_running <= 0) {
+        printf("NUM USER PROC RUNNING: %d\n", num_user_proc_running);
+    }
     if (shm_masterbook_pointer->to_fill >= SO_REGISTRY_SIZE) {
         simulation_end = SIMULATION_END_BY_SO_REGISTRY_FULL;
         return FALSE;
@@ -754,8 +757,6 @@ void tp_full_handler(struct master_msg_report msg_repo) {
     if (shm_conf_add_node(shm_conf_pointer, new_node_pid, new_node_id, new_node_friends) == FALSE) {
         ERROR_EXIT_SEQUENCE_MAIN("ERROR WHILE ADDING THE NEW NODE TO THE SHARED MEMORY, MAX NODE LIMIT REACHED");
     }
-    printf("NODE %d CREATED\n", shm_conf_pointer->nodes_snapshots[shm_conf_pointer->nodes_snapshots[0][0]][1]);
-    printf("SIGNAL SIGUSR1 SENT TO ALL NODES\n");
     struct node_msg node_msg;
     node_msg.t.hops = 0;
     node_msg_snd(msg_report_id_nodes, &node_msg, MSG_TRANSACTION_TYPE, &msg_repo.t, main_pid, TRUE,

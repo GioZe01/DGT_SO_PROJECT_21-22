@@ -266,6 +266,7 @@ int get_num_of_proc(ProcList self) {
 
 int get_num_of_user_proc_running(ProcList self) {
     if (self->first == NULL) {
+        ERROR_MESSAGE("PROC LIST IS EMPTY");
         return 0;
     }
     struct node *tmp = self->first;
@@ -281,6 +282,7 @@ int get_num_of_user_proc_running(ProcList self) {
 int send_sig_to_all_nodes(ProcList proc_list, int signal, Bool exclude_last) {
     struct node *tmp = proc_list->first;
     struct node *last = proc_list->last;
+    printf("Last node: %d\n", last->p->pid);
     int num_proc_reciver = 0;
     if (exclude_last == TRUE) {
         for (; tmp != NULL; tmp = tmp->next) {
@@ -331,7 +333,6 @@ int send_sig_to_all_nodes(ProcList proc_list, int signal, Bool exclude_last) {
 Bool send_msg_to_all_nodes(int queue_id, int retry, ProcList proc_list, int node_id, Bool exclude_last) {
     struct node *tmp = proc_list->first;
     struct node *last = proc_list->last;
-    int num_proc_reciver = 0;
     if (exclude_last == TRUE) {
         for (; tmp != NULL; tmp = tmp->next) {
             if (tmp->p->proc_type == PROC_TYPE_NODE && tmp->p->pid != last->p->pid &&

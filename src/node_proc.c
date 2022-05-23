@@ -125,7 +125,7 @@ void connect_to_queues(void);
 Bool load_block(void);
 
 /**
- * @brief Load n simple from the queue of the current node
+ * @brief Load n simple transactions from the queue of the current node
  * Where n is chosen randomly between 1 and so_tp_size
  */
 void load_simple_transaction(struct node_msg *msg_rep);
@@ -173,17 +173,17 @@ void advice_master_of_termination(long termination_type);
 long int get_time_processing(void);
 
 /* SysVar */
-int semaphore_start_id = -1;      /*Id of the start semaphore arrays for sinc*/
-int semaphore_masterbook_id = -1; /*Id of the masterbook semaphore for accessing the block matrix*/
-int semaphore_to_fill_id = -1;    /* Id of the masterbook to_fill access semaphore*/
-int queue_node_id = -1;           /* Identifier of the node queue id */
-int queue_user_id = -1;           /* Identifier of the user queue id*/
-int queue_master_id = -1;         /* Identifier of the master queue id*/
-int node_end = 0;                 /* For values different from 0 the node proc must end*/
-float current_block_reward = 0;   /* The current value of all node block reward*/
-int last_signal;                  /* Last signal received*/
-int friends = -1;                 /* Number of friends of the node*/
-sigset_t current_mask;            /* Current mask of the node*/
+int semaphore_start_id = -1;                    /*Id of the start semaphore arrays for sinc*/
+int semaphore_masterbook_id = -1;               /*Id of the masterbook semaphore for accessing the block matrix*/
+int semaphore_to_fill_id = -1;                  /* Id of the masterbook to_fill access semaphore*/
+int queue_node_id = -1;                         /* Identifier of the node queue id */
+int queue_user_id = -1;                         /* Identifier of the user queue id*/
+int queue_master_id = -1;                       /* Identifier of the master queue id*/
+int node_end = 0;                               /* For values different from 0 the node proc must end*/
+float current_block_reward = 0;                 /* The current value of all node block reward*/
+int last_signal;                                /* Last signal received*/
+int friends = -1;                               /* Number of friends of the node*/
+sigset_t current_mask;                          /* Current mask of the node*/
 struct node current_node;                       /* Current representation of the node*/
 struct conf node_configuration;                 /* Configuration File representation*/
 struct shm_conf *shm_conf_pointer_node;         /* Ref to the shm for configuration of the node*/
@@ -223,7 +223,9 @@ int main(int argc, char const *argv[]) {
         /*---------------------------*/
         DEBUG_MESSAGE("NODE READY, ON START_SEM");
         int sem_val = semctl(semaphore_start_id, 0, GETVAL);
-        if (sem_val < 0) { ERROR_EXIT_SEQUENCE_NODE ("IMPOSSIBLE TO ACCESS START SEMAPHORE INFO"); }
+        if (sem_val < 0) {
+            ERROR_EXIT_SEQUENCE_NODE("IMPOSSIBLE TO ACCESS START SEMAPHORE INFO");
+        }
         if ((sem_val != 0 && semaphore_lock(semaphore_start_id, 0) < 0) ||
             semaphore_wait_for_sinc(semaphore_start_id, 0) < 0) {
             ERROR_EXIT_SEQUENCE_NODE("IMPOSSIBLE TO WAIT FOR START");
@@ -340,13 +342,14 @@ void signals_handler(int signum) {
                              node_configuration.so_retry, friend);
                 queue_remove_head(current_node.transactions_pool);
             }
+            printf("ALARM NODE RECEIVED \n");
             alarm(1);
             break;
         case SIGUSR1:
             /**
              * Receive new friends from master and update the friends list
              */
-            printf("\n\n\n\n\n\n\n\n\nNODE MESSAGE ARRIVED\n\n");
+            printf("\nNODE MESSAGE ARRIVED\n\n");
             node_msg_receive(queue_node_id, &node_msg, MSG_MASTER_ORIGIN_ID);
             friends = set_one(friends, node_msg.sender_pid);
             break;
@@ -439,7 +442,8 @@ int process_node_block() {
     /*Loading them into the node_block_transactions*/
     if (load_block() == TRUE &&
         get_num_transactions(current_node.transactions_block) ==
-        SO_BLOCK_SIZE /* DID i got the correct num of transactions*/ &&
+        SO_BLOCK_SIZE /* DID i got the correct num of transactions*/
+        &&
         current_node.calc_reward(&current_node, current_node.percentage, TRUE, &current_block_reward) >= 0) {
         int num_of_shm_retry = 0;
         while (num_of_shm_retry < MAX_FAILURE_SHM_BOOKMASTER_LOCKING && lock_shm_masterbook() == FALSE) {
@@ -470,7 +474,7 @@ Bool lock_shm_masterbook(void) {
     if (insert_block(shm_masterbook_pointer, block_list) == 0) {
         number_of_insertion++;
         current_node.budget += current_block_reward;
-/*        printf("\n\n Node %d number of inserton = %d\n\n", current_node.node_id, number_of_insertion);*/
+        /*        printf("\n\n Node %d number of inserton = %d\n\n", current_node.node_id, number_of_insertion);*/
     } else {
         ERROR_MESSAGE("IMPOSSIBLE TO INSERT BLOCK");
         return FALSE;
@@ -555,7 +559,6 @@ Bool load_block(void) {
     block_signal(SIGUSR1);
     if (queue_is_empty(current_node.transactions_block) == FALSE ||
         get_num_transactions(current_node.transactions_pool) < SO_BLOCK_SIZE) {
-
         ris = FALSE;
     }
     /*Loading the transactions from the pool to the block*/
@@ -568,6 +571,7 @@ Bool load_block(void) {
     unblock_signal(SIGALRM);
     unblock_signal(SIGUSR2);
     unblock_signal(SIGUSR1);
+    alarm(1);
     return ris;
 }
 
