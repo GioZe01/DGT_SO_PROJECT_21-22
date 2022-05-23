@@ -275,8 +275,6 @@ int main() {
                 tp_full_handler(msg_repo);
 
             } else if (msg_rep_value == 2) {
-                printf("\n");
-                printf("called\n");
                 master_msg_report_print(&msg_repo);
             }
         }
@@ -617,7 +615,9 @@ void print_info(void) {
     printf("============== INFO ============== \n");
     printf("Number of users at node active: %d\n", get_num_of_user_proc_running(proc_list));
     print_list(proc_list);
+    lock_to_fill_sem();
     printf("\nTO FILL SHM VALUE: %d\n", shm_masterbook_pointer->to_fill);
+    unlock_to_fill_sem();
     printf("============== END INFO ===========\n");
 }
 
@@ -757,6 +757,7 @@ void tp_full_handler(struct master_msg_report msg_repo) {
     if (shm_conf_add_node(shm_conf_pointer, new_node_pid, new_node_id, new_node_friends) == FALSE) {
         ERROR_EXIT_SEQUENCE_MAIN("ERROR WHILE ADDING THE NEW NODE TO THE SHARED MEMORY, MAX NODE LIMIT REACHED");
     }
+    printf("Number of NODE process running : %d\n\n", shm_conf_pointer->nodes_snapshots[0][0]);
     struct node_msg node_msg;
     node_msg.t.hops = 0;
     node_msg_snd(msg_report_id_nodes, &node_msg, MSG_TRANSACTION_TYPE, &msg_repo.t, main_pid, TRUE,

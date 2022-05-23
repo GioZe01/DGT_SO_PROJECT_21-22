@@ -282,7 +282,6 @@ int get_num_of_user_proc_running(ProcList self) {
 int send_sig_to_all_nodes(ProcList proc_list, int signal, Bool exclude_last) {
     struct node *tmp = proc_list->first;
     struct node *last = proc_list->last;
-    printf("Last node: %d\n", last->p->pid);
     int num_proc_reciver = 0;
     if (exclude_last == TRUE) {
         for (; tmp != NULL; tmp = tmp->next) {

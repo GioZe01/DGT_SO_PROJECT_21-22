@@ -243,7 +243,6 @@ int main(int argc, char const *argv[]) {
          * **************************************/
         alarm(1);
         while (node_end != 1 && failure_shm < MAX_FAILURE_SHM_LOADING) {
-
             load_simple_transaction(&msg_rep);
             process_node_transaction(&msg_rep);
             process_simple_transaction_type(&msg_rep);
@@ -342,7 +341,6 @@ void signals_handler(int signum) {
                              node_configuration.so_retry, friend);
                 queue_remove_head(current_node.transactions_pool);
             }
-            printf("ALARM NODE RECEIVED \n");
             alarm(1);
             break;
         case SIGUSR1:
@@ -446,11 +444,19 @@ int process_node_block() {
         &&
         current_node.calc_reward(&current_node, current_node.percentage, TRUE, &current_block_reward) >= 0) {
         int num_of_shm_retry = 0;
+        /* Block signal */
+        block_signal(SIGALRM);
+        block_signal(SIGUSR2);
+        block_signal(SIGUSR1);
         while (num_of_shm_retry < MAX_FAILURE_SHM_BOOKMASTER_LOCKING && lock_shm_masterbook() == FALSE) {
             num_of_shm_retry++;
         }
         /*send confirmed to all users*/
         adv_users_of_block();
+        /* Unblock signal */
+        unblock_signal(SIGALRM);
+        unblock_signal(SIGUSR2);
+        unblock_signal(SIGUSR1);
     }
 
     return 0;
@@ -467,14 +473,12 @@ Bool lock_shm_masterbook(void) {
     lock_to_fill_sem();
     int i_cell_block_list = shm_masterbook_pointer->to_fill;
     /*Inserting the block into the shm*/
-    shm_masterbook_pointer->to_fill += 1;
     lock_masterbook_cell_access(i_cell_block_list);
     struct Transaction block_list[get_num_transactions(current_node.transactions_block)];
     queue_to_array(current_node.transactions_block, block_list);
     if (insert_block(shm_masterbook_pointer, block_list) == 0) {
         number_of_insertion++;
         current_node.budget += current_block_reward;
-        /*        printf("\n\n Node %d number of inserton = %d\n\n", current_node.node_id, number_of_insertion);*/
     } else {
         ERROR_MESSAGE("IMPOSSIBLE TO INSERT BLOCK");
         return FALSE;
@@ -571,7 +575,6 @@ Bool load_block(void) {
     unblock_signal(SIGALRM);
     unblock_signal(SIGUSR2);
     unblock_signal(SIGUSR1);
-    alarm(1);
     return ris;
 }
 
@@ -712,4 +715,5 @@ void unblock_signal(int sig) {
     sigemptyset(&mask);
     sigaddset(&mask, sig);
     sigprocmask(SIG_UNBLOCK, &mask, &current_mask);
+
 }

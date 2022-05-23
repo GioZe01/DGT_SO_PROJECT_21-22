@@ -26,7 +26,7 @@ int insert_block(struct shm_book_master * self, struct Transaction block_t[SO_BL
     if(self!=NULL){
         copy_trasaction_blocks(self->blocks[self->to_fill][0].block_t, block_t);
         self->blocks[self->to_fill][1].index=self->to_fill;
-        self->to_fill+=1;
+        self->to_fill++;
         return 0;
     }
     return -1;
