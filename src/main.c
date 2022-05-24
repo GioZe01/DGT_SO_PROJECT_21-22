@@ -423,7 +423,7 @@ void signals_handler(int signum) {
                     end_simulation();
                     break;
                 } else
-                    alarm(1);
+                    alarm(10);
                 /*TODO: METTO IN PAUSA I NODI vedere se mettere anche in pausa i processi user*/
             }
             break;
