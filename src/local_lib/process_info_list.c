@@ -186,8 +186,9 @@ void list_set_state(ProcList self, pid_t pid, short int state) {
     }
 }
 
-int send_sig_to_all(ProcList proc_list, int signal) {
+int * send_sig_to_all(ProcList proc_list, int signal) {
     struct node *tmp = proc_list->first;
+    int *pids = malloc(sizeof(int) * (proc_list->num_proc+1));
     int num_proc_reciver = 0;
     for (; tmp != NULL; tmp = tmp->next) {
         if (tmp->p->proc_state == PROC_STATE_RUNNING && (kill(tmp->p->pid, signal) >= 0 || errno == ESRCH)) {
@@ -202,13 +203,18 @@ int send_sig_to_all(ProcList proc_list, int signal) {
             printf ("\n{DEBUG_MAIN}:= SENT SIGNAL TO : process type: %s, proc exec_State: %s\n", from_proctype_to_string(tmp->p->proc_type),string);
             DEBUG_MESSAGE("SIGNAL SENT TO THE PROCESS");
 #endif
+            pids[num_proc_reciver+1] = tmp->p->pid;
             num_proc_reciver++;
         } else if (errno == EINTR || tmp->p->proc_state == PROC_STATE_TERMINATED) { continue; }
         else {
+            free(pids);
             return -1;
         }
     }
-    return num_proc_reciver;
+    pids[0] = num_proc_reciver;
+    /** Fix the size of pids */
+    pids = realloc(pids, sizeof(int) * (num_proc_reciver+1));
+    return pids;
 }
 
 void proc_list_remove_head(ProcList self) {

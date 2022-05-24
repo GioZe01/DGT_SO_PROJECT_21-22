@@ -69,12 +69,13 @@ Proc get_proc_from_pid(ProcList self, pid_t pid);
 Proc get_proc_from_queue_id(ProcList self, int id_queue);
 
 /**
- * Send the given signal to all proc saved via kill() method
+ * \brief Send the given signal to all proc saved via kill() method
+ *
  * @param proc_list the list of proced to receive the signal
  * @param signal signal to be sent
- * @return -1 in case of failure. the number of proc to wait responce for
+ * @return An array of pid_t containing the pid of the processes that have received the signal, in the 0 index is the number of receivers
  */
-int send_sig_to_all(ProcList proc_list, int signal);
+int * send_sig_to_all(ProcList proc_list, int signal);
 
 /**
  * Send the given signal to the process with type node

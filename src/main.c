@@ -237,10 +237,10 @@ int main() {
         /*-------------------------------*/
         /*  INITIALIZING THE SHM         */
         /*-------------------------------*/
-        number_of_nodes = nodes_queues_ids[0];
-        if (number_of_nodes < 0) {
+        if ( nodes_queues_ids == NULL || nodes_queues_ids[0]<0) {
             ERROR_EXIT_SEQUENCE_MAIN("IMPOSSIBLE TO CREATE NODES FRIENDS");
         }
+        number_of_nodes = nodes_queues_ids[0];
         int *nodes_friends = malloc(sizeof(int) * (number_of_nodes + 1));
         generate_nodes_friends_array(nodes_friends, nodes_queues_ids);
         if (shm_conf_create(shm_conf_pointer, users_pids, users_queues_ids, nodes_pids, nodes_queues_ids,
@@ -411,6 +411,7 @@ void signals_handler(int signum) {
                 exit(0);
             }
         case SIGALRM:
+            alarm(0);
             if (getpid() == main_pid) {
                 num_inv++;
                 /*request info from kids */
@@ -628,8 +629,10 @@ void update_kids_info(void) {
     if (check_msg_report(msg_rep, msg_report_id_master, proc_list) == 1) {
         tp_full_handler(*msg_rep);
     }
-    int num_msg_to_wait_for = -1;
-    num_msg_to_wait_for = send_sig_to_all(proc_list, SIGUSR2);
+    int retry = 0;
+    int * to_wait_proc = send_sig_to_all(proc_list, SIGUSR2);
+    int num_msg_to_wait_for = to_wait_proc [0];
+    to_wait_proc++;
     if (num_msg_to_wait_for < 0) {
         ERROR_MESSAGE("IMPOSSIBLE TO UPDATE KIDS INFO");
     } else if (num_msg_to_wait_for == 0) {
@@ -645,10 +648,24 @@ void update_kids_info(void) {
 #ifdef DEBUG_MAIN
             master_msg_report_print(msg_rep);
 #endif
+            /** Find the pid in to wait proc and remove it */
+            int i;
+            for (i = 0; i < num_msg_to_wait_for; i++) {
+                if (to_wait_proc[i] == msg_rep->sender_pid) {
+                    to_wait_proc[i] = to_wait_proc[num_msg_to_wait_for - 1];
+                    num_msg_to_wait_for--;
+                    break;
+                }
+            }
+            /** Acknowledge the message */
             if (acknowledge(msg_rep, proc_list) == 1) {
                 tp_full_handler(*msg_rep);
             }
-            num_msg_to_wait_for--;
+        }else if (num_msg_to_wait_for == 1 && retry > MAX_RETRY_UPDATE_KIDS_INFO) {
+            kill(to_wait_proc[num_msg_to_wait_for], SIGUSR2);
+            printf("Signal resent to %d\n\n", to_wait_proc[num_msg_to_wait_for]);
+        }else{
+            retry++;
         }
     } while (num_msg_to_wait_for > 0);
     free(msg_rep);
