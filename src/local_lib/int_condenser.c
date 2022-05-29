@@ -11,20 +11,37 @@
  * @param posistion the position to check
  * @return 1 if there is a 1 in the given position, 0 otherwise
  */
-int check_bit(int n, int position){
+int check_bit(int n, int position) {
     return (n >> position) & 1;
 }
 
+/**
+ * \brief count the number of 1 in the given number
+ * @param number the number to count
+ * @return the number of 1 in the given number
+ */
+int count_1(int number) {
+    int count = 0;
+    while (number) {
+        count++;
+        number = number & (number - 1);
+    }
+    return count;
+}
+
 /* Methods implementation */
-void get_all_ones_positions(int *arr, int friends){
+int *get_all_ones_positions(int friends) {
     int i, arr_index = 0;
-    for (i = 0; arr!= NULL && i< MAX_FRIENDS; i++){
-        if (check_bit(friends, i)){
+    int *arr = malloc(sizeof(int) * count_1(friends));
+    for (i = 0; arr != NULL && i < MAX_FRIENDS; i++) {
+        if (check_bit(friends, i)) {
             arr[arr_index] = i;
             arr_index++;
         }
     }
+    return arr;
 }
+
 int rand_int(int n) {
     if (n < 0) {
         n = -n;
@@ -38,9 +55,10 @@ int rand_int(int n) {
 int rand_int_range(int min, int max) {
     return rand() % (max - min + 1) + min;
 }
-int get_rand_one(int n){
+
+int get_rand_one(int n) {
     int i = rand_int(n);
-    while(check_bit(n,i) == 0){
+    while (check_bit(n, i) == 0) {
         i = rand_int(n);
     }
     if (i == 0) {
@@ -62,7 +80,7 @@ int get_ones(int n) {
 int rand_int_n(int n, int max) {
     int i, r;
     int res = 0;
-    for (i = 0; get_ones(res)<n; i++) {
+    for (i = 0; get_ones(res) < n; i++) {
         do {
             r = rand_int(max);
         } while (r & (1 << i));
@@ -71,24 +89,34 @@ int rand_int_n(int n, int max) {
     return res;
 }
 
-int rand_int_n_exclude(int n, int exclude, int max){
+int rand_int_n_exclude(int n, int exclude, int max) {
     int i, r;
     int res = 0;
-    for (i = 0; get_ones(res)<n; i++) {
+    for (i = 0; get_ones(res) < n; i++) {
         do {
             r = rand_int(max);
-        } while (r & (1 << i) || r == exclude);
+        } while (r == exclude);
         res |= 1 << r;
     }
     return res;
 }
+
 int rand_int_n_pos(int n) {
     int position = rand_int(32);
     while (check_bit(n, position)) {
         position = rand_int(32);
     }
-    return position+1;
+    return position + 1;
 }
-int set_one(int n, int pos){
+
+int set_one(int n, int pos) {
     return n | (1 << pos);
+}
+
+void print_binary(int n) {
+    int i;
+    for (i = 31; i >= 0; i--) {
+        printf("%d", check_bit(n, i));
+    }
+    printf("\n");
 }

@@ -3,10 +3,11 @@
 
 /**
  * \brief Get all the position where the one is present in the given number
- * @param arr The array to be filled
  * @param friends The number to search in
+ * @return The list of positions
  */
-void get_all_ones_positions(int *arr, int friends);
+int *get_all_ones_positions(int friends);
+
 /**
  * @brief Generate a random number between 0 and n-1
  * @param n The upper bound
@@ -70,4 +71,11 @@ int rand_int_n_pos(int n);
  * @return The number with a 1 in the given position
  */
 int set_one(int n, int pos);
+
+/**
+ * \brief Print the given number in binary
+ * @param n The number
+ */
+void print_binary(int n);
+
 #endif //DGT_SO_PROJECT_21_22_INT_CONDENSER_H

@@ -194,13 +194,13 @@ int main() {
     int *users_queues_ids; /*in 0 position is saved the actual size of the array of ids saved in the pointer*/
     int *nodes_queues_ids; /*in 0 position is saved the actual size of the array of ids saved in the pointer*/
     int number_of_nodes = -1; /*Number of nodes in the network*/
-    /* Pointers allocation  */
-    users_pids = (int*) malloc(sizeof(int) * (simulation_conf.so_user_num + 1));
-    nodes_pids = (int*) malloc(sizeof(int) * (simulation_conf.so_nodes_num + 1));
-    users_queues_ids = (int*) malloc(sizeof(int) * (simulation_conf.so_user_num + 1));
-    nodes_queues_ids = (int*) malloc(sizeof(int) * (simulation_conf.so_nodes_num + 1));
     main_pid = getpid();
     if (read_conf() == TRUE) {
+        /* Pointers allocation  */
+        users_pids = malloc(sizeof(int) * (simulation_conf.so_user_num + 1));
+        nodes_pids = malloc(sizeof(int) * (simulation_conf.so_nodes_num + 1));
+        users_queues_ids = malloc(sizeof(int) * (simulation_conf.so_user_num + 1));
+        nodes_queues_ids = malloc(sizeof(int) * (simulation_conf.so_nodes_num + 1));
         /************************************
          *      CONFIGURATION FASE          *
          * ***********************************/
@@ -237,7 +237,7 @@ int main() {
         /*-------------------------------*/
         /*  INITIALIZING THE SHM         */
         /*-------------------------------*/
-        if ( nodes_queues_ids == NULL || nodes_queues_ids[0]<0) {
+        if (nodes_queues_ids == NULL || nodes_queues_ids[0] < 0) {
             ERROR_EXIT_SEQUENCE_MAIN("IMPOSSIBLE TO CREATE NODES FRIENDS");
         }
         number_of_nodes = nodes_queues_ids[0];
@@ -423,7 +423,7 @@ void signals_handler(int signum) {
                     end_simulation();
                     break;
                 } else
-                    alarm(10);
+                    alarm(1);
                 /*TODO: METTO IN PAUSA I NODI vedere se mettere anche in pausa i processi user*/
             }
             break;
@@ -630,8 +630,8 @@ void update_kids_info(void) {
         tp_full_handler(*msg_rep);
     }
     int retry = 0;
-    int * to_wait_proc = send_sig_to_all(proc_list, SIGUSR2);
-    int num_msg_to_wait_for = to_wait_proc [0];
+    int *to_wait_proc = send_sig_to_all(proc_list, SIGUSR2);
+    int num_msg_to_wait_for = to_wait_proc[0];
     to_wait_proc++;
     if (num_msg_to_wait_for < 0) {
         ERROR_MESSAGE("IMPOSSIBLE TO UPDATE KIDS INFO");
@@ -661,11 +661,13 @@ void update_kids_info(void) {
             if (acknowledge(msg_rep, proc_list) == 1) {
                 tp_full_handler(*msg_rep);
             }
-        }else if (num_msg_to_wait_for == 1 && retry > MAX_RETRY_UPDATE_KIDS_INFO) {
+        } else if (num_msg_to_wait_for == 1 && retry > MAX_RETRY_UPDATE_KIDS_INFO) {
             kill(to_wait_proc[num_msg_to_wait_for], SIGUSR2);
+#ifdef DEBUG_MAIN
             printf("Signal resent to %d\n\n", to_wait_proc[num_msg_to_wait_for]);
+#endif
             nanosleep(SLEEP_TIME_UPDATE_KIDS_INFO, NULL);
-        }else{
+        } else {
             retry++;
         }
     } while (num_msg_to_wait_for > 0);
@@ -718,8 +720,8 @@ char *get_end_simulation_msg() {
 void generate_nodes_friends_array(int *nodes_friends, int *nodes) {
     int i = 1;
     nodes_friends[0] = nodes[0];
-    for (; i < nodes[0]; i++) {
-        nodes_friends[i] = rand_int_n_exclude(simulation_conf.so_num_friends, i, nodes[0]);
+    for (; i < nodes[0]+1; i++) {
+        nodes_friends[i] = rand_int_n_exclude(simulation_conf.so_num_friends, i-1, nodes[0]);
     }
 }
 

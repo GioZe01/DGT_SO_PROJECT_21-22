@@ -1,4 +1,3 @@
-#define _GNU_SOURCE
 /*  Standard Library */
 #include <stdio.h>
 #include <stdlib.h>
@@ -252,7 +251,9 @@ int main(int argc, char const *argv[]) {
         /*-------------------------*/
         /* Print the node info     */
         /*-------------------------*/
+#ifdef DEBUG_NODE
         print_node_info();
+#endif
         /****************************************
          *   PROCESSING OF TRANSACTION FASE     *
          * **************************************/
@@ -735,20 +736,18 @@ void unblock_signal(int sig) {
 }
 
 void print_node_info() {
-    int *friends_pos = (int *) malloc(sizeof(int) * node_configuration.so_num_friends);
-    int i;
+    int *friends_pos;
     /*Print node friends and values*/
     printf("NODE FRIENDS:%d\n", current_node.node_id);
-    if (friends != -1){
-        get_all_ones_positions(friends_pos, friends);
-        for (i = 0; i < node_configuration.so_num_friends ; i++) {
-            printf("dumping friends: %d\n", *friends_pos);
-            /*printf("%d ", shm_conf_pointer_node->nodes_snapshots[*friends_pos][2]);*/
-            friends_pos++;
+    if (friends != -1) {
+        int i;
+        friends_pos = get_all_ones_positions(friends);
+        for (i = 0; i < node_configuration.so_num_friends; i++) {
+            printf("[%d] Friend position: %d\n", getpid(),
+                   shm_conf_pointer_node->nodes_snapshots[(friends_pos[i]) + 1][0]);
+
         }
         printf("\n");
-    }else{
-        printf("NODE HAS NO FRIENDS\n");
+        free(friends_pos);
     }
-    free(friends_pos);
 }
