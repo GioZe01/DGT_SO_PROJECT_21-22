@@ -137,7 +137,8 @@
 #define MAX_FAILURE_SHM_BOOKMASTER_LOCKING 10 /**< max number of times that the shm locking can fail*/
 #define MAX_PROC_TO_PRINT 20/**< max number of processes to print*/
 #define MAX_FRIENDS 32 /**< max number of friends currently saved into an integer of 32 bit*/
-#define MAX_RETRY_UPDATE_KIDS_INFO 10 /**< max number of times that the update of the kids info can be retried*/
+#define MAX_RETRY_UPDATE_KIDS_INFO 100 /**< max number of times that the update of the kids info can be retried*/
+#define SLEEP_TIME_UPDATE_KIDS_INFO 100 /**< sleep time in ms between two retries of the update of the kids info*/
 /*SIMULATION END TYPES*/
 /*! \enum SIMULATION_END_TYPE
  * \brief The type of the simulation that can occured

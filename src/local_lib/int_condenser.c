@@ -1,5 +1,10 @@
 #include <stdio.h>
 #include <stdlib.h>
+/* Local Import */
+#include "headers/glob.h"
+
+/* Helper Functions */
+
 /**
  * @brief Check if there is a 1 int the given position
  * @param n the number to check
@@ -10,6 +15,16 @@ int check_bit(int n, int position){
     return (n >> position) & 1;
 }
 
+/* Methods implementation */
+void get_all_ones_positions(int *arr, int friends){
+    int i, arr_index = 0;
+    for (i = 0; arr!= NULL && i< MAX_FRIENDS; i++){
+        if (check_bit(friends, i)){
+            arr[arr_index] = i;
+            arr_index++;
+        }
+    }
+}
 int rand_int(int n) {
     if (n < 0) {
         n = -n;

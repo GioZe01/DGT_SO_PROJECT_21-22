@@ -1,5 +1,12 @@
 #ifndef DGT_SO_PROJECT_21_22_INT_CONDENSER_H
 #define DGT_SO_PROJECT_21_22_INT_CONDENSER_H
+
+/**
+ * \brief Get all the position where the one is present in the given number
+ * @param arr The array to be filled
+ * @param friends The number to search in
+ */
+void get_all_ones_positions(int *arr, int friends);
 /**
  * @brief Generate a random number between 0 and n-1
  * @param n The upper bound

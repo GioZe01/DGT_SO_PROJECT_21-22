@@ -139,36 +139,48 @@ void load_simple_transaction(struct node_msg *msg_rep);
  */
 void acquire_semaphore_ids(void);
 
-/* Lock the shm book_master via masterbook_to_fill param and the cell to fill index.
+/**
+ * \brief Lock the shm book_master via masterbook_to_fill param and the cell to fill index.
  * @return FALSE in case of failure, TRUE otherwise
  */
 Bool lock_shm_masterbook(void);
 
-/* Lock the to_fill index saved in the shared_memory access
+/**
+ * \brief Lock the to_fill index saved in the shared_memory access
  */
 void lock_to_fill_sem(void);
 
-/* Lock the current cell of the masterbook shm in which the node had written the block
+/**
+ * \brief Lock the current cell of the masterbook shm in which the node had written the block
  * @param i_cell_block_list index to be blocked
  */
 void lock_masterbook_cell_access(int i_cell_block_list);
 
-/* Unlock the to_fill index saved in the shared_memory access
+/**
+ * \brief Print the current node configuration in the standard output
+ */
+void print_node_info();
+
+/**
+ * Unlock the to_fill index saved in the shared_memory access
  */
 void unlock_to_fill_sem();
 
-/* Unlock the current cell of the masterbook shm in which the node had written the block
+/**
+ * Unlock the current cell of the masterbook shm in which the node had written the block
  * @param i_cell_block_list index to be blocked
  */
 void unlock_masterbook_cell_access(int i_cell_block_list);
 
-/* Advice the master porc via master_message queue by sending a master_message
+/**
+ * \brief Advice the master porc via master_message queue by sending a master_message
  * @param termination_type MSG_REPORT_TYPE type process termination occured
  */
 void advice_master_of_termination(long termination_type);
 
-/*Extract randomly the time needed for processing from node_configuration
- *@return an integer that rappresent the time for processing
+/**
+ * \brief Extract randomly the time needed for processing from node_configuration
+ * @return an integer that rappresent the time for processing
  * */
 long int get_time_processing(void);
 
@@ -182,7 +194,7 @@ int queue_master_id = -1;                       /* Identifier of the master queu
 int node_end = 0;                               /* For values different from 0 the node proc must end*/
 float current_block_reward = 0;                 /* The current value of all node block reward*/
 int last_signal;                                /* Last signal received*/
-int friends = -1;                               /* Number of friends of the node*/
+int friends = -1;                               /* Number rappresenting the friends of the node*/
 sigset_t current_mask;                          /* Current mask of the node*/
 struct node current_node;                       /* Current representation of the node*/
 struct conf node_configuration;                 /* Configuration File representation*/
@@ -237,7 +249,10 @@ int main(int argc, char const *argv[]) {
         /*  SHARED MEM  CONFIG     */
         /*-------------------------*/
         attach_to_shms();
-
+        /*-------------------------*/
+        /* Print the node info     */
+        /*-------------------------*/
+        print_node_info();
         /****************************************
          *   PROCESSING OF TRANSACTION FASE     *
          * **************************************/
@@ -359,6 +374,7 @@ void signals_handler(int signum) {
             master_msg_send(queue_master_id, &master_msg, INFO_BUDGET, NODE, current_node.pid, current_node.exec_state,
                             TRUE, current_node.budget, &t);
 #ifdef DEBUG_NODE
+            printf(" [%d] NODE REPLIED\n", current_node.pid);
             DEBUG_NOTIFY_ACTIVITY_DONE("{DEBUG_NODE}:= REPLIED TO MASTER DONE");
 #endif
             break;
@@ -716,4 +732,23 @@ void unblock_signal(int sig) {
     sigaddset(&mask, sig);
     sigprocmask(SIG_UNBLOCK, &mask, &current_mask);
 
+}
+
+void print_node_info() {
+    int *friends_pos = (int *) malloc(sizeof(int) * node_configuration.so_num_friends);
+    int i;
+    /*Print node friends and values*/
+    printf("NODE FRIENDS:%d\n", current_node.node_id);
+    if (friends != -1){
+        get_all_ones_positions(friends_pos, friends);
+        for (i = 0; i < node_configuration.so_num_friends ; i++) {
+            printf("dumping friends: %d\n", *friends_pos);
+            /*printf("%d ", shm_conf_pointer_node->nodes_snapshots[*friends_pos][2]);*/
+            friends_pos++;
+        }
+        printf("\n");
+    }else{
+        printf("NODE HAS NO FRIENDS\n");
+    }
+    free(friends_pos);
 }

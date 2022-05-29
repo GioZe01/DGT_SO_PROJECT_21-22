@@ -194,13 +194,13 @@ int main() {
     int *users_queues_ids; /*in 0 position is saved the actual size of the array of ids saved in the pointer*/
     int *nodes_queues_ids; /*in 0 position is saved the actual size of the array of ids saved in the pointer*/
     int number_of_nodes = -1; /*Number of nodes in the network*/
+    /* Pointers allocation  */
+    users_pids = (int*) malloc(sizeof(int) * (simulation_conf.so_user_num + 1));
+    nodes_pids = (int*) malloc(sizeof(int) * (simulation_conf.so_nodes_num + 1));
+    users_queues_ids = (int*) malloc(sizeof(int) * (simulation_conf.so_user_num + 1));
+    nodes_queues_ids = (int*) malloc(sizeof(int) * (simulation_conf.so_nodes_num + 1));
     main_pid = getpid();
     if (read_conf() == TRUE) {
-        /* Pointers allocation  */
-        users_pids = malloc(sizeof(int) * (simulation_conf.so_user_num + 1));
-        nodes_pids = malloc(sizeof(int) * (simulation_conf.so_nodes_num + 1));
-        users_queues_ids = malloc(sizeof(int) * (simulation_conf.so_user_num + 1));
-        nodes_queues_ids = malloc(sizeof(int) * (simulation_conf.so_nodes_num + 1));
         /************************************
          *      CONFIGURATION FASE          *
          * ***********************************/
@@ -225,11 +225,11 @@ int main() {
         DEBUG_BLOCK_ACTION_START("PROC GENERATION");
         /* Crating users*/
         if (create_users_proc(users_pids, users_queues_ids) < 0) {
-            ERROR_MESSAGE("IMPOSSIBLE TO CREATE USERS PROC");
+            ERROR_EXIT_SEQUENCE_MAIN("IMPOSSIBLE TO CREATE USERS PROC");
         }
         /* Creating nodes*/
         if (create_nodes_proc(nodes_pids, nodes_queues_ids) < 0) {
-            ERROR_MESSAGE("IMPOSSIBLE TO CREATE NODES PROC");
+            ERROR_EXIT_SEQUENCE_MAIN("IMPOSSIBLE TO CREATE NODES PROC");
         }
 
         DEBUG_BLOCK_ACTION_END();
@@ -664,6 +664,7 @@ void update_kids_info(void) {
         }else if (num_msg_to_wait_for == 1 && retry > MAX_RETRY_UPDATE_KIDS_INFO) {
             kill(to_wait_proc[num_msg_to_wait_for], SIGUSR2);
             printf("Signal resent to %d\n\n", to_wait_proc[num_msg_to_wait_for]);
+            nanosleep(SLEEP_TIME_UPDATE_KIDS_INFO, NULL);
         }else{
             retry++;
         }
