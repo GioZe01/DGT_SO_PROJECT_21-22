@@ -454,6 +454,10 @@ void connect_to_queues(void) {
 }
 
 int process_node_block() {
+    /* Block signal */
+    block_signal(SIGALRM);
+    block_signal(SIGUSR2);
+    block_signal(SIGUSR1);
     /*Loading them into the node_block_transactions*/
     if (load_block() == TRUE &&
         get_num_transactions(current_node.transactions_block) ==
@@ -461,21 +465,18 @@ int process_node_block() {
         &&
         current_node.calc_reward(&current_node, current_node.percentage, TRUE, &current_block_reward) >= 0) {
         int num_of_shm_retry = 0;
-        /* Block signal */
-        block_signal(SIGALRM);
-        block_signal(SIGUSR2);
-        block_signal(SIGUSR1);
+
         while (num_of_shm_retry < MAX_FAILURE_SHM_BOOKMASTER_LOCKING && lock_shm_masterbook() == FALSE) {
             num_of_shm_retry++;
         }
         /*send confirmed to all users*/
         adv_users_of_block();
-        /* Unblock signal */
-        unblock_signal(SIGALRM);
-        unblock_signal(SIGUSR2);
-        unblock_signal(SIGUSR1);
-    }
 
+    }
+    /* Unblock signal */
+    unblock_signal(SIGALRM);
+    unblock_signal(SIGUSR2);
+    unblock_signal(SIGUSR1);
     return 0;
 }
 
@@ -574,10 +575,6 @@ void unlock_masterbook_cell_access(int i_cell_block_list) {
 Bool load_block(void) {
     /* Critical section */
     Bool ris = FALSE;
-    /* Block signal */
-    block_signal(SIGALRM);
-    block_signal(SIGUSR2);
-    block_signal(SIGUSR1);
     if (queue_is_empty(current_node.transactions_block) == FALSE ||
         get_num_transactions(current_node.transactions_pool) < SO_BLOCK_SIZE) {
         ris = FALSE;
@@ -588,10 +585,6 @@ Bool load_block(void) {
         ris = TRUE;
     } else
         ris = FALSE;
-    /* Unblock signal */
-    unblock_signal(SIGALRM);
-    unblock_signal(SIGUSR2);
-    unblock_signal(SIGUSR1);
     return ris;
 }
 
