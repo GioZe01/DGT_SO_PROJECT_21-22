@@ -625,6 +625,9 @@ void print_info(void) {
 void update_kids_info(void) {
     DEBUG_BLOCK_ACTION_START("UPDATE KIDS INFO");
     DEBUG_NOTIFY_ACTIVITY_RUNNING("UPDATING KIDS INFO....");
+#ifdef DEBUG_MAIN
+    Bool printed = FALSE;
+#endif
     struct master_msg_report *msg_rep = malloc(sizeof(struct master_msg_report));
     if (check_msg_report(msg_rep, msg_report_id_master, proc_list) == 1) {
         tp_full_handler(*msg_rep);
@@ -664,7 +667,10 @@ void update_kids_info(void) {
         } else if (num_msg_to_wait_for == 1 && retry > MAX_RETRY_UPDATE_KIDS_INFO) {
             kill(to_wait_proc[num_msg_to_wait_for], SIGUSR2);
 #ifdef DEBUG_MAIN
-            printf("Signal resent to %d\n\n", to_wait_proc[num_msg_to_wait_for]);
+            if (printed == FALSE){
+                 printf("Signal resent to %d\n\n", to_wait_proc[num_msg_to_wait_for]);
+                 printed = TRUE;
+            }
 #endif
             nanosleep(SLEEP_TIME_UPDATE_KIDS_INFO, NULL);
         } else {

@@ -83,11 +83,10 @@ Bool read_conf_node();
 
 /**
  * Set the handler for signals of the current node_proc
- * @param sa describe the type of action to be performed when a signal arrive
- * @param sigmask the mask to be applied
+ * @param sa describe the type of action to be performed when a signal arrives
  * @return FALSE in case of FAILURE, TRUE otherwise
  */
-Bool set_signal_handler_node(struct sigaction sa, sigset_t sig_mask);
+Bool set_signal_handler_node(struct sigaction sa);
 
 /**
  * Check the argc and argv to match with project specification
@@ -214,7 +213,7 @@ int main(int argc, char const *argv[]) {
     read_conf_node(&node_configuration);
     node_create(&current_node, getpid(), -1, 0, node_configuration.so_tp_size, SO_BLOCK_SIZE,
                 node_configuration.so_reward, (Reward) &calc_reward);
-    if (check_arguments(argc, argv) && set_signal_handler_node(sa, current_mask)) {
+    if (check_arguments(argc, argv) && set_signal_handler_node(sa)) {
         struct node_msg msg_rep;
         int is_unsed_node = 0;
         /*-----------------------*/
@@ -257,7 +256,7 @@ int main(int argc, char const *argv[]) {
         /****************************************
          *   PROCESSING OF TRANSACTION FASE     *
          * **************************************/
-        alarm(1);
+        alarm(3);
         while (node_end != 1 && failure_shm < MAX_FAILURE_SHM_LOADING) {
             load_simple_transaction(&msg_rep);
             process_node_transaction(&msg_rep);
@@ -317,11 +316,12 @@ Bool check_arguments(int argc, char const *argv[]) {
     return TRUE;
 }
 
-Bool set_signal_handler_node(struct sigaction sa, sigset_t sig_mask) {
+Bool set_signal_handler_node(struct sigaction sa) {
     DEBUG_NOTIFY_ACTIVITY_RUNNING("SETTING SIGNAL HANDLER...");
     memset(&sa, 0, sizeof(sa));
     sa.sa_handler = signals_handler;
-    sa.sa_mask = sig_mask;
+    sigemptyset(&current_mask);
+    sa.sa_mask = current_mask;
     if (sigaction(SIGINT, &sa, NULL) < 0 ||
         sigaction(SIGALRM, &sa, NULL) < 0 ||
         sigaction(SIGUSR1, &sa, NULL) < 0 ||
