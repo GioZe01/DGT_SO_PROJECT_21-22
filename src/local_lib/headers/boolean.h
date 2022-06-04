@@ -9,4 +9,5 @@
 #define TRUE 1
 #define FALSE 0
 typedef  int Bool;
+char *bool_to_string(Bool b);
 #endif /*DGT_SO_PROJECT_21_22_BOOLEAN_H*/

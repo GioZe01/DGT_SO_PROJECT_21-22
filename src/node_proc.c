@@ -31,6 +31,7 @@
 #include "local_lib/headers/debug_utility.h"
 #include "local_lib/headers/transaction_list.h"
 #include "local_lib/headers/int_condenser.h"
+#include "local_lib/headers/gt_sig_handler.h"
 
 /* Support Functions*/
 
@@ -61,18 +62,6 @@ void adv_users_of_block(void);
  * @param signum type of signal to be handled
  */
 void signals_handler(int signum);
-
-/**
- * @brief Block the given signal
- * @param sig signal to be blocked
- */
-void block_signal(int sig);
-
-/**
- * @brief Unblock the given signal
- * @param sig signal to be unblocked
- */
-void unblock_signal(int sig);
 
 /**
  * @brief Read the conf file present in te project dir
@@ -324,6 +313,7 @@ Bool set_signal_handler_node(struct sigaction sa) {
     sa.sa_mask = current_mask;
     if (sigaction(SIGINT, &sa, NULL) < 0 ||
         sigaction(SIGALRM, &sa, NULL) < 0 ||
+        sigaction(SIGTERM, &sa, NULL) < 0 ||
         sigaction(SIGUSR1, &sa, NULL) < 0 ||
         sigaction(SIGUSR2, &sa, NULL) < 0) {
         ERROR_EXIT_SEQUENCE_NODE("ERROR DURING THE CREATION OF THE SIG HANDLER ");
@@ -340,6 +330,7 @@ void signals_handler(int signum) {
     struct node_msg node_msg;
     struct Transaction t;
     switch (signum) {
+        case SIGTERM:
         case SIGINT:
             alarm(0); /*pending alarm removed*/
             current_node.exec_state = PROC_STATE_TERMINATED;
@@ -455,9 +446,9 @@ void connect_to_queues(void) {
 
 int process_node_block() {
     /* Block signal */
-    block_signal(SIGALRM);
-    block_signal(SIGUSR2);
-    block_signal(SIGUSR1);
+    block_signal(SIGALRM, &current_mask);
+    block_signal(SIGUSR2, &current_mask);
+    block_signal(SIGUSR1, &current_mask);
     /*Loading them into the node_block_transactions*/
     if (load_block() == TRUE &&
         get_num_transactions(current_node.transactions_block) ==
@@ -474,9 +465,9 @@ int process_node_block() {
 
     }
     /* Unblock signal */
-    unblock_signal(SIGALRM);
-    unblock_signal(SIGUSR2);
-    unblock_signal(SIGUSR1);
+    unblock_signal(SIGUSR2, &current_mask);
+    unblock_signal(SIGUSR1, &current_mask);
+    unblock_signal(SIGALRM, &current_mask);
     return 0;
 }
 
@@ -625,7 +616,7 @@ void adv_users_of_block(void) {
     int sender_pid = -1;
     int receiver_pid = -1;
     while (queue_is_empty(current_node.transactions_block) == FALSE) {
-        struct user_msg *u_msg_rep = (struct user_msg *) malloc(sizeof(struct user_msg));
+        struct user_msg *u_msg_rep = malloc(sizeof(struct user_msg));
         struct Transaction t = queue_head(current_node.transactions_block);
         t.t_type = TRANSACTION_SUCCES;
         sender_pid = t.sender;
@@ -711,21 +702,6 @@ void load_simple_transaction(struct node_msg *msg_rep) {
     while (to_load > 0 && process_simple_transaction_type(msg_rep) != -1) {
         to_load--;
     }
-}
-
-void block_signal(int sig) {
-    sigset_t mask;
-    sigemptyset(&mask);
-    sigaddset(&mask, sig);
-    sigprocmask(SIG_BLOCK, &mask, &current_mask);
-}
-
-void unblock_signal(int sig) {
-    sigset_t mask;
-    sigemptyset(&mask);
-    sigaddset(&mask, sig);
-    sigprocmask(SIG_UNBLOCK, &mask, &current_mask);
-
 }
 
 void print_node_info() {

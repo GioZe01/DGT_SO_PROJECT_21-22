@@ -35,7 +35,8 @@ pid_t extract_user(int users_num[][2]);
  */
 float gen_amount(struct user_transaction *user);
 
-void user_create(struct user_transaction *self, float budget, int pid, Balance balance, CalcCashFlow update_cash_flow) {
+void user_create(struct user_transaction *self, float budget, int pid, Balance balance, CalcCashFlow update_cash_flow)
+{
     DEBUG_NOTIFY_ACTIVITY_RUNNING("CREATING THE USER...");
     self->pid = pid;
     self->budget = budget;
@@ -50,91 +51,117 @@ void user_create(struct user_transaction *self, float budget, int pid, Balance b
     DEBUG_NOTIFY_ACTIVITY_DONE("CREATING THE USER DONE");
 }
 
-void free_user(struct user_transaction *self) {
+void free_user(struct user_transaction *self)
+{
     DEBUG_NOTIFY_ACTIVITY_RUNNING("FREE USER OPERATION...");
     queue_destroy(self->in_process);
     queue_destroy(self->transactions_failed);
     DEBUG_NOTIFY_ACTIVITY_RUNNING("FREE USER OPERATION DONE");
 }
 
-Bool check_balance(struct user_transaction *self) {
+Bool check_balance(struct user_transaction *self)
+{
     return self->u_balance(self) >= 2 ? TRUE : FALSE;
 }
 
-double calc_balance(struct user_transaction *self) {
-    double value = fabs(self->cash_flow.entries) - fabs(self->cash_flow.outcomes) - fabs(self->expected_out);
+double calc_balance(struct user_transaction *self)
+{
+    double value = (fabs(self->cash_flow.entries) - fabs(self->cash_flow.outcomes)) - fabs(self->expected_out);
 #ifdef DEBUG_USER
     print_cashflow(self);
-    sleep(1); /* I know about nanosleep but sleep is fuster to write and np at this stage for debug*/
 #endif
     return value;
 }
 
-void print_cashflow(struct user_transaction *self) {
+void print_cashflow(struct user_transaction *self)
+{
     printf("[%d]-> budget: %f, ENTRIES: %f, OUTCOMES: %f, expected_out: %f  \n", getpid(), self->budget,
            self->cash_flow.entries, self->cash_flow.outcomes, self->expected_out);
 }
 
-int update_cash_flow(struct user_transaction *self, struct Transaction t) {
-    if (self->pid == t.reciver && t.t_type == TRANSACTION_SUCCES) {
+int update_cash_flow(struct user_transaction *self, struct Transaction t)
+{
+    if (self->pid == t.reciver && t.t_type == TRANSACTION_SUCCES)
+    {
         self->cash_flow.entries += t.amount;
         self->budget += t.amount;
         return 0;
-    } else if (self->pid == t.sender && t.t_type == TRANSACTION_SUCCES) {
+    }
+    else if (self->pid == t.sender && t.t_type == TRANSACTION_SUCCES)
+    {
         self->cash_flow.outcomes += t.amount;
         self->budget -= t.amount;
         self->expected_out -= t.amount;
         return 0;
-    } else if (self->pid == t.sender && t.t_type == TRANSACTION_FAILED) {
+    }
+    else if (self->pid == t.sender && t.t_type == TRANSACTION_FAILED)
+    {
         self->cash_flow.outcomes -= t.amount;
         return 0;
-    } else if (self->pid == t.sender && t.t_type == TRANSACTION_WAITING) {
+    }
+    else if (self->pid == t.sender && t.t_type == TRANSACTION_WAITING)
+    {
         self->expected_out += t.amount;
         return 0;
     }
     return -1;
 }
 
-int generate_transaction(struct user_transaction *self, pid_t user_proc_pid, struct shm_conf *shm_conf) {
+int generate_transaction(struct user_transaction *self, pid_t user_proc_pid, struct shm_conf *shm_conf)
+{
     /* DEBUG_NOTIFY_ACTIVITY_RUNNING("GENERATING THE TRANSACTION..."); */
     struct Transaction t;
     float amount;
-    if (check_balance(self) == TRUE) {
+    if (check_balance(self) == TRUE)
+    {
+
         amount = gen_amount(self);
-        if (amount == 0 || self->expected_out + amount > self->budget || self->budget - self->expected_out <= 0) {
+        if (amount < 0 || self->expected_out + amount > self->budget || self->budget - self->expected_out <= 0)
+        {
             return -1;
         }
         int receiver = extract_user(shm_conf->users_snapshots);
-        if (receiver == -1) {
+        if (receiver == -1)
+        {
             return -1;
         }
-        while (receiver == self->pid) {
+        while (receiver == self->pid)
+        {
             receiver = extract_user(shm_conf->users_snapshots);
         }
 
         if (create_transaction(&t, user_proc_pid, receiver, amount) <
-            0) {
+            0)
+        {
             ERROR_MESSAGE("FAILED ON TRANSACTION CREATION");
-        } else {
+        }
+        else
+        {
             queue_append(self->in_process, t);
-            if (self->update_cash_flow(self, t) < 0) {
+            if (self->update_cash_flow(self, t) < 0)
+            {
                 ERROR_EXIT_SEQUENCE_USER("IMPOSSIBLE TO UPDATE CASH FLOW");
             }
             self->to_wait_transaction++;
             /* DEBUG_NOTIFY_ACTIVITY_DONE("GENERATING THE TRANSACTION DONE"); */
             return 0;
         }
-    } else {
-#ifdef DEBUG_USER
+    }
+    else
+    {
+#ifdef USER_BALANCE_CHECK
         DEBUG_ERROR_MESSAGE("BALANCE DOES NOT ALLOW ANY TRANSACTION TO BE GENERATED");
 #endif
+        return -2;
     }
     return -1;
 }
 
-pid_t extract_user(int users_num[][2]) {
+pid_t extract_user(int users_num[][2])
+{
     /* DEBUG_NOTIFY_ACTIVITY_RUNNING("EXTRACTING USER FROM SNAPSHOTS...");*/
-    if (users_num[0][0] == 0) {
+    if (users_num[0][0] == 0)
+    {
         return -1;
     }
     int max = users_num[0][0];
@@ -143,14 +170,17 @@ pid_t extract_user(int users_num[][2]) {
     return users_num[e][0];
 }
 
-int extract_node(int nodes_num) {
+int extract_node(int nodes_num)
+{
     return (rand() % (nodes_num) + 1);
 }
 
-float gen_amount(struct user_transaction *user) {
-    float ris = (rand() / (float) RAND_MAX) * (user->budget - user->expected_out);
-    if (user->budget - ris < 0) {
-        return 0;
+float gen_amount(struct user_transaction *user)
+{
+    float ris = (rand() / (float)RAND_MAX) * (user->budget - user->expected_out);
+    if (user->budget - ris < 0)
+    {
+        return -1;
     }
     return ris;
 }

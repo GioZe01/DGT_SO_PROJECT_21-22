@@ -1,3 +1,4 @@
+
 /* Handle a single node transaction queue, keep loading the transactions into a transaction pool,
  * as node_proc is data status is rappresented via the ADT structure "node".
  *

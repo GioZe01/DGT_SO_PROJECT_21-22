@@ -23,6 +23,7 @@
 #include "local_lib/headers/boolean.h"
 #include "local_lib/headers/conf_shm.h"
 #include "local_lib/headers/debug_utility.h"
+#include "local_lib/headers/gt_sig_handler.h"
 
 /*  Support functions*/
 
@@ -106,6 +107,7 @@ int queue_node_id = -1;               /* Identifier of the node queue id */
 int queue_user_id = -1;               /* Identifier of the user queue id*/
 int queue_master_id = -1;             /* Identifier of the master queue id*/
 int user_id = -1;                     /*Id of the current user into the snapshots vectors*/
+sigset_t current_mask;                /* Current mask of the user*/
 struct user_transaction current_user; /* Current representation of the user*/
 struct conf configuration;            /* Configuration File representation */
 struct shm_conf *shm_conf_pointer;    /* Ref to the shm fir configuration of the user*/
@@ -217,7 +219,9 @@ void connect_to_queues(void) {
 
 Bool set_signal_handler_user(struct sigaction sa) {
     memset(&sa, 0, sizeof(sa));
+    sigemptyset(&current_mask);
     sa.sa_handler = signals_handler_user;
+    sa.sa_mask = current_mask;
     if (sigaction(SIGINT, &sa, NULL) < 0 ||
         sigaction(SIGALRM, &sa, NULL) < 0 ||
         sigaction(SIGUSR2, &sa, NULL) < 0) {
@@ -365,22 +369,21 @@ void attach_to_shm_conf(void) {
 }
 
 void generating_transactions(void) {
+
     struct timespec gen_sleep;
     int failed_gen_trans = 0;
     while (failed_gen_trans < configuration.so_retry && current_user.budget >= 0) {
-#ifdef DEBUG_USER
-        DEBUG_MESSAGE("TRANSACTION ALLOWED");
-#endif
+        block_signal(SIGUSR2, &current_mask);
         getting_richer();
         check_for_transactions_confirmed();
         check_for_transactions_failed();
-
-        if (generate_transaction(&current_user, current_user.pid, shm_conf_pointer) < 0) {
+        int gen_trans_ris = generate_transaction(&current_user, current_user.pid, shm_conf_pointer);
+        if (gen_trans_ris == -1) {
             failed_gen_trans++;
 #ifdef DEBUG_USER
-            ERROR_MESSAGE("IMPOSSIBLE TO GENERATE TRANSACTION"); /*TODO: can be a simple advice, not a critical one*/
+            ERROR_MESSAGE("IMPOSSIBLE TO GENERATE TRANSACTION");
 #endif
-        } else {
+        } else if (gen_trans_ris >= 0) {
             gen_sleep.tv_nsec =
                     (rand() % (configuration.so_max_trans_gen_nsec - configuration.so_min_trans_gen_nsec + 1)) +
                     configuration.so_min_trans_gen_nsec;
@@ -388,18 +391,22 @@ void generating_transactions(void) {
             /*TODO: make cashing*/
 #else
             /*SENDING TRANSACTION TO THE NODE*/
-
             if (send_to_node() < 0) {
 #ifdef DEBUG_USER
                 ERROR_MESSAGE("IMPOSSIBLE TO SEND TO THE NODE");
 #endif
+            } else {
+#ifdef DEBUG_USER
+                DEBUG_MESSAGE("TRANSACTION SENT TO THE NODE");
+#endif
             }
 
 #endif
-
             nanosleep(&gen_sleep, (void *) NULL);
         }
+        unblock_signal(SIGUSR2, &current_mask);
     }
+
 }
 
 Bool check_for_transactions_confirmed(void) {
@@ -433,7 +440,6 @@ Bool getting_richer(void) {
         current_user.update_cash_flow(&current_user, msg.t);
         return TRUE;
     }
-
     return FALSE;
 }
 

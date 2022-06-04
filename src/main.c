@@ -26,6 +26,7 @@
 #include "local_lib/headers/conf_shm.h"
 #include "local_lib/headers/book_master_shm.h"
 #include "local_lib/headers/debug_utility.h"
+#include "local_lib/headers/gt_sig_handler.h"
 
 /* Support functions*/
 /*  ! All the following functions are capable of EXIT_PROCEDURE*/
@@ -126,7 +127,7 @@ Bool read_conf(void);
  * Set the handler for signals of the current main_proc
  * @param sa  describe the type of action to performed when a signal arrive
  */
-void set_signal_handlers(struct sigaction sa, sigset_t sig_mask);
+void set_signal_handlers(struct sigaction sa);
 
 /**
  * handler of the signal
@@ -150,18 +151,6 @@ void lock_to_fill_sem(void);
 void unlock_to_fill_sem(void);
 
 /**
- * @brief Block the given signal
- * @param sig signal to be blocked
- */
-void block_signal(int sig);
-
-/**
- * @brief Unblock the given signal
- * @param sig signal to be unblocked
- */
-void unblock_signal(int sig);
-
-/**
  * @brief handle the message queue of type TP_FULL
  * @param msg_repo message to be handled
  */
@@ -170,7 +159,7 @@ void tp_full_handler(struct master_msg_report msg_repo);
 /* Variables*/
 struct conf simulation_conf;                    /* Structure representing the configuration present in the conf file*/
 ProcList proc_list;                             /* Pointer to a linked list of all proc generated*/
-sigset_t current_mask;                          /* Current mask of the node*/
+sigset_t current_mask;                          /* Current mask of the main*/
 struct shm_conf *shm_conf_pointer;              /* Pointer to the shm_conf structure in shared memory*/
 struct shm_book_master *shm_masterbook_pointer; /* Pointer to the shm_masterbook structure in shared memory*/
 int simulation_end = -1;                        /* For value different >= 0 the simulation must end*/
@@ -205,7 +194,7 @@ int main() {
          *      CONFIGURATION FASE          *
          * ***********************************/
         proc_list = proc_list_create();
-        set_signal_handlers(sa, current_mask);
+        set_signal_handlers(sa);
         create_semaphores();
         create_masterbook();
         create_shm_conf();
@@ -373,16 +362,16 @@ int create_nodes_proc(int *nodes_pids, int *nodes_queues_ids) {
     return 0;
 }
 
-void set_signal_handlers(struct sigaction sa, sigset_t sig_mask) {
+void set_signal_handlers(struct sigaction sa) {
 #ifdef DEBUG_MAIN
     DEBUG_BLOCK_ACTION_START("SIGNAL HANDLERS");
     DEBUG_NOTIFY_ACTIVITY_RUNNING("SETTING SIGNALS HANDLERS...");
 #endif
     memset(&sa, 0, sizeof(sa)); /*initialize the structure*/
+    sigemptyset(&current_mask);
     sa.sa_handler = signals_handler;
-    sa.sa_mask = sig_mask;
-    if (sigaction(SIGTSTP, &sa, NULL) < 0 ||
-        sigaction(SIGINT, &sa, NULL) < 0 ||
+    sa.sa_mask = current_mask;
+    if (sigaction(SIGINT, &sa, NULL) < 0 ||
         sigaction(SIGTERM, &sa, NULL) < 0 ||
         sigaction(SIGALRM, &sa, NULL) < 0) {
         ERROR_MESSAGE("ERROR SETTING SIGNAL HANDLERS");
@@ -411,7 +400,6 @@ void signals_handler(int signum) {
                 exit(0);
             }
         case SIGALRM:
-            alarm(0);
             if (getpid() == main_pid) {
                 num_inv++;
                 /*request info from kids */
@@ -625,9 +613,6 @@ void print_info(void) {
 void update_kids_info(void) {
     DEBUG_BLOCK_ACTION_START("UPDATE KIDS INFO");
     DEBUG_NOTIFY_ACTIVITY_RUNNING("UPDATING KIDS INFO....");
-#ifdef DEBUG_MAIN
-    Bool printed = FALSE;
-#endif
     struct master_msg_report *msg_rep = malloc(sizeof(struct master_msg_report));
     if (check_msg_report(msg_rep, msg_report_id_master, proc_list) == 1) {
         tp_full_handler(*msg_rep);
@@ -664,15 +649,18 @@ void update_kids_info(void) {
             if (acknowledge(msg_rep, proc_list) == 1) {
                 tp_full_handler(*msg_rep);
             }
-        } else if (num_msg_to_wait_for == 1 && retry > MAX_RETRY_UPDATE_KIDS_INFO) {
-            kill(to_wait_proc[num_msg_to_wait_for], SIGUSR2);
+        } else if (num_msg_to_wait_for <= simulation_conf.so_nodes_num && retry > MAX_RETRY_UPDATE_KIDS_INFO) {
+            int i;
+            for (i = 0; i < num_msg_to_wait_for; i++) {
+                kill(to_wait_proc[num_msg_to_wait_for-i], SIGUSR2);
 #ifdef DEBUG_MAIN
-            if (printed == FALSE){
                  printf("Signal resent to %d\n\n", to_wait_proc[num_msg_to_wait_for]);
-                 printed = TRUE;
-            }
 #endif
-            nanosleep(SLEEP_TIME_UPDATE_KIDS_INFO, NULL);
+            }
+            struct timespec ts;
+            ts.tv_sec = SLEEP_TIME_UPDATE_KIDS_INFO;
+            nanosleep(&ts, NULL);
+            retry = 0;
         } else {
             retry++;
         }
@@ -773,7 +761,7 @@ void unlock_to_fill_sem(void) {
 }
 
 void tp_full_handler(struct master_msg_report msg_repo) {
-    block_signal(SIGALRM);
+    block_signal(SIGALRM, &current_mask);
     int new_node_id = shm_conf_pointer->nodes_snapshots[shm_conf_pointer->nodes_snapshots[0][0]][1] +
                       DELTA_NODE_MSG_TYPE;
     int new_node_pid = create_node_proc(new_node_id);
@@ -792,19 +780,5 @@ void tp_full_handler(struct master_msg_report msg_repo) {
     send_sig_to_all_nodes(proc_list, SIGUSR1, TRUE);
     send_msg_to_all_nodes(new_node_id, simulation_conf.so_retry, proc_list,
                           shm_conf_pointer->nodes_snapshots[shm_conf_pointer->nodes_snapshots[0][0]][1], TRUE);
-    unblock_signal(SIGALRM);
-}
-
-void block_signal(int sig) {
-    sigset_t mask;
-    sigemptyset(&mask);
-    sigaddset(&mask, sig);
-    sigprocmask(SIG_BLOCK, &mask, &current_mask);
-}
-
-void unblock_signal(int sig) {
-    sigset_t mask;
-    sigemptyset(&mask);
-    sigaddset(&mask, sig);
-    sigprocmask(SIG_UNBLOCK, &mask, &current_mask);
+    unblock_signal(SIGALRM, &current_mask);
 }
