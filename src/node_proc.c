@@ -40,8 +40,9 @@
  * If it finds node msg of type NODE_TRANSACTION it proccess them
  * and make the aknowledgement
  * @param msg_rep the messagge to be loaded if present in the queue
- * */
-void process_node_transaction(struct node_msg *msg_rep);
+ * @return -1 if the transaction is not handled 0 otherwise
+ */
+int process_node_transaction(struct node_msg *msg_rep);
 
 /**
  * If it finds node msg of type TRANSACTION_TYPE it process them
@@ -171,6 +172,15 @@ void advice_master_of_termination(long termination_type);
  * */
 long int get_time_processing(void);
 
+/**
+ * @brief Handle the msg with the transaction received
+ * if tp is full check for hops in the transaction: if hops not exceeded send the transaction to the next node otherwise
+ * send the transaction to the master to be handled
+ * @param msg the message received
+ * @return TRUE if the message was handled, FALSE otherwise
+ */
+Bool handle_msg_transaction(struct node_msg *msg);
+
 /* SysVar */
 int semaphore_start_id = -1;                    /*Id of the start semaphore arrays for sinc*/
 int semaphore_masterbook_id = -1;               /*Id of the masterbook semaphore for accessing the block matrix*/
@@ -245,7 +255,7 @@ int main(int argc, char const *argv[]) {
         /****************************************
          *   PROCESSING OF TRANSACTION FASE     *
          * **************************************/
-        alarm(3);
+        alarm(1);
         while (node_end != 1 && failure_shm < MAX_FAILURE_SHM_LOADING) {
             load_simple_transaction(&msg_rep);
             process_node_transaction(&msg_rep);
@@ -313,7 +323,6 @@ Bool set_signal_handler_node(struct sigaction sa) {
     sa.sa_mask = current_mask;
     if (sigaction(SIGINT, &sa, NULL) < 0 ||
         sigaction(SIGALRM, &sa, NULL) < 0 ||
-        sigaction(SIGTERM, &sa, NULL) < 0 ||
         sigaction(SIGUSR1, &sa, NULL) < 0 ||
         sigaction(SIGUSR2, &sa, NULL) < 0) {
         ERROR_EXIT_SEQUENCE_NODE("ERROR DURING THE CREATION OF THE SIG HANDLER ");
@@ -330,7 +339,6 @@ void signals_handler(int signum) {
     struct node_msg node_msg;
     struct Transaction t;
     switch (signum) {
-        case SIGTERM:
         case SIGINT:
             alarm(0); /*pending alarm removed*/
             current_node.exec_state = PROC_STATE_TERMINATED;
@@ -338,7 +346,7 @@ void signals_handler(int signum) {
             EXIT_PROCEDURE_NODE(0);
             break;
         case SIGALRM:
-            if (get_num_transactions(current_node.transactions_pool) > 0) {
+            if (get_num_transactions(current_node.transactions_pool) > 0 && friends != 0) {
                 /**
                  * select a transaction from the pool and send it to a friend node into the message queue
                  */
@@ -356,6 +364,7 @@ void signals_handler(int signum) {
              */
             printf("\nNODE MESSAGE ARRIVED\n\n");
             node_msg_receive(queue_node_id, &node_msg, MSG_MASTER_ORIGIN_ID);
+            printf(" Node message sender id: %d\n", node_msg.t.sender);
             friends = set_one(friends, node_msg.sender_pid);
             break;
         case SIGUSR2:
@@ -462,7 +471,6 @@ int process_node_block() {
         }
         /*send confirmed to all users*/
         adv_users_of_block();
-
     }
     /* Unblock signal */
     unblock_signal(SIGUSR2, &current_mask);
@@ -643,25 +651,9 @@ void adv_users_of_block(void) {
 int process_simple_transaction_type(struct node_msg *msg_rep) {
     if (node_msg_receive(queue_node_id, msg_rep, current_node.node_id) == 0) {
 #ifdef DEBUG_NODE
-        DEBUG_MESSAGE("NODE TRANSACTION TYPE RECEIVED");
+        DEBUG_MESSAGE("NODE SIMPLE TRANSACTION RECEIVED");
 #endif
-        if (get_num_transactions(current_node.transactions_pool) < current_node.tp_size) {
-            queue_append(current_node.transactions_pool, msg_rep->t);
-        } else if (msg_rep->t.hops < node_configuration.so_hops) {
-            /**TP_SIZE FULL
-             * Sending the transaction to a friend
-             */
-            int friend = shm_conf_pointer_node->nodes_snapshots[get_rand_one(friends)][1];
-            node_msg_snd(queue_node_id, msg_rep, MSG_NODE_ORIGIN_TYPE, &msg_rep->t, current_node.node_id, TRUE,
-                         node_configuration.so_retry, friend);
-        } else {
-            /*TP_SIZE FULL AND HOPS EXCEEDED
-             * Reporting the transaction to the master
-             */
-            struct master_msg_report master_msg;
-            master_msg_send(queue_master_id, &master_msg, TP_FULL, NODE, current_node.pid, current_node.exec_state,
-                            TRUE, current_node.budget, &msg_rep->t);
-        }
+        handle_msg_transaction(msg_rep);
     } else {
         msg_rep->sender_pid = -1;
         return -1;
@@ -669,32 +661,18 @@ int process_simple_transaction_type(struct node_msg *msg_rep) {
     return 0;
 }
 
-void process_node_transaction(struct node_msg *msg_rep) {
+int process_node_transaction(struct node_msg *msg_rep) {
     /*TODO: Implement incoming transaction from other node*/
     if (node_msg_receive(queue_node_id, msg_rep, current_node.node_id - 1) == 0) {
+#ifdef DEBUG_NODE
         DEBUG_MESSAGE("NODE TRANSACTION RECEIVED");
-        if (get_num_transactions(current_node.transactions_pool) < current_node.tp_size) {
-            queue_append(current_node.transactions_pool, msg_rep->t);
-        } else if (msg_rep->t.hops < node_configuration.so_hops) {
-            /**TP_SIZE FULL
-             * Sending the transaction to a friend
-             */
-            printf("TP_SIZE FULL NODE\n");
-            int friend = shm_conf_pointer_node->nodes_snapshots[get_rand_one(friends)][1];
-            node_msg_snd(queue_node_id, msg_rep, MSG_NODE_ORIGIN_TYPE, &msg_rep->t, current_node.node_id, TRUE,
-                         node_configuration.so_retry, friend);
-        } else {
-            /*TP_SIZE FULL AND HOPS EXCEEDED
-             * Reporting the transaction to the master
-             */
-            printf("TP_SIZE FULL AND HOPS EXCEEDED\n");
-            struct master_msg_report master_msg;
-            master_msg_send(queue_master_id, &master_msg, TP_FULL, NODE, current_node.pid, current_node.exec_state,
-                            TRUE, current_node.budget, &msg_rep->t);
-        }
+#endif
+        handle_msg_transaction(msg_rep);
     } else {
         msg_rep->sender_pid = -1;
+        return -1;
     }
+    return 0;
 }
 
 void load_simple_transaction(struct node_msg *msg_rep) {
@@ -706,17 +684,38 @@ void load_simple_transaction(struct node_msg *msg_rep) {
 
 void print_node_info() {
     int *friends_pos;
-    /*Print node friends and values*/
-    printf("NODE FRIENDS:%d\n", current_node.node_id);
     if (friends != -1) {
         int i;
         friends_pos = get_all_ones_positions(friends);
         for (i = 0; i < node_configuration.so_num_friends; i++) {
             printf("[%d] Friend position: %d\n", getpid(),
                    shm_conf_pointer_node->nodes_snapshots[(friends_pos[i]) + 1][0]);
-
         }
         printf("\n");
         free(friends_pos);
+    }
+}
+
+Bool handle_msg_transaction(struct node_msg *msg) {
+    if (get_num_transactions(current_node.transactions_pool) < current_node.tp_size) {
+        queue_append(current_node.transactions_pool, msg->t);
+    } else if (msg->t.hops < node_configuration.so_hops && friends != 0) {
+        /**TP_SIZE FULL
+         * Sending the transaction to a friend
+         */
+        int friend = shm_conf_pointer_node->nodes_snapshots[get_rand_one(friends)][1];
+        node_msg_snd(queue_node_id, msg, MSG_NODE_ORIGIN_TYPE, &msg->t, current_node.node_id, TRUE,
+                     node_configuration.so_retry, friend);
+    } else {
+        /**
+         * TP_SIZE FULL AND HOPS EXCEEDED
+         * Reporting the transaction to the master
+         */
+#ifdef DEBUG_NODE
+        DEBUG_MESSAGE("TRANSACTION HOPS EXCEEDED");
+#endif
+        struct master_msg_report master_msg;
+        master_msg_send(queue_master_id, &master_msg, TP_FULL, NODE, current_node.pid, current_node.exec_state,
+                        TRUE, current_node.budget, &msg->t);
     }
 }

@@ -18,6 +18,7 @@ int node_msg_create(struct node_msg *self, long type, pid_t sender_pid, struct T
         self->t = *t;
     }else{
         self->t = create_empty_transaction();
+        self->t.sender = t->sender;
     }
     self->type = type;
     self->sender_pid = sender_pid;

@@ -730,7 +730,7 @@ int create_node_proc(int new_node_id) {
         case -1:
         ERROR_EXIT_SEQUENCE_MAIN("IMPOSSIBLE TO FORK NEW NODE PROCESS");
         case 0:
-            execv(PATH_TO_NODE, argv_node);
+            execve(argv_node[0], argv_node, NULL);
             ERROR_EXIT_SEQUENCE_MAIN("IMPOSSIBLE TO EXEC NEW NODE PROCESS");
         default:
             p = proc_create(new_node_pid, new_node_id, PROC_STATE_RUNNING, PROC_TYPE_NODE, -1);
@@ -768,17 +768,18 @@ void tp_full_handler(struct master_msg_report msg_repo) {
     int new_node_friends = rand_int_n_exclude(simulation_conf.so_num_friends,
                                               shm_conf_pointer->nodes_snapshots[0][0] + 1,
                                               shm_conf_pointer->nodes_snapshots[0][0]);
+
     if (shm_conf_add_node(shm_conf_pointer, new_node_pid, new_node_id, new_node_friends) == FALSE) {
         ERROR_EXIT_SEQUENCE_MAIN("ERROR WHILE ADDING THE NEW NODE TO THE SHARED MEMORY, MAX NODE LIMIT REACHED");
     }
-    printf("Number of NODE process running : %d\n\n", shm_conf_pointer->nodes_snapshots[0][0]);
+
     struct node_msg node_msg;
     node_msg.t.hops = 0;
     node_msg_snd(msg_report_id_nodes, &node_msg, MSG_TRANSACTION_TYPE, &msg_repo.t, main_pid, TRUE,
                  simulation_conf.so_retry, new_node_id);
     /*Send the signal SIGUSR1 to all the nodes*/
     send_sig_to_all_nodes(proc_list, SIGUSR1, TRUE);
-    send_msg_to_all_nodes(new_node_id, simulation_conf.so_retry, proc_list,
-                          shm_conf_pointer->nodes_snapshots[shm_conf_pointer->nodes_snapshots[0][0]][1], TRUE);
+    send_msg_to_all_nodes(msg_report_id_nodes, simulation_conf.so_retry, proc_list,
+                          new_node_id, TRUE);
     unblock_signal(SIGALRM, &current_mask);
 }

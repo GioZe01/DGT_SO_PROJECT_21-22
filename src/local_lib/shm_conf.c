@@ -81,11 +81,12 @@ Bool shm_conf_add_node(struct shm_conf *self, int pid, int queue_id, int friends
     if (self->nodes_snapshots[0][0] == NODES_MAX) {
         return FALSE;
     }
+
     /**
      * Check if queue_id is already used
      */
     int *snapshot;
-    snapshot = &self->nodes_snapshots[1][0];
+    snapshot = &self->nodes_snapshots[1][1];
     int i = 0;
     for (i = 0; i < self->nodes_snapshots[0][0]; snapshot += 3) {
         if (*(snapshot + 1) == queue_id) {
@@ -96,10 +97,10 @@ Bool shm_conf_add_node(struct shm_conf *self, int pid, int queue_id, int friends
     /**
      * Add the node information to the snapshot at snapshot[0][0] +1 position
      */
-    int row = self->nodes_snapshots[0][0] + 1;
+    int row = self->nodes_snapshots[0][0]+1;
     self->nodes_snapshots[row][0] = pid;
     self->nodes_snapshots[row][1] = queue_id;
     self->nodes_snapshots[row][2] = friends;
-    self->nodes_snapshots[0][0]++;
+    self->nodes_snapshots[0][0] = self->nodes_snapshots[0][0]+1;
     return TRUE;
 }

@@ -208,12 +208,11 @@ int * send_sig_to_all(ProcList proc_list, int signal) {
         } else if (errno == EINTR || tmp->p->proc_state == PROC_STATE_TERMINATED) { continue; }
         else {
             free(pids);
-            return -1;
+            return NULL;
         }
     }
     pids[0] = num_proc_reciver;
-    /** Fix the size of pids */
-    pids = realloc(pids, sizeof(int) * (num_proc_reciver+1));
+
     return pids;
 }
 
@@ -416,7 +415,7 @@ struct node *sortedMerge(struct node *frontHead, struct node *backHead) {
 }
 
 Proc proc_create(pid_t pid, int id_queue, short int proc_state, short int proc_type, float budget) {
-    Proc p = (Proc) malloc(sizeof(struct ProcessInfo));
+    Proc p = malloc(sizeof(struct ProcessInfo));
     p->proc_type = proc_type;
     p->proc_state = proc_state;
     p->pid = pid;

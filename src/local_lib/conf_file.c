@@ -98,10 +98,11 @@ int load_configuration(struct conf *self) {
         self->so_min_trans_proc_nsec <= 0 ||
         self->so_max_trans_proc_nsec <= 0 ||
         self->so_sim_sec <= 0 ||
-        self->so_num_friends<0 ||
-        self->so_hops <0){
+        self->so_num_friends < 0 ||
+        self->so_hops < 0) {
         fclose(conf_file);
-        return -2;}
+        return -2;
+    }
     /*Checks for -3*/
     if (self->so_user_num < 2 || self->so_nodes_num < 1) {/*TODO: numbers nodes check requested ?*/
         fclose(conf_file);
@@ -115,7 +116,8 @@ int load_configuration(struct conf *self) {
         return -4;
     }
     /*Checks for -5*/
-    if (self->so_reward > 100 || self->so_num_friends > MAX_FRIENDS) { /*Vorrebbe dire che con una transazione da max budget non puoi pagare le spese*/
+    if (self->so_reward > 100 || self->so_num_friends >
+                                 MAX_FRIENDS) { /*Vorrebbe dire che con una transazione da max budget non puoi pagare le spese*/
         fclose(conf_file);
         return -5;
     }
