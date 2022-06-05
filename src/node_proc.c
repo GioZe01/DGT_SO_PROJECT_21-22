@@ -364,7 +364,6 @@ void signals_handler(int signum) {
              */
             printf("\nNODE MESSAGE ARRIVED\n\n");
             node_msg_receive(queue_node_id, &node_msg, MSG_MASTER_ORIGIN_ID);
-            printf(" Node message sender id: %d\n", node_msg.t.sender);
             friends = set_one(friends, node_msg.sender_pid);
             break;
         case SIGUSR2:
