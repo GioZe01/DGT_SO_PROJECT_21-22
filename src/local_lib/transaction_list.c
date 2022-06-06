@@ -46,7 +46,6 @@ static void queue_underflow(void);
  */
 void get_status(char char_type[80], int t_type);
 
-
 /**
  * Compare to transaction
  * @param t1 transaction 1
@@ -62,10 +61,10 @@ Bool compare_transaction(struct Transaction t1, struct Transaction t2);
  */
 void append_to_node(struct node *where, struct node *to_append);
 
-struct Transaction create_empty_transaction(void){
+struct Transaction create_empty_transaction(void) {
     struct Transaction t;
     t.t_type = -1;
-    t.amount= -1;
+    t.amount = -1;
     t.reward = -1;
     t.hops = -1;
     t.sender = -1;
@@ -95,7 +94,7 @@ int create_transaction(struct Transaction *t, pid_t sender, pid_t receiver, floa
 }
 
 Queue queue_create() {
-    Queue q = malloc(sizeof(struct transaction_list));
+    Queue q = (struct transaction_list *) malloc(sizeof(struct transaction_list));
     if (q == NULL) {
         ERROR_MESSAGE("MALLOC FAILED IN THE CREATION OF QUEUE_T");
         return NULL;
@@ -134,7 +133,7 @@ void queue_append(Queue q, struct Transaction t) {
     new_node->next = NULL;
     if (queue_is_empty(q) == TRUE) /*adding the first ever node to the list*/
         q->first = q->last = new_node;
-    else {/*is not the first node*/
+    else { /*is not the first node*/
         q->last->next = new_node;
         q->last = new_node;
     }
@@ -195,10 +194,9 @@ struct Transaction queue_head(Queue q) {
 }
 
 struct Transaction queue_last(Queue q) {
-    if (queue_is_empty(q) == FALSE){
+    if (queue_is_empty(q) == FALSE) {
         return q->last->t;
-    }
-    else {
+    } else {
 #ifdef DEBUG_UNDERFLOW
         DEBUG_MESSAGE("queue_head in transaction: UNDERFLOW CALLED");
 #endif
@@ -226,7 +224,7 @@ float queue_apt_amount_reward(Queue q, float percentage) {
     float total_reward = 0;
 
     for (; first != NULL; first = first->next) {
-        first->t.reward = (first->t.amount * (percentage))/ 100;
+        first->t.reward = (first->t.amount * (percentage)) / 100;
         if (first->t.reward < 0) {
             ERROR_MESSAGE("NEGATIVE REWARD, CHECK VALUES");
             return -1;
@@ -305,7 +303,7 @@ int get_num_transactions(Queue q) {
 }
 
 int queue_to_array(Queue q, struct Transaction vector[]) {
-    if (get_num_transactions(q)>0) {
+    if (get_num_transactions(q) > 0) {
         struct node *iterable = q->first;
         int i = 0;
         for (; iterable != NULL; iterable = iterable->next) {
@@ -316,22 +314,23 @@ int queue_to_array(Queue q, struct Transaction vector[]) {
     }
     return -1;
 }
-int array_to_queue(Queue q, struct Transaction* vector){
-    if (vector == NULL){
+
+int array_to_queue(Queue q, struct Transaction *vector) {
+    if (vector == NULL) {
         return -1;
     }
     int i = 0;
-    for (;i<SO_BLOCK_SIZE; i++){
+    for (; i < SO_BLOCK_SIZE; i++) {
         queue_append(q, vector[i]);
     }
     return 0;
 }
 
-Bool queue_copy_n_transactions(Queue q, Queue r, int n){
+Bool queue_copy_n_transactions(Queue q, Queue r, int n) {
     if (n > q->transactions) {
         return FALSE;
     }
-    int to_remove= n;
+    int to_remove = n;
     struct node *iterable = q->first;
     for (; iterable != NULL && n > 0; iterable = iterable->next) {
         queue_append(r, iterable->t);
@@ -354,4 +353,3 @@ int copy_transaction(struct Transaction t, struct Transaction *t_copy) {
     t_copy->timestamp = t.timestamp;
     return 0;
 }
-

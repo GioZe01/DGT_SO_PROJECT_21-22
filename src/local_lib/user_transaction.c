@@ -67,7 +67,7 @@ Bool check_balance(struct user_transaction *self)
 double calc_balance(struct user_transaction *self)
 {
     double value = (fabs(self->cash_flow.entries) - fabs(self->cash_flow.outcomes)) - fabs(self->expected_out);
-#ifdef DEBUG_USER
+#ifdef SHOW_USER_CASHFLOW
     print_cashflow(self);
 #endif
     return value;

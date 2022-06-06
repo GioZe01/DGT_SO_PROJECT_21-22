@@ -243,6 +243,7 @@ void signals_handler_user(int signum) {
             EXIT_PROCEDURE_USER(0);
             break;
         case SIGALRM: /*    Generate a new transaction  */
+            alarm(0); /* pending alarm removed*/
             DEBUG_NOTIFY_ACTIVITY_RUNNING("GENERATING A NEW TRANSACTION FROM SIG...");
             if (generate_transaction(&current_user, current_user.pid, shm_conf_pointer) < 0) {
                 ERROR_EXIT_SEQUENCE_USER("IMPOSSIBLE TO GENERATE TRANSACTION");
@@ -341,7 +342,6 @@ int send_to_node(void) {
         }
         queue_remove_head(current_user.in_process); /*removed if and only if has been sent*/
 #ifdef DEBUG_USER
-        node_msg_print(&msg);
         DEBUG_NOTIFY_ACTIVITY_DONE("SENDING TRANSACTION TO THE NODE DONE");
 #endif
         return 0;

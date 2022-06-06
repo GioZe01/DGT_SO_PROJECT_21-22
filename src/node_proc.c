@@ -346,6 +346,7 @@ void signals_handler(int signum) {
             EXIT_PROCEDURE_NODE(0);
             break;
         case SIGALRM:
+            alarm(0); /*pending alarm removed*/
             if (get_num_transactions(current_node.transactions_pool) > 0 && friends != 0) {
                 /**
                  * select a transaction from the pool and send it to a friend node into the message queue
@@ -374,7 +375,6 @@ void signals_handler(int signum) {
             master_msg_send(queue_master_id, &master_msg, INFO_BUDGET, NODE, current_node.pid, current_node.exec_state,
                             TRUE, current_node.budget, &t);
 #ifdef DEBUG_NODE
-            printf(" [%d] NODE REPLIED\n", current_node.pid);
             DEBUG_NOTIFY_ACTIVITY_DONE("{DEBUG_NODE}:= REPLIED TO MASTER DONE");
 #endif
             break;
@@ -623,7 +623,7 @@ void adv_users_of_block(void) {
     int sender_pid = -1;
     int receiver_pid = -1;
     while (queue_is_empty(current_node.transactions_block) == FALSE) {
-        struct user_msg *u_msg_rep = malloc(sizeof(struct user_msg));
+        struct user_msg *u_msg_rep = (struct user_msg *) malloc(sizeof(struct user_msg));
         struct Transaction t = queue_head(current_node.transactions_block);
         t.t_type = TRANSACTION_SUCCES;
         sender_pid = t.sender;

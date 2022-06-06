@@ -28,23 +28,16 @@ typedef struct processes_info_list *ProcList;
 ProcList proc_list_create();
 
 /**
- * Create and initialize a new Proc
- * @param pid the pid of the proc
- * @param id_queue the id of the queue of the proc
- * @param proc_state the state of the proc
- * @param proc_type the type of the proc
- * @param budget the budget of the proc
- * @return the new proc
- */
-Proc proc_create(pid_t pid, int id_queue, short int proc_state, short int proc_type, float budget);
-
-/**
  * Insert the new process and initialize it in running mode
  * @param self the next of the list to be linked with
- * @param proc the proc to be inserted
+ * @param pid the pid of the new process
+ * @param id_queue the id of the queue of the new process
+ * @param proc_type the type of the new process
+ * @param budget of the new process
+ * @param proc_state the state of the new process
  * @return FALSE if the process is not inserted, TRUE otherwise
  */
-Bool insert_in_list(ProcList self, Proc proc);
+Bool insert_in_list(ProcList self, pid_t pid, int id_queue, short int proc_state, short int proc_type, float budget);
 
 /**
  * Check if the ProcList is empty
@@ -58,7 +51,7 @@ Bool proc_list_is_empty(const ProcList self);
  * @param pid the value to search for
  * @return the element with the specified pid if found. Otherwise NULL
  */
-Proc get_proc_from_pid(ProcList self, pid_t pid);
+struct ProcessInfo get_proc_from_pid(ProcList self, pid_t pid);
 
 /**
  * Return the process inside the list associated with the id_queue given as param
@@ -66,7 +59,7 @@ Proc get_proc_from_pid(ProcList self, pid_t pid);
  * @param queue_id the value to search for
  * @return the element with the specified pid if found. Otherwise NULL
  */
-Proc get_proc_from_queue_id(ProcList self, int id_queue);
+struct ProcessInfo get_proc_from_queue_id(ProcList self, int id_queue);
 
 /**
  * \brief Send the given signal to all proc saved via kill() method
@@ -75,7 +68,7 @@ Proc get_proc_from_queue_id(ProcList self, int id_queue);
  * @param signal signal to be sent
  * @return An array of pid_t containing the pid of the processes that have received the signal, in the 0 index is the number of receivers
  */
-int * send_sig_to_all(ProcList proc_list, int signal);
+int *send_sig_to_all(ProcList proc_list, int signal);
 
 /**
  * Send the given signal to the process with type node
@@ -141,5 +134,29 @@ int get_num_of_user_proc_running(ProcList self);
  * @return FALSE in case of FAILURE, TRUE otherwise
  */
 Bool send_msg_to_all_nodes(int queue_id, int retry, ProcList proc_list, int node_id, Bool exclude_last);
+
+/**
+ * @brief Get the last proc in the list
+ * @param self the list to search in
+ * @return The last proc in the list
+ */
+struct ProcessInfo get_last(ProcList self);
+
+/**
+ * @brief Get the first proc in the list
+ * @param self the list to search in
+ * @return The first proc in the list
+ */
+struct ProcessInfo get_first(ProcList self);
+
+/**
+ * @brief Update if found the proc with the given pid in the list
+ * @param self the list to search in
+ * @param pid  the pid to search for
+ * @param budget  the new budget
+ * @param proc_state  the new proc_state
+ * @return -2 if the pid is not found, -1 if the budget is not valid, 0 otherwise
+ */
+int update_proc(ProcList self, int pid, float budget, short int proc_state);
 /*TODO: implementare budget maggiore get -> vedere se fare una hash table di processi*/
 #endif /*DGT_SO_PROJECT_21_22_PROCESS_INFO_LIST_H*/

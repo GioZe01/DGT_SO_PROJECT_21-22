@@ -154,7 +154,7 @@ void unlock_to_fill_sem(void);
  * @brief handle the message queue of type TP_FULL
  * @param msg_repo message to be handled
  */
-void tp_full_handler(struct master_msg_report msg_repo);
+void tp_full_handler(struct master_msg_report *msg_repo);
 
 /* Variables*/
 struct conf simulation_conf;                    /* Structure representing the configuration present in the conf file*/
@@ -173,7 +173,7 @@ int semaphore_masterbook_id = -1;               /* Id of the masterbook semaphor
 int semaphore_to_fill_id = -1;                  /* Id of the masterbook to_fill access semaphore*/
 int last_signal = -1;                           /* Last signal received*/
 pid_t main_pid;                                 /*pid of the current proc*/
-
+Bool printed = FALSE;                           /* Flag to know if the info has been printed*/
 int main() {
     /*  Local Var Declaration   */
     struct sigaction sa; /*Structure for handling signals */
@@ -261,11 +261,12 @@ int main() {
                 print_info();
                 end_simulation();
             } else if (msg_rep_value == 1) {
-                tp_full_handler(msg_repo);
+                tp_full_handler(&msg_repo);
 
             } else if (msg_rep_value == 2) {
                 master_msg_report_print(&msg_repo);
             }
+
         }
         end_simulation();
     }
@@ -303,8 +304,7 @@ int create_users_proc(int *users_pids, int *users_queues_ids) {
                 users_pids[i + 1] = user_pid;
                 users_pids[0] += 1;
                 users_queues_ids[0] += 1;
-                Proc p = proc_create(user_pid, queue_id, PROC_STATE_RUNNING, PROC_TYPE_USER, -1);
-                insert_in_list(proc_list, p);
+                insert_in_list(proc_list, user_pid, queue_id, PROC_STATE_RUNNING, PROC_TYPE_USER, -1);
                 /*Free if utilized pointers to argv*/
                 if (argv_user[1] != NULL)
                     free(argv_user[1]);
@@ -347,8 +347,7 @@ int create_nodes_proc(int *nodes_pids, int *nodes_queues_ids) {
                 nodes_pids[i + 1] = node_pid;
                 nodes_pids[0] += 1;
                 nodes_queues_ids[0] += 1;
-                Proc p = proc_create(node_pid, queue_id, PROC_STATE_RUNNING, PROC_TYPE_NODE, -1);
-                insert_in_list(proc_list, p);
+                insert_in_list(proc_list, node_pid, queue_id, PROC_STATE_RUNNING, PROC_TYPE_NODE, -1);
                 /*Free if utilized pointers to argv*/
                 if (argv_node[1] != NULL)
                     free(argv_node[1]);
@@ -614,11 +613,9 @@ void update_kids_info(void) {
     DEBUG_BLOCK_ACTION_START("UPDATE KIDS INFO");
     DEBUG_NOTIFY_ACTIVITY_RUNNING("UPDATING KIDS INFO....");
     struct master_msg_report *msg_rep = malloc(sizeof(struct master_msg_report));
-    if (check_msg_report(msg_rep, msg_report_id_master, proc_list) == 1) {
-        tp_full_handler(*msg_rep);
-    }
     int retry = 0;
     int *to_wait_proc = send_sig_to_all(proc_list, SIGUSR2);
+
     int num_msg_to_wait_for = to_wait_proc[0];
     to_wait_proc++;
     if (num_msg_to_wait_for < 0) {
@@ -647,14 +644,20 @@ void update_kids_info(void) {
             }
             /** Acknowledge the message */
             if (acknowledge(msg_rep, proc_list) == 1) {
-                tp_full_handler(*msg_rep);
+                tp_full_handler(&msg_rep);
             }
         } else if (num_msg_to_wait_for <= simulation_conf.so_nodes_num && retry > MAX_RETRY_UPDATE_KIDS_INFO) {
             int i;
+            /*Print to wait proc*/
+            printf("\n TO WAIT PROC: ");
             for (i = 0; i < num_msg_to_wait_for; i++) {
-                kill(to_wait_proc[num_msg_to_wait_for-i], SIGUSR2);
+                printf("%d ", to_wait_proc[i]);
+            }
+            printf("\n");
+            for (i = 0; i < num_msg_to_wait_for; i++) {
+                kill(to_wait_proc[i], SIGUSR2);
 #ifdef DEBUG_MAIN
-                 printf("Signal resent to %d\n\n", to_wait_proc[num_msg_to_wait_for]);
+                printf("Signal resent to %d\n\n", to_wait_proc[i]);
 #endif
             }
             struct timespec ts;
@@ -670,19 +673,26 @@ void update_kids_info(void) {
 }
 
 Bool check_runnability() {
+    if ((get_num_of_proc(proc_list) == 3 || get_first(proc_list).pid == get_last(proc_list).pid) &&
+        printed == FALSE) {
+        printf("\n\nNumber of proc in the list: %d\n", get_num_of_proc(proc_list));
+        printf("First element: %d\n", get_first(proc_list).pid);
+        printf("Last element: %d\n", get_last(proc_list).pid);
+        if (get_first(proc_list).pid == get_last(proc_list).pid) {
+            printed = TRUE;
+        }
+    }
     int num_user_proc_running = get_num_of_user_proc_running(proc_list);
     if (num_user_proc_running <= 0) {
         printf("NUM USER PROC RUNNING: %d\n", num_user_proc_running);
+        simulation_end = SIMULATION_END_BY_NO_PROC_RUNNING;
+        return FALSE;
     }
     if (shm_masterbook_pointer->to_fill >= SO_REGISTRY_SIZE) {
         simulation_end = SIMULATION_END_BY_SO_REGISTRY_FULL;
         return FALSE;
-    } else if (num_user_proc_running <= 0) {
-        simulation_end = SIMULATION_END_BY_NO_PROC_RUNNING;
-        return FALSE;
-    } else {
-        return TRUE;
     }
+    return TRUE;
 }
 
 void end_simulation() {
@@ -714,32 +724,36 @@ char *get_end_simulation_msg() {
 void generate_nodes_friends_array(int *nodes_friends, int *nodes) {
     int i = 1;
     nodes_friends[0] = nodes[0];
-    for (; i < nodes[0]+1; i++) {
-        nodes_friends[i] = rand_int_n_exclude(simulation_conf.so_num_friends, i-1, nodes[0]);
+    for (; i < nodes[0] + 1; i++) {
+        nodes_friends[i] = rand_int_n_exclude(simulation_conf.so_num_friends, i - 1, nodes[0]);
     }
 }
 
 int create_node_proc(int new_node_id) {
     pid_t new_node_pid;
     char *argv_node[] = {PATH_TO_NODE, NULL, NULL};
-    Proc p;
     /*Add the new node id to argv_node and run the new node process*/
     argv_node[1] = (char *) malloc(sizeof(char) * 11);
-    sprintf(argv_node[1], "%d", new_node_id);
     switch (new_node_pid = fork()) {
         case -1:
         ERROR_EXIT_SEQUENCE_MAIN("IMPOSSIBLE TO FORK NEW NODE PROCESS");
         case 0:
+            sprintf(argv_node[1], "%d", new_node_id);
             execve(argv_node[0], argv_node, NULL);
             ERROR_EXIT_SEQUENCE_MAIN("IMPOSSIBLE TO EXEC NEW NODE PROCESS");
         default:
-            p = proc_create(new_node_pid, new_node_id, PROC_STATE_RUNNING, PROC_TYPE_NODE, -1);
-            insert_in_list(proc_list, p);
+
+            insert_in_list(proc_list, new_node_pid, new_node_id, PROC_STATE_RUNNING, PROC_TYPE_NODE, -1);
             /*Free the memory allocated for the argv_node*/
-            free(argv_node[1]);
+            if (argv_node[1] != NULL) {
+                free(argv_node[1]);
+            }
+            if (argv_node[2] != NULL) {
+                free(argv_node[2]);
+            }
             DEBUG_MESSAGE("NEW NODE PROCESS CREATED");
-            return new_node_pid;
     }
+    return new_node_pid;
 }
 
 void lock_to_fill_sem(void) {
@@ -760,8 +774,9 @@ void unlock_to_fill_sem(void) {
     }
 }
 
-void tp_full_handler(struct master_msg_report msg_repo) {
+void tp_full_handler(struct master_msg_report *msg_repo) {
     block_signal(SIGALRM, &current_mask);
+    block_signal(SIGUSR1, &current_mask);
     int new_node_id = shm_conf_pointer->nodes_snapshots[shm_conf_pointer->nodes_snapshots[0][0]][1] +
                       DELTA_NODE_MSG_TYPE;
     int new_node_pid = create_node_proc(new_node_id);
@@ -772,14 +787,14 @@ void tp_full_handler(struct master_msg_report msg_repo) {
     if (shm_conf_add_node(shm_conf_pointer, new_node_pid, new_node_id, new_node_friends) == FALSE) {
         ERROR_EXIT_SEQUENCE_MAIN("ERROR WHILE ADDING THE NEW NODE TO THE SHARED MEMORY, MAX NODE LIMIT REACHED");
     }
-
     struct node_msg node_msg;
-    node_msg.t.hops = 0;
-    node_msg_snd(msg_report_id_nodes, &node_msg, MSG_TRANSACTION_TYPE, &msg_repo.t, main_pid, TRUE,
+    msg_repo->t.hops = 0;
+    node_msg_snd(msg_report_id_nodes, &node_msg, MSG_TRANSACTION_TYPE, &msg_repo->t, main_pid, TRUE,
                  simulation_conf.so_retry, new_node_id);
     /*Send the signal SIGUSR1 to all the nodes*/
     send_sig_to_all_nodes(proc_list, SIGUSR1, TRUE);
     send_msg_to_all_nodes(msg_report_id_nodes, simulation_conf.so_retry, proc_list,
                           new_node_id, TRUE);
+    unblock_signal(SIGUSR1, &current_mask);
     unblock_signal(SIGALRM, &current_mask);
 }

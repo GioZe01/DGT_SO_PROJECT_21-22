@@ -28,7 +28,11 @@
 
 /* Struct definitions */
 struct node {
-    Proc p;
+    pid_t pid;
+    int id_queue; /*Id for calculating range type of a user*/
+    short int proc_state;
+    short int proc_type;
+    float budget;
     struct node *next;
 };
 struct processes_info_list {
@@ -65,7 +69,7 @@ struct node *sortedMerge(struct node *frontHead, struct node *backHead);
  * @brief print the process
  * @param p The process to print
  */
-void process_info_print(Proc p);
+void process_info_print(struct node *p);
 
 /**
  * @brief remove the head of the list
@@ -76,7 +80,7 @@ void proc_list_remove_head(ProcList self);
 void proc_list_underflow();
 
 ProcList proc_list_create() {
-    ProcList p = malloc(sizeof(struct processes_info_list));
+    ProcList p = (struct processes_info_list *) malloc(sizeof(struct processes_info_list));
     if (p == NULL) {
         ERROR_MESSAGE("MALLOC FAILED IN THE CREATION OF QUEUE_T");
         return NULL;
@@ -87,13 +91,19 @@ ProcList proc_list_create() {
     return p;
 }
 
-Bool insert_in_list(ProcList self, Proc p) {
-    struct node *new = malloc(sizeof(struct node));
+Bool insert_in_list(ProcList self, pid_t pid, int id_queue, short int proc_state, short int proc_type, float budget) {
+    struct node *new = (struct node *) malloc(sizeof(struct node));
     if (new == NULL) {
         ERROR_MESSAGE("IMPOSSIBLE TO INSERT NEW PROC");
         return FALSE;
     }
-    new->p = p;
+    /** Copy the Proc pointer  into the new node */
+    new->proc_state = proc_state;
+    new->pid = pid;
+    new->proc_type = proc_type;
+    new->budget = budget;
+    new->id_queue = id_queue;
+    new->next = NULL;
     if (proc_list_is_empty(self) == TRUE) {
         self->first = self->last = new;
     } else {
@@ -108,24 +118,35 @@ Bool proc_list_is_empty(ProcList self) {
     return (self->num_proc == 0) ? TRUE : FALSE;
 }
 
-Proc get_proc_from_queue_id(ProcList self, int id_queue) {
+struct ProcessInfo get_proc_from_queue_id(ProcList self, int id_queue) {
     /*Implemented linear search :( */
     struct node *tmp = self->first;
     for (; tmp != NULL; tmp = tmp->next) {
-        if (tmp->p->id_queue == id_queue) return tmp->p;
-    }
-    return NULL;
+        if (tmp->id_queue == id_queue) {
+            struct ProcessInfo info;
+            info.budget = tmp->budget;
+            info.pid = tmp->pid;
+            info.proc_type = tmp->proc_type;
+            info.proc_state = tmp->proc_state;
+            return info;
+        }
+    };
 }
 
-Proc get_proc_from_pid(ProcList self, pid_t pid) {
+struct ProcessInfo get_proc_from_pid(ProcList self, pid_t pid) {
     /*Implemented linear search :( */
     struct node *tmp = self->first;
     for (; tmp != NULL; tmp = tmp->next) {
-        if (tmp->p->pid == pid) return tmp->p;
+        if (tmp->pid == pid) {
+            struct ProcessInfo info;
+            info.budget = tmp->budget;
+            info.pid = tmp->pid;
+            info.proc_type = tmp->proc_type;
+            info.proc_state = tmp->proc_state;
+            return info;
+        }
     }
-    return NULL;
 }
-
 
 void print_list(ProcList self) {
     mergeSort(&self->first);
@@ -136,24 +157,23 @@ void print_list(ProcList self) {
         int num_proc = self->num_proc;
         for (i = 0; tmp != NULL; tmp = tmp->next) {
             if (i < MAX_PROC_TO_PRINT / 2 || i > num_proc - MAX_PROC_TO_PRINT / 2) {
-                process_info_print(tmp->p);
+                process_info_print(tmp);
                 printf("\n");
             }
             i++;
         }
-
     } else {
         struct node *tmp = self->first;
         for (; tmp != NULL; tmp = tmp->next) {
-            process_info_print(tmp->p);
-            if (tmp->next != NULL) printf("\n");
+            process_info_print(tmp);
+            if (tmp->next != NULL)
+                printf("\n");
         }
     }
     printf("\n");
 }
 
-
-void process_info_print(const Proc p) {
+void process_info_print(struct node *p) {
     char state[80];
     from_procstate_to_string(p->proc_state, state);
     if (p != NULL)
@@ -161,8 +181,7 @@ void process_info_print(const Proc p) {
                p->pid,
                from_proctype_to_string(p->proc_type),
                state,
-               p->budget
-        );
+               p->budget);
     else
         DEBUG_ERROR_MESSAGE("Calling print_list on NULL process info");
 }
@@ -179,34 +198,36 @@ void list_set_state(ProcList self, pid_t pid, short int state) {
     /*linear search implemented*/
     struct node *tmp = self->first;
     for (; tmp != NULL; tmp = tmp->next) {
-        if (tmp->p->pid == pid) {
-            tmp->p->proc_state = state;
+        if (tmp->pid == pid) {
+            tmp->proc_state = state;
             return;
         }
     }
 }
 
-int * send_sig_to_all(ProcList proc_list, int signal) {
+int *send_sig_to_all(ProcList proc_list, int signal) {
     struct node *tmp = proc_list->first;
-    int *pids = malloc(sizeof(int) * (proc_list->num_proc+1));
+    int *pids = (int *) malloc(sizeof(int) * (proc_list->num_proc + 1));
     int num_proc_reciver = 0;
     for (; tmp != NULL; tmp = tmp->next) {
-        if (tmp->p->proc_state == PROC_STATE_RUNNING && (kill(tmp->p->pid, signal) >= 0 || errno == ESRCH)) {
+        if (tmp->proc_state == PROC_STATE_RUNNING && (kill(tmp->pid, signal) >= 0 || errno == ESRCH)) {
             /**
              * errno == ESRCH is allowed because it might be that the proc intrest is terminated and
              * the termination has not been read by main, in this case need wait on the proc to update the proc-list
              * state
              */
 #ifdef DEBUG_MAIN
-            char string [80];
-            from_procstate_to_string(tmp->p->proc_state,string);
-            printf ("\n{DEBUG_MAIN}:= SENT SIGNAL TO : process type: %s, proc exec_State: %s\n", from_proctype_to_string(tmp->p->proc_type),string);
+            char string[80];
+            from_procstate_to_string(tmp->proc_state, string);
+            printf("\n{DEBUG_MAIN}:= SENT SIGNAL TO : process type: %s, proc exec_State: %s\n",
+                   from_proctype_to_string(tmp->proc_type), string);
             DEBUG_MESSAGE("SIGNAL SENT TO THE PROCESS");
 #endif
-            pids[num_proc_reciver+1] = tmp->p->pid;
+            pids[num_proc_reciver + 1] = tmp->pid;
             num_proc_reciver++;
-        } else if (errno == EINTR || tmp->p->proc_state == PROC_STATE_TERMINATED) { continue; }
-        else {
+        } else if (errno == EINTR || tmp->proc_state == PROC_STATE_TERMINATED) {
+            continue;
+        } else {
             free(pids);
             return NULL;
         }
@@ -236,7 +257,7 @@ void proc_list_underflow() {
 void terminator(ProcList self) {
     struct node *tmp = self->first;
     for (; tmp != NULL; tmp = tmp->next) {
-        if (tmp->p->proc_state == PROC_STATE_RUNNING && (kill(tmp->p->pid, SIGINT) >= 0 || errno == ESRCH)) {
+        if (tmp->proc_state == PROC_STATE_RUNNING && (kill(tmp->pid, SIGINT) >= 0 || errno == ESRCH)) {
             /**
              * errno == ESRCH is allowed because it might be that the proc intrest is terminated and
              * the termination has not been read by main, in this case need wait on the proc to update the proc-list
@@ -244,7 +265,9 @@ void terminator(ProcList self) {
              */
             DEBUG_MESSAGE("PROC KILLED");
         } else {
-            if (tmp->p->proc_state == PROC_STATE_TERMINATED || errno == EINTR) { continue; }
+            if (tmp->proc_state == PROC_STATE_TERMINATED || errno == EINTR) {
+                continue;
+            }
             ERROR_MESSAGE("IMPOSSIBLE TO SEND TERMINATION SIGNAL TO KID");
         }
     }
@@ -258,9 +281,9 @@ void saving_private_ryan(ProcList self, int queue_id) {
     struct master_msg_report msg_rep;
     for (; tmp != NULL; tmp = tmp->next) {
         check_msg_report(&msg_rep, queue_id, self);
-        if (tmp->p->proc_state == PROC_STATE_RUNNING) {
-            waitpid(tmp->p->pid, NULL, 0);
-            tmp->p->proc_state = PROC_STATE_TERMINATED;
+        if (tmp->proc_state == PROC_STATE_RUNNING) {
+            waitpid(tmp->pid, NULL, 0);
+            tmp->proc_state = PROC_STATE_TERMINATED;
         }
     }
 }
@@ -277,7 +300,7 @@ int get_num_of_user_proc_running(ProcList self) {
     struct node *tmp = self->first;
     int ris = 0;
     for (; tmp != NULL; tmp = tmp->next) {
-        if (tmp->p->proc_type == PROC_TYPE_USER && tmp->p->proc_state == PROC_STATE_RUNNING) {
+        if (tmp->proc_type == PROC_TYPE_USER && tmp->proc_state == PROC_STATE_RUNNING) {
             ris++;
         }
     }
@@ -290,43 +313,47 @@ int send_sig_to_all_nodes(ProcList proc_list, int signal, Bool exclude_last) {
     int num_proc_reciver = 0;
     if (exclude_last == TRUE) {
         for (; tmp != NULL; tmp = tmp->next) {
-            if (tmp->p->proc_type == PROC_TYPE_NODE && tmp->p->pid != last->p->pid &&
-                tmp->p->proc_state == PROC_STATE_RUNNING && (kill(tmp->p->pid, signal) >= 0 || errno == ESRCH)) {
+            if (tmp->proc_type == PROC_TYPE_NODE && tmp->pid != last->pid &&
+                tmp->proc_state == PROC_STATE_RUNNING && (kill(tmp->pid, signal) >= 0 || errno == ESRCH)) {
                 /**
                  * errno == ESRCH is allowed because it might be that the proc intrest is terminated and
                  * the termination has not been read by main, in this case need wait on the proc to update the proc-list
                  * state
                  */
 #ifdef DEBUG_MAIN
-                char string [80];
-                from_procstate_to_string(tmp->p->proc_state,string);
-                printf ("\n{DEBUG_MAIN}:= SENT SIGNAL TO : process type: %s, proc exec_State: %s\n", from_proctype_to_string(tmp->p->proc_type),string);
+                char string[80];
+                from_procstate_to_string(tmp->proc_state, string);
+                printf("\n{DEBUG_MAIN}:= SENT SIGNAL TO [%d] : process type: %s, proc exec_State: %s\n",
+                       tmp->pid, from_proctype_to_string(tmp->proc_type), string);
                 DEBUG_MESSAGE("SIGNAL SENT TO THE PROCESS");
 #endif
                 num_proc_reciver++;
-            } else if (errno == EINTR || tmp->p->proc_state == PROC_STATE_TERMINATED) { continue; }
-            else {
+            } else if (errno == EINTR || tmp->proc_state == PROC_STATE_TERMINATED) {
+                continue;
+            } else {
                 return -1;
             }
         }
     } else {
         for (; tmp != NULL; tmp = tmp->next) {
-            if (tmp->p->proc_type == PROC_TYPE_NODE && tmp->p->proc_state == PROC_STATE_RUNNING &&
-                (kill(tmp->p->pid, signal) >= 0 || errno == ESRCH)) {
+            if (tmp->proc_type == PROC_TYPE_NODE && tmp->proc_state == PROC_STATE_RUNNING &&
+                (kill(tmp->pid, signal) >= 0 || errno == ESRCH)) {
                 /**
                  * errno == ESRCH is allowed because it might be that the proc intrest is terminated and
                  * the termination has not been read by main, in this case need wait on the proc to update the proc-list
                  * state
                  */
 #ifdef DEBUG_MAIN
-                char string [80];
-                from_procstate_to_string(tmp->p->proc_state,string);
-                printf ("\n{DEBUG_MAIN}:= SENT SIGNAL TO : process type: %s, proc exec_State: %s\n", from_proctype_to_string(tmp->p->proc_type),string);
+                char string[80];
+                from_procstate_to_string(tmp->proc_state, string);
+                printf("\n{DEBUG_MAIN}:= SENT SIGNAL TO : process type: %s, proc exec_State: %s\n",
+                       from_proctype_to_string(tmp->proc_type), string);
                 DEBUG_MESSAGE("SIGNAL SENT TO THE PROCESS");
 #endif
                 num_proc_reciver++;
-            } else if (errno == EINTR || tmp->p->proc_state == PROC_STATE_TERMINATED) { continue; }
-            else {
+            } else if (errno == EINTR || tmp->proc_state == PROC_STATE_TERMINATED) {
+                continue;
+            } else {
                 return -1;
             }
         }
@@ -339,21 +366,21 @@ Bool send_msg_to_all_nodes(int queue_id, int retry, ProcList proc_list, int node
     struct node *last = proc_list->last;
     if (exclude_last == TRUE) {
         for (; tmp != NULL; tmp = tmp->next) {
-            if (tmp->p->proc_type == PROC_TYPE_NODE && tmp->p->pid != last->p->pid &&
-                tmp->p->proc_state == PROC_STATE_RUNNING) {
+            if (tmp->proc_type == PROC_TYPE_NODE && tmp->pid != last->pid &&
+                tmp->proc_state == PROC_STATE_RUNNING) {
                 struct node_msg msg;
-                struct Transaction *t = (struct Transaction *) malloc(sizeof(struct Transaction));
-                t->sender = node_id;
-                node_msg_snd(queue_id, &msg, MSG_MASTER_ORIGIN_ID, t, getpid(), TRUE, retry, tmp->p->id_queue);
+                struct Transaction t = create_empty_transaction();
+                t.sender = node_id;
+                node_msg_snd(queue_id, &msg, MSG_MASTER_ORIGIN_ID, &t, getpid(), TRUE, retry, tmp->id_queue);
             }
         }
     } else {
         for (; tmp != NULL; tmp = tmp->next) {
-            if (tmp->p->proc_type == PROC_TYPE_NODE && tmp->p->proc_state == PROC_STATE_RUNNING) {
+            if (tmp->proc_type == PROC_TYPE_NODE && tmp->proc_state == PROC_STATE_RUNNING) {
                 struct node_msg msg;
                 struct Transaction *t = (struct Transaction *) malloc(sizeof(struct Transaction));
                 t->sender = node_id;
-                node_msg_snd(queue_id, &msg, MSG_MASTER_ORIGIN_ID, t, getpid(), TRUE, retry, tmp->p->id_queue);
+                node_msg_snd(queue_id, &msg, MSG_MASTER_ORIGIN_ID, t, getpid(), TRUE, retry, tmp->id_queue);
             }
         }
     }
@@ -372,7 +399,6 @@ void mergeSort(struct node **head_ref) {
     mergeSort(&sublist2);
     *head_ref = sortedMerge(sublist1, sublist2);
 }
-
 
 void frontBackSplit(struct node *head, struct node **frontRef, struct node **backRef) {
     struct node *fast;
@@ -396,7 +422,6 @@ void frontBackSplit(struct node *head, struct node **frontRef, struct node **bac
     }
 }
 
-
 struct node *sortedMerge(struct node *frontHead, struct node *backHead) {
     struct node *result = NULL;
     if (frontHead == NULL) {
@@ -404,7 +429,7 @@ struct node *sortedMerge(struct node *frontHead, struct node *backHead) {
     } else if (backHead == NULL) {
         return frontHead;
     }
-    if (frontHead->p->budget < backHead->p->budget) {
+    if (frontHead->budget < backHead->budget) {
         result = frontHead;
         result->next = sortedMerge(frontHead->next, backHead);
     } else {
@@ -414,12 +439,37 @@ struct node *sortedMerge(struct node *frontHead, struct node *backHead) {
     return result;
 }
 
-Proc proc_create(pid_t pid, int id_queue, short int proc_state, short int proc_type, float budget) {
-    Proc p = malloc(sizeof(struct ProcessInfo));
-    p->proc_type = proc_type;
-    p->proc_state = proc_state;
-    p->pid = pid;
-    p->id_queue = id_queue;
-    p->budget = budget;
-    return p;
+
+struct ProcessInfo get_last(ProcList self) {
+    struct ProcessInfo info;
+    info.budget = self->last->budget;
+    info.pid = self->last->pid;
+    info.proc_type = self->last->proc_type;
+    info.proc_state = self->last->proc_state;
+    return info;
+}
+
+struct ProcessInfo get_first(ProcList self) {
+    struct ProcessInfo info;
+    info.budget = self->last->budget;
+    info.pid = self->last->pid;
+    info.proc_type = self->last->proc_type;
+    info.proc_state = self->last->proc_state;
+    return info;
+}
+
+int update_proc(ProcList self, int pid, float budget, short int proc_state) {
+    if (budget < 0) {
+        return -1;
+    }
+    struct node *tmp = self->first;
+    while (tmp != NULL) {
+        if (tmp->pid == pid) {
+            tmp->budget = budget;
+            tmp->proc_state = proc_state;
+            return 0;
+        }
+        tmp = tmp->next;
+    }
+    return -2;
 }
