@@ -363,9 +363,16 @@ void signals_handler(int signum) {
             /**
              * Receive new friends from master and update the friends list
              */
+#ifdef DEBUG_NODE
             printf("\nNODE MESSAGE ARRIVED\n\n");
+#endif
             node_msg_receive(queue_node_id, &node_msg, MSG_MASTER_ORIGIN_ID);
-            friends = set_one(friends, node_msg.sender_pid);
+            friends = set_one(friends, node_msg.t.sender);
+#ifdef DEBUG_NODE
+            printf("Node msg sender: %d\n", node_msg.t.sender);
+            printf("NODE FRIENDS: ");
+            print_binary(friends);
+#endif
             break;
         case SIGUSR2:
             /**

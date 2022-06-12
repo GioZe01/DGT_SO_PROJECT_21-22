@@ -161,16 +161,17 @@ int main(int arc, char const *argv[]) {
             ERROR_EXIT_SEQUENCE_USER("IMPOSSIBLE TO OBTAIN THE START SEMAPHORE");
         }
         DEBUG_MESSAGE("USER READY, WAITING FOR SEMAPHORE TO FREE");
-        if (semaphore_wait_for_sinc(semaphore_start_id, 0) < 0) {
-            ERROR_EXIT_SEQUENCE_USER("ERROR DURING WAITING START_SEMAPHORE UNLOCK");
-        }
-        current_user.exec_state = PROC_STATE_RUNNING;
-
-
         /*-------------------------*/
         /*  SHARED MEM  CONFIG     */
         /*-------------------------*/
         attach_to_shm_conf();
+        if (semaphore_wait_for_sinc(semaphore_start_id, 0) < 0) {
+            ERROR_EXIT_SEQUENCE_USER("ERROR DURING WAITING START_SEMAPHORE UNLOCK");
+        }
+        current_user.exec_state = PROC_STATE_RUNNING;
+        DEBUG_MESSAGE("USER PROCESS RUNNING");
+
+
 
         /****************************************
          *      GENERATION OF TRANSACTION FASE *
@@ -243,6 +244,7 @@ void signals_handler_user(int signum) {
             EXIT_PROCEDURE_USER(0);
             break;
         case SIGALRM: /*    Generate a new transaction  */
+            block_signal(SIGUSR1, &current_mask);
             alarm(0); /* pending alarm removed*/
             DEBUG_NOTIFY_ACTIVITY_RUNNING("GENERATING A NEW TRANSACTION FROM SIG...");
             if (generate_transaction(&current_user, current_user.pid, shm_conf_pointer) < 0) {
@@ -252,14 +254,18 @@ void signals_handler_user(int signum) {
                 ERROR_MESSAGE("IMPOSISBLE TO SEND TO THE NODE");
             }
             DEBUG_NOTIFY_ACTIVITY_DONE("GENERATING A NEW TRANSACTION FROM SIG DONE");
+            alarm (1); /* pending alarm added*/
+            unblock_signal(SIGUSR1, &current_mask);
             break;
         case SIGUSR2:
+            block_signal(SIGALRM, &current_mask);
             t = create_empty_transaction();
             if (master_msg_send(queue_master_id, &msg, INFO_BUDGET, USER, current_user.pid,
                                 current_user.exec_state, TRUE, current_user.budget, &t) < 0) {
                 char *error_string = strcat("IMPOSSIBLE TO ADVICE MASTER OF : %s", from_type_to_string(INFO_BUDGET));
                 ERROR_MESSAGE(error_string);
             }
+            unblock_signal(SIGALRM, &current_mask);
             break;
         default:
             break;

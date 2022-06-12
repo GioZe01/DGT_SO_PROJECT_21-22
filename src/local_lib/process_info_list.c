@@ -37,33 +37,31 @@ struct node {
 };
 struct processes_info_list {
     struct node *first;
-    struct node *last;
     int num_proc;
 };
 
-/*  Helper Funciton */
+/*  Helper Function Definitions */
+/**
+ * @brief Sort the list of processes by their budget
+ * @param ref The reference to the first node of the list
+ */
+void sort_list(struct node **ref);
 
 /**
- * @brief Split head into two sublists
- * @param head The head of the list
- * @param frontRef A pointer to the head of the first sublist
- * @param backRef A pointer to the head of the second sublist
+ * @brief Split the list into two sublists
+ * @param head  The head of the list to split
+ * @param sublist1  The first sublist
+ * @param sublist2  The second sublist
  */
-void frontBackSplit(struct node *head, struct node **frontRef, struct node **backRef);
-
-/**
- * @brief Merge Sort the list
- * @param head The head of the list
- */
-void mergeSort(struct node **head);
+void split_list(struct node *head, struct node **sublist1, struct node **sublist2);
 
 /**
  * @brief Merge two sublists
- * @param frontHead The head of the first sublist
- * @param backHead The head of the second sublist
- * @return The head of the merged sublist
+ * @param sublist1  The first sublist
+ * @param sublist2  The second sublist
+ * @return The head of the merged list
  */
-struct node *sortedMerge(struct node *frontHead, struct node *backHead);
+struct node *merge_list(struct node *sublist1, struct node *sublist2);
 
 /**
  * @brief print the process
@@ -77,8 +75,12 @@ void process_info_print(struct node *p);
  */
 void proc_list_remove_head(ProcList self);
 
+/**
+ * @brief Advice via terminal that the list is in underflow
+ */
 void proc_list_underflow();
 
+/* Function Implementations */
 ProcList proc_list_create() {
     ProcList p = (struct processes_info_list *) malloc(sizeof(struct processes_info_list));
     if (p == NULL) {
@@ -86,12 +88,11 @@ ProcList proc_list_create() {
         return NULL;
     }
     p->first = NULL;
-    p->last = NULL;
     p->num_proc = 0;
     return p;
 }
 
-Bool insert_in_list(ProcList self, pid_t pid, int id_queue, short int proc_state, short int proc_type, float budget) {
+Bool insert_in_list(ProcList *self, pid_t pid, int id_queue, short int proc_state, short int proc_type, float budget) {
     struct node *new = (struct node *) malloc(sizeof(struct node));
     if (new == NULL) {
         ERROR_MESSAGE("IMPOSSIBLE TO INSERT NEW PROC");
@@ -103,14 +104,9 @@ Bool insert_in_list(ProcList self, pid_t pid, int id_queue, short int proc_state
     new->proc_type = proc_type;
     new->budget = budget;
     new->id_queue = id_queue;
-    new->next = NULL;
-    if (proc_list_is_empty(self) == TRUE) {
-        self->first = self->last = new;
-    } else {
-        self->last->next = new;
-        self->last = new;
-    }
-    self->num_proc++;
+    new->next = (*self)->first;
+    (*self)->first = new;
+    (*self)->num_proc++;
     return TRUE;
 }
 
@@ -149,14 +145,15 @@ struct ProcessInfo get_proc_from_pid(ProcList self, pid_t pid) {
 }
 
 void print_list(ProcList self) {
-    mergeSort(&self->first);
+    /* Sort the list before printing */
+    /*sort_list(&(self->first));*/
     if (self->num_proc > MAX_PROC_TO_PRINT) {
         /* Print the min budget */
         struct node *tmp = self->first;
         int i;
         int num_proc = self->num_proc;
         for (i = 0; tmp != NULL; tmp = tmp->next) {
-            if (i < MAX_PROC_TO_PRINT / 2 || i > num_proc - MAX_PROC_TO_PRINT / 2) {
+            if (i < MAX_PROC_TO_PRINT / 2 || i > num_proc - (MAX_PROC_TO_PRINT / 2)) {
                 process_info_print(tmp);
                 printf("\n");
             }
@@ -171,6 +168,53 @@ void print_list(ProcList self) {
         }
     }
     printf("\n");
+}
+
+void sort_list(struct node **ref) {
+    struct node *head = *ref;
+    struct node *sublist1;
+    struct node *sublist2;
+
+    if (head == NULL || head->next == NULL) {
+        return;
+    }
+    split_list(head, &sublist1, &sublist2);
+
+    sort_list(&sublist1);
+    sort_list(&sublist2);
+    *ref = merge_list(sublist1, sublist2);
+}
+
+void split_list(struct node *head, struct node **sublist1, struct node **sublist2) {
+    struct node *slow = head;
+    struct node *fast = head->next;
+    while (fast != NULL) {
+        fast = fast->next;
+        if (fast != NULL) {
+            slow = slow->next;
+            fast = fast->next;
+        }
+    }
+    *sublist1 = head;
+    *sublist2 = slow->next;
+    slow->next = NULL;
+}
+
+struct node *merge_list(struct node *sublist1, struct node *sublist2) {
+    struct node *ris = NULL;
+    if (sublist1 == NULL) {
+        return sublist2;
+    } else if (sublist2 == NULL) {
+        return sublist1;
+    }
+    if (sublist1->budget < sublist2->budget) {
+        ris = sublist1;
+        ris->next = merge_list(sublist1->next, sublist2);
+    } else {
+        ris = sublist2;
+        ris->next = merge_list(sublist1, sublist2->next);
+    }
+    return ris;
 }
 
 void process_info_print(struct node *p) {
@@ -240,10 +284,7 @@ int *send_sig_to_all(ProcList proc_list, int signal) {
 void proc_list_remove_head(ProcList self) {
     if (proc_list_is_empty(self) == FALSE) {
         struct node *temp = self->first;
-        if (self->first == self->last)
-            self->first = self->last = NULL;
-        else
-            self->first = self->first->next;
+        self->first = self->first->next;
         free(temp);
         self->num_proc--;
     } else
@@ -309,11 +350,11 @@ int get_num_of_user_proc_running(ProcList self) {
 
 int send_sig_to_all_nodes(ProcList proc_list, int signal, Bool exclude_last) {
     struct node *tmp = proc_list->first;
-    struct node *last = proc_list->last;
     int num_proc_reciver = 0;
     if (exclude_last == TRUE) {
+        tmp = tmp->next;
         for (; tmp != NULL; tmp = tmp->next) {
-            if (tmp->proc_type == PROC_TYPE_NODE && tmp->pid != last->pid &&
+            if (tmp->proc_type == PROC_TYPE_NODE &&
                 tmp->proc_state == PROC_STATE_RUNNING && (kill(tmp->pid, signal) >= 0 || errno == ESRCH)) {
                 /**
                  * errno == ESRCH is allowed because it might be that the proc intrest is terminated and
@@ -363,10 +404,10 @@ int send_sig_to_all_nodes(ProcList proc_list, int signal, Bool exclude_last) {
 
 Bool send_msg_to_all_nodes(int queue_id, int retry, ProcList proc_list, int node_id, Bool exclude_last) {
     struct node *tmp = proc_list->first;
-    struct node *last = proc_list->last;
     if (exclude_last == TRUE) {
+        tmp = tmp->next;
         for (; tmp != NULL; tmp = tmp->next) {
-            if (tmp->proc_type == PROC_TYPE_NODE && tmp->pid != last->pid &&
+            if (tmp->proc_type == PROC_TYPE_NODE &&
                 tmp->proc_state == PROC_STATE_RUNNING) {
                 struct node_msg msg;
                 struct Transaction t = create_empty_transaction();
@@ -387,74 +428,13 @@ Bool send_msg_to_all_nodes(int queue_id, int retry, ProcList proc_list, int node
     return TRUE;
 }
 
-void mergeSort(struct node **head_ref) {
-    struct node *head = *head_ref;
-    struct node *sublist1;
-    struct node *sublist2;
-    if ((head == NULL) || (head->next == NULL)) {
-        return;
-    }
-    frontBackSplit(head, &sublist1, &sublist2);
-    mergeSort(&sublist1);
-    mergeSort(&sublist2);
-    *head_ref = sortedMerge(sublist1, sublist2);
-}
-
-void frontBackSplit(struct node *head, struct node **frontRef, struct node **backRef) {
-    struct node *fast;
-    struct node *slow;
-    if (head == NULL || head->next == NULL) {
-        *frontRef = head;
-        *backRef = NULL;
-    } else {
-        slow = head;
-        fast = head->next;
-        while (fast != NULL) {
-            fast = fast->next;
-            if (fast != NULL) {
-                slow = slow->next;
-                fast = fast->next;
-            }
-        }
-        *frontRef = head;
-        *backRef = slow->next;
-        slow->next = NULL;
-    }
-}
-
-struct node *sortedMerge(struct node *frontHead, struct node *backHead) {
-    struct node *result = NULL;
-    if (frontHead == NULL) {
-        return backHead;
-    } else if (backHead == NULL) {
-        return frontHead;
-    }
-    if (frontHead->budget < backHead->budget) {
-        result = frontHead;
-        result->next = sortedMerge(frontHead->next, backHead);
-    } else {
-        result = backHead;
-        result->next = sortedMerge(frontHead, backHead->next);
-    }
-    return result;
-}
-
-
-struct ProcessInfo get_last(ProcList self) {
-    struct ProcessInfo info;
-    info.budget = self->last->budget;
-    info.pid = self->last->pid;
-    info.proc_type = self->last->proc_type;
-    info.proc_state = self->last->proc_state;
-    return info;
-}
 
 struct ProcessInfo get_first(ProcList self) {
     struct ProcessInfo info;
-    info.budget = self->last->budget;
-    info.pid = self->last->pid;
-    info.proc_type = self->last->proc_type;
-    info.proc_state = self->last->proc_state;
+    info.budget = self->first->budget;
+    info.pid = self->first->pid;
+    info.proc_type = self->first->proc_type;
+    info.proc_state = self->first->proc_state;
     return info;
 }
 

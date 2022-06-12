@@ -37,7 +37,7 @@ ProcList proc_list_create();
  * @param proc_state the state of the new process
  * @return FALSE if the process is not inserted, TRUE otherwise
  */
-Bool insert_in_list(ProcList self, pid_t pid, int id_queue, short int proc_state, short int proc_type, float budget);
+Bool insert_in_list(ProcList *self, pid_t pid, int id_queue, short int proc_state, short int proc_type, float budget);
 
 /**
  * Check if the ProcList is empty
@@ -134,13 +134,6 @@ int get_num_of_user_proc_running(ProcList self);
  * @return FALSE in case of FAILURE, TRUE otherwise
  */
 Bool send_msg_to_all_nodes(int queue_id, int retry, ProcList proc_list, int node_id, Bool exclude_last);
-
-/**
- * @brief Get the last proc in the list
- * @param self the list to search in
- * @return The last proc in the list
- */
-struct ProcessInfo get_last(ProcList self);
 
 /**
  * @brief Get the first proc in the list

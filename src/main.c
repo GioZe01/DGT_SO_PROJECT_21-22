@@ -258,7 +258,6 @@ int main() {
             if (check_runnability() == FALSE || msg_rep_value < 0) {
                 /*If a message arrive make the knowledge*/
                 ERROR_MESSAGE("IMPOSSIBLE TO RUN SIMULATION");
-                print_info();
                 end_simulation();
             } else if (msg_rep_value == 1) {
                 tp_full_handler(&msg_repo);
@@ -304,7 +303,7 @@ int create_users_proc(int *users_pids, int *users_queues_ids) {
                 users_pids[i + 1] = user_pid;
                 users_pids[0] += 1;
                 users_queues_ids[0] += 1;
-                insert_in_list(proc_list, user_pid, queue_id, PROC_STATE_RUNNING, PROC_TYPE_USER, -1);
+                insert_in_list(&proc_list, user_pid, queue_id, PROC_STATE_RUNNING, PROC_TYPE_USER, -1);
                 /*Free if utilized pointers to argv*/
                 if (argv_user[1] != NULL)
                     free(argv_user[1]);
@@ -347,7 +346,7 @@ int create_nodes_proc(int *nodes_pids, int *nodes_queues_ids) {
                 nodes_pids[i + 1] = node_pid;
                 nodes_pids[0] += 1;
                 nodes_queues_ids[0] += 1;
-                insert_in_list(proc_list, node_pid, queue_id, PROC_STATE_RUNNING, PROC_TYPE_NODE, -1);
+                insert_in_list(&proc_list, node_pid, queue_id, PROC_STATE_RUNNING, PROC_TYPE_NODE, -1);
                 /*Free if utilized pointers to argv*/
                 if (argv_node[1] != NULL)
                     free(argv_node[1]);
@@ -431,7 +430,7 @@ void create_semaphores(void) {
     DEBUG_NOTIFY_ACTIVITY_DONE("CREATION OF START_SEMAPHORE CHILDREN DONE");
 
     DEBUG_NOTIFY_ACTIVITY_RUNNING("INITIALIZATION OF START_SEMAPHORE CHILDREN....");
-    if (semctl(semaphore_start_id, 0, SETVAL, simulation_conf.so_user_num + (simulation_conf.so_nodes_num)) <
+    if (semctl(semaphore_start_id, 0, SETVAL, simulation_conf.so_user_num + simulation_conf.so_nodes_num) <
         0) {
         ERROR_EXIT_SEQUENCE_MAIN("IMPOSSIBLE TO INITIALISE SEMAPHORE START CHILDREN");
     }
@@ -447,9 +446,6 @@ void create_semaphores(void) {
 
     DEBUG_NOTIFY_ACTIVITY_RUNNING("CREATION OF TO_FILL SEM....");
     semaphore_to_fill_id = semget(SEMAPHORE_MASTER_BOOK_TO_FILL_KEY, 1, IPC_CREAT | IPC_EXCL | 0600);
-    if (semaphore_start_id < 0) {
-        ERROR_EXIT_SEQUENCE_MAIN("IMPOSSIBLE TO CREATE TO_FILL SEM");
-    }
     semctl(semaphore_to_fill_id, 0, SETVAL, 1);
     DEBUG_NOTIFY_ACTIVITY_DONE("CREATION OF TO_FILL DONE");
 }
@@ -673,15 +669,6 @@ void update_kids_info(void) {
 }
 
 Bool check_runnability() {
-    if ((get_num_of_proc(proc_list) == 3 || get_first(proc_list).pid == get_last(proc_list).pid) &&
-        printed == FALSE) {
-        printf("\n\nNumber of proc in the list: %d\n", get_num_of_proc(proc_list));
-        printf("First element: %d\n", get_first(proc_list).pid);
-        printf("Last element: %d\n", get_last(proc_list).pid);
-        if (get_first(proc_list).pid == get_last(proc_list).pid) {
-            printed = TRUE;
-        }
-    }
     int num_user_proc_running = get_num_of_user_proc_running(proc_list);
     if (num_user_proc_running <= 0) {
         printf("NUM USER PROC RUNNING: %d\n", num_user_proc_running);
@@ -696,7 +683,11 @@ Bool check_runnability() {
 }
 
 void end_simulation() {
+    alarm(0);
+    block_signal(SIGUSR1, &current_mask);
     printf("Simulation %s \n", get_end_simulation_msg());
+    update_kids_info();
+    print_info();
     kill_kids();
     wait_kids();
     free_mem();
@@ -742,8 +733,7 @@ int create_node_proc(int new_node_id) {
             execve(argv_node[0], argv_node, NULL);
             ERROR_EXIT_SEQUENCE_MAIN("IMPOSSIBLE TO EXEC NEW NODE PROCESS");
         default:
-
-            insert_in_list(proc_list, new_node_pid, new_node_id, PROC_STATE_RUNNING, PROC_TYPE_NODE, -1);
+            insert_in_list(&proc_list, new_node_pid, new_node_id, PROC_STATE_RUNNING, PROC_TYPE_NODE, -1);
             /*Free the memory allocated for the argv_node*/
             if (argv_node[1] != NULL) {
                 free(argv_node[1]);
@@ -794,7 +784,7 @@ void tp_full_handler(struct master_msg_report *msg_repo) {
     /*Send the signal SIGUSR1 to all the nodes*/
     send_sig_to_all_nodes(proc_list, SIGUSR1, TRUE);
     send_msg_to_all_nodes(msg_report_id_nodes, simulation_conf.so_retry, proc_list,
-                          new_node_id, TRUE);
+                          shm_conf_pointer->nodes_snapshots[0][0], TRUE);
     unblock_signal(SIGUSR1, &current_mask);
     unblock_signal(SIGALRM, &current_mask);
 }

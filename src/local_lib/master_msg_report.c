@@ -154,7 +154,6 @@ int master_msg_receive_info(int id, struct master_msg_report *self) {
 
 int acknowledge(struct master_msg_report *self, ProcList list) {
     long msg_type = self->type;
-    short int exec_state = self->state;
     switch (msg_type) {
         case TERMINATION_END_CORRECTLY:
         case IMPOSSIBLE_TO_SEND_TRANSACTION:
@@ -163,7 +162,7 @@ int acknowledge(struct master_msg_report *self, ProcList list) {
         case SIGNALS_OF_TERM_RECEIVED:
         case UNUSED_PROC:
         case INFO_BUDGET:
-            if (update_proc(list, self->sender_pid, self->budget, exec_state) == -2) {
+            if (update_proc(list, self->sender_pid, self->budget, self->state) == -2) {
                 return -2;
             }
             break;
@@ -186,7 +185,6 @@ int check_msg_report(struct master_msg_report *msg_report, int msg_report_id_mas
         while (msg_rep_info.msg_qnum != 0 &&
                msgrcv(msg_report_id_master, msg_report, sizeof(*msg_report) - sizeof(long), 0, 0) > 0 &&
                msgctl(msg_report_id_master, IPC_STAT, &msg_rep_info) >= 0) {
-
             ris = acknowledge(msg_report, proc_list);
 
             if (ris == -1) {
