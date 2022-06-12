@@ -1,5 +1,6 @@
 #TODO: mkdir maker
 #Flags per la compilazione
+CC= gcc
 CFLAGS = -std=c89 -pedantic -Wall -Wextra -Werror=format-security -fstack-protector-strong
 
 # Folders
