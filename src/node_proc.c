@@ -652,6 +652,7 @@ void adv_users_of_block(void) {
         queue_remove_head(current_node.transactions_block);
     }
     current_node.budget += current_block_reward;
+    current_block_reward = 0;
 }
 
 int process_simple_transaction_type(struct node_msg *msg_rep) {

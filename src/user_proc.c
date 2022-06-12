@@ -172,7 +172,7 @@ int main(int arc, char const *argv[]) {
         DEBUG_MESSAGE("USER PROCESS RUNNING");
 
 
-
+        alarm(1);
         /****************************************
          *      GENERATION OF TRANSACTION FASE *
          * **************************************/
@@ -244,18 +244,22 @@ void signals_handler_user(int signum) {
             EXIT_PROCEDURE_USER(0);
             break;
         case SIGALRM: /*    Generate a new transaction  */
-            block_signal(SIGUSR1, &current_mask);
             alarm(0); /* pending alarm removed*/
+#ifdef DEBUG_USER
             DEBUG_NOTIFY_ACTIVITY_RUNNING("GENERATING A NEW TRANSACTION FROM SIG...");
-            if (generate_transaction(&current_user, current_user.pid, shm_conf_pointer) < 0) {
+#endif
+            int gen_value = generate_transaction(&current_user, current_user.pid, shm_conf_pointer);
+            if (check_balance(&current_user) == TRUE && gen_value < 0) {
+                advice_master_of_termination(IMPOSSIBLE_TO_GENERATE_TRANSACTION);
                 ERROR_EXIT_SEQUENCE_USER("IMPOSSIBLE TO GENERATE TRANSACTION");
             }
-            if (send_to_node() < 0) {
+            if (gen_value >= 0 && send_to_node() < 0) {
                 ERROR_MESSAGE("IMPOSISBLE TO SEND TO THE NODE");
             }
+#ifdef DEBUG_USER
             DEBUG_NOTIFY_ACTIVITY_DONE("GENERATING A NEW TRANSACTION FROM SIG DONE");
-            alarm (1); /* pending alarm added*/
-            unblock_signal(SIGUSR1, &current_mask);
+#endif
+            alarm(1); /* pending alarm added*/
             break;
         case SIGUSR2:
             block_signal(SIGALRM, &current_mask);
@@ -285,7 +289,7 @@ void advice_master_of_termination(long termination_type) {
         ERROR_MESSAGE(error_string);
     }
 #ifdef DEBUG_USER
-        DEBUG_NOTIFY_ACTIVITY_DONE("{DEBUG_USER}:= ADVICING MASTER OF TERMINATION DONE");
+    DEBUG_NOTIFY_ACTIVITY_DONE("{DEBUG_USER}:= ADVICING MASTER OF TERMINATION DONE");
 #endif
     DEBUG_NOTIFY_ACTIVITY_DONE("{DEBUG_USER}:= ADVICING MASTER OF TERMINATION DONE");
 }

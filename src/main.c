@@ -392,8 +392,10 @@ void signals_handler(int signum) {
     switch (signum) {
         case SIGINT:
         case SIGTERM:
+            alarm(0);
             if (getpid() == main_pid) {
-                EXIT_PROCEDURE_MAIN(0);
+                simulation_end = SIMULATION_END_BY_USER;
+                end_simulation();
             } else {
                 exit(0);
             }
@@ -608,7 +610,7 @@ void print_info(void) {
 void update_kids_info(void) {
     DEBUG_BLOCK_ACTION_START("UPDATE KIDS INFO");
     DEBUG_NOTIFY_ACTIVITY_RUNNING("UPDATING KIDS INFO....");
-    struct master_msg_report *msg_rep = malloc(sizeof(struct master_msg_report));
+    struct master_msg_report *msg_rep = (struct master_msg_report *) malloc(sizeof(struct master_msg_report));
     int retry = 0;
     int *to_wait_proc = send_sig_to_all(proc_list, SIGUSR2);
 
@@ -642,7 +644,7 @@ void update_kids_info(void) {
             if (acknowledge(msg_rep, proc_list) == 1) {
                 tp_full_handler(&msg_rep);
             }
-        } else if (num_msg_to_wait_for <= simulation_conf.so_nodes_num && retry > MAX_RETRY_UPDATE_KIDS_INFO) {
+        } else if (retry > MAX_RETRY_UPDATE_KIDS_INFO) {
             int i;
             /*Print to wait proc*/
             printf("\n TO WAIT PROC: ");
@@ -685,9 +687,9 @@ Bool check_runnability() {
 void end_simulation() {
     alarm(0);
     block_signal(SIGUSR1, &current_mask);
-    printf("Simulation %s \n", get_end_simulation_msg());
     update_kids_info();
     print_info();
+    printf("Simulation %s \n", get_end_simulation_msg());
     kill_kids();
     wait_kids();
     free_mem();
