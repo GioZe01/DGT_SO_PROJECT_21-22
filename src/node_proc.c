@@ -233,10 +233,12 @@ int main(int argc, char const *argv[]) {
         DEBUG_MESSAGE("NODE READY, ON START_SEM");
         int sem_val = semctl(semaphore_start_id, 0, GETVAL);
         if (sem_val < 0) {
+            advice_master_of_termination(IMPOSSIBLE_TO_ACQUIRE_SEMAPHORE);
             ERROR_EXIT_SEQUENCE_NODE("IMPOSSIBLE TO ACCESS START SEMAPHORE INFO");
         }
         if ((sem_val != 0 && semaphore_lock(semaphore_start_id, 0) < 0) ||
             semaphore_wait_for_sinc(semaphore_start_id, 0) < 0) {
+            advice_master_of_termination(IMPOSSIBLE_TO_ACQUIRE_SEMAPHORE);
             ERROR_EXIT_SEQUENCE_NODE("IMPOSSIBLE TO WAIT FOR START");
         }
         current_node.exec_state = PROC_STATE_RUNNING;
@@ -341,6 +343,7 @@ void signals_handler(int signum) {
     switch (signum) {
         case SIGINT:
             alarm(0); /*pending alarm removed*/
+            block_signal(SIGUSR1, &current_mask);
             current_node.exec_state = PROC_STATE_TERMINATED;
             advice_master_of_termination(SIGNALS_OF_TERM_RECEIVED);
             EXIT_PROCEDURE_NODE(0);
@@ -360,21 +363,26 @@ void signals_handler(int signum) {
             alarm(1);
             break;
         case SIGUSR1:
+            block_signal(SIGALRM, &current_mask);
+            block_signal(SIGUSR2, &current_mask);
             /**
              * Receive new friends from master and update the friends list
              */
 #ifdef DEBUG_NODE
             printf("\nNODE MESSAGE ARRIVED\n\n");
 #endif
-            node_msg_receive(queue_node_id, &node_msg, MSG_MASTER_ORIGIN_ID);
+            while(node_msg_receive(queue_node_id, &node_msg, MSG_MASTER_ORIGIN_ID) == 0);
             friends = set_one(friends, node_msg.t.sender);
 #ifdef DEBUG_NODE
             printf("Node msg sender: %d\n", node_msg.t.sender);
             printf("NODE FRIENDS: ");
             print_binary(friends);
 #endif
+            unblock_signal(SIGALRM, &current_mask);
+            unblock_signal(SIGUSR2, &current_mask);
             break;
         case SIGUSR2:
+            block_signal(SIGALRM, &current_mask);
             /**
              * Inform master of the node state
              */
@@ -384,6 +392,7 @@ void signals_handler(int signum) {
 #ifdef DEBUG_NODE
             DEBUG_NOTIFY_ACTIVITY_DONE("{DEBUG_NODE}:= REPLIED TO MASTER DONE");
 #endif
+            unblock_signal(SIGALRM, &current_mask);
             break;
         default:
             break;
@@ -550,6 +559,7 @@ void lock_masterbook_cell_access(int i_cell_block_list) {
                 continue;
             }
         } else {
+            advice_master_of_termination(IMPOSSIBLE_TO_CONNECT_TO_SHM);
             ERROR_EXIT_SEQUENCE_NODE("ERROR WHILE TRYING TO EXEC LOCK ON TO_FILL ACCESS SEM");
         }
     }
@@ -561,6 +571,7 @@ void unlock_to_fill_sem(void) {
 #endif
     while (semaphore_unlock(semaphore_to_fill_id, 0) < 0) {
         if (errno != EINTR) {
+            advice_master_of_termination(IMPOSSIBLE_TO_CONNECT_TO_SHM);
             ERROR_EXIT_SEQUENCE_NODE("ERROR DURING THE UNLOCK OF THE SEMAPHORE");
         }
     }
@@ -572,6 +583,7 @@ void unlock_to_fill_sem(void) {
 void unlock_masterbook_cell_access(int i_cell_block_list) {
     while (semaphore_unlock(semaphore_masterbook_id, i_cell_block_list) < 0) {
         if (errno != EINTR) {
+            advice_master_of_termination(IMPOSSIBLE_TO_CONNECT_TO_SHM);
             ERROR_EXIT_SEQUENCE_NODE("ERROR DURING THE UNLOCK OF BOOKMASTER CELL");
         }
     }
@@ -607,14 +619,17 @@ void advice_master_of_termination(long termination_type) {
 void acquire_semaphore_ids(void) {
     semaphore_start_id = semget(SEMAPHORE_SINC_KEY_START, 1, 0);
     if (semaphore_start_id < 0) {
+        advice_master_of_termination(IMPOSSIBLE_TO_ACQUIRE_SEMAPHORE);
         ERROR_EXIT_SEQUENCE_NODE("IMPOSSIBLE TO OBTAIN ID OF START SEM");
     }
     semaphore_masterbook_id = semget(SEMAPHORE_MASTER_BOOK_ACCESS_KEY, 1, 0);
     if (semaphore_masterbook_id < 0) {
+        advice_master_of_termination(IMPOSSIBLE_TO_ACQUIRE_SEMAPHORE);
         ERROR_EXIT_SEQUENCE_NODE("IMPOSSIBLE TO OBTAIN THE MASTERBOOK SEM");
     }
     semaphore_to_fill_id = semget(SEMAPHORE_MASTER_BOOK_TO_FILL_KEY, 1, 0);
     if (semaphore_to_fill_id < 0) {
+        advice_master_of_termination(IMPOSSIBLE_TO_ACQUIRE_SEMAPHORE);
         ERROR_EXIT_SEQUENCE_NODE("IMPOSSIBLE TO OBTAIN MASTERBOOK_TO_FILL SEM");
     }
 }
@@ -651,7 +666,6 @@ void adv_users_of_block(void) {
                      queue_id_user_proc);
         queue_remove_head(current_node.transactions_block);
     }
-    current_node.budget += current_block_reward;
     current_block_reward = 0;
 }
 

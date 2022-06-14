@@ -10,19 +10,21 @@
 #include "transaction_list.h"
 
 typedef enum {
-    PROC_STATE_INIT, PROC_STATE_RUNNING,PROC_STATE_TERMINATED,PROC_STATE_WAITING, PROC_STATE_NODE_SERV_TRANS
-}PROCSTATE;
+    PROC_STATE_INIT, PROC_STATE_RUNNING, PROC_STATE_TERMINATED, PROC_STATE_WAITING, PROC_STATE_NODE_SERV_TRANS
+} PROCSTATE;
 typedef enum {
     TERMINATION_END_CORRECTLY = 1,
     IMPOSSIBLE_TO_SEND_TRANSACTION = 2,
     IMPOSSIBLE_TO_CONNECT_TO_SHM = 3,
     IMPOSSIBLE_TO_COMUNICATE_WITH_QUEUE = 4,
     IMPOSSIBLE_TO_GENERATE_TRANSACTION = 5,
-    SIGNALS_OF_TERM_RECEIVED = 6,
-    INFO_BUDGET = 7,
-    TP_FULL = 8,
-    UNUSED_PROC = 9,
-}MSG_REPORT_TYPE;
+    IMPOSSIBLE_TO_ACQUIRE_SEMAPHORE = 6,
+    IMPOSSIBLE_TO_LOAD_CONFIGURATION = 7,
+    SIGNALS_OF_TERM_RECEIVED = 8,
+    INFO_BUDGET = 9,
+    TP_FULL = 10,
+    UNUSED_PROC = 11,
+} MSG_REPORT_TYPE;
 
 typedef enum {
     USER,
@@ -48,7 +50,8 @@ struct master_msg_report {
  * @param t set if type is TP_FULL otherwise t set to empty
  */
 void
-master_msg_report_create(struct master_msg_report *self, long type, long proc_type, pid_t sender_pid, short int state, float budget, struct Transaction t );
+master_msg_report_create(struct master_msg_report *self, long type, long proc_type, pid_t sender_pid, short int state,
+                         float budget, struct Transaction t);
 
 /**
  * Print the message based on his type
@@ -69,7 +72,7 @@ void master_msg_report_print(const struct master_msg_report *self);
  * */
 int
 master_msg_send(int id, struct master_msg_report *self, long type, long proc_type, pid_t sender_pid, short int state,
-                Bool create, float budget, struct Transaction* t);
+                Bool create, float budget, struct Transaction *t);
 
 /**
  * Retrive the message_node_report on the specified message queue
@@ -106,26 +109,27 @@ int master_msg_receive_info(int id, struct master_msg_report *self);
  * @return -2 in case of no sender pid in proc_list.-1 in case of wrong msg_type.1 in case of TP_FULL and  0 otherwise.
  * TODO: Implement termination info in the list of proc (Cause that determined the termination)
  **/
-int acknowledge(struct master_msg_report * self, ProcList list);
+int acknowledge(struct master_msg_report *self, ProcList list);
 
 /**
  * Convert the given type into his relative string
  * @param type the type of the message
  * @return the string equivalent
  */
-char * from_type_to_string(long type);
+char *from_type_to_string(long type);
 
 /**
  * Convert the given exec type into his equivalent string
  * @param state current state of the proc
  * @param string var in wich the method save the equivalent string
  */
-void from_procstate_to_string(int state, char * string);
+void from_procstate_to_string(int state, char *string);
 
 /**
  * Convert the given proc_type into his relative string
  * @param proc_type the process type to be converted
  * @return the equivalent string
  */
-char * from_proctype_to_string(long proc_type);
+char *from_proctype_to_string(long proc_type);
+
 #endif /*DGT_SO_PROJECT_21_22_MASTER_MSG_REPORT_H*/

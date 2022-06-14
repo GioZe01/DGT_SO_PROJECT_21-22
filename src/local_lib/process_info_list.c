@@ -146,7 +146,7 @@ struct ProcessInfo get_proc_from_pid(ProcList self, pid_t pid) {
 
 void print_list(ProcList self) {
     /* Sort the list before printing */
-    /*sort_list(&(self->first));*/
+   sort_list(&(self->first));
     if (self->num_proc > MAX_PROC_TO_PRINT) {
         /* Print the min budget */
         struct node *tmp = self->first;
@@ -263,9 +263,8 @@ int *send_sig_to_all(ProcList proc_list, int signal) {
 #ifdef DEBUG_MAIN
             char string[80];
             from_procstate_to_string(tmp->proc_state, string);
-            printf("\n{DEBUG_MAIN}:= SENT SIGNAL TO : process type: %s, proc exec_State: %s\n",
-                   from_proctype_to_string(tmp->proc_type), string);
-            DEBUG_MESSAGE("SIGNAL SENT TO THE PROCESS");
+            printf("\n{DEBUG_MAIN}:= SENT SIGNAL TO %d: process type: %s, proc exec_State: %s\n",
+                   tmp->pid, from_proctype_to_string(tmp->proc_type), string);
 #endif
             pids[num_proc_reciver + 1] = tmp->pid;
             num_proc_reciver++;
@@ -342,6 +341,21 @@ int get_num_of_user_proc_running(ProcList self) {
     int ris = 0;
     for (; tmp != NULL; tmp = tmp->next) {
         if (tmp->proc_type == PROC_TYPE_USER && tmp->proc_state == PROC_STATE_RUNNING) {
+            ris++;
+        }
+    }
+    return ris;
+}
+
+int get_num_of_node_proc_running(ProcList self) {
+    if (self->first == NULL) {
+        ERROR_MESSAGE("PROC LIST IS EMPTY");
+        return 0;
+    }
+    struct node *tmp = self->first;
+    int ris = 0;
+    for (; tmp != NULL; tmp = tmp->next) {
+        if (tmp->proc_type == PROC_TYPE_NODE && tmp->proc_state == PROC_STATE_RUNNING) {
             ris++;
         }
     }
@@ -452,4 +466,42 @@ int update_proc(ProcList self, int pid, float budget, short int proc_state) {
         tmp = tmp->next;
     }
     return -2;
+}
+
+void get_random_node_list(ProcList proc_list, ProcList node_list, int num_of_node) {
+    int running_node = get_num_of_node_proc_running(proc_list);
+    if (num_of_node > running_node) {
+        ERROR_MESSAGE("NOT ENOUGH NODE PROCESSES RUNNING");
+        node_list = proc_list;
+        return;
+    }
+    int random_node, last_node = -1;
+    int i = 0;
+    ProcList running_nodes = get_running_node_proc(proc_list);
+
+    printf("NODE LIST\n\n");
+    print_list(running_nodes);
+    for (; i < num_of_node; i++) {
+        while (random_node == last_node) {
+            random_node = rand() % running_node + 1;
+        }
+        struct node *tmp = running_nodes->first;
+        int j = 0;
+        for (; j < random_node; j++) {
+            tmp = tmp->next;
+        }
+        insert_in_list(node_list, tmp->pid, tmp->id_queue, tmp->proc_state, tmp->proc_type, tmp->budget);
+    }
+}
+
+ProcList get_running_node_proc(ProcList self) {
+    ProcList node_list = proc_list_create();
+    struct node *tmp = self->first;
+    while (tmp != NULL) {
+        if (tmp->proc_type == PROC_TYPE_NODE && tmp->proc_state == PROC_STATE_RUNNING) {
+            insert_in_list(node_list, tmp->pid, tmp->id_queue, tmp->proc_state, tmp->proc_type, tmp->budget);
+        }
+        tmp = tmp->next;
+    }
+    return node_list;
 }

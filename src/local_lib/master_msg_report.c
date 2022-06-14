@@ -27,7 +27,10 @@ void master_msg_report_print(const struct master_msg_report *self) {
     char state_string[80];
     switch (self->type) {
         case IMPOSSIBLE_TO_SEND_TRANSACTION:
+        case IMPOSSIBLE_TO_ACQUIRE_SEMAPHORE:
+        case IMPOSSIBLE_TO_LOAD_CONFIGURATION:
         case IMPOSSIBLE_TO_COMUNICATE_WITH_QUEUE:
+        case IMPOSSIBLE_TO_GENERATE_TRANSACTION:
         case IMPOSSIBLE_TO_CONNECT_TO_SHM:
             switch (self->state) {
                 case PROC_STATE_WAITING:
@@ -96,6 +99,12 @@ char *from_type_to_string(long type) {
             return "TERMINATION END CORRECTLY";
         case IMPOSSIBLE_TO_SEND_TRANSACTION:
             return "IMPOSSIBLE TO SEND TRANSACTION";
+        case IMPOSSIBLE_TO_GENERATE_TRANSACTION:
+            return "IMPOSSIBLE TO GENERATE TRANSACTION";
+        case IMPOSSIBLE_TO_ACQUIRE_SEMAPHORE:
+            return "IMPOSSIBLE TO ACQUIRE SEMAPHORE";
+        case IMPOSSIBLE_TO_LOAD_CONFIGURATION:
+            return "IMPOSSIBLE TO LOAD CONFIGURATION";
         case IMPOSSIBLE_TO_COMUNICATE_WITH_QUEUE:
             return "IMPOSSIBLE TO COMUNICATE WITH QUEUE";
         case IMPOSSIBLE_TO_CONNECT_TO_SHM:
@@ -158,7 +167,10 @@ int acknowledge(struct master_msg_report *self, ProcList list) {
         case TERMINATION_END_CORRECTLY:
         case IMPOSSIBLE_TO_SEND_TRANSACTION:
         case IMPOSSIBLE_TO_CONNECT_TO_SHM:
+        case IMPOSSIBLE_TO_LOAD_CONFIGURATION:
+        case IMPOSSIBLE_TO_ACQUIRE_SEMAPHORE:
         case IMPOSSIBLE_TO_COMUNICATE_WITH_QUEUE:
+        case IMPOSSIBLE_TO_GENERATE_TRANSACTION:
         case SIGNALS_OF_TERM_RECEIVED:
         case UNUSED_PROC:
         case INFO_BUDGET:

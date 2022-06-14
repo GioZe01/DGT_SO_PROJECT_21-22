@@ -149,6 +149,7 @@ enum SIMULATION_END_TYPE {
     SIMULATION_END_BY_SO_REGISTRY_FULL, /**< The simulation is ended by the registry full*/
     SIMULATION_END_BY_NO_PROC_RUNNING, /**< The simulation is ended by the no proc running*/
     SIMULATION_END_PROPERLY_TERMINATED, /**< The simulation is ended by the properly terminated*/
+    SIMULATION_END_BY_MAX_NODE_GEN_REACHED, /**< The simulation is ended by the max node gen reached*/
 };
 
 #endif /*DGT_SO_PROJECT_21_22_GLOB_H*/

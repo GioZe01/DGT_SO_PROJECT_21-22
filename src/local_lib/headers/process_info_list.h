@@ -126,6 +126,12 @@ int get_num_of_proc(ProcList self);
 int get_num_of_user_proc_running(ProcList self);
 
 /**
+ * Return the number of active node_proc
+ * @return integer rappresenting the number of active user
+ */
+int get_num_of_node_proc_running(ProcList self);
+
+/**
  * @brief send a msg with the new node id to all the other nodes
  * @param queue_id id of the queue to snd the msg on
  * @param retry number of retry to send the single msg
@@ -134,6 +140,15 @@ int get_num_of_user_proc_running(ProcList self);
  * @return FALSE in case of FAILURE, TRUE otherwise
  */
 Bool send_msg_to_all_nodes(int queue_id, int retry, ProcList proc_list, int node_id, Bool exclude_last);
+
+/**
+ * @brief Extract randomly a num_of_node from the proc_list and insert them into the node_list
+ * @param proc_list the list of proc to extract from
+ * @param node_list the list of node to insert into
+ * @param num_of_node the number of node to extract
+ * @warning if the number of nodes into the proc_list is less than the num_of_node, the node_list will be equal to the proc_list
+ */
+void get_random_node_list(ProcList proc_list, ProcList node_list, int num_of_node);
 
 /**
  * @brief Get the first proc in the list
@@ -151,5 +166,12 @@ struct ProcessInfo get_first(ProcList self);
  * @return -2 if the pid is not found, -1 if the budget is not valid, 0 otherwise
  */
 int update_proc(ProcList self, int pid, float budget, short int proc_state);
+
+/**
+ * @brief Get the running node in the list
+ * @param self the list to search in
+ * @return The running nods list
+ */
+ProcList get_running_node_proc(ProcList self);
 /*TODO: implementare budget maggiore get -> vedere se fare una hash table di processi*/
 #endif /*DGT_SO_PROJECT_21_22_PROCESS_INFO_LIST_H*/

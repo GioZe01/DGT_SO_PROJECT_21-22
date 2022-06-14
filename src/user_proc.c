@@ -151,13 +151,16 @@ int main(int arc, char const *argv[]) {
         /*TODO: need a semafore for reading into the message queue*/
         semaphore_start_id = semget(SEMAPHORE_SINC_KEY_START, 1, 0);
         if (semaphore_start_id < 0) {
+            advice_master_of_termination(IMPOSSIBLE_TO_ACQUIRE_SEMAPHORE);
             ERROR_EXIT_SEQUENCE_USER("IMPOSSIBLE TO OBTAIN ID OF START SEM.");
         }
         start_sem_value = semctl(semaphore_start_id, 0, GETVAL);
         if (start_sem_value < 0) {
+            advice_master_of_termination(IMPOSSIBLE_TO_ACQUIRE_SEMAPHORE);
             ERROR_EXIT_SEQUENCE_USER("IMPOSSIBLE TO OBTAIN INFO FROM START SEM.");
         }
         if (start_sem_value != 0 && semaphore_lock(semaphore_start_id, 0) < 0) {
+            advice_master_of_termination(IMPOSSIBLE_TO_ACQUIRE_SEMAPHORE);
             ERROR_EXIT_SEQUENCE_USER("IMPOSSIBLE TO OBTAIN THE START SEMAPHORE");
         }
         DEBUG_MESSAGE("USER READY, WAITING FOR SEMAPHORE TO FREE");
@@ -166,13 +169,14 @@ int main(int arc, char const *argv[]) {
         /*-------------------------*/
         attach_to_shm_conf();
         if (semaphore_wait_for_sinc(semaphore_start_id, 0) < 0) {
+            advice_master_of_termination(IMPOSSIBLE_TO_ACQUIRE_SEMAPHORE);
             ERROR_EXIT_SEQUENCE_USER("ERROR DURING WAITING START_SEMAPHORE UNLOCK");
         }
         current_user.exec_state = PROC_STATE_RUNNING;
         DEBUG_MESSAGE("USER PROCESS RUNNING");
 
 
-        alarm(1);
+        alarm(3);
         /****************************************
          *      GENERATION OF TRANSACTION FASE *
          * **************************************/
@@ -185,7 +189,7 @@ int main(int arc, char const *argv[]) {
         advice_master_of_termination(TERMINATION_END_CORRECTLY);
         EXIT_PROCEDURE_USER(0);
     }
-
+    advice_master_of_termination(UNUSED_PROC);
     ERROR_EXIT_SEQUENCE_USER("CREATION OF USER_PROC FAILED DUE TO: Arg or Signal handler creation failure");
 }
 
@@ -194,6 +198,7 @@ Bool check_argument(int argc, char const *argv[]) {
     DEBUG_NOTIFY_ACTIVITY_RUNNING("CHECKING ARGC AND ARGV...");
 #endif
     if (argc < 2) {
+        advice_master_of_termination(UNUSED_PROC);
         ERROR_EXIT_SEQUENCE_USER("MISSING ARGUMENT");
     }
     user_id = atoi(argv[1]);
@@ -206,14 +211,17 @@ Bool check_argument(int argc, char const *argv[]) {
 void connect_to_queues(void) {
     queue_node_id = msgget(NODES_QUEUE_KEY, 0600);
     if (queue_node_id < 0) {
+        advice_master_of_termination(IMPOSSIBLE_TO_COMUNICATE_WITH_QUEUE);
         ERROR_EXIT_SEQUENCE_USER("IMPOSSIBLE TO CONNECT TO NODE MESSAGE QUEUE");
     }
     queue_user_id = msgget(USERS_QUEUE_KEY, 0600);
     if (queue_user_id < 0) {
+        advice_master_of_termination(IMPOSSIBLE_TO_COMUNICATE_WITH_QUEUE);
         ERROR_EXIT_SEQUENCE_USER("IMPOSSIBLE TO CONNECT TO USER QUEUE");
     }
     queue_master_id = msgget(MASTER_QUEUE_KEY, 0600);
     if (queue_master_id < 0) {
+        advice_master_of_termination(IMPOSSIBLE_TO_COMUNICATE_WITH_QUEUE);
         ERROR_EXIT_SEQUENCE_USER("IMPOSSIBLE TO CONNECT TO MASTER QUEUE");
     }
 }
@@ -226,6 +234,7 @@ Bool set_signal_handler_user(struct sigaction sa) {
     if (sigaction(SIGINT, &sa, NULL) < 0 ||
         sigaction(SIGALRM, &sa, NULL) < 0 ||
         sigaction(SIGUSR2, &sa, NULL) < 0) {
+        advice_master_of_termination(UNUSED_PROC);
         ERROR_EXIT_SEQUENCE_USER("ERROR DURING THE CREATION OF THE SIG HANDLER ");
         return FALSE;
     }
@@ -259,7 +268,7 @@ void signals_handler_user(int signum) {
 #ifdef DEBUG_USER
             DEBUG_NOTIFY_ACTIVITY_DONE("GENERATING A NEW TRANSACTION FROM SIG DONE");
 #endif
-            alarm(1); /* pending alarm added*/
+            alarm(3); /* pending alarm added*/
             break;
         case SIGUSR2:
             block_signal(SIGALRM, &current_mask);
@@ -289,7 +298,7 @@ void advice_master_of_termination(long termination_type) {
         ERROR_MESSAGE(error_string);
     }
 #ifdef DEBUG_USER
-    DEBUG_NOTIFY_ACTIVITY_DONE("{DEBUG_USER}:= ADVICING MASTER OF TERMINATION DONE");
+        DEBUG_NOTIFY_ACTIVITY_DONE("{DEBUG_USER}:= ADVICING MASTER OF TERMINATION DONE");
 #endif
     DEBUG_NOTIFY_ACTIVITY_DONE("{DEBUG_USER}:= ADVICING MASTER OF TERMINATION DONE");
 }
@@ -318,15 +327,20 @@ Bool read_conf() {
         case 0:
             break;
         case -1:
-        ERROR_EXIT_SEQUENCE_USER(" DURING CONF. LOADING: MISSING FILE OR EMPTY");
+            advice_master_of_termination(IMPOSSIBLE_TO_LOAD_CONFIGURATION);
+            ERROR_EXIT_SEQUENCE_USER(" DURING CONF. LOADING: MISSING FILE OR EMPTY");
         case -2:
-        ERROR_EXIT_SEQUENCE_USER(" DURING CONF. LOADING: BROKEN SIMULTATION LOGIC, CHECK CONF. VALUE");
+            advice_master_of_termination(IMPOSSIBLE_TO_LOAD_CONFIGURATION);
+            ERROR_EXIT_SEQUENCE_USER(" DURING CONF. LOADING: BROKEN SIMULTATION LOGIC, CHECK CONF. VALUE");
         case -3:
-        ERROR_EXIT_SEQUENCE_USER(" DURING CONF. LOADING: NOT ENOUGH USERS FOR NODES");
+            advice_master_of_termination(IMPOSSIBLE_TO_LOAD_CONFIGURATION);
+            ERROR_EXIT_SEQUENCE_USER(" DURING CONF. LOADING: NOT ENOUGH USERS FOR NODES");
         case -4:
-        ERROR_EXIT_SEQUENCE_USER(" DURING CONF. LOADING: MIN MAX EXECUTION TIME WRONG");
+            advice_master_of_termination(IMPOSSIBLE_TO_LOAD_CONFIGURATION);
+            ERROR_EXIT_SEQUENCE_USER(" DURING CONF. LOADING: MIN MAX EXECUTION TIME WRONG");
         case -5:
-        ERROR_EXIT_SEQUENCE_USER(" DURING CONF. LOADING: NODE REWARD IS OVER POSSIBILITIES OF USERS");
+            advice_master_of_termination(IMPOSSIBLE_TO_LOAD_CONFIGURATION);
+            ERROR_EXIT_SEQUENCE_USER(" DURING CONF. LOADING: NODE REWARD IS OVER POSSIBILITIES OF USERS");
         default:
             return FALSE;
     }
@@ -367,10 +381,12 @@ void attach_to_shm_conf(void) {
     int shm_conf_id; /* id to the shm_conf*/
     shm_conf_id = shmget(SHM_CONFIGURATION, sizeof(struct shm_conf), 0600);
     if (shm_conf_id < 0) {
+        advice_master_of_termination(IMPOSSIBLE_TO_CONNECT_TO_SHM);
         ERROR_EXIT_SEQUENCE_USER("IMPOSSIBLE TO ACCESS SHM CONF");
     }
     shm_conf_pointer = shmat(shm_conf_id, NULL, 0);
     if (shm_conf_pointer == (void *) -1) {
+        advice_master_of_termination(IMPOSSIBLE_TO_CONNECT_TO_SHM);
         ERROR_EXIT_SEQUENCE_USER("IMPOSSIBLE TO CONNECT TO SHM CONF");
     }
 #ifdef DEBUG_USER
@@ -383,6 +399,7 @@ void generating_transactions(void) {
     struct timespec gen_sleep;
     int failed_gen_trans = 0;
     while (failed_gen_trans < configuration.so_retry && current_user.budget >= 0) {
+        block_signal(SIGALRM, &current_mask);
         block_signal(SIGUSR2, &current_mask);
         getting_richer();
         check_for_transactions_confirmed();
@@ -415,6 +432,7 @@ void generating_transactions(void) {
             nanosleep(&gen_sleep, (void *) NULL);
         }
         unblock_signal(SIGUSR2, &current_mask);
+        unblock_signal(SIGALRM, &current_mask);
     }
 
 }

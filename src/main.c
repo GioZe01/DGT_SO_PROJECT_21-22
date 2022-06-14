@@ -156,6 +156,14 @@ void unlock_to_fill_sem(void);
  */
 void tp_full_handler(struct master_msg_report *msg_repo);
 
+/**
+ * @brief Remove the pid in the given list
+ * @param list The list to search the pid in
+ * @param pid The pid to be removed
+ * @return TRUE if the pid was removed, FALSE otherwise
+ */
+Bool remove_proc_from_list(int *list, int pid);
+
 /* Variables*/
 struct conf simulation_conf;                    /* Structure representing the configuration present in the conf file*/
 ProcList proc_list;                             /* Pointer to a linked list of all proc generated*/
@@ -252,7 +260,7 @@ int main() {
         }
         DEBUG_MESSAGE("WAITING DONE");
         DEBUG_BLOCK_ACTION_END();
-        alarm(1);
+        alarm(2);
         while (simulation_end < 0) {
             int msg_rep_value = check_msg_report(&msg_repo, msg_report_id_master, proc_list);
             if (check_runnability() == FALSE || msg_rep_value < 0) {
@@ -400,6 +408,7 @@ void signals_handler(int signum) {
                 exit(0);
             }
         case SIGALRM:
+            alarm(0);
             if (getpid() == main_pid) {
                 num_inv++;
                 /*request info from kids */
@@ -610,63 +619,42 @@ void print_info(void) {
 void update_kids_info(void) {
     DEBUG_BLOCK_ACTION_START("UPDATE KIDS INFO");
     DEBUG_NOTIFY_ACTIVITY_RUNNING("UPDATING KIDS INFO....");
-    struct master_msg_report *msg_rep = (struct master_msg_report *) malloc(sizeof(struct master_msg_report));
-    int retry = 0;
+    struct master_msg_report msg_report;
+    int found_info, retry = 0;
     int *to_wait_proc = send_sig_to_all(proc_list, SIGUSR2);
-
-    int num_msg_to_wait_for = to_wait_proc[0];
-    to_wait_proc++;
-    if (num_msg_to_wait_for < 0) {
-        ERROR_MESSAGE("IMPOSSIBLE TO UPDATE KIDS INFO");
-    } else if (num_msg_to_wait_for == 0) {
-        DEBUG_MESSAGE("NO PROCESS TO UPDATE");
+    if (to_wait_proc == NULL || to_wait_proc[0] < 0) {
+        ERROR_EXIT_SEQUENCE_MAIN("IMPOSSIBLE TO SEND SIGUSR2 TO PROCESSES");
     }
-    DEBUG_NOTIFY_ACTIVITY_RUNNING("RETRIVING INFO ...");
-    do {
-        msg_rep->sender_pid = -1;
-        /*TODO: POSSIBLE INFITE WAITING CHECK FOR SIG*/
-        master_msg_receive_info(msg_report_id_master, msg_rep);
-
-        if (msg_rep->sender_pid != -1) {
-#ifdef DEBUG_MAIN
-            master_msg_report_print(msg_rep);
-#endif
-            /** Find the pid in to wait proc and remove it */
+    while (to_wait_proc[0] > 0) {
+        if (retry > MAX_RETRY_UPDATE_KIDS_INFO) {
+            /**
+             * Resend the signal to the processes that are not responding
+             */
             int i;
-            for (i = 0; i < num_msg_to_wait_for; i++) {
-                if (to_wait_proc[i] == msg_rep->sender_pid) {
-                    to_wait_proc[i] = to_wait_proc[num_msg_to_wait_for - 1];
-                    num_msg_to_wait_for--;
-                    break;
-                }
-            }
-            /** Acknowledge the message */
-            if (acknowledge(msg_rep, proc_list) == 1) {
-                tp_full_handler(&msg_rep);
-            }
-        } else if (retry > MAX_RETRY_UPDATE_KIDS_INFO) {
-            int i;
-            /*Print to wait proc*/
-            printf("\n TO WAIT PROC: ");
-            for (i = 0; i < num_msg_to_wait_for; i++) {
-                printf("%d ", to_wait_proc[i]);
-            }
-            printf("\n");
-            for (i = 0; i < num_msg_to_wait_for; i++) {
+            for (i = 0; i < to_wait_proc[0]; i++) {
                 kill(to_wait_proc[i], SIGUSR2);
-#ifdef DEBUG_MAIN
-                printf("Signal resent to %d\n\n", to_wait_proc[i]);
-#endif
             }
-            struct timespec ts;
-            ts.tv_sec = SLEEP_TIME_UPDATE_KIDS_INFO;
-            nanosleep(&ts, NULL);
-            retry = 0;
-        } else {
-            retry++;
         }
-    } while (num_msg_to_wait_for > 0);
-    free(msg_rep);
+        found_info = master_msg_receive_info(msg_report_id_master, &msg_report);
+        /** Remove the process from the waiting list
+         *  and acknowledge the msg_report */
+        if (found_info >= 0 &&
+            remove_proc_from_list(to_wait_proc, msg_report.sender_pid) == TRUE &&
+            acknowledge(&msg_report, proc_list) == 1) {
+            tp_full_handler(&msg_report);
+        } else if (found_info == -2) {
+            retry++;
+        } else if (found_info == -1) {
+            ERROR_MESSAGE("IMPOSSIBLE TO RECEIVE INFO FROM PROCESS");
+            return;
+        }
+#ifdef DEBUG
+        if (found_info >= 0) {
+            master_msg_report_print(&msg_report);
+        }
+#endif
+    }
+    free(to_wait_proc);
     DEBUG_NOTIFY_ACTIVITY_DONE("RETRIVING INFO DONE");
 }
 
@@ -678,6 +666,7 @@ Bool check_runnability() {
         return FALSE;
     }
     if (shm_masterbook_pointer->to_fill >= SO_REGISTRY_SIZE) {
+        printf("TO FILL SHM VALUE: %d\n", shm_masterbook_pointer->to_fill);
         simulation_end = SIMULATION_END_BY_SO_REGISTRY_FULL;
         return FALSE;
     }
@@ -686,8 +675,9 @@ Bool check_runnability() {
 
 void end_simulation() {
     alarm(0);
+    struct master_msg_report msg_rep;
+    check_msg_report(&msg_rep, msg_report_id_master, proc_list);
     block_signal(SIGUSR1, &current_mask);
-    update_kids_info();
     print_info();
     printf("Simulation %s \n", get_end_simulation_msg());
     kill_kids();
@@ -709,6 +699,8 @@ char *get_end_simulation_msg() {
             return "END BY SO REGISTRY FULL";
         case SIMULATION_END_PROPERLY_TERMINATED:
             return "END PROPERLY TERMINATED";
+        case SIMULATION_END_BY_MAX_NODE_GEN_REACHED:
+            return "END BY MAX NODE GEN REACHED";
         default:
             return "UNKNOWN";
     }
@@ -777,16 +769,34 @@ void tp_full_handler(struct master_msg_report *msg_repo) {
                                               shm_conf_pointer->nodes_snapshots[0][0]);
 
     if (shm_conf_add_node(shm_conf_pointer, new_node_pid, new_node_id, new_node_friends) == FALSE) {
-        ERROR_EXIT_SEQUENCE_MAIN("ERROR WHILE ADDING THE NEW NODE TO THE SHARED MEMORY, MAX NODE LIMIT REACHED");
+        ERROR_MESSAGE("ERROR WHILE ADDING THE NEW NODE TO THE SHARED MEMORY, MAX NODE LIMIT REACHED");
+        simulation_end = SIMULATION_END_BY_MAX_NODE_GEN_REACHED;
+        end_simulation();
     }
     struct node_msg node_msg;
     msg_repo->t.hops = 0;
     node_msg_snd(msg_report_id_nodes, &node_msg, MSG_TRANSACTION_TYPE, &msg_repo->t, main_pid, TRUE,
                  simulation_conf.so_retry, new_node_id);
     /*Send the signal SIGUSR1 to all the nodes*/
-    send_sig_to_all_nodes(proc_list, SIGUSR1, TRUE);
-    send_msg_to_all_nodes(msg_report_id_nodes, simulation_conf.so_retry, proc_list,
-                          shm_conf_pointer->nodes_snapshots[0][0], TRUE);
+    if (simulation_conf.so_num_friends > 0) {
+        ProcList random_nodes = proc_list_create();
+        get_random_node_list(proc_list, random_nodes, simulation_conf.so_num_friends);
+        send_sig_to_all_nodes(random_nodes, SIGUSR1, TRUE);
+        send_msg_to_all_nodes(msg_report_id_nodes, simulation_conf.so_retry, random_nodes,
+                              shm_conf_pointer->nodes_snapshots[0][0], TRUE);
+    }
     unblock_signal(SIGUSR1, &current_mask);
     unblock_signal(SIGALRM, &current_mask);
+}
+
+Bool remove_proc_from_list(int *list, int pid) {
+    int i = 0;
+    for (; i < list[0]; i++) {
+        if (list[i + 1] == pid) {
+            list[i + 1] = list[list[0]];
+            list[0]--;
+            return TRUE;
+        }
+    }
+    return FALSE;
 }
