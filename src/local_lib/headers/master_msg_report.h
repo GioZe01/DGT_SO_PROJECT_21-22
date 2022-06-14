@@ -24,6 +24,7 @@ typedef enum {
     INFO_BUDGET = 9,
     TP_FULL = 10,
     UNUSED_PROC = 11,
+    MAX_FAILURE_SHM_REACHED = 12,
 } MSG_REPORT_TYPE;
 
 typedef enum {

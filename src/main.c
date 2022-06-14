@@ -632,8 +632,12 @@ void update_kids_info(void) {
              */
             int i;
             for (i = 0; i < to_wait_proc[0]; i++) {
+                if (printed == FALSE) {
+                    printf("SENDING SIGUSR2 TO PROCESS %d\n", to_wait_proc[i + 1]);
+                }
                 kill(to_wait_proc[i], SIGUSR2);
             }
+            printed = TRUE;
         }
         found_info = master_msg_receive_info(msg_report_id_master, &msg_report);
         /** Remove the process from the waiting list
@@ -677,7 +681,9 @@ void end_simulation() {
     alarm(0);
     struct master_msg_report msg_rep;
     check_msg_report(&msg_rep, msg_report_id_master, proc_list);
-    block_signal(SIGUSR1, &current_mask);
+    sigemptyset(&current_mask);
+    sigaddset(&current_mask, SIGUSR1);
+    sigprocmask(SIG_BLOCK, &current_mask, NULL);
     print_info();
     printf("Simulation %s \n", get_end_simulation_msg());
     kill_kids();
@@ -759,8 +765,10 @@ void unlock_to_fill_sem(void) {
 }
 
 void tp_full_handler(struct master_msg_report *msg_repo) {
-    block_signal(SIGALRM, &current_mask);
-    block_signal(SIGUSR1, &current_mask);
+    sigemptyset(&current_mask);
+    sigaddset(&current_mask, SIGUSR1);
+    sigaddset(&current_mask, SIGALRM);
+    sigprocmask(SIG_BLOCK, &current_mask, NULL);
     int new_node_id = shm_conf_pointer->nodes_snapshots[shm_conf_pointer->nodes_snapshots[0][0]][1] +
                       DELTA_NODE_MSG_TYPE;
     int new_node_pid = create_node_proc(new_node_id);
@@ -785,8 +793,9 @@ void tp_full_handler(struct master_msg_report *msg_repo) {
         send_msg_to_all_nodes(msg_report_id_nodes, simulation_conf.so_retry, random_nodes,
                               shm_conf_pointer->nodes_snapshots[0][0], TRUE);
     }
-    unblock_signal(SIGUSR1, &current_mask);
-    unblock_signal(SIGALRM, &current_mask);
+    sigaddset(&current_mask, SIGUSR1);
+    sigaddset(&current_mask, SIGALRM);
+    sigprocmask(SIG_UNBLOCK, &current_mask, NULL);
 }
 
 Bool remove_proc_from_list(int *list, int pid) {

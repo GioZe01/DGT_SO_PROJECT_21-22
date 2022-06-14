@@ -32,6 +32,7 @@ void master_msg_report_print(const struct master_msg_report *self) {
         case IMPOSSIBLE_TO_COMUNICATE_WITH_QUEUE:
         case IMPOSSIBLE_TO_GENERATE_TRANSACTION:
         case IMPOSSIBLE_TO_CONNECT_TO_SHM:
+        case MAX_FAILURE_SHM_REACHED:
             switch (self->state) {
                 case PROC_STATE_WAITING:
                 case PROC_STATE_NODE_SERV_TRANS:
@@ -117,6 +118,8 @@ char *from_type_to_string(long type) {
             return "UNUSED PROCESS";
         case TP_FULL:
             return "TP_FULL";
+        case MAX_FAILURE_SHM_REACHED:
+            return "MAX FAILURE SHM REACHED";
         default:
             return "";
     }

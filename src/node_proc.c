@@ -257,7 +257,7 @@ int main(int argc, char const *argv[]) {
         /****************************************
          *   PROCESSING OF TRANSACTION FASE     *
          * **************************************/
-        alarm(1);
+        /*alarm(1);*/
         while (node_end != 1 && failure_shm < MAX_FAILURE_SHM_LOADING) {
             load_simple_transaction(&msg_rep);
             process_node_transaction(&msg_rep);
@@ -340,10 +340,12 @@ void signals_handler(int signum) {
     struct master_msg_report master_msg;
     struct node_msg node_msg;
     struct Transaction t;
+    sigemptyset(&current_mask);
     switch (signum) {
         case SIGINT:
             alarm(0); /*pending alarm removed*/
-            block_signal(SIGUSR1, &current_mask);
+            sigaddset(&current_mask, SIGUSR1);
+            sigprocmask(SIG_BLOCK, &current_mask, NULL);
             current_node.exec_state = PROC_STATE_TERMINATED;
             advice_master_of_termination(SIGNALS_OF_TERM_RECEIVED);
             EXIT_PROCEDURE_NODE(0);
@@ -363,26 +365,31 @@ void signals_handler(int signum) {
             alarm(1);
             break;
         case SIGUSR1:
-            block_signal(SIGALRM, &current_mask);
-            block_signal(SIGUSR2, &current_mask);
+            sigaddset(&current_mask, SIGUSR2);
+            sigaddset(&current_mask, SIGALRM);
+            sigprocmask(SIG_BLOCK, &current_mask, NULL);
             /**
              * Receive new friends from master and update the friends list
              */
 #ifdef DEBUG_NODE
             printf("\nNODE MESSAGE ARRIVED\n\n");
 #endif
-            while(node_msg_receive(queue_node_id, &node_msg, MSG_MASTER_ORIGIN_ID) == 0);
+            while (node_msg_receive(queue_node_id, &node_msg, MSG_MASTER_ORIGIN_ID) == 0);
             friends = set_one(friends, node_msg.t.sender);
 #ifdef DEBUG_NODE
             printf("Node msg sender: %d\n", node_msg.t.sender);
             printf("NODE FRIENDS: ");
             print_binary(friends);
 #endif
-            unblock_signal(SIGALRM, &current_mask);
-            unblock_signal(SIGUSR2, &current_mask);
+            sigaddset(&current_mask, SIGUSR2);
+            sigaddset(&current_mask, SIGALRM);
+            sigprocmask(SIG_UNBLOCK, &current_mask, NULL);
             break;
         case SIGUSR2:
-            block_signal(SIGALRM, &current_mask);
+
+            sigaddset(&current_mask, SIGALRM);
+            sigaddset(&current_mask, SIGUSR1);
+            sigprocmask(SIG_BLOCK, &current_mask, NULL);
             /**
              * Inform master of the node state
              */
@@ -392,7 +399,9 @@ void signals_handler(int signum) {
 #ifdef DEBUG_NODE
             DEBUG_NOTIFY_ACTIVITY_DONE("{DEBUG_NODE}:= REPLIED TO MASTER DONE");
 #endif
-            unblock_signal(SIGALRM, &current_mask);
+            sigaddset(&current_mask, SIGALRM);
+            sigaddset(&current_mask, SIGUSR1);
+            sigprocmask(SIG_UNBLOCK, &current_mask, NULL);
             break;
         default:
             break;
@@ -470,9 +479,11 @@ void connect_to_queues(void) {
 
 int process_node_block() {
     /* Block signal */
-    block_signal(SIGALRM, &current_mask);
-    block_signal(SIGUSR2, &current_mask);
-    block_signal(SIGUSR1, &current_mask);
+    sigemptyset(&current_mask);
+    sigaddset(&current_mask, SIGALRM);
+    sigaddset(&current_mask, SIGUSR1);
+    sigaddset(&current_mask, SIGUSR2);
+    sigprocmask(SIG_BLOCK, &current_mask, NULL);
     /*Loading them into the node_block_transactions*/
     if (load_block() == TRUE &&
         get_num_transactions(current_node.transactions_block) ==
@@ -484,13 +495,20 @@ int process_node_block() {
         while (num_of_shm_retry < MAX_FAILURE_SHM_BOOKMASTER_LOCKING && lock_shm_masterbook() == FALSE) {
             num_of_shm_retry++;
         }
-        /*send confirmed to all users*/
-        adv_users_of_block();
+        if (num_of_shm_retry < MAX_FAILURE_SHM_BOOKMASTER_LOCKING) {
+            /*send confirmed to all users*/
+            adv_users_of_block();
+        } else {
+            advice_master_of_termination(MAX_FAILURE_SHM_REACHED);
+            ERROR_EXIT_SEQUENCE_NODE("MAX FAILURE SHM REACHED");
+        }
+
     }
     /* Unblock signal */
-    unblock_signal(SIGUSR2, &current_mask);
-    unblock_signal(SIGUSR1, &current_mask);
-    unblock_signal(SIGALRM, &current_mask);
+    sigaddset(&current_mask, SIGUSR2);
+    sigaddset(&current_mask, SIGALRM);
+    sigaddset(&current_mask, SIGUSR1);
+    sigprocmask(SIG_UNBLOCK, &current_mask, NULL);
     return 0;
 }
 
@@ -590,7 +608,6 @@ void unlock_masterbook_cell_access(int i_cell_block_list) {
 }
 
 Bool load_block(void) {
-    /* Critical section */
     Bool ris = FALSE;
     if (queue_is_empty(current_node.transactions_block) == FALSE ||
         get_num_transactions(current_node.transactions_pool) < SO_BLOCK_SIZE) {

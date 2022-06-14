@@ -176,7 +176,7 @@ int main(int arc, char const *argv[]) {
         DEBUG_MESSAGE("USER PROCESS RUNNING");
 
 
-        alarm(3);
+        /*alarm(3);*/
         /****************************************
          *      GENERATION OF TRANSACTION FASE *
          * **************************************/
@@ -245,6 +245,7 @@ void signals_handler_user(int signum) {
     DEBUG_SIGNAL("SIGNAL RECEIVED", signum);
     struct master_msg_report msg;
     struct Transaction t;
+    sigemptyset(&current_mask);
     switch (signum) {
         case SIGINT:
             alarm(0); /* pending alarm removed*/
@@ -271,14 +272,16 @@ void signals_handler_user(int signum) {
             alarm(3); /* pending alarm added*/
             break;
         case SIGUSR2:
-            block_signal(SIGALRM, &current_mask);
+            sigaddset(&current_mask, SIGALRM);
+            sigprocmask(SIG_BLOCK, &current_mask, NULL);
             t = create_empty_transaction();
             if (master_msg_send(queue_master_id, &msg, INFO_BUDGET, USER, current_user.pid,
                                 current_user.exec_state, TRUE, current_user.budget, &t) < 0) {
                 char *error_string = strcat("IMPOSSIBLE TO ADVICE MASTER OF : %s", from_type_to_string(INFO_BUDGET));
                 ERROR_MESSAGE(error_string);
             }
-            unblock_signal(SIGALRM, &current_mask);
+            sigaddset(&current_mask, SIGALRM);
+            sigprocmask(SIG_UNBLOCK, &current_mask, NULL);
             break;
         default:
             break;
@@ -399,11 +402,15 @@ void generating_transactions(void) {
     struct timespec gen_sleep;
     int failed_gen_trans = 0;
     while (failed_gen_trans < configuration.so_retry && current_user.budget >= 0) {
-        block_signal(SIGALRM, &current_mask);
-        block_signal(SIGUSR2, &current_mask);
         getting_richer();
         check_for_transactions_confirmed();
         check_for_transactions_failed();
+        /** Blocking signals*/
+        sigemptyset(&current_mask);
+        sigaddset(&current_mask, SIGUSR2);
+        sigaddset(&current_mask, SIGALRM);
+        sigprocmask(SIG_BLOCK, &current_mask, NULL);
+
         int gen_trans_ris = generate_transaction(&current_user, current_user.pid, shm_conf_pointer);
         if (gen_trans_ris == -1) {
             failed_gen_trans++;
@@ -429,10 +436,13 @@ void generating_transactions(void) {
             }
 
 #endif
+
             nanosleep(&gen_sleep, (void *) NULL);
         }
-        unblock_signal(SIGUSR2, &current_mask);
-        unblock_signal(SIGALRM, &current_mask);
+        /** Unblocking Signals*/
+        sigaddset(&current_mask, SIGUSR2);
+        sigaddset(&current_mask, SIGALRM);
+        sigprocmask(SIG_UNBLOCK, &current_mask, NULL);
     }
 
 }
