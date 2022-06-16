@@ -30,8 +30,9 @@ int user_msg_create(struct user_msg *self, long type, pid_t sender_pid, struct T
 /**
  * Print the msg based on his type
  * @param self the message to be printed
+ * @param type the type of the message
  */
-void user_msg_print(struct user_msg *self);
+void user_msg_print(struct user_msg *self, long type);
 
 /**
 * (Create if selected) and Send the message on ipc user_queue with the key as specified

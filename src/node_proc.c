@@ -257,19 +257,35 @@ int main(int argc, char const *argv[]) {
         /****************************************
          *   PROCESSING OF TRANSACTION FASE     *
          * **************************************/
-        /*alarm(1);*/
+        alarm(3);
+        /* Block signal */
+        int sig_list[] = {SIGUSR2, SIGALRM, SIGUSR1};
+        sigset_t mask;
+        gen_mask(&mask, sig_list, sizeof(sig_list) / sizeof(int));
         while (node_end != 1 && failure_shm < MAX_FAILURE_SHM_LOADING) {
+            block_signals(&mask, &current_mask);
             load_simple_transaction(&msg_rep);
+            unblock_signals(&current_mask);
+            block_signals(&mask, &current_mask);
             process_node_transaction(&msg_rep);
+            unblock_signals(&current_mask);
+            block_signals(&mask, &current_mask);
             process_simple_transaction_type(&msg_rep);
+            unblock_signals(&current_mask);
             if (msg_rep.sender_pid ==
                 -1) { /**default value of sender_pid is -1, if it is -1 it means that the transaction is not valid*/
                 is_unsed_node++;
+            }
+            block_signals(&mask, &current_mask);
+            if (get_num_transactions(current_node.transactions_pool) >= SO_BLOCK_SIZE) {
+                printf("get_num_transactions(%d) = %d\n", current_node.pid,
+                       get_num_transactions(current_node.transactions_pool));
             }
             if (get_num_transactions(current_node.transactions_pool) >= SO_BLOCK_SIZE &&
                 process_node_block() == FALSE) {
                 failure_shm++;
             }
+            unblock_signals(&current_mask);
         }
         if (failure_shm > MAX_FAILURE_SHM_LOADING) {
             advice_master_of_termination(UNUSED_PROC);
@@ -279,7 +295,8 @@ int main(int argc, char const *argv[]) {
             advice_master_of_termination(UNUSED_PROC);
             ERROR_EXIT_SEQUENCE_NODE("UNUSED NODE TP PROC");
         }
-        sleep(100);
+
+
     }
     advice_master_of_termination(TERMINATION_END_CORRECTLY);
     EXIT_PROCEDURE_NODE(0);
@@ -336,16 +353,14 @@ void signals_handler(int signum) {
 #ifdef DEBUG_NODE
     DEBUG_SIGNAL("SIGNAL RECEIVED ", signum);
 #endif
+    DEBUG_SIGNAL("SIGNAL RECEIVED ", signum);
     last_signal = signum;
     struct master_msg_report master_msg;
     struct node_msg node_msg;
-    struct Transaction t;
-    sigemptyset(&current_mask);
+    struct Transaction *t;
     switch (signum) {
         case SIGINT:
             alarm(0); /*pending alarm removed*/
-            sigaddset(&current_mask, SIGUSR1);
-            sigprocmask(SIG_BLOCK, &current_mask, NULL);
             current_node.exec_state = PROC_STATE_TERMINATED;
             advice_master_of_termination(SIGNALS_OF_TERM_RECEIVED);
             EXIT_PROCEDURE_NODE(0);
@@ -358,16 +373,13 @@ void signals_handler(int signum) {
                  */
                 int friend = shm_conf_pointer_node->nodes_snapshots[get_rand_one(friends)][1];
                 t = queue_head(current_node.transactions_pool);
-                node_msg_snd(queue_node_id, &node_msg, MSG_NODE_ORIGIN_TYPE, &t, current_node.node_id, TRUE,
+                node_msg_snd(queue_node_id, &node_msg, MSG_NODE_ORIGIN_TYPE, t, current_node.node_id, TRUE,
                              node_configuration.so_retry, friend);
                 queue_remove_head(current_node.transactions_pool);
             }
             alarm(1);
             break;
         case SIGUSR1:
-            sigaddset(&current_mask, SIGUSR2);
-            sigaddset(&current_mask, SIGALRM);
-            sigprocmask(SIG_BLOCK, &current_mask, NULL);
             /**
              * Receive new friends from master and update the friends list
              */
@@ -381,39 +393,34 @@ void signals_handler(int signum) {
             printf("NODE FRIENDS: ");
             print_binary(friends);
 #endif
-            sigaddset(&current_mask, SIGUSR2);
-            sigaddset(&current_mask, SIGALRM);
-            sigprocmask(SIG_UNBLOCK, &current_mask, NULL);
             break;
         case SIGUSR2:
-
-            sigaddset(&current_mask, SIGALRM);
-            sigaddset(&current_mask, SIGUSR1);
-            sigprocmask(SIG_BLOCK, &current_mask, NULL);
             /**
              * Inform master of the node state
              */
-            t = create_empty_transaction();
+            t = (struct Transaction *) malloc(sizeof(struct Transaction));
+            create_empty_transaction(t);
             master_msg_send(queue_master_id, &master_msg, INFO_BUDGET, NODE, current_node.pid, current_node.exec_state,
-                            TRUE, current_node.budget, &t);
+                            TRUE, current_node.budget, t);
 #ifdef DEBUG_NODE
             DEBUG_NOTIFY_ACTIVITY_DONE("{DEBUG_NODE}:= REPLIED TO MASTER DONE");
 #endif
-            sigaddset(&current_mask, SIGALRM);
-            sigaddset(&current_mask, SIGUSR1);
-            sigprocmask(SIG_UNBLOCK, &current_mask, NULL);
+            if (t != NULL) {
+                free(t);
+            }
             break;
         default:
             break;
     }
+
 }
 
 void free_sysVar_node() {
     int semaphore_start_value;
-    /* If the process is in INIT STATE his termination can block the whole simulation. So it need to
+    /** If the process is in INIT STATE his termination can block the whole simulation. So it need to
      * lock the sart semaphore.
      * If the semaphore_start_id is impossible to retrive ( = -1) nothing can be done.
-     * */
+     */
     if (current_node.exec_state == PROC_STATE_INIT && semaphore_start_id >= 0) {
         semaphore_start_value = semctl(semaphore_start_id, 0, GETVAL);
         if (semaphore_start_value < 0)
@@ -433,7 +440,6 @@ void attach_to_shms(void) {
 #ifdef DEBUG_NODE
     DEBUG_NOTIFY_ACTIVITY_RUNNING("ATTACHING TO SHM...");
 #endif
-
     int shm_conf_id = -1; /* id to the shm_conf*/
     shm_conf_id = shmget(SHM_CONFIGURATION, sizeof(struct shm_conf), 0600);
     if (shm_conf_id < 0) {
@@ -478,37 +484,23 @@ void connect_to_queues(void) {
 }
 
 int process_node_block() {
-    /* Block signal */
-    sigemptyset(&current_mask);
-    sigaddset(&current_mask, SIGALRM);
-    sigaddset(&current_mask, SIGUSR1);
-    sigaddset(&current_mask, SIGUSR2);
-    sigprocmask(SIG_BLOCK, &current_mask, NULL);
     /*Loading them into the node_block_transactions*/
     if (load_block() == TRUE &&
-        get_num_transactions(current_node.transactions_block) ==
-        SO_BLOCK_SIZE /* DID i got the correct num of transactions*/
-        &&
+        get_num_transactions(current_node.transactions_block) == SO_BLOCK_SIZE &&
         current_node.calc_reward(&current_node, current_node.percentage, TRUE, &current_block_reward) >= 0) {
         int num_of_shm_retry = 0;
-
         while (num_of_shm_retry < MAX_FAILURE_SHM_BOOKMASTER_LOCKING && lock_shm_masterbook() == FALSE) {
             num_of_shm_retry++;
         }
         if (num_of_shm_retry < MAX_FAILURE_SHM_BOOKMASTER_LOCKING) {
             /*send confirmed to all users*/
             adv_users_of_block();
+            printf("NODE BLOCK CONFIRMED : %d ", current_node.pid);
         } else {
             advice_master_of_termination(MAX_FAILURE_SHM_REACHED);
             ERROR_EXIT_SEQUENCE_NODE("MAX FAILURE SHM REACHED");
         }
-
     }
-    /* Unblock signal */
-    sigaddset(&current_mask, SIGUSR2);
-    sigaddset(&current_mask, SIGALRM);
-    sigaddset(&current_mask, SIGUSR1);
-    sigprocmask(SIG_UNBLOCK, &current_mask, NULL);
     return 0;
 }
 
@@ -625,12 +617,15 @@ Bool load_block(void) {
 void advice_master_of_termination(long termination_type) {
     struct master_msg_report termination_report;
     current_node.exec_state = PROC_STATE_TERMINATED;
-    struct Transaction t = create_empty_transaction();
+    struct Transaction *t = (struct Transaction *) malloc(sizeof(struct Transaction));
+    create_empty_transaction(t);
     if (master_msg_send(queue_master_id, &termination_report, termination_type, NODE, current_node.pid,
-                        current_node.exec_state, TRUE, current_node.budget, &t) < 0) {
+                        current_node.exec_state, TRUE, current_node.budget, t) < 0) {
         char *error_string = strcat("IMPOSSIBLE TO ADVICE MASTER OF : %s", from_type_to_string(termination_type));
         ERROR_MESSAGE(error_string);
     }
+    if (t != NULL)
+        free(t);
 }
 
 void acquire_semaphore_ids(void) {
@@ -661,29 +656,39 @@ long int get_time_processing(void) {
 void adv_users_of_block(void) {
     int sender_pid = -1;
     int receiver_pid = -1;
+#ifdef DEBUG_NODE
+    DEBUG_NOTIFY_ACTIVITY_RUNNING("ADV USERS OF THE BLOCK ...");
+#endif
+    struct Transaction *t;
+    struct user_msg u_msg_rep;
     while (queue_is_empty(current_node.transactions_block) == FALSE) {
-        struct user_msg *u_msg_rep = (struct user_msg *) malloc(sizeof(struct user_msg));
-        struct Transaction t = queue_head(current_node.transactions_block);
-        t.t_type = TRANSACTION_SUCCES;
-        sender_pid = t.sender;
-        receiver_pid = t.reciver;
+        printf("NODE %d UNLOADING BLOCK \n", current_node.pid);
+        t = queue_head(current_node.transactions_block);
+        t->t_type = TRANSACTION_SUCCES;
+        sender_pid = t->sender;
+        receiver_pid = t->reciver;
         int queue_id_user_proc = get_queueid_by_pid(shm_conf_pointer_node, sender_pid, TRUE);
         if (queue_id_user_proc < 0) {
             ERROR_MESSAGE("ILLIGAL PID INTO TRANSACTION, NO PIDS FOUND");
             return;
         }
-        user_msg_snd(queue_user_id, u_msg_rep, MSG_TRANSACTION_CONFIRMED_TYPE, &t, current_node.pid, TRUE,
-                     queue_id_user_proc);
+        if (user_msg_snd(queue_user_id, &u_msg_rep, MSG_TRANSACTION_CONFIRMED_TYPE, t, current_node.pid, TRUE,
+                         queue_id_user_proc) < 0) { ERROR_MESSAGE("ERROR WHILE SENDING THE MSG TO USER"); }
         queue_id_user_proc = get_queueid_by_pid(shm_conf_pointer_node, receiver_pid, TRUE);
         if (queue_id_user_proc < 0) {
             ERROR_MESSAGE("ILLIGAL PID INTO TRANSACTION, NO PIDS FOUND");
             return;
         }
-        user_msg_snd(queue_user_id, u_msg_rep, MSG_TRANSACTION_INCOME_TYPE, &t, current_node.pid, TRUE,
-                     queue_id_user_proc);
+        if (user_msg_snd(queue_user_id, &u_msg_rep, MSG_TRANSACTION_INCOME_TYPE, t, current_node.pid, TRUE,
+                         queue_id_user_proc) < 0) { ERROR_MESSAGE("ERROR WHILE SENDING THE MSG TO USER"); }
         queue_remove_head(current_node.transactions_block);
+
     }
     current_block_reward = 0;
+#ifdef DEBUG_NODE
+    DEBUG_NOTIFY_ACTIVITY_DONE("ADV USERS OF THE BLOCK DONE");
+#endif
+
 }
 
 int process_simple_transaction_type(struct node_msg *msg_rep) {
@@ -726,7 +731,7 @@ void print_node_info() {
         int i;
         friends_pos = get_all_ones_positions(friends);
         for (i = 0; i < node_configuration.so_num_friends; i++) {
-            printf("[%d] Friend position: %d\n", getpid(),
+            printf("[%d] Queue id: %d Friend position: %d\n", getpid(), current_node.node_id,
                    shm_conf_pointer_node->nodes_snapshots[(friends_pos[i]) + 1][0]);
         }
         printf("\n");

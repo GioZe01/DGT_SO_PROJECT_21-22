@@ -2,17 +2,30 @@
 #define DGT_SO_PROJECT_21_22_GT_SIG_HANDLER_H
 /* Standard includes */
 #include <signal.h>
+/* Local includes */
+#include "boolean.h"
 
 /**
- * @brief Block the given list of signal. If the signal is already blocked, do nothing.
- * @param sigs_num The signals to be block.
- * @param old_sig_mask The old signal mask.
+ * @brief Generate a mask for the signals to be blocked
+ * @param mask the mask to be generated
+ * @param sig_list the list of signals to be blocked
+ * @param sig_size the size of the list of signals
  */
-void block_signals(int* sigs_num, sigset_t *old_sig_mask);
+void gen_mask(sigset_t *mask, int *sig_list, int sig_size);
+
 /**
- * @brief Unblock the given list of signal. If the signal is already unblocked, do nothing.
- * @param sig_num The signals to be unblock.
- * @param old_sig_mask The old signal mask.
+ * @brief Block the signals of the new mask
+ * @param new_mask the new mask to block
+ * @param old_mask pointer to the old mask
+ * @return TRUE if success, FALSE otherwise
  */
-void unblock_signals(int * sigs_num, sigset_t *old_sig_mask);
+Bool block_signals(sigset_t *new_mask, sigset_t *old_mask);
+
+/**
+ * @brief Set the old mask given
+ * @param old_mask pointer to the old mask
+ * @return TRUE if success, FALSE otherwise
+ */
+Bool unblock_signals(sigset_t *old_mask);
+
 #endif /*DGT_SO_PROJECT_21_22_GT_SIG_HANDLER_H*/

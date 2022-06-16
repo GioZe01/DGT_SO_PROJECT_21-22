@@ -260,14 +260,14 @@ int main() {
         }
         DEBUG_MESSAGE("WAITING DONE");
         DEBUG_BLOCK_ACTION_END();
-        alarm(2);
+        alarm(1);
         while (simulation_end < 0) {
             int msg_rep_value = check_msg_report(&msg_repo, msg_report_id_master, proc_list);
             if (check_runnability() == FALSE || msg_rep_value < 0) {
                 /*If a message arrive make the knowledge*/
                 ERROR_MESSAGE("IMPOSSIBLE TO RUN SIMULATION");
                 end_simulation();
-            } else if (msg_rep_value == 1) {
+            } else if (msg_rep_value == -3) {
                 tp_full_handler(&msg_repo);
 
             } else if (msg_rep_value == 2) {
@@ -621,32 +621,44 @@ void update_kids_info(void) {
     DEBUG_NOTIFY_ACTIVITY_RUNNING("UPDATING KIDS INFO....");
     struct master_msg_report msg_report;
     int found_info, retry = 0;
-    int *to_wait_proc = send_sig_to_all(proc_list, SIGUSR2);
+    int num_proc_runnin = get_num_proc_running(proc_list);
+    int *to_wait_proc = (int *) malloc(sizeof(int) * (num_proc_runnin));
+    send_sig_to_all(proc_list, SIGUSR2, to_wait_proc);
     if (to_wait_proc == NULL || to_wait_proc[0] < 0) {
+        free(to_wait_proc);
         ERROR_EXIT_SEQUENCE_MAIN("IMPOSSIBLE TO SEND SIGUSR2 TO PROCESSES");
     }
-    while (to_wait_proc[0] > 0) {
+    while (to_wait_proc != NULL && to_wait_proc[0] > 0) {
         if (retry > MAX_RETRY_UPDATE_KIDS_INFO) {
             /**
              * Resend the signal to the processes that are not responding
              */
             int i;
-            for (i = 0; i < to_wait_proc[0]; i++) {
+            for (i = 1; i < to_wait_proc[0]; i++) {
                 if (printed == FALSE) {
-                    printf("SENDING SIGUSR2 TO PROCESS %d\n", to_wait_proc[i + 1]);
+                    printf("SENDING SIGUSR2 TO PROCESS %d\n", to_wait_proc[i]);
                 }
                 kill(to_wait_proc[i], SIGUSR2);
             }
             printed = TRUE;
+            retry = 0;
         }
         found_info = master_msg_receive_info(msg_report_id_master, &msg_report);
         /** Remove the process from the waiting list
          *  and acknowledge the msg_report */
         if (found_info >= 0 &&
             remove_proc_from_list(to_wait_proc, msg_report.sender_pid) == TRUE &&
-            acknowledge(&msg_report, proc_list) == 1) {
+            acknowledge(&msg_report, proc_list) == -3) {
             tp_full_handler(&msg_report);
         } else if (found_info == -2) {
+            int pid = check_msg_report(&msg_report, msg_report_id_master, proc_list);
+            if (num_proc_runnin != get_num_proc_running(proc_list)) {
+                num_proc_runnin = get_num_proc_running(proc_list);
+                to_wait_proc = (int *) realloc(to_wait_proc, sizeof(int) * num_proc_runnin);
+                send_sig_to_all(proc_list, SIGUSR2, to_wait_proc);
+            }
+            if (pid > 0)
+                remove_proc_from_list(to_wait_proc, pid);
             retry++;
         } else if (found_info == -1) {
             ERROR_MESSAGE("IMPOSSIBLE TO RECEIVE INFO FROM PROCESS");
@@ -681,9 +693,10 @@ void end_simulation() {
     alarm(0);
     struct master_msg_report msg_rep;
     check_msg_report(&msg_rep, msg_report_id_master, proc_list);
-    sigemptyset(&current_mask);
-    sigaddset(&current_mask, SIGUSR1);
-    sigprocmask(SIG_BLOCK, &current_mask, NULL);
+    int sig_list[] = {SIGUSR1};
+    sigset_t mask;
+    gen_mask(&mask, sig_list, sizeof(sig_list) / sizeof(int));
+    block_signals(&mask, &current_mask);
     print_info();
     printf("Simulation %s \n", get_end_simulation_msg());
     kill_kids();
@@ -765,10 +778,10 @@ void unlock_to_fill_sem(void) {
 }
 
 void tp_full_handler(struct master_msg_report *msg_repo) {
-    sigemptyset(&current_mask);
-    sigaddset(&current_mask, SIGUSR1);
-    sigaddset(&current_mask, SIGALRM);
-    sigprocmask(SIG_BLOCK, &current_mask, NULL);
+    int sig_list[] = {SIGUSR1, SIGALRM};
+    sigset_t mask;
+    gen_mask(&mask, sig_list, sizeof(sig_list) / sizeof(int));
+    block_signals(&mask, &current_mask);
     int new_node_id = shm_conf_pointer->nodes_snapshots[shm_conf_pointer->nodes_snapshots[0][0]][1] +
                       DELTA_NODE_MSG_TYPE;
     int new_node_pid = create_node_proc(new_node_id);
@@ -793,9 +806,7 @@ void tp_full_handler(struct master_msg_report *msg_repo) {
         send_msg_to_all_nodes(msg_report_id_nodes, simulation_conf.so_retry, random_nodes,
                               shm_conf_pointer->nodes_snapshots[0][0], TRUE);
     }
-    sigaddset(&current_mask, SIGUSR1);
-    sigaddset(&current_mask, SIGALRM);
-    sigprocmask(SIG_UNBLOCK, &current_mask, NULL);
+    unblock_signals(&current_mask);
 }
 
 Bool remove_proc_from_list(int *list, int pid) {

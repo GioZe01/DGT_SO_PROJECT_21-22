@@ -41,25 +41,22 @@ void shm_copy_snapshots_nodes(int (*snapshot)[3], int *pids, int *queues_ids, in
 }
 
 int get_queueid_by_pid(struct shm_conf *self, int pid, Bool in_users) {
-    int *snapshot;
+    int row;
     int ris = -1;
     if (in_users == TRUE) {
-        snapshot = &self->users_snapshots[1][0];
-        for (; snapshot != NULL; snapshot += 2) {
-            if (*snapshot == pid) {
-                ris = *(snapshot + 1);
-                return ris;
+        for (row = 1; row < self->users_snapshots[0][0] + 1; row++) {
+            if (self->users_snapshots[row][0] == pid) {
+                ris = self->users_snapshots[row][1];
+                break;
             }
         }
     } else {
-        snapshot = &self->nodes_snapshots[1][0];
-        for (; snapshot != NULL; snapshot += 3) {
-            if (*snapshot == pid) {
-                ris = *(snapshot + 1);
-                return ris;
+        for (row = 1; row < self->nodes_snapshots[0][0] + 1; row++) {
+            if (self->nodes_snapshots[row][0] == pid) {
+                ris = self->nodes_snapshots[row][1];
+                break;
             }
         }
-
     }
     return ris;
 }
@@ -97,10 +94,10 @@ Bool shm_conf_add_node(struct shm_conf *self, int pid, int queue_id, int friends
     /**
      * Add the node information to the snapshot at snapshot[0][0] +1 position
      */
-    int row = self->nodes_snapshots[0][0]+1;
+    int row = self->nodes_snapshots[0][0] + 1;
     self->nodes_snapshots[row][0] = pid;
     self->nodes_snapshots[row][1] = queue_id;
     self->nodes_snapshots[row][2] = friends;
-    self->nodes_snapshots[0][0] = self->nodes_snapshots[0][0]+1;
+    self->nodes_snapshots[0][0] = self->nodes_snapshots[0][0] + 1;
     return TRUE;
 }

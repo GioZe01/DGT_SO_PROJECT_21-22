@@ -19,14 +19,14 @@ int get_transaction_type(int type);
 int check_user_type(int type_given, int queue_id);
 
 int user_msg_create(struct user_msg *self, long type, pid_t sender_pid, struct Transaction *t) {
-    self->t = *t;
+    copy_transaction(t, &self->t);
     self->type = type;
     self->sender_pid = sender_pid;
     return 0;
 }
 
-void user_msg_print(struct user_msg *self) {
-    switch (self->type) {
+void user_msg_print(struct user_msg *self, long type) {
+    switch (type) {
         case MSG_TRANSACTION_CONFIRMED_TYPE:
             printf("~ USER_MSG | type: TRANSACTION | %s%s status: CONFIRMED %s | sender_pid: %d | amount: %f "
                    "| t_sender: %d | t_receiver : %d ~\n",
@@ -37,6 +37,12 @@ void user_msg_print(struct user_msg *self) {
             printf("~ USER_MSG | type: TRANSACTION | %s%s status: CONFIRMED %s | sender_pid: %d | amount: %f "
                    "| t_sender: %d | t_receiver : %d ~\n",
                    COLOR_RESET_ANSI_CODE, COLOR_RED_ANSI_CODE, COLOR_RESET_ANSI_CODE, self->sender_pid,
+                   self->t.amount, self->t.sender, self->t.reciver);
+            break;
+        case MSG_TRANSACTION_INCOME_TYPE:
+            printf("~ USER_MSG | type: TRANSACTION | %s%s status: INCOME %s | sender_pid: %d | amount: %f "
+                   "| t_sender: %d | t_receiver : %d ~\n",
+                   COLOR_RESET_ANSI_CODE, COLOR_GREEN_ANSI_CODE, COLOR_RESET_ANSI_CODE, self->sender_pid,
                    self->t.amount, self->t.sender, self->t.reciver);
             break;
         default:
@@ -54,12 +60,13 @@ user_msg_snd(int id, struct user_msg *msg, long type, struct Transaction *t, pid
     while (msgsnd(id, msg, sizeof(struct user_msg) - sizeof(long), 0) < 0) {
         if (errno != EINTR)
             return -1;
+        ERROR_MESSAGE("SEND PROBLEM");
     }
     return 0;
 }
 
 int user_msg_receive(int id, struct user_msg *msg, long type) {
-    if (msgrcv(id, msg, sizeof(struct user_msg) - sizeof(type), type, IPC_NOWAIT) < 0) {
+    if (msgrcv(id, msg, sizeof(struct user_msg) - sizeof(long), type, IPC_NOWAIT) < 0) {
         if (errno == ENOMSG) {
             return -2;
         }

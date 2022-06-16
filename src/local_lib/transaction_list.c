@@ -61,14 +61,13 @@ Bool compare_transaction(struct Transaction t1, struct Transaction t2);
  */
 void append_to_node(struct node *where, struct node *to_append);
 
-struct Transaction create_empty_transaction(void) {
-    struct Transaction t;
-    t.t_type = -1;
-    t.amount = -1;
-    t.reward = -1;
-    t.hops = -1;
-    t.sender = -1;
-    return t;
+void create_empty_transaction(struct Transaction *t) {
+    t->t_type = -1;
+    t->amount = -1;
+    t->reward = -1;
+    t->hops = -1;
+    t->sender = -1;
+    t->timestamp = (struct timespec) {0, 0};
 }
 
 int create_transaction(struct Transaction *t, pid_t sender, pid_t receiver, float amount) {
@@ -144,14 +143,24 @@ void queue_append(Queue q, struct Transaction t) {
 }
 
 void queue_remove_head(Queue q) {
-    if (queue_is_empty(q) == TRUE || q->first == NULL) {
+#ifdef DEBUG_USER DEBUG_NODE
+    DEBUG_NOTIFY_ACTIVITY_RUNNING("REMOVING FROM TRANSACTION QUEUE THE HEAD...");
+#endif
+    if (queue_is_empty(q) == TRUE) {
         queue_underflow();
         return;
     }
     struct node *to_remove = q->first;
-    q->first = q->first->next;
+    if (q->first == q->last) {
+        q->first = q->last = NULL;
+    } else {
+        q->first = q->first->next;
+    }
     free(to_remove);
     q->transactions--;
+#ifdef DEBUG_USER DEBUG_NODE
+    DEBUG_NOTIFY_ACTIVITY_DONE("REMOVING FROM TRANSACTION QUEUE THE HEAD DONE");
+#endif
 }
 
 int queue_remove(Queue q, struct Transaction t) {
@@ -182,9 +191,9 @@ Bool compare_transaction(struct Transaction t1, struct Transaction t2) {
     return FALSE;
 }
 
-struct Transaction queue_head(Queue q) {
+struct Transaction *queue_head(Queue q) {
     if (queue_is_empty(q) == FALSE)
-        return q->first->t;
+        return &q->first->t;
     else {
 #ifdef DEBUG_UNDERFLOW
         DEBUG_MESSAGE("queue_head in transaction: UNDERFLOW CALLED");
@@ -307,7 +316,7 @@ int queue_to_array(Queue q, struct Transaction vector[]) {
         struct node *iterable = q->first;
         int i = 0;
         for (; iterable != NULL; iterable = iterable->next) {
-            copy_transaction(iterable->t, &vector[i]);
+            copy_transaction(&iterable->t, &vector[i]);
             i++;
         }
         return 0;
@@ -343,13 +352,13 @@ Bool queue_copy_n_transactions(Queue q, Queue r, int n) {
     return TRUE;
 }
 
-int copy_transaction(struct Transaction t, struct Transaction *t_copy) {
-    t_copy->sender = t.sender;
-    t_copy->reciver = t.reciver;
-    t_copy->amount = t.amount;
-    t_copy->hops = t.hops;
-    t_copy->reward = t.reward;
-    t_copy->t_type = t.t_type;
-    t_copy->timestamp = t.timestamp;
+int copy_transaction(struct Transaction * t, struct Transaction *t_copy) {
+    t_copy->sender = t->sender;
+    t_copy->reciver = t->reciver;
+    t_copy->amount = t->amount;
+    t_copy->hops = t->hops;
+    t_copy->reward = t->reward;
+    t_copy->t_type = t->t_type;
+    t_copy->timestamp = t->timestamp;
     return 0;
 }

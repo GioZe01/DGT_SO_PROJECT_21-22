@@ -107,7 +107,7 @@ int master_msg_receive_info(int id, struct master_msg_report *self);
  * Based on the given master msg, load and modify the data in proc list
  * @param self the message
  * @param list the list of process to be updated
- * @return -2 in case of no sender pid in proc_list.-1 in case of wrong msg_type.1 in case of TP_FULL and  0 otherwise.
+ * @return -2 in case of no sender pid in proc_list.-1 in case of wrong msg_type.-3 in case of TP_FULL. The pid of the sender otherwise  .
  * TODO: Implement termination info in the list of proc (Cause that determined the termination)
  **/
 int acknowledge(struct master_msg_report *self, ProcList list);

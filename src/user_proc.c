@@ -176,7 +176,7 @@ int main(int arc, char const *argv[]) {
         DEBUG_MESSAGE("USER PROCESS RUNNING");
 
 
-        /*alarm(3);*/
+        alarm(3);
         /****************************************
          *      GENERATION OF TRANSACTION FASE *
          * **************************************/
@@ -242,10 +242,11 @@ Bool set_signal_handler_user(struct sigaction sa) {
 }
 
 void signals_handler_user(int signum) {
+#ifdef DEBUG_USER
     DEBUG_SIGNAL("SIGNAL RECEIVED", signum);
+#endif
     struct master_msg_report msg;
-    struct Transaction t;
-    sigemptyset(&current_mask);
+    struct Transaction *t;
     switch (signum) {
         case SIGINT:
             alarm(0); /* pending alarm removed*/
@@ -255,6 +256,7 @@ void signals_handler_user(int signum) {
             break;
         case SIGALRM: /*    Generate a new transaction  */
             alarm(0); /* pending alarm removed*/
+
 #ifdef DEBUG_USER
             DEBUG_NOTIFY_ACTIVITY_RUNNING("GENERATING A NEW TRANSACTION FROM SIG...");
 #endif
@@ -263,25 +265,26 @@ void signals_handler_user(int signum) {
                 advice_master_of_termination(IMPOSSIBLE_TO_GENERATE_TRANSACTION);
                 ERROR_EXIT_SEQUENCE_USER("IMPOSSIBLE TO GENERATE TRANSACTION");
             }
-            if (gen_value >= 0 && send_to_node() < 0) {
+            if (gen_value >= 0 && send_to_node() == -1) {
                 ERROR_MESSAGE("IMPOSISBLE TO SEND TO THE NODE");
             }
 #ifdef DEBUG_USER
             DEBUG_NOTIFY_ACTIVITY_DONE("GENERATING A NEW TRANSACTION FROM SIG DONE");
 #endif
+
             alarm(3); /* pending alarm added*/
             break;
         case SIGUSR2:
-            sigaddset(&current_mask, SIGALRM);
-            sigprocmask(SIG_BLOCK, &current_mask, NULL);
-            t = create_empty_transaction();
+            t = (struct Transaction *) malloc(sizeof(struct Transaction));
+            create_empty_transaction(t);
             if (master_msg_send(queue_master_id, &msg, INFO_BUDGET, USER, current_user.pid,
-                                current_user.exec_state, TRUE, current_user.budget, &t) < 0) {
+                                current_user.exec_state, TRUE, current_user.budget, t) < 0) {
                 char *error_string = strcat("IMPOSSIBLE TO ADVICE MASTER OF : %s", from_type_to_string(INFO_BUDGET));
                 ERROR_MESSAGE(error_string);
             }
-            sigaddset(&current_mask, SIGALRM);
-            sigprocmask(SIG_UNBLOCK, &current_mask, NULL);
+            if (t != NULL) {
+                free(t);
+            }
             break;
         default:
             break;
@@ -294,9 +297,10 @@ void advice_master_of_termination(long termination_type) {
     DEBUG_NOTIFY_ACTIVITY_RUNNING("{DEBUG_USER}:= ADVICING MASTER OF TERMINATION ....");
 #endif
     current_user.exec_state = PROC_STATE_TERMINATED;
-    struct Transaction t = create_empty_transaction();
+    struct Transaction *t = (struct Transaction *) malloc(sizeof(struct Transaction));
+    create_empty_transaction(t);
     if (master_msg_send(queue_master_id, &termination_report, termination_type, USER, current_user.pid,
-                        current_user.exec_state, TRUE, current_user.budget, &t) < 0) {
+                        current_user.exec_state, TRUE, current_user.budget, t) < 0) {
         char *error_string = strcat("IMPOSSIBLE TO ADVICE MASTER OF : %s", from_type_to_string(termination_type));
         ERROR_MESSAGE(error_string);
     }
@@ -304,6 +308,9 @@ void advice_master_of_termination(long termination_type) {
         DEBUG_NOTIFY_ACTIVITY_DONE("{DEBUG_USER}:= ADVICING MASTER OF TERMINATION DONE");
 #endif
     DEBUG_NOTIFY_ACTIVITY_DONE("{DEBUG_USER}:= ADVICING MASTER OF TERMINATION DONE");
+    if (t != NULL) {
+        free(t);
+    }
 }
 
 void free_mem_user() {
@@ -358,14 +365,16 @@ int send_to_node(void) {
 #ifdef DEBUG_USER
         DEBUG_NOTIFY_ACTIVITY_RUNNING("SENDING TRANSACTION TO THE NODE...");
 #endif
-        srand(getpid());
         int node_num = extract_node(shm_conf_pointer->nodes_snapshots[0][0]);
         struct node_msg msg;
-        struct Transaction t = queue_head(current_user.in_process);
-        if (node_msg_snd(queue_node_id, &msg, MSG_TRANSACTION_TYPE, &t,
+        struct Transaction *t = queue_head(current_user.in_process);
+        int snd_ris =  node_msg_snd(queue_node_id, &msg, MSG_TRANSACTION_TYPE, t,
                          current_user.pid, TRUE, configuration.so_retry,
-                         shm_conf_pointer->nodes_snapshots[node_num][1]) < 0) {
+                         shm_conf_pointer->nodes_snapshots[node_num][1]);
+        if (snd_ris == -1)  {
             return -1;
+        }else if (snd_ris == -2) {
+            return -2;
         }
         queue_remove_head(current_user.in_process); /*removed if and only if has been sent*/
 #ifdef DEBUG_USER
@@ -401,16 +410,15 @@ void generating_transactions(void) {
 
     struct timespec gen_sleep;
     int failed_gen_trans = 0;
+    int sig_list[] = {SIGUSR2, SIGALRM};
+    sigset_t mask;
+    gen_mask(&mask, sig_list, sizeof(sig_list) / sizeof(int));
     while (failed_gen_trans < configuration.so_retry && current_user.budget >= 0) {
+        /** Blocking signals*/
+        block_signals(&mask, &current_mask);
         getting_richer();
         check_for_transactions_confirmed();
         check_for_transactions_failed();
-        /** Blocking signals*/
-        sigemptyset(&current_mask);
-        sigaddset(&current_mask, SIGUSR2);
-        sigaddset(&current_mask, SIGALRM);
-        sigprocmask(SIG_BLOCK, &current_mask, NULL);
-
         int gen_trans_ris = generate_transaction(&current_user, current_user.pid, shm_conf_pointer);
         if (gen_trans_ris == -1) {
             failed_gen_trans++;
@@ -424,25 +432,33 @@ void generating_transactions(void) {
 #ifdef U_CASHING
             /*TODO: make cashing*/
 #else
-            /*SENDING TRANSACTION TO THE NODE*/
-            if (send_to_node() < 0) {
-#ifdef DEBUG_USER
-                ERROR_MESSAGE("IMPOSSIBLE TO SEND TO THE NODE");
-#endif
-            } else {
-#ifdef DEBUG_USER
-                DEBUG_MESSAGE("TRANSACTION SENT TO THE NODE");
-#endif
+            /** Check if there is space in the node message queue **/
+            struct msqid_ds msq_ds;
+
+            if (msgctl(queue_node_id, IPC_STAT, &msq_ds) < 0) {
+                ERROR_MESSAGE("IMPOSSIBLE TO GET INFO ON NODE MESSAGE QUEUE");
             }
-
+            printf("%lu msq_ds.msg_qbytes\n", msq_ds.msg_qbytes);
+            printf("[%d] My bytes: %lu\n", getpid(), (msq_ds.msg_qnum + 1) * sizeof(struct node_msg));
+            if ((msq_ds.msg_qnum + 1) * sizeof(struct node_msg) < msq_ds.msg_qbytes) {
+                printf("ENTRATO\n");
+                /*SENDING TRANSACTION TO THE NODE*/
+                if (send_to_node() < 0) {
+#ifdef DEBUG_USER
+                    ERROR_MESSAGE("IMPOSSIBLE TO SEND TO THE NODE");
 #endif
+                } else {
+#ifdef DEBUG_USER
+                    DEBUG_MESSAGE("TRANSACTION SENT TO THE NODE");
+#endif
+                }
+#endif
+                nanosleep(&gen_sleep, (void *) NULL);
 
-            nanosleep(&gen_sleep, (void *) NULL);
+            }
         }
         /** Unblocking Signals*/
-        sigaddset(&current_mask, SIGUSR2);
-        sigaddset(&current_mask, SIGALRM);
-        sigprocmask(SIG_UNBLOCK, &current_mask, NULL);
+        unblock_signals(&current_mask);
     }
 
 }

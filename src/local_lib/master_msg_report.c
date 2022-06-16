@@ -159,7 +159,7 @@ int master_msg_receive_info(int id, struct master_msg_report *self) {
         if (errno == ENOMSG) {
             return -2;
         }
-        return -1;
+       return -1;
     }
     return 0;
 }
@@ -182,11 +182,11 @@ int acknowledge(struct master_msg_report *self, ProcList list) {
             }
             break;
         case TP_FULL:
-            return 1;
+            return -3;
         default:
             return -1;
     }
-    return 0;
+    return self->sender_pid;
 }
 
 int check_msg_report(struct master_msg_report *msg_report, int msg_report_id_master, ProcList proc_list) {
@@ -204,14 +204,14 @@ int check_msg_report(struct master_msg_report *msg_report, int msg_report_id_mas
 
             if (ris == -1) {
                 ERROR_MESSAGE("IMPOSSIBLE TO MAKE THE ACKNOWLEDGE OF MASTER MESSAGE");
-            } else if (ris == 1) {
-                return 1;
+            } else if (ris == -3) {
+                return -3;
+            } else {
+                return ris;
             }
         }
         if (msg_rep_info.msg_qnum == 0) {
             return 0;
-        } else {
-            return 2;
         }
     }
 }

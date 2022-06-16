@@ -50,7 +50,7 @@ void queue_remove_head(Queue q);
  * @param q the queue to operate on
  * @return The first Transaction of the queue
  */
-struct Transaction queue_head(Queue q);
+struct Transaction * queue_head(Queue q);
 /**
  * Get the last element of the queue
  * @param q
@@ -125,15 +125,15 @@ void empty_queue(Queue q);
 
 /**
  * Create a empty transaction
- * @return the empty transaction
+ * @param t the transaction to be created
  */
-struct Transaction create_empty_transaction(void);
+void create_empty_transaction(struct  Transaction *t);
 
 /**
  * Copy the given transaction into the given transaction
  * @param t the transaction to copy from
- * @param t_copy the transaction to copy to
+ * @param t_copy the transaction to copy into
  * @return -1 in case of failure 0 otherwise
  */
-int copy_transaction(struct Transaction t, struct Transaction* t_copy);
+int copy_transaction(struct Transaction * t, struct Transaction* t_copy);
 #endif /*DGT_SO_PROJECT_21_22_TRANSACTION_LIST_H*/

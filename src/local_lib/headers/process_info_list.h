@@ -62,13 +62,14 @@ struct ProcessInfo get_proc_from_pid(ProcList self, pid_t pid);
 struct ProcessInfo get_proc_from_queue_id(ProcList self, int id_queue);
 
 /**
- * \brief Send the given signal to all proc saved via kill() method
+ * \brief Send the given signal to all proc saved via kill() method and save in pids the list of pid of the processes killed
  *
  * @param proc_list the list of proced to receive the signal
  * @param signal signal to be sent
- * @return An array of pid_t containing the pid of the processes that have received the signal, in the 0 index is the number of receivers
+ * @param pids the list where the pid of the killed processes will be saved
+ * @warning in the 0 index of the pids list is saved the number of processes killed
  */
-int *send_sig_to_all(ProcList proc_list, int signal);
+void send_sig_to_all(ProcList proc_list, int signal, int *pids);
 
 /**
  * Send the given signal to the process with type node
@@ -173,5 +174,12 @@ int update_proc(ProcList self, int pid, float budget, short int proc_state);
  * @return The running nods list
  */
 ProcList get_running_node_proc(ProcList self);
+
+/**
+ * @brief Get the num of proc in running state
+ * @param self the list to search in
+ * @return the number of proc in running state
+ */
+int get_num_proc_running(ProcList self);
 /*TODO: implementare budget maggiore get -> vedere se fare una hash table di processi*/
 #endif /*DGT_SO_PROJECT_21_22_PROCESS_INFO_LIST_H*/

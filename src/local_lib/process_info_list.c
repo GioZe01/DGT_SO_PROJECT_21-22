@@ -146,7 +146,7 @@ struct ProcessInfo get_proc_from_pid(ProcList self, pid_t pid) {
 
 void print_list(ProcList self) {
     /* Sort the list before printing */
-   sort_list(&(self->first));
+    sort_list(&(self->first));
     if (self->num_proc > MAX_PROC_TO_PRINT) {
         /* Print the min budget */
         struct node *tmp = self->first;
@@ -249,9 +249,8 @@ void list_set_state(ProcList self, pid_t pid, short int state) {
     }
 }
 
-int *send_sig_to_all(ProcList proc_list, int signal) {
+void send_sig_to_all(ProcList proc_list, int signal, int *pids) {
     struct node *tmp = proc_list->first;
-    int *pids = (int *) malloc(sizeof(int) * (proc_list->num_proc + 1));
     int num_proc_reciver = 0;
     for (; tmp != NULL; tmp = tmp->next) {
         if (tmp->proc_state == PROC_STATE_RUNNING && (kill(tmp->pid, signal) >= 0 || errno == ESRCH)) {
@@ -271,13 +270,10 @@ int *send_sig_to_all(ProcList proc_list, int signal) {
         } else if (errno == EINTR || tmp->proc_state == PROC_STATE_TERMINATED) {
             continue;
         } else {
-            free(pids);
-            return NULL;
+            return;
         }
     }
     pids[0] = num_proc_reciver;
-
-    return pids;
 }
 
 void proc_list_remove_head(ProcList self) {
@@ -362,6 +358,11 @@ int get_num_of_node_proc_running(ProcList self) {
     return ris;
 }
 
+
+int get_num_proc_running(ProcList self){
+    return get_num_of_user_proc_running(self) + get_num_of_node_proc_running(self);
+}
+
 int send_sig_to_all_nodes(ProcList proc_list, int signal, Bool exclude_last) {
     struct node *tmp = proc_list->first;
     int num_proc_reciver = 0;
@@ -418,26 +419,29 @@ int send_sig_to_all_nodes(ProcList proc_list, int signal, Bool exclude_last) {
 
 Bool send_msg_to_all_nodes(int queue_id, int retry, ProcList proc_list, int node_id, Bool exclude_last) {
     struct node *tmp = proc_list->first;
+    struct Transaction *t = (struct Transaction *) malloc(sizeof(struct Transaction));
     if (exclude_last == TRUE) {
         tmp = tmp->next;
         for (; tmp != NULL; tmp = tmp->next) {
             if (tmp->proc_type == PROC_TYPE_NODE &&
                 tmp->proc_state == PROC_STATE_RUNNING) {
                 struct node_msg msg;
-                struct Transaction t = create_empty_transaction();
-                t.sender = node_id;
-                node_msg_snd(queue_id, &msg, MSG_MASTER_ORIGIN_ID, &t, getpid(), TRUE, retry, tmp->id_queue);
+                create_empty_transaction(t);
+                t->sender = node_id;
+                node_msg_snd(queue_id, &msg, MSG_MASTER_ORIGIN_ID, t, getpid(), TRUE, retry, tmp->id_queue);
             }
         }
     } else {
         for (; tmp != NULL; tmp = tmp->next) {
             if (tmp->proc_type == PROC_TYPE_NODE && tmp->proc_state == PROC_STATE_RUNNING) {
                 struct node_msg msg;
-                struct Transaction *t = (struct Transaction *) malloc(sizeof(struct Transaction));
                 t->sender = node_id;
                 node_msg_snd(queue_id, &msg, MSG_MASTER_ORIGIN_ID, t, getpid(), TRUE, retry, tmp->id_queue);
             }
         }
+    }
+    if (t != NULL) {
+        free(t);
     }
     return TRUE;
 }
