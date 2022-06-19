@@ -1,4 +1,5 @@
 #include <stdio.h>
+#include <stdlib.h>
 #include <unistd.h>
 #include <sys/msg.h>
 
@@ -56,6 +57,15 @@ user_msg_snd(int id, struct user_msg *msg, long type, struct Transaction *t, pid
     t->t_type = get_transaction_type(type);
     if (create == TRUE) {
         user_msg_create(msg, check_user_type(type, queue_id), sender, t);
+    }
+    /** Check if there is space in the node message queue **/
+    struct msqid_ds msq_ds;
+
+    if (msgctl(id, IPC_STAT, &msq_ds) < 0) {
+        ERROR_MESSAGE("IMPOSSIBLE TO GET INFO ON NODE MESSAGE QUEUE");
+    }
+    if ((msq_ds.msg_qnum + 1) * sizeof(struct user_msg) > msq_ds.msg_qbytes) {
+        return -2;
     }
     while (msgsnd(id, msg, sizeof(struct user_msg) - sizeof(long), 0) < 0) {
         if (errno != EINTR)

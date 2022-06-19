@@ -167,12 +167,6 @@ void unlock_masterbook_cell_access(int i_cell_block_list);
 void advice_master_of_termination(long termination_type);
 
 /**
- * \brief Extract randomly the time needed for processing from node_configuration
- * @return an integer that rappresent the time for processing
- * */
-long int get_time_processing(void);
-
-/**
  * @brief Handle the msg with the transaction received
  * if tp is full check for hops in the transaction: if hops not exceeded send the transaction to the next node otherwise
  * send the transaction to the master to be handled
@@ -180,6 +174,12 @@ long int get_time_processing(void);
  * @return TRUE if the message was handled, FALSE otherwise
  */
 Bool handle_msg_transaction(struct node_msg *msg);
+
+/**
+ * @brief Generate sleep time using the conf file
+ * @param ts
+ */
+void gen_sleep_time(struct timespec *ts);
 
 /* SysVar */
 int semaphore_start_id = -1;                    /*Id of the start semaphore arrays for sinc*/
@@ -277,10 +277,6 @@ int main(int argc, char const *argv[]) {
                 is_unsed_node++;
             }
             block_signals(&mask, &current_mask);
-            if (get_num_transactions(current_node.transactions_pool) >= SO_BLOCK_SIZE) {
-                printf("get_num_transactions(%d) = %d\n", current_node.pid,
-                       get_num_transactions(current_node.transactions_pool));
-            }
             if (get_num_transactions(current_node.transactions_pool) >= SO_BLOCK_SIZE &&
                 process_node_block() == FALSE) {
                 failure_shm++;
@@ -368,16 +364,22 @@ void signals_handler(int signum) {
         case SIGALRM:
             alarm(0); /*pending alarm removed*/
             if (get_num_transactions(current_node.transactions_pool) > 0 && friends != 0) {
-                /**
-                 * select a transaction from the pool and send it to a friend node into the message queue
-                 */
-                int friend = shm_conf_pointer_node->nodes_snapshots[get_rand_one(friends)][1];
-                t = queue_head(current_node.transactions_pool);
-                node_msg_snd(queue_node_id, &node_msg, MSG_NODE_ORIGIN_TYPE, t, current_node.node_id, TRUE,
-                             node_configuration.so_retry, friend);
-                queue_remove_head(current_node.transactions_pool);
+
+                /** Check if there is space in the node message queue **/
+                struct msqid_ds msq_ds;
+
+                if (msgctl(queue_node_id, IPC_STAT, &msq_ds) < 0) {
+                    ERROR_MESSAGE("IMPOSSIBLE TO GET INFO ON NODE MESSAGE QUEUE");
+                }
+                if ((msq_ds.msg_qnum + 1) * sizeof(struct node_msg) < msq_ds.msg_qbytes) {
+                    int friend = shm_conf_pointer_node->nodes_snapshots[get_rand_one(friends)][1];
+                    t = queue_head(current_node.transactions_pool);
+                    node_msg_snd(queue_node_id, &node_msg, MSG_NODE_ORIGIN_TYPE, t, current_node.node_id, TRUE,
+                                 node_configuration.so_retry, friend);
+                    queue_remove_head(current_node.transactions_pool);
+                }
             }
-            alarm(1);
+            alarm(3);
             break;
         case SIGUSR1:
             /**
@@ -495,7 +497,6 @@ int process_node_block() {
         if (num_of_shm_retry < MAX_FAILURE_SHM_BOOKMASTER_LOCKING) {
             /*send confirmed to all users*/
             adv_users_of_block();
-            printf("NODE BLOCK CONFIRMED : %d ", current_node.pid);
         } else {
             advice_master_of_termination(MAX_FAILURE_SHM_REACHED);
             ERROR_EXIT_SEQUENCE_NODE("MAX FAILURE SHM REACHED");
@@ -509,8 +510,7 @@ Bool lock_shm_masterbook(void) {
     DEBUG_NOTIFY_ACTIVITY_RUNNING("NODE:= LOCKING THE SHM FOR ADDING THE BLOCK...");
 #endif
     struct timespec trans_proc_sim;
-    trans_proc_sim.tv_sec = 0;
-    trans_proc_sim.tv_nsec = get_time_processing();
+    gen_sleep_time(&trans_proc_sim);
     nanosleep(&trans_proc_sim, (void *) NULL);
     lock_to_fill_sem();
     int i_cell_block_list = shm_masterbook_pointer->to_fill;
@@ -656,13 +656,14 @@ long int get_time_processing(void) {
 void adv_users_of_block(void) {
     int sender_pid = -1;
     int receiver_pid = -1;
+    int retry = 0;
 #ifdef DEBUG_NODE
     DEBUG_NOTIFY_ACTIVITY_RUNNING("ADV USERS OF THE BLOCK ...");
 #endif
     struct Transaction *t;
     struct user_msg u_msg_rep;
+    struct timespec ts;
     while (queue_is_empty(current_node.transactions_block) == FALSE) {
-        printf("NODE %d UNLOADING BLOCK \n", current_node.pid);
         t = queue_head(current_node.transactions_block);
         t->t_type = TRANSACTION_SUCCES;
         sender_pid = t->sender;
@@ -672,16 +673,36 @@ void adv_users_of_block(void) {
             ERROR_MESSAGE("ILLIGAL PID INTO TRANSACTION, NO PIDS FOUND");
             return;
         }
-        if (user_msg_snd(queue_user_id, &u_msg_rep, MSG_TRANSACTION_CONFIRMED_TYPE, t, current_node.pid, TRUE,
-                         queue_id_user_proc) < 0) { ERROR_MESSAGE("ERROR WHILE SENDING THE MSG TO USER"); }
-        queue_id_user_proc = get_queueid_by_pid(shm_conf_pointer_node, receiver_pid, TRUE);
-        if (queue_id_user_proc < 0) {
-            ERROR_MESSAGE("ILLIGAL PID INTO TRANSACTION, NO PIDS FOUND");
-            return;
+        int ris_snd =
+                user_msg_snd(queue_user_id, &u_msg_rep, MSG_TRANSACTION_CONFIRMED_TYPE, t, current_node.pid, TRUE,
+                             queue_id_user_proc);
+        if (ris_snd == -1) { ERROR_MESSAGE("ERROR WHILE SENDING THE MSG TO USER"); }
+        else if (ris_snd >= 0) {
+            queue_id_user_proc = get_queueid_by_pid(shm_conf_pointer_node, receiver_pid, TRUE);
+            if (queue_id_user_proc < 0) {
+                ERROR_MESSAGE("ILLIGAL PID INTO TRANSACTION, NO PIDS FOUND");
+                return;
+            }
+            ris_snd = user_msg_snd(queue_user_id, &u_msg_rep, MSG_TRANSACTION_INCOME_TYPE, t, current_node.pid, TRUE,
+                                   queue_id_user_proc);
+            switch (ris_snd) {
+                case -1:
+                    ERROR_MESSAGE("ERROR WHILE SENDING THE MSG TO USER");
+                    break;
+                case -2:
+                    queue_id_user_proc = get_queueid_by_pid(shm_conf_pointer_node, sender_pid, TRUE);
+                    while (user_msg_snd(queue_user_id, &u_msg_rep, MSG_TRANSACTION_FAILED_TYPE, t, current_node.pid,
+                                        TRUE, queue_id_user_proc) < 0 && retry < node_configuration.so_retry) {
+                        gen_sleep_time(&ts);
+                        nanosleep(&ts, NULL);
+                        retry++;
+                    }
+                default:
+                    queue_remove_head(current_node.transactions_block);
+                    break;
+            }
         }
-        if (user_msg_snd(queue_user_id, &u_msg_rep, MSG_TRANSACTION_INCOME_TYPE, t, current_node.pid, TRUE,
-                         queue_id_user_proc) < 0) { ERROR_MESSAGE("ERROR WHILE SENDING THE MSG TO USER"); }
-        queue_remove_head(current_node.transactions_block);
+
 
     }
     current_block_reward = 0;
@@ -747,8 +768,19 @@ Bool handle_msg_transaction(struct node_msg *msg) {
          * Sending the transaction to a friend
          */
         int friend = shm_conf_pointer_node->nodes_snapshots[get_rand_one(friends)][1];
-        node_msg_snd(queue_node_id, msg, MSG_NODE_ORIGIN_TYPE, &msg->t, current_node.node_id, TRUE,
-                     node_configuration.so_retry, friend);
+        /** Check if there is space in the node message queue **/
+        struct msqid_ds msq_ds;
+
+        if (msgctl(queue_node_id, IPC_STAT, &msq_ds) < 0) {
+            ERROR_MESSAGE("IMPOSSIBLE TO GET INFO ON NODE MESSAGE QUEUE");
+        }
+        if ((msq_ds.msg_qnum + 1) * sizeof(struct node_msg) < msq_ds.msg_qbytes) {
+            node_msg_snd(queue_node_id, msg, MSG_NODE_ORIGIN_TYPE, &msg->t, current_node.node_id, TRUE,
+                         node_configuration.so_retry, friend);
+        } else {
+            user_msg_snd(queue_user_id, msg, MSG_TRANSACTION_FAILED_TYPE, &msg->t, current_node.pid, TRUE,
+                         get_queueid_by_pid(shm_conf_pointer_node, msg->t.sender, TRUE));
+        }
     } else {
         /**
          * TP_SIZE FULL AND HOPS EXCEEDED
@@ -761,4 +793,16 @@ Bool handle_msg_transaction(struct node_msg *msg) {
         master_msg_send(queue_master_id, &master_msg, TP_FULL, NODE, current_node.pid, current_node.exec_state,
                         TRUE, current_node.budget, &msg->t);
     }
+}
+
+void gen_sleep_time(struct timespec *ts) {
+    long int sleep_time =
+            (rand() % (node_configuration.so_max_trans_proc_nsec - node_configuration.so_min_trans_proc_nsec + 1)) +
+            node_configuration.so_min_trans_proc_nsec;
+    ts->tv_sec = 0;
+    while (sleep_time > MAX_TIME_NSEC) {
+        sleep_time -= 1000000000;
+        ts->tv_sec++;
+    }
+    ts->tv_nsec = sleep_time;
 }

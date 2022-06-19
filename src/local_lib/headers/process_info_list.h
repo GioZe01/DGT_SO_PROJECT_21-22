@@ -171,9 +171,9 @@ int update_proc(ProcList self, int pid, float budget, short int proc_state);
 /**
  * @brief Get the running node in the list
  * @param self the list to search in
- * @return The running nods list
+ * @param node_list the list to insert the running node
  */
-ProcList get_running_node_proc(ProcList self);
+void get_running_node_proc(ProcList self, ProcList node_list);
 
 /**
  * @brief Get the num of proc in running state

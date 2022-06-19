@@ -133,4 +133,13 @@ void from_procstate_to_string(int state, char *string);
  */
 char *from_proctype_to_string(long proc_type);
 
+/**
+ * Get all the pids of the processes that have send a message to the master of termination type
+ * @param msg_report the message to be checked
+ * @param msg_report_id_master id of the queue
+ * @param ris the list of pids
+ * @param proc_list the list of processes to be checked
+ * @return -3 in case of tp_full, -1 in case of failure. 0 otherwise
+ */
+int check_for_termination(struct master_msg_report *msg_report, int msg_report_id_master, int *ris, ProcList proc_list);
 #endif /*DGT_SO_PROJECT_21_22_MASTER_MSG_REPORT_H*/

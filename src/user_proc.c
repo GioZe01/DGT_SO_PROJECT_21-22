@@ -101,6 +101,12 @@ void generating_transactions(void);
  */
 Bool getting_richer(void);
 
+/**
+ * @brief Generate sleep time using the conf file
+ * @param ts
+ */
+void gen_sleep_time(struct timespec *ts);
+
 /*  SysV  */
 int semaphore_start_id = -1;          /*Id of the start semaphore arrays for sinc*/
 int queue_node_id = -1;               /* Identifier of the node queue id */
@@ -362,19 +368,36 @@ Bool read_conf() {
 
 int send_to_node(void) {
     if (get_num_transactions(current_user.in_process) > 0) {
+        int retry = 0;
 #ifdef DEBUG_USER
         DEBUG_NOTIFY_ACTIVITY_RUNNING("SENDING TRANSACTION TO THE NODE...");
 #endif
         int node_num = extract_node(shm_conf_pointer->nodes_snapshots[0][0]);
         struct node_msg msg;
         struct Transaction *t = queue_head(current_user.in_process);
-        int snd_ris =  node_msg_snd(queue_node_id, &msg, MSG_TRANSACTION_TYPE, t,
+
+        int snd_ris = node_msg_snd(queue_node_id, &msg, MSG_TRANSACTION_TYPE, t,
+                                   current_user.pid, TRUE, configuration.so_retry,
+                                   shm_conf_pointer->nodes_snapshots[node_num][1]);
+        if (snd_ris == -1) {
+            return -1;
+        } else if (snd_ris == -2) {
+            /** Check if there is space in the node message queue **/
+            struct msqid_ds msq_ds;
+
+            if (msgctl(queue_node_id, IPC_STAT, &msq_ds) < 0) {
+                ERROR_MESSAGE("IMPOSSIBLE TO GET INFO ON NODE MESSAGE QUEUE");
+            }
+
+            while ((msq_ds.msg_qnum + 1) * sizeof(struct node_msg) > msq_ds.msg_qbytes) {
+                if (retry++ > configuration.so_retry) {
+                    advice_master_of_termination(IMPOSSIBLE_TO_SEND_TRANSACTION);
+                    ERROR_EXIT_SEQUENCE_USER("ENDED DURING SENDING TRANSACTION TO NODE");
+                }
+            }
+            node_msg_snd(queue_node_id, &msg, MSG_TRANSACTION_TYPE, t,
                          current_user.pid, TRUE, configuration.so_retry,
                          shm_conf_pointer->nodes_snapshots[node_num][1]);
-        if (snd_ris == -1)  {
-            return -1;
-        }else if (snd_ris == -2) {
-            return -2;
         }
         queue_remove_head(current_user.in_process); /*removed if and only if has been sent*/
 #ifdef DEBUG_USER
@@ -407,8 +430,6 @@ void attach_to_shm_conf(void) {
 }
 
 void generating_transactions(void) {
-
-    struct timespec gen_sleep;
     int failed_gen_trans = 0;
     int sig_list[] = {SIGUSR2, SIGALRM};
     sigset_t mask;
@@ -426,22 +447,12 @@ void generating_transactions(void) {
             ERROR_MESSAGE("IMPOSSIBLE TO GENERATE TRANSACTION");
 #endif
         } else if (gen_trans_ris >= 0) {
-            gen_sleep.tv_nsec =
-                    (rand() % (configuration.so_max_trans_gen_nsec - configuration.so_min_trans_gen_nsec + 1)) +
-                    configuration.so_min_trans_gen_nsec;
-#ifdef U_CASHING
-            /*TODO: make cashing*/
-#else
             /** Check if there is space in the node message queue **/
             struct msqid_ds msq_ds;
-
             if (msgctl(queue_node_id, IPC_STAT, &msq_ds) < 0) {
                 ERROR_MESSAGE("IMPOSSIBLE TO GET INFO ON NODE MESSAGE QUEUE");
             }
-            printf("%lu msq_ds.msg_qbytes\n", msq_ds.msg_qbytes);
-            printf("[%d] My bytes: %lu\n", getpid(), (msq_ds.msg_qnum + 1) * sizeof(struct node_msg));
             if ((msq_ds.msg_qnum + 1) * sizeof(struct node_msg) < msq_ds.msg_qbytes) {
-                printf("ENTRATO\n");
                 /*SENDING TRANSACTION TO THE NODE*/
                 if (send_to_node() < 0) {
 #ifdef DEBUG_USER
@@ -451,11 +462,15 @@ void generating_transactions(void) {
 #ifdef DEBUG_USER
                     DEBUG_MESSAGE("TRANSACTION SENT TO THE NODE");
 #endif
+                    /** Generating sleep time using configuration.so_max_trans_gen_nsec*/
+                    struct timespec gen_sleep;
+                    gen_sleep_time(&gen_sleep);
+                    if (nanosleep(&gen_sleep, (void *) NULL) < 0) {
+                        ERROR_MESSAGE("IMPOSSIBLE TO SLEEP");
+                    }
                 }
-#endif
-                nanosleep(&gen_sleep, (void *) NULL);
-
             }
+
         }
         /** Unblocking Signals*/
         unblock_signals(&current_mask);
@@ -498,3 +513,14 @@ Bool getting_richer(void) {
 }
 
 
+void gen_sleep_time(struct timespec *ts) {
+    long int sleep_time =
+            (rand() % (configuration.so_max_trans_gen_nsec - configuration.so_min_trans_gen_nsec + 1)) +
+            configuration.so_min_trans_gen_nsec;
+    ts->tv_sec = 0;
+    while (sleep_time > MAX_TIME_NSEC) {
+        sleep_time -= 1000000000;
+        ts->tv_sec++;
+    }
+    ts->tv_nsec = sleep_time;
+}

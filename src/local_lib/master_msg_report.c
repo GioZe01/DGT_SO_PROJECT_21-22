@@ -159,7 +159,7 @@ int master_msg_receive_info(int id, struct master_msg_report *self) {
         if (errno == ENOMSG) {
             return -2;
         }
-       return -1;
+        return -1;
     }
     return 0;
 }
@@ -180,13 +180,12 @@ int acknowledge(struct master_msg_report *self, ProcList list) {
             if (update_proc(list, self->sender_pid, self->budget, self->state) == -2) {
                 return -2;
             }
-            break;
+            return 0;
         case TP_FULL:
             return -3;
         default:
             return -1;
     }
-    return self->sender_pid;
 }
 
 int check_msg_report(struct master_msg_report *msg_report, int msg_report_id_master, ProcList proc_list) {
@@ -210,6 +209,38 @@ int check_msg_report(struct master_msg_report *msg_report, int msg_report_id_mas
                 return ris;
             }
         }
+        if (msg_rep_info.msg_qnum == 0) {
+            return 0;
+        }
+    }
+}
+
+int
+check_for_termination(struct master_msg_report *msg_report, int msg_report_id_master, int *ris, ProcList proc_list) {
+    struct msqid_ds msg_rep_info;
+    if (msgctl(msg_report_id_master, IPC_STAT, &msg_rep_info) < 0 || ris == NULL) {
+        DEBUG_ERROR_MESSAGE("IMPOSSIBLE TO RETRIEVE MESSAGE QUEUE INFO");
+        return -1;
+    } else {
+        if (ris + 1 == NULL) {
+            DEBUG_ERROR_MESSAGE("IMPOSSIBLE TO RETRIEVE MESSAGE QUEUE INFO");
+            return -1;
+        }
+        int ack_ris;
+        int index = 1;
+        /*fetching all msg if present*/
+        while (msg_rep_info.msg_qnum != 0 &&
+               msgrcv(msg_report_id_master, msg_report, sizeof(*msg_report) - sizeof(long), 0, 0) > 0 &&
+               msgctl(msg_report_id_master, IPC_STAT, &msg_rep_info) >= 0 && index < get_num_proc_running(proc_list)) {
+            ack_ris = acknowledge(msg_report, proc_list);
+            if (ack_ris == 0) {
+                ris[index] = msg_report->sender_pid;
+                index++;
+            } else {
+                return ack_ris;
+            }
+        }
+        ris[0] = index - 1;
         if (msg_rep_info.msg_qnum == 0) {
             return 0;
         }

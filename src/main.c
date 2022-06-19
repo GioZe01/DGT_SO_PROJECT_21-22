@@ -164,6 +164,15 @@ void tp_full_handler(struct master_msg_report *msg_repo);
  */
 Bool remove_proc_from_list(int *list, int pid);
 
+/**
+ * @Remove the list of pids in the given list
+ * @param list The list to search the pid in
+ * @param pids The list of pids to be removed
+ * @return TRUE if the pid was removed, FALSE otherwise
+ */
+Bool remove_processes_from_list(int *list, int *pids);
+
+
 /* Variables*/
 struct conf simulation_conf;                    /* Structure representing the configuration present in the conf file*/
 ProcList proc_list;                             /* Pointer to a linked list of all proc generated*/
@@ -263,15 +272,13 @@ int main() {
         alarm(1);
         while (simulation_end < 0) {
             int msg_rep_value = check_msg_report(&msg_repo, msg_report_id_master, proc_list);
-            if (check_runnability() == FALSE || msg_rep_value < 0) {
+            if (check_runnability() == FALSE || msg_rep_value == -1) {
                 /*If a message arrive make the knowledge*/
                 ERROR_MESSAGE("IMPOSSIBLE TO RUN SIMULATION");
                 end_simulation();
             } else if (msg_rep_value == -3) {
                 tp_full_handler(&msg_repo);
 
-            } else if (msg_rep_value == 2) {
-                master_msg_report_print(&msg_repo);
             }
 
         }
@@ -623,24 +630,23 @@ void update_kids_info(void) {
     int found_info, retry = 0;
     int num_proc_runnin = get_num_proc_running(proc_list);
     int *to_wait_proc = (int *) malloc(sizeof(int) * (num_proc_runnin));
+    int *pid = (int *) malloc(sizeof(int) * num_proc_runnin);
     send_sig_to_all(proc_list, SIGUSR2, to_wait_proc);
     if (to_wait_proc == NULL || to_wait_proc[0] < 0) {
-        free(to_wait_proc);
         ERROR_EXIT_SEQUENCE_MAIN("IMPOSSIBLE TO SEND SIGUSR2 TO PROCESSES");
     }
-    while (to_wait_proc != NULL && to_wait_proc[0] > 0) {
+    while (to_wait_proc[0] > 0) {
         if (retry > MAX_RETRY_UPDATE_KIDS_INFO) {
             /**
              * Resend the signal to the processes that are not responding
              */
             int i;
             for (i = 1; i < to_wait_proc[0]; i++) {
-                if (printed == FALSE) {
-                    printf("SENDING SIGUSR2 TO PROCESS %d\n", to_wait_proc[i]);
-                }
+#ifdef DEBUG_MAIN
+                printf("SENDING SIGUSR2 TO PROCESS %d\n", to_wait_proc[i]);
+#endif
                 kill(to_wait_proc[i], SIGUSR2);
             }
-            printed = TRUE;
             retry = 0;
         }
         found_info = master_msg_receive_info(msg_report_id_master, &msg_report);
@@ -651,14 +657,18 @@ void update_kids_info(void) {
             acknowledge(&msg_report, proc_list) == -3) {
             tp_full_handler(&msg_report);
         } else if (found_info == -2) {
-            int pid = check_msg_report(&msg_report, msg_report_id_master, proc_list);
-            if (num_proc_runnin != get_num_proc_running(proc_list)) {
+            if (check_for_termination(&msg_report, msg_report_id_master, pid, proc_list) == -3) {
+                tp_full_handler(&msg_report);
+            }
+           /* if (num_proc_runnin != get_num_proc_running(proc_list)) {
                 num_proc_runnin = get_num_proc_running(proc_list);
                 to_wait_proc = (int *) realloc(to_wait_proc, sizeof(int) * num_proc_runnin);
+                pid = (int *) realloc(pid, sizeof(int) * num_proc_runnin);
                 send_sig_to_all(proc_list, SIGUSR2, to_wait_proc);
+            }*/
+            if (pid [0] > 0){
+                remove_processes_from_list(to_wait_proc, pid);
             }
-            if (pid > 0)
-                remove_proc_from_list(to_wait_proc, pid);
             retry++;
         } else if (found_info == -1) {
             ERROR_MESSAGE("IMPOSSIBLE TO RECEIVE INFO FROM PROCESS");
@@ -810,8 +820,8 @@ void tp_full_handler(struct master_msg_report *msg_repo) {
 }
 
 Bool remove_proc_from_list(int *list, int pid) {
-    int i = 0;
-    for (; i < list[0]; i++) {
+    int i;
+    for (i = 0; i < list[0]; i++) {
         if (list[i + 1] == pid) {
             list[i + 1] = list[list[0]];
             list[0]--;
@@ -819,4 +829,16 @@ Bool remove_proc_from_list(int *list, int pid) {
         }
     }
     return FALSE;
+}
+
+Bool remove_processes_from_list(int *list, int *pids) {
+    /** Remove the processes from the list **/
+    int i;
+    for (i = 0; i < pids[0]; i++) {
+        if (remove_proc_from_list(list, pids[i + 1]) == FALSE) {
+            return FALSE;
+        }
+    }
+    pids[0] = 0;
+    return TRUE;
 }

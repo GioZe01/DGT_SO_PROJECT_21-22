@@ -359,7 +359,7 @@ int get_num_of_node_proc_running(ProcList self) {
 }
 
 
-int get_num_proc_running(ProcList self){
+int get_num_proc_running(ProcList self) {
     return get_num_of_user_proc_running(self) + get_num_of_node_proc_running(self);
 }
 
@@ -481,8 +481,8 @@ void get_random_node_list(ProcList proc_list, ProcList node_list, int num_of_nod
     }
     int random_node, last_node = -1;
     int i = 0;
-    ProcList running_nodes = get_running_node_proc(proc_list);
-
+    ProcList running_nodes = proc_list_create();
+    get_running_node_proc(proc_list, running_nodes);
     printf("NODE LIST\n\n");
     print_list(running_nodes);
     for (; i < num_of_node; i++) {
@@ -494,16 +494,16 @@ void get_random_node_list(ProcList proc_list, ProcList node_list, int num_of_nod
         for (; j < random_node; j++) {
             tmp = tmp->next;
         }
-        insert_in_list(node_list, tmp->pid, tmp->id_queue, tmp->proc_state, tmp->proc_type, tmp->budget);
+        insert_in_list(&node_list, tmp->pid, tmp->id_queue, tmp->proc_state, tmp->proc_type, tmp->budget);
+        last_node = random_node;
     }
 }
 
-ProcList get_running_node_proc(ProcList self) {
-    ProcList node_list = proc_list_create();
+void get_running_node_proc(ProcList self, ProcList node_list) {
     struct node *tmp = self->first;
     while (tmp != NULL) {
         if (tmp->proc_type == PROC_TYPE_NODE && tmp->proc_state == PROC_STATE_RUNNING) {
-            insert_in_list(node_list, tmp->pid, tmp->id_queue, tmp->proc_state, tmp->proc_type, tmp->budget);
+            insert_in_list(&node_list, tmp->pid, tmp->id_queue, tmp->proc_state, tmp->proc_type, tmp->budget);
         }
         tmp = tmp->next;
     }

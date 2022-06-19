@@ -52,11 +52,9 @@ node_msg_snd(int id, struct node_msg *msg, long type, struct Transaction *t, pid
     }
     /** Check if there is space in the node message queue **/
     struct msqid_ds msq_ds;
-
     if (msgctl(id, IPC_STAT, &msq_ds) < 0) {
         ERROR_MESSAGE("IMPOSSIBLE TO GET INFO ON NODE MESSAGE QUEUE");
     }
-    printf("[%d] My bytes: %lu\n", getpid(), (msq_ds.msg_qnum + 1) * sizeof(struct node_msg));
     if ((msq_ds.msg_qnum + 1) * sizeof(struct node_msg) > msq_ds.msg_qbytes) {
         return -2;
     }
