@@ -479,20 +479,20 @@ void get_random_node_list(ProcList proc_list, ProcList node_list, int num_of_nod
         node_list = proc_list;
         return;
     }
-    int random_node, last_node = -1;
+    int random_node=-1, last_node = -1;
     int i = 0;
     ProcList running_nodes = proc_list_create();
     get_running_node_proc(proc_list, running_nodes);
-    printf("NODE LIST\n\n");
-    print_list(running_nodes);
     for (; i < num_of_node; i++) {
         while (random_node == last_node) {
             random_node = rand() % running_node + 1;
         }
         struct node *tmp = running_nodes->first;
         int j = 0;
-        for (; j < random_node; j++) {
-            tmp = tmp->next;
+        for (; j < random_node-1; j++) {
+            if (tmp->next != NULL) {
+                tmp = tmp->next;
+            }
         }
         insert_in_list(&node_list, tmp->pid, tmp->id_queue, tmp->proc_state, tmp->proc_type, tmp->budget);
         last_node = random_node;
@@ -507,5 +507,4 @@ void get_running_node_proc(ProcList self, ProcList node_list) {
         }
         tmp = tmp->next;
     }
-    return node_list;
 }

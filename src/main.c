@@ -660,13 +660,7 @@ void update_kids_info(void) {
             if (check_for_termination(&msg_report, msg_report_id_master, pid, proc_list) == -3) {
                 tp_full_handler(&msg_report);
             }
-           /* if (num_proc_runnin != get_num_proc_running(proc_list)) {
-                num_proc_runnin = get_num_proc_running(proc_list);
-                to_wait_proc = (int *) realloc(to_wait_proc, sizeof(int) * num_proc_runnin);
-                pid = (int *) realloc(pid, sizeof(int) * num_proc_runnin);
-                send_sig_to_all(proc_list, SIGUSR2, to_wait_proc);
-            }*/
-            if (pid [0] > 0){
+            if (pid[0] > 0) {
                 remove_processes_from_list(to_wait_proc, pid);
             }
             retry++;
@@ -680,7 +674,8 @@ void update_kids_info(void) {
         }
 #endif
     }
-    free(to_wait_proc);
+    if (to_wait_proc != NULL)
+        free(to_wait_proc);
     DEBUG_NOTIFY_ACTIVITY_DONE("RETRIVING INFO DONE");
 }
 
