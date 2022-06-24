@@ -462,12 +462,15 @@ void generating_transactions(void) {
 #ifdef DEBUG_USER
                     DEBUG_MESSAGE("TRANSACTION SENT TO THE NODE");
 #endif
-                    /** Generating sleep time using configuration.so_max_trans_gen_nsec*/
-                    struct timespec gen_sleep;
-                    gen_sleep_time(&gen_sleep);
-                    if (nanosleep(&gen_sleep, (void *) NULL) < 0) {
-                        ERROR_MESSAGE("IMPOSSIBLE TO SLEEP");
+                    if (configuration.so_min_trans_gen_nsec > 0 && configuration.so_max_trans_gen_nsec) {
+                        /** Generating sleep time using configuration.so_max_trans_gen_nsec*/
+                        struct timespec gen_sleep;
+                        gen_sleep_time(&gen_sleep);
+                        if (nanosleep(&gen_sleep, (void *) NULL) < 0) {
+                            ERROR_MESSAGE("IMPOSSIBLE TO SLEEP");
+                        }
                     }
+
                 }
             }
 

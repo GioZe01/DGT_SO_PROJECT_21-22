@@ -91,12 +91,12 @@ int load_configuration(struct conf *self) {
         self->so_nodes_num <= 0 ||
         self->so_buget_init <= 0 ||
         self->so_reward < 0 ||
-        self->so_min_trans_gen_nsec <= 0 ||
-        self->so_max_trans_gen_nsec <= 0 ||
+        self->so_min_trans_gen_nsec < 0 ||
+        self->so_max_trans_gen_nsec < 0 ||
         self->so_retry < 0 ||
         self->so_tp_size <= 0 ||
-        self->so_min_trans_proc_nsec <= 0 ||
-        self->so_max_trans_proc_nsec <= 0 ||
+        self->so_min_trans_proc_nsec < 0 ||
+        self->so_max_trans_proc_nsec < 0 ||
         self->so_sim_sec <= 0 ||
         self->so_num_friends < 0 ||
         self->so_hops < 0) {
