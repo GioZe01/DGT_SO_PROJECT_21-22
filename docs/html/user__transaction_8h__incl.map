@@ -1,0 +1,11 @@
+<map id="src/local_lib/headers/user_transaction.h" name="src/local_lib/headers/user_transaction.h">
+<area shape="rect" id="node1" title="Header file for user_transaction.c Contains the definition of the struct user_transaction and the fun..." alt="" coords="240,5,395,47"/>
+<area shape="rect" id="node2" href="$boolean_8h.html" title="Type Definition for the boolean type using integer values Done for C89 compatibility." alt="" coords="286,169,373,196"/>
+<area shape="rect" id="node3" href="$transaction__list_8h.html" title="Header file for the transaction_list.c file. Contains the definition of the Transaction structure and..." alt="" coords="134,95,269,121"/>
+<area shape="rect" id="node8" href="$conf__shm_8h.html" title="Header file for shm_conf.c Define the shared memory structure and the functions to create and destroy..." alt="" coords="355,95,453,121"/>
+<area shape="rect" id="node4" title=" " alt="" coords="5,169,72,196"/>
+<area shape="rect" id="node5" title=" " alt="" coords="176,244,251,271"/>
+<area shape="rect" id="node6" title=" " alt="" coords="147,169,211,196"/>
+<area shape="rect" id="node7" title=" " alt="" coords="289,244,385,271"/>
+<area shape="rect" id="node9" href="$glob_8h.html" title="Definition of Values and Macros for the project." alt="" coords="397,169,459,196"/>
+</map>

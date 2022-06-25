@@ -1,0 +1,26 @@
+var transaction__list_8h =
+[
+    [ "Transaction", "struct_transaction.html", "struct_transaction" ],
+    [ "TRANSACTION_FAILED", "group___t_r_a_n_s_a_c_t_i_o_n.html#gae014e4ccad1cdab524116fe12eeeb019", null ],
+    [ "TRANSACTION_SUCCES", "group___t_r_a_n_s_a_c_t_i_o_n.html#gab9ac4ae07455898e68aba90097416561", null ],
+    [ "TRANSACTION_WAITING", "group___t_r_a_n_s_a_c_t_i_o_n.html#ga372cf53d1af73707059cb2cbae422bad", null ],
+    [ "array_to_queue", "transaction__list_8h.html#a9e3b375d7349e6135e54e63bf55274f9", null ],
+    [ "copy_transaction", "transaction__list_8h.html#a734dc553e25dce539c134e72ac979219", null ],
+    [ "create_empty_transaction", "transaction__list_8h.html#aa800cb1cf4fca227ec58d3e9194bd87d", null ],
+    [ "create_transaction", "transaction__list_8h.html#a2a36e946d79aa2164121998cb2a60d75", null ],
+    [ "empty_queue", "transaction__list_8h.html#ad4e71b33c67d7c97003a968baee1fb4d", null ],
+    [ "get_num_transactions", "transaction__list_8h.html#ae8be3c873d5030e3205e21cfc2288185", null ],
+    [ "queue_append", "transaction__list_8h.html#a3cf1de6854c5ceaf45344cd84795886a", null ],
+    [ "queue_apt_amount_reward", "transaction__list_8h.html#a54c8919b16e7e3a12c3455c5ca31fc2e", null ],
+    [ "queue_copy_n_transactions", "transaction__list_8h.html#ad8fc45e2f26ef0060da11359d4d87cfe", null ],
+    [ "queue_create", "transaction__list_8h.html#a24a786275016ae7b4831f94fa44dd6a8", null ],
+    [ "queue_destroy", "transaction__list_8h.html#a4b43e06a4ecbf63d97c657b2713c482e", null ],
+    [ "queue_get_reward", "transaction__list_8h.html#ab7181a1b1aea65ba8a23c0be5268de2d", null ],
+    [ "queue_head", "transaction__list_8h.html#ad6e2542da82cf7ad128342f55af7168b", null ],
+    [ "queue_is_empty", "transaction__list_8h.html#ae770c903ab121bcd43dd5914c731b931", null ],
+    [ "queue_last", "transaction__list_8h.html#a0822880f1cc2fc8be1497d1c075ce602", null ],
+    [ "queue_print", "transaction__list_8h.html#a01a21c03bc602f27f94653f323d0e4ef", null ],
+    [ "queue_remove_head", "transaction__list_8h.html#a58f069167e5ce83fd53fc0472e446c9a", null ],
+    [ "queue_to_array", "transaction__list_8h.html#a6bc9d809f7097558ebe3b8d87f974d68", null ],
+    [ "transaction_print", "transaction__list_8h.html#a2ea5e61e8576c1c4c1751f63d4f77cab", null ]
+];

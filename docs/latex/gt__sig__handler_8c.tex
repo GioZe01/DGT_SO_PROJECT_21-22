@@ -1,0 +1,81 @@
+\hypertarget{gt__sig__handler_8c}{}\doxysection{src/local\+\_\+lib/gt\+\_\+sig\+\_\+handler.c File Reference}
+\label{gt__sig__handler_8c}\index{src/local\_lib/gt\_sig\_handler.c@{src/local\_lib/gt\_sig\_handler.c}}
+{\ttfamily \#include $<$stdio.\+h$>$}\newline
+{\ttfamily \#include $<$stdlib.\+h$>$}\newline
+{\ttfamily \#include \char`\"{}headers/gt\+\_\+sig\+\_\+handler.\+h\char`\"{}}\newline
+Include dependency graph for gt\+\_\+sig\+\_\+handler.\+c\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{gt__sig__handler_8c__incl}
+\end{center}
+\end{figure}
+\doxysubsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+void \mbox{\hyperlink{gt__sig__handler_8c_af63c50eca6252457c76b6484016ca795}{gen\+\_\+mask}} (sigset\+\_\+t $\ast$mask, int $\ast$sig\+\_\+list, int sig\+\_\+size)
+\begin{DoxyCompactList}\small\item\em Generate a mask for the signals to be blocked. \end{DoxyCompactList}\item 
+\mbox{\hyperlink{boolean_8h_afdcfe6db5bea87bd493a3fe2c513d5ef}{Bool}} \mbox{\hyperlink{gt__sig__handler_8c_acc2e46a7371383727f2daffd3d556085}{block\+\_\+signals}} (sigset\+\_\+t $\ast$new\+\_\+mask, sigset\+\_\+t $\ast$old\+\_\+mask)
+\begin{DoxyCompactList}\small\item\em \mbox{\hyperlink{union_block}{Block}} the signals of the new mask. \end{DoxyCompactList}\item 
+\mbox{\hyperlink{boolean_8h_afdcfe6db5bea87bd493a3fe2c513d5ef}{Bool}} \mbox{\hyperlink{gt__sig__handler_8c_a9a118b6f8d927cb8681009771007dbc1}{unblock\+\_\+signals}} (sigset\+\_\+t $\ast$old\+\_\+mask)
+\begin{DoxyCompactList}\small\item\em Set the old mask given. \end{DoxyCompactList}\end{DoxyCompactItemize}
+
+
+\doxysubsection{Function Documentation}
+\mbox{\Hypertarget{gt__sig__handler_8c_acc2e46a7371383727f2daffd3d556085}\label{gt__sig__handler_8c_acc2e46a7371383727f2daffd3d556085}} 
+\index{gt\_sig\_handler.c@{gt\_sig\_handler.c}!block\_signals@{block\_signals}}
+\index{block\_signals@{block\_signals}!gt\_sig\_handler.c@{gt\_sig\_handler.c}}
+\doxysubsubsection{\texorpdfstring{block\_signals()}{block\_signals()}}
+{\footnotesize\ttfamily \mbox{\hyperlink{boolean_8h_afdcfe6db5bea87bd493a3fe2c513d5ef}{Bool}} block\+\_\+signals (\begin{DoxyParamCaption}\item[{sigset\+\_\+t $\ast$}]{new\+\_\+mask,  }\item[{sigset\+\_\+t $\ast$}]{old\+\_\+mask }\end{DoxyParamCaption})}
+
+
+
+\mbox{\hyperlink{union_block}{Block}} the signals of the new mask. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em new\+\_\+mask} & the new mask to block \\
+\hline
+{\em old\+\_\+mask} & pointer to the old mask \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+TRUE if success, FALSE otherwise 
+\end{DoxyReturn}
+\mbox{\Hypertarget{gt__sig__handler_8c_af63c50eca6252457c76b6484016ca795}\label{gt__sig__handler_8c_af63c50eca6252457c76b6484016ca795}} 
+\index{gt\_sig\_handler.c@{gt\_sig\_handler.c}!gen\_mask@{gen\_mask}}
+\index{gen\_mask@{gen\_mask}!gt\_sig\_handler.c@{gt\_sig\_handler.c}}
+\doxysubsubsection{\texorpdfstring{gen\_mask()}{gen\_mask()}}
+{\footnotesize\ttfamily void gen\+\_\+mask (\begin{DoxyParamCaption}\item[{sigset\+\_\+t $\ast$}]{mask,  }\item[{int $\ast$}]{sig\+\_\+list,  }\item[{int}]{sig\+\_\+size }\end{DoxyParamCaption})}
+
+
+
+Generate a mask for the signals to be blocked. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em mask} & the mask to be generated \\
+\hline
+{\em sig\+\_\+list} & the list of signals to be blocked \\
+\hline
+{\em sig\+\_\+size} & the size of the list of signals \\
+\hline
+\end{DoxyParams}
+\mbox{\Hypertarget{gt__sig__handler_8c_a9a118b6f8d927cb8681009771007dbc1}\label{gt__sig__handler_8c_a9a118b6f8d927cb8681009771007dbc1}} 
+\index{gt\_sig\_handler.c@{gt\_sig\_handler.c}!unblock\_signals@{unblock\_signals}}
+\index{unblock\_signals@{unblock\_signals}!gt\_sig\_handler.c@{gt\_sig\_handler.c}}
+\doxysubsubsection{\texorpdfstring{unblock\_signals()}{unblock\_signals()}}
+{\footnotesize\ttfamily \mbox{\hyperlink{boolean_8h_afdcfe6db5bea87bd493a3fe2c513d5ef}{Bool}} unblock\+\_\+signals (\begin{DoxyParamCaption}\item[{sigset\+\_\+t $\ast$}]{old\+\_\+mask }\end{DoxyParamCaption})}
+
+
+
+Set the old mask given. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em old\+\_\+mask} & pointer to the old mask \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+TRUE if success, FALSE otherwise 
+\end{DoxyReturn}

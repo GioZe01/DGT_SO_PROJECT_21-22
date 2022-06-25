@@ -1,0 +1,148 @@
+\hypertarget{glob_8h}{}\doxysection{src/local\+\_\+lib/headers/glob.h File Reference}
+\label{glob_8h}\index{src/local\_lib/headers/glob.h@{src/local\_lib/headers/glob.h}}
+
+
+Definition of Values and Macros for the project.  
+
+
+{\ttfamily \#include $<$unistd.\+h$>$}\newline
+{\ttfamily \#include \char`\"{}sys/types.\+h\char`\"{}}\newline
+Include dependency graph for glob.\+h\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=226pt]{glob_8h__incl}
+\end{center}
+\end{figure}
+This graph shows which files directly or indirectly include this file\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{glob_8h__dep__incl}
+\end{center}
+\end{figure}
+\doxysubsection*{Macros}
+\begin{DoxyCompactItemize}
+\item 
+\#define \mbox{\hyperlink{group___e_x_c_v_e_ga97e592bfb85567b2b2df9930e8fecbaa}{PATH\+\_\+\+TO\+\_\+\+USER}}~\char`\"{}build/bin/user\char`\"{}
+\item 
+\#define \mbox{\hyperlink{group___e_x_c_v_e_gaa085c71f4cd80778075a2ce29f6a1b4c}{PATH\+\_\+\+TO\+\_\+\+NODE}}~\char`\"{}build/bin/\mbox{\hyperlink{structnode}{node}}\char`\"{}
+\item 
+\#define \mbox{\hyperlink{group___e_x_c_v_e_ga2d7db4fadee248b9e8118ec27787a6ab}{PATH\+\_\+\+TO\+\_\+\+NODE\+\_\+\+TP}}~\char`\"{}build/bin/node\+\_\+tp\char`\"{}
+\item 
+\#define \mbox{\hyperlink{group___n_u_m_gae06302813b35864e23de62f0cb0d0786}{USERS\+\_\+\+MAX}}~1000
+\begin{DoxyCompactList}\small\item\em The number of processes that can be created. \end{DoxyCompactList}\item 
+\#define \mbox{\hyperlink{group___n_u_m_gafa04adbda4886a89c58926abb351386c}{NODES\+\_\+\+MAX}}~100
+\begin{DoxyCompactList}\small\item\em The number of processes that can be created. \end{DoxyCompactList}\item 
+\#define \mbox{\hyperlink{group___s_i_n_c_r_o_n_i_z_a_t_i_o_n_ga5dc3040049b556021258270864f32d37}{SEMAPHORE\+\_\+\+SINC\+\_\+\+KEY\+\_\+\+START}}~0x60
+\begin{DoxyCompactList}\small\item\em The first key for the sincronization semaphore sincronization. \end{DoxyCompactList}\item 
+\#define \mbox{\hyperlink{group___s_i_n_c_r_o_n_i_z_a_t_i_o_n_ga90091b261ea6d647cb02f379f1506897}{SEMAPHORE\+\_\+\+MASTER\+\_\+\+BOOK\+\_\+\+ACCESS\+\_\+\+KEY}}~0x61
+\begin{DoxyCompactList}\small\item\em The key for the masterbook semaphore for single block access. \end{DoxyCompactList}\item 
+\#define \mbox{\hyperlink{group___s_i_n_c_r_o_n_i_z_a_t_i_o_n_ga64d29dc8281cc6bbacbf6b62c92d21ca}{SEMAPHORE\+\_\+\+MASTER\+\_\+\+BOOK\+\_\+\+TO\+\_\+\+FILL\+\_\+\+KEY}}~0\+X62
+\begin{DoxyCompactList}\small\item\em The key for the masterbook semaphore for to\+\_\+fill shm param. \end{DoxyCompactList}\item 
+\#define \mbox{\hyperlink{group___q_u_e_u_e_gaa028dcfbac7fa19d97b0dcbcd4054ef5}{MASTER\+\_\+\+QUEUE\+\_\+\+KEY}}~0x71
+\begin{DoxyCompactList}\small\item\em The key for the master report queue. \end{DoxyCompactList}\item 
+\#define \mbox{\hyperlink{group___q_u_e_u_e_gabe739eaab2e560c781f595dc3a148454}{USERS\+\_\+\+QUEUE\+\_\+\+KEY}}~0x72
+\begin{DoxyCompactList}\small\item\em The key for the user report queue. \end{DoxyCompactList}\item 
+\#define \mbox{\hyperlink{group___q_u_e_u_e_gaa74f9d7a79cbbb1b618d248ec1fba976}{NODES\+\_\+\+QUEUE\+\_\+\+KEY}}~0x73
+\item 
+\#define \mbox{\hyperlink{group___s_h_a_r_e_d_gaa989aa06da74522de721d867affe699e}{SHM\+\_\+\+CONFIGURATION}}~0x81
+\begin{DoxyCompactList}\small\item\em The key for the shm dedicated to the configuration. \end{DoxyCompactList}\item 
+\#define \mbox{\hyperlink{group___s_h_a_r_e_d_ga361b6c3e8eb32c69aa28abe265b98eb4}{MASTER\+\_\+\+BOOK\+\_\+\+SHM\+\_\+\+KEY}}~0x82
+\item 
+\#define \mbox{\hyperlink{group___c_o_l_o_r_ga1aef55df029d2a394bfc1f0bc919b041}{COLOR\+\_\+\+RED\+\_\+\+ANSI\+\_\+\+CODE}}~\char`\"{}\textbackslash{}x1b\mbox{[}31m\char`\"{}
+\begin{DoxyCompactList}\small\item\em The color red in ansi code. \end{DoxyCompactList}\item 
+\#define \mbox{\hyperlink{group___c_o_l_o_r_ga152c815cf21879e518b82c3261a3bd31}{COLOR\+\_\+\+GREEN\+\_\+\+ANSI\+\_\+\+CODE}}~\char`\"{}\textbackslash{}x1b\mbox{[}32m\char`\"{}
+\begin{DoxyCompactList}\small\item\em The color green in ansi code. \end{DoxyCompactList}\item 
+\#define \mbox{\hyperlink{group___c_o_l_o_r_gad06700b2426f628fb6ac1bf3f2f1b54c}{COLOR\+\_\+\+YELLOW\+\_\+\+ANSI\+\_\+\+CODE}}~\char`\"{}\textbackslash{}x1b\mbox{[}33m\char`\"{}
+\begin{DoxyCompactList}\small\item\em The color yellow in ansi code. \end{DoxyCompactList}\item 
+\#define \mbox{\hyperlink{group___c_o_l_o_r_ga87e3426a5a0dcf4447417de1c6ed18c3}{COLOR\+\_\+\+BLUE\+\_\+\+ANSI\+\_\+\+CODE}}~\char`\"{}\textbackslash{}x1b\mbox{[}34m\char`\"{}
+\begin{DoxyCompactList}\small\item\em The color blue in ansi code. \end{DoxyCompactList}\item 
+\#define \mbox{\hyperlink{group___c_o_l_o_r_ga9e4bb38fd98d6155fdcad85f0bfc61ff}{COLOR\+\_\+\+WHITE\+\_\+\+ANSI\+\_\+\+CODE}}~\char`\"{}\textbackslash{}x1b\mbox{[}37m\char`\"{}
+\item 
+\#define \mbox{\hyperlink{group___c_o_l_o_r_gadf1e0460998b025f712ef8b327a295b2}{COLOR\+\_\+\+RESET\+\_\+\+ANSI\+\_\+\+CODE}}~\char`\"{}\textbackslash{}x1b\mbox{[}0m\char`\"{}
+\begin{DoxyCompactList}\small\item\em The color reset in ansi code. \end{DoxyCompactList}\item 
+\#define \mbox{\hyperlink{group___a_t_gaae9d8904fbca80e9986482d75e345f98}{SO\+\_\+\+REGISTRY\+\_\+\+SIZE}}~100
+\begin{DoxyCompactList}\small\item\em The size of the registry of the shared objects. \end{DoxyCompactList}\item 
+\#define \mbox{\hyperlink{group___a_t_ga320169181de72ba0b5203555e14103c4}{SO\+\_\+\+BLOCK\+\_\+\+SIZE}}~10
+\begin{DoxyCompactList}\small\item\em The size of the block of the shared objects. \end{DoxyCompactList}\item 
+\#define \mbox{\hyperlink{group___g_e_n_e_r_a_l_gae953ffc3e92b6baa985e692116d69572}{REALLOC\+\_\+\+MARGIN}}~10
+\item 
+\#define \mbox{\hyperlink{group___g_e_n_e_r_a_l_ga9e3d14ce35ff410fe7ee603f64bb9f1f}{MAX\+\_\+\+FAILURE\+\_\+\+SHM\+\_\+\+LOADING}}~1000
+\item 
+\#define \mbox{\hyperlink{group___g_e_n_e_r_a_l_ga250de75b7974075e9f44303532202d50}{MAX\+\_\+\+UNSED\+\_\+\+CICLE\+\_\+\+OF\+\_\+\+NODE\+\_\+\+PROC}}~10000000
+\item 
+\#define \mbox{\hyperlink{group___g_e_n_e_r_a_l_gad7e3289adbc6e5fef978443509da6c7f}{MAX\+\_\+\+WAITING\+\_\+\+TIME\+\_\+\+FOR\+\_\+\+UPDATE}}~10000
+\item 
+\#define \mbox{\hyperlink{group___g_e_n_e_r_a_l_ga6abe7f1bd5a31c2544e5f5e817f5418b}{MAX\+\_\+\+FAILURE\+\_\+\+SHM\+\_\+\+BOOKMASTER\+\_\+\+LOCKING}}~10
+\item 
+\#define \mbox{\hyperlink{group___g_e_n_e_r_a_l_ga9047a7e10275f0dad957dc618abf9743}{MAX\+\_\+\+PROC\+\_\+\+TO\+\_\+\+PRINT}}~1000
+\item 
+\#define \mbox{\hyperlink{group___g_e_n_e_r_a_l_gade717809518d76007bcbd9272dc28b9d}{MAX\+\_\+\+FRIENDS}}~32
+\item 
+\#define \mbox{\hyperlink{group___g_e_n_e_r_a_l_ga03afafcbe29990e8d9f689042f622a03}{MAX\+\_\+\+RETRY\+\_\+\+UPDATE\+\_\+\+KIDS\+\_\+\+INFO}}~100000
+\item 
+\#define \mbox{\hyperlink{group___g_e_n_e_r_a_l_ga1ce33a3754051ba823a303fcdc23af00}{MAX\+\_\+\+TIME\+\_\+\+NSEC}}~999999999
+\item 
+\#define \mbox{\hyperlink{group___g_e_n_e_r_a_l_gab7773afec2d4d8425255fffb4c142d6f}{SLEEP\+\_\+\+TIME\+\_\+\+UPDATE\+\_\+\+KIDS\+\_\+\+INFO}}~10000
+\end{DoxyCompactItemize}
+\doxysubsection*{Enumerations}
+\begin{DoxyCompactItemize}
+\item 
+enum \mbox{\hyperlink{glob_8h_a974c3938b8c9549612d1ca3062ed3bef}{SIMULATION\+\_\+\+END\+\_\+\+TYPE}} \{ \newline
+\mbox{\hyperlink{glob_8h_a974c3938b8c9549612d1ca3062ed3befa90a199823951918a5d0f204115e625a4}{SIMULATION\+\_\+\+END\+\_\+\+BY\+\_\+\+USER}}
+, \mbox{\hyperlink{glob_8h_a974c3938b8c9549612d1ca3062ed3befa2df98673d6108fc2dba20ccc4e85b3ee}{SIMULATION\+\_\+\+END\+\_\+\+BY\+\_\+\+TIME}}
+, \mbox{\hyperlink{glob_8h_a974c3938b8c9549612d1ca3062ed3befabdef3ee17c868d4951c7464f711a82a2}{SIMULATION\+\_\+\+END\+\_\+\+BY\+\_\+\+SO\+\_\+\+REGISTRY\+\_\+\+FULL}}
+, \mbox{\hyperlink{glob_8h_a974c3938b8c9549612d1ca3062ed3befad839d023cbf0fe8ef4e9a77ddd8c5944}{SIMULATION\+\_\+\+END\+\_\+\+BY\+\_\+\+NO\+\_\+\+PROC\+\_\+\+RUNNING}}
+, \newline
+\mbox{\hyperlink{glob_8h_a974c3938b8c9549612d1ca3062ed3befa3b78a26bb39d291adc297f3beeb38dc7}{SIMULATION\+\_\+\+END\+\_\+\+PROPERLY\+\_\+\+TERMINATED}}
+, \mbox{\hyperlink{glob_8h_a974c3938b8c9549612d1ca3062ed3befa731e5fa866d699e5f8e2cef11e3690c3}{SIMULATION\+\_\+\+END\+\_\+\+BY\+\_\+\+MAX\+\_\+\+NODE\+\_\+\+GEN\+\_\+\+REACHED}}
+ \}
+\begin{DoxyCompactList}\small\item\em The type of the simulation that can occured. \end{DoxyCompactList}\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+Definition of Values and Macros for the project. 
+
+\begin{DoxyAuthor}{Author}
+Giovanni Terzuolo 
+\end{DoxyAuthor}
+
+
+\doxysubsection{Enumeration Type Documentation}
+\mbox{\Hypertarget{glob_8h_a974c3938b8c9549612d1ca3062ed3bef}\label{glob_8h_a974c3938b8c9549612d1ca3062ed3bef}} 
+\index{glob.h@{glob.h}!SIMULATION\_END\_TYPE@{SIMULATION\_END\_TYPE}}
+\index{SIMULATION\_END\_TYPE@{SIMULATION\_END\_TYPE}!glob.h@{glob.h}}
+\doxysubsubsection{\texorpdfstring{SIMULATION\_END\_TYPE}{SIMULATION\_END\_TYPE}}
+{\footnotesize\ttfamily enum \mbox{\hyperlink{glob_8h_a974c3938b8c9549612d1ca3062ed3bef}{SIMULATION\+\_\+\+END\+\_\+\+TYPE}}}
+
+
+
+The type of the simulation that can occured. 
+
+\begin{DoxyEnumFields}{Enumerator}
+\raisebox{\heightof{T}}[0pt][0pt]{\index{SIMULATION\_END\_BY\_USER@{SIMULATION\_END\_BY\_USER}!glob.h@{glob.h}}\index{glob.h@{glob.h}!SIMULATION\_END\_BY\_USER@{SIMULATION\_END\_BY\_USER}}}\mbox{\Hypertarget{glob_8h_a974c3938b8c9549612d1ca3062ed3befa90a199823951918a5d0f204115e625a4}\label{glob_8h_a974c3938b8c9549612d1ca3062ed3befa90a199823951918a5d0f204115e625a4}} 
+SIMULATION\+\_\+\+END\+\_\+\+BY\+\_\+\+USER&The simulation is ended by the user \\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{SIMULATION\_END\_BY\_TIME@{SIMULATION\_END\_BY\_TIME}!glob.h@{glob.h}}\index{glob.h@{glob.h}!SIMULATION\_END\_BY\_TIME@{SIMULATION\_END\_BY\_TIME}}}\mbox{\Hypertarget{glob_8h_a974c3938b8c9549612d1ca3062ed3befa2df98673d6108fc2dba20ccc4e85b3ee}\label{glob_8h_a974c3938b8c9549612d1ca3062ed3befa2df98673d6108fc2dba20ccc4e85b3ee}} 
+SIMULATION\+\_\+\+END\+\_\+\+BY\+\_\+\+TIME&The simulation is ended by the time \\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{SIMULATION\_END\_BY\_SO\_REGISTRY\_FULL@{SIMULATION\_END\_BY\_SO\_REGISTRY\_FULL}!glob.h@{glob.h}}\index{glob.h@{glob.h}!SIMULATION\_END\_BY\_SO\_REGISTRY\_FULL@{SIMULATION\_END\_BY\_SO\_REGISTRY\_FULL}}}\mbox{\Hypertarget{glob_8h_a974c3938b8c9549612d1ca3062ed3befabdef3ee17c868d4951c7464f711a82a2}\label{glob_8h_a974c3938b8c9549612d1ca3062ed3befabdef3ee17c868d4951c7464f711a82a2}} 
+SIMULATION\+\_\+\+END\+\_\+\+BY\+\_\+\+SO\+\_\+\+REGISTRY\+\_\+\+FULL&The simulation is ended by the registry full \\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{SIMULATION\_END\_BY\_NO\_PROC\_RUNNING@{SIMULATION\_END\_BY\_NO\_PROC\_RUNNING}!glob.h@{glob.h}}\index{glob.h@{glob.h}!SIMULATION\_END\_BY\_NO\_PROC\_RUNNING@{SIMULATION\_END\_BY\_NO\_PROC\_RUNNING}}}\mbox{\Hypertarget{glob_8h_a974c3938b8c9549612d1ca3062ed3befad839d023cbf0fe8ef4e9a77ddd8c5944}\label{glob_8h_a974c3938b8c9549612d1ca3062ed3befad839d023cbf0fe8ef4e9a77ddd8c5944}} 
+SIMULATION\+\_\+\+END\+\_\+\+BY\+\_\+\+NO\+\_\+\+PROC\+\_\+\+RUNNING&The simulation is ended by the no proc running \\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{SIMULATION\_END\_PROPERLY\_TERMINATED@{SIMULATION\_END\_PROPERLY\_TERMINATED}!glob.h@{glob.h}}\index{glob.h@{glob.h}!SIMULATION\_END\_PROPERLY\_TERMINATED@{SIMULATION\_END\_PROPERLY\_TERMINATED}}}\mbox{\Hypertarget{glob_8h_a974c3938b8c9549612d1ca3062ed3befa3b78a26bb39d291adc297f3beeb38dc7}\label{glob_8h_a974c3938b8c9549612d1ca3062ed3befa3b78a26bb39d291adc297f3beeb38dc7}} 
+SIMULATION\+\_\+\+END\+\_\+\+PROPERLY\+\_\+\+TERMINATED&The simulation is ended by the properly terminated \\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{SIMULATION\_END\_BY\_MAX\_NODE\_GEN\_REACHED@{SIMULATION\_END\_BY\_MAX\_NODE\_GEN\_REACHED}!glob.h@{glob.h}}\index{glob.h@{glob.h}!SIMULATION\_END\_BY\_MAX\_NODE\_GEN\_REACHED@{SIMULATION\_END\_BY\_MAX\_NODE\_GEN\_REACHED}}}\mbox{\Hypertarget{glob_8h_a974c3938b8c9549612d1ca3062ed3befa731e5fa866d699e5f8e2cef11e3690c3}\label{glob_8h_a974c3938b8c9549612d1ca3062ed3befa731e5fa866d699e5f8e2cef11e3690c3}} 
+SIMULATION\+\_\+\+END\+\_\+\+BY\+\_\+\+MAX\+\_\+\+NODE\+\_\+\+GEN\+\_\+\+REACHED&The simulation is ended by the max node gen reached \\
+\hline
+
+\end{DoxyEnumFields}

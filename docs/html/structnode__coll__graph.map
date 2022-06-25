@@ -1,0 +1,4 @@
+<map id="node" name="node">
+<area shape="rect" id="node1" title="Node structure used to represent a node." alt="" coords="26,96,81,123"/>
+<area shape="rect" id="node2" href="$struct_transaction.html" title="Structure for the transaction." alt="" coords="5,5,101,32"/>
+</map>

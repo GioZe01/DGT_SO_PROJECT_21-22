@@ -1,0 +1,70 @@
+\hypertarget{book__master__shm_8c}{}\doxysection{src/local\+\_\+lib/book\+\_\+master\+\_\+shm.c File Reference}
+\label{book__master__shm_8c}\index{src/local\_lib/book\_master\_shm.c@{src/local\_lib/book\_master\_shm.c}}
+{\ttfamily \#include $<$stdio.\+h$>$}\newline
+{\ttfamily \#include $<$sys/sem.\+h$>$}\newline
+{\ttfamily \#include \char`\"{}headers/book\+\_\+master\+\_\+shm.\+h\char`\"{}}\newline
+{\ttfamily \#include \char`\"{}headers/glob.\+h\char`\"{}}\newline
+Include dependency graph for book\+\_\+master\+\_\+shm.\+c\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{book__master__shm_8c__incl}
+\end{center}
+\end{figure}
+\doxysubsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+void \mbox{\hyperlink{book__master__shm_8c_a8047e2c044164b5263663ccc585fa58d}{copy\+\_\+trasaction\+\_\+blocks}} (struct \mbox{\hyperlink{struct_transaction}{Transaction}} block1\mbox{[}\mbox{\hyperlink{group___a_t_ga320169181de72ba0b5203555e14103c4}{SO\+\_\+\+BLOCK\+\_\+\+SIZE}}\mbox{]}, struct \mbox{\hyperlink{struct_transaction}{Transaction}} block2\mbox{[}\mbox{\hyperlink{group___a_t_ga320169181de72ba0b5203555e14103c4}{SO\+\_\+\+BLOCK\+\_\+\+SIZE}}\mbox{]})
+\item 
+int \mbox{\hyperlink{book__master__shm_8c_a498e1dcf6ec8a65f8a039b06d945183c}{shm\+\_\+book\+\_\+master\+\_\+create}} (struct \mbox{\hyperlink{structshm__book__master}{shm\+\_\+book\+\_\+master}} $\ast$self, int sem\+\_\+access\+\_\+id)
+\item 
+int \mbox{\hyperlink{book__master__shm_8c_a3dfc9c8b702da13acb0a0f8499a4c349}{insert\+\_\+block}} (struct \mbox{\hyperlink{structshm__book__master}{shm\+\_\+book\+\_\+master}} $\ast$self, struct \mbox{\hyperlink{struct_transaction}{Transaction}} block\+\_\+t\mbox{[}\mbox{\hyperlink{group___a_t_ga320169181de72ba0b5203555e14103c4}{SO\+\_\+\+BLOCK\+\_\+\+SIZE}}\mbox{]})
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Function Documentation}
+\mbox{\Hypertarget{book__master__shm_8c_a8047e2c044164b5263663ccc585fa58d}\label{book__master__shm_8c_a8047e2c044164b5263663ccc585fa58d}} 
+\index{book\_master\_shm.c@{book\_master\_shm.c}!copy\_trasaction\_blocks@{copy\_trasaction\_blocks}}
+\index{copy\_trasaction\_blocks@{copy\_trasaction\_blocks}!book\_master\_shm.c@{book\_master\_shm.c}}
+\doxysubsubsection{\texorpdfstring{copy\_trasaction\_blocks()}{copy\_trasaction\_blocks()}}
+{\footnotesize\ttfamily void copy\+\_\+trasaction\+\_\+blocks (\begin{DoxyParamCaption}\item[{struct \mbox{\hyperlink{struct_transaction}{Transaction}}}]{block1\mbox{[}\+SO\+\_\+\+BLOCK\+\_\+\+SIZE\mbox{]},  }\item[{struct \mbox{\hyperlink{struct_transaction}{Transaction}}}]{block2\mbox{[}\+SO\+\_\+\+BLOCK\+\_\+\+SIZE\mbox{]} }\end{DoxyParamCaption})}
+
+Copy the block2 in block1 
+\begin{DoxyParams}{Parameters}
+{\em block1} & transactions block vector \\
+\hline
+{\em block2} & transactions block vector \\
+\hline
+\end{DoxyParams}
+\mbox{\Hypertarget{book__master__shm_8c_a3dfc9c8b702da13acb0a0f8499a4c349}\label{book__master__shm_8c_a3dfc9c8b702da13acb0a0f8499a4c349}} 
+\index{book\_master\_shm.c@{book\_master\_shm.c}!insert\_block@{insert\_block}}
+\index{insert\_block@{insert\_block}!book\_master\_shm.c@{book\_master\_shm.c}}
+\doxysubsubsection{\texorpdfstring{insert\_block()}{insert\_block()}}
+{\footnotesize\ttfamily int insert\+\_\+block (\begin{DoxyParamCaption}\item[{struct \mbox{\hyperlink{structshm__book__master}{shm\+\_\+book\+\_\+master}} $\ast$}]{self,  }\item[{struct \mbox{\hyperlink{struct_transaction}{Transaction}}}]{block\+\_\+t\mbox{[}\+SO\+\_\+\+BLOCK\+\_\+\+SIZE\mbox{]} }\end{DoxyParamCaption})}
+
+Load into the given shm struct the block. 
+\begin{DoxyParams}{Parameters}
+{\em self} & the shm struct to load the block in \\
+\hline
+{\em block\+\_\+t} & block of transactions to be loaded \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+-\/1 in case of FAILURE. 0 otherwise 
+\end{DoxyReturn}
+\mbox{\Hypertarget{book__master__shm_8c_a498e1dcf6ec8a65f8a039b06d945183c}\label{book__master__shm_8c_a498e1dcf6ec8a65f8a039b06d945183c}} 
+\index{book\_master\_shm.c@{book\_master\_shm.c}!shm\_book\_master\_create@{shm\_book\_master\_create}}
+\index{shm\_book\_master\_create@{shm\_book\_master\_create}!book\_master\_shm.c@{book\_master\_shm.c}}
+\doxysubsubsection{\texorpdfstring{shm\_book\_master\_create()}{shm\_book\_master\_create()}}
+{\footnotesize\ttfamily int shm\+\_\+book\+\_\+master\+\_\+create (\begin{DoxyParamCaption}\item[{struct \mbox{\hyperlink{structshm__book__master}{shm\+\_\+book\+\_\+master}} $\ast$}]{self,  }\item[{int}]{sem\+\_\+access\+\_\+id }\end{DoxyParamCaption})}
+
+Load all the index in col 2 of blocks 
+\begin{DoxyParams}{Parameters}
+{\em self} & the shm to create \\
+\hline
+{\em sem\+\_\+access\+\_\+id} & the id of the semaphore to access the shm value \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+-\/1 in case of Failure. 0 otherwise 
+\end{DoxyReturn}

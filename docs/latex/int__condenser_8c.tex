@@ -1,0 +1,276 @@
+\hypertarget{int__condenser_8c}{}\doxysection{src/local\+\_\+lib/int\+\_\+condenser.c File Reference}
+\label{int__condenser_8c}\index{src/local\_lib/int\_condenser.c@{src/local\_lib/int\_condenser.c}}
+{\ttfamily \#include $<$stdio.\+h$>$}\newline
+{\ttfamily \#include $<$stdlib.\+h$>$}\newline
+{\ttfamily \#include \char`\"{}headers/glob.\+h\char`\"{}}\newline
+Include dependency graph for int\+\_\+condenser.\+c\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=341pt]{int__condenser_8c__incl}
+\end{center}
+\end{figure}
+\doxysubsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+int \mbox{\hyperlink{int__condenser_8c_a8a2a2e6075a30a74ff4b215c7d681eed}{check\+\_\+bit}} (int n, int position)
+\begin{DoxyCompactList}\small\item\em Check if there is a 1 int the given position. \end{DoxyCompactList}\item 
+int \mbox{\hyperlink{int__condenser_8c_a1702698435663ce8abcade0a06aa86c1}{count\+\_\+1}} (int number)
+\begin{DoxyCompactList}\small\item\em count the number of 1 in the given number \end{DoxyCompactList}\item 
+int $\ast$ \mbox{\hyperlink{int__condenser_8c_ad47d3fa48fd29333a27984d8d30cba78}{get\+\_\+all\+\_\+ones\+\_\+positions}} (int \mbox{\hyperlink{node__proc_8c_aed763209d90cbafd9a1c8b3b1602daba}{friends}})
+\begin{DoxyCompactList}\small\item\em Get all the position where the one is present in the given number. \end{DoxyCompactList}\item 
+int \mbox{\hyperlink{int__condenser_8c_ab3aa48bb968d9217f198e8453134682b}{rand\+\_\+int}} (int n)
+\begin{DoxyCompactList}\small\item\em Generate a random number between 0 and n-\/1. \end{DoxyCompactList}\item 
+int \mbox{\hyperlink{int__condenser_8c_a90269aec4aabc892a25b2a31a0747d00}{rand\+\_\+int\+\_\+range}} (int min, int max)
+\begin{DoxyCompactList}\small\item\em Generate a random number between min and max. \end{DoxyCompactList}\item 
+int \mbox{\hyperlink{int__condenser_8c_aeae4e9c54ad5c983cfed0f456c374f08}{get\+\_\+rand\+\_\+one}} (int n)
+\begin{DoxyCompactList}\small\item\em Return the position of a randomly chosen 1 in the given number. \end{DoxyCompactList}\item 
+int \mbox{\hyperlink{int__condenser_8c_a12251ea0bed5602fab60bd5cac3fedd9}{get\+\_\+ones}} (int n)
+\begin{DoxyCompactList}\small\item\em Get the 1s positions of a number. \end{DoxyCompactList}\item 
+int \mbox{\hyperlink{int__condenser_8c_a0f65db997bb3addda5128a079e158757}{rand\+\_\+int\+\_\+n}} (int n, int max)
+\begin{DoxyCompactList}\small\item\em Initialize a integer number with 1 in n random positions and 0 elsewhere. \end{DoxyCompactList}\item 
+int \mbox{\hyperlink{int__condenser_8c_aa4c2e380cc05a9450bed222ad62c7e89}{rand\+\_\+int\+\_\+n\+\_\+exclude}} (int n, int exclude, int max)
+\begin{DoxyCompactList}\small\item\em Initialize a integer number with 1 in n random positions excluding the one given and 0 elsewhere. \end{DoxyCompactList}\item 
+int \mbox{\hyperlink{int__condenser_8c_a6e0fcce4999af283391c8323a3099668}{rand\+\_\+int\+\_\+n\+\_\+pos}} (int n)
+\begin{DoxyCompactList}\small\item\em Get a random 1 position in the given number. \end{DoxyCompactList}\item 
+int \mbox{\hyperlink{int__condenser_8c_a659844e9357a3daa8be110558c644c31}{set\+\_\+one}} (int n, int pos)
+\begin{DoxyCompactList}\small\item\em Insert a 1 in the given position in the given number. \end{DoxyCompactList}\item 
+void \mbox{\hyperlink{int__condenser_8c_a965f6f29c66acea376553d0eeb0acc13}{print\+\_\+binary}} (int n)
+\begin{DoxyCompactList}\small\item\em Print the given number in binary. \end{DoxyCompactList}\end{DoxyCompactItemize}
+
+
+\doxysubsection{Function Documentation}
+\mbox{\Hypertarget{int__condenser_8c_a8a2a2e6075a30a74ff4b215c7d681eed}\label{int__condenser_8c_a8a2a2e6075a30a74ff4b215c7d681eed}} 
+\index{int\_condenser.c@{int\_condenser.c}!check\_bit@{check\_bit}}
+\index{check\_bit@{check\_bit}!int\_condenser.c@{int\_condenser.c}}
+\doxysubsubsection{\texorpdfstring{check\_bit()}{check\_bit()}}
+{\footnotesize\ttfamily int check\+\_\+bit (\begin{DoxyParamCaption}\item[{int}]{n,  }\item[{int}]{position }\end{DoxyParamCaption})}
+
+
+
+Check if there is a 1 int the given position. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em n} & the number to check \\
+\hline
+{\em posistion} & the position to check \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+1 if there is a 1 in the given position, 0 otherwise 
+\end{DoxyReturn}
+\mbox{\Hypertarget{int__condenser_8c_a1702698435663ce8abcade0a06aa86c1}\label{int__condenser_8c_a1702698435663ce8abcade0a06aa86c1}} 
+\index{int\_condenser.c@{int\_condenser.c}!count\_1@{count\_1}}
+\index{count\_1@{count\_1}!int\_condenser.c@{int\_condenser.c}}
+\doxysubsubsection{\texorpdfstring{count\_1()}{count\_1()}}
+{\footnotesize\ttfamily int count\+\_\+1 (\begin{DoxyParamCaption}\item[{int}]{number }\end{DoxyParamCaption})}
+
+
+
+count the number of 1 in the given number 
+
+
+\begin{DoxyParams}{Parameters}
+{\em number} & the number to count \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+the number of 1 in the given number 
+\end{DoxyReturn}
+\mbox{\Hypertarget{int__condenser_8c_ad47d3fa48fd29333a27984d8d30cba78}\label{int__condenser_8c_ad47d3fa48fd29333a27984d8d30cba78}} 
+\index{int\_condenser.c@{int\_condenser.c}!get\_all\_ones\_positions@{get\_all\_ones\_positions}}
+\index{get\_all\_ones\_positions@{get\_all\_ones\_positions}!int\_condenser.c@{int\_condenser.c}}
+\doxysubsubsection{\texorpdfstring{get\_all\_ones\_positions()}{get\_all\_ones\_positions()}}
+{\footnotesize\ttfamily int $\ast$ get\+\_\+all\+\_\+ones\+\_\+positions (\begin{DoxyParamCaption}\item[{int}]{friends }\end{DoxyParamCaption})}
+
+
+
+Get all the position where the one is present in the given number. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em friends} & The number to search in \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+The list of positions 
+\end{DoxyReturn}
+\mbox{\Hypertarget{int__condenser_8c_a12251ea0bed5602fab60bd5cac3fedd9}\label{int__condenser_8c_a12251ea0bed5602fab60bd5cac3fedd9}} 
+\index{int\_condenser.c@{int\_condenser.c}!get\_ones@{get\_ones}}
+\index{get\_ones@{get\_ones}!int\_condenser.c@{int\_condenser.c}}
+\doxysubsubsection{\texorpdfstring{get\_ones()}{get\_ones()}}
+{\footnotesize\ttfamily int get\+\_\+ones (\begin{DoxyParamCaption}\item[{int}]{n }\end{DoxyParamCaption})}
+
+
+
+Get the 1s positions of a number. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em n} & The number \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+The positions of 1s 
+\end{DoxyReturn}
+\mbox{\Hypertarget{int__condenser_8c_aeae4e9c54ad5c983cfed0f456c374f08}\label{int__condenser_8c_aeae4e9c54ad5c983cfed0f456c374f08}} 
+\index{int\_condenser.c@{int\_condenser.c}!get\_rand\_one@{get\_rand\_one}}
+\index{get\_rand\_one@{get\_rand\_one}!int\_condenser.c@{int\_condenser.c}}
+\doxysubsubsection{\texorpdfstring{get\_rand\_one()}{get\_rand\_one()}}
+{\footnotesize\ttfamily int get\+\_\+rand\+\_\+one (\begin{DoxyParamCaption}\item[{int}]{n }\end{DoxyParamCaption})}
+
+
+
+Return the position of a randomly chosen 1 in the given number. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em n} & The number \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+The position of a randomly chosen 1 in the given number 
+\end{DoxyReturn}
+\begin{DoxyWarning}{Warning}
+rand is done on 32 bits 
+\end{DoxyWarning}
+\mbox{\Hypertarget{int__condenser_8c_a965f6f29c66acea376553d0eeb0acc13}\label{int__condenser_8c_a965f6f29c66acea376553d0eeb0acc13}} 
+\index{int\_condenser.c@{int\_condenser.c}!print\_binary@{print\_binary}}
+\index{print\_binary@{print\_binary}!int\_condenser.c@{int\_condenser.c}}
+\doxysubsubsection{\texorpdfstring{print\_binary()}{print\_binary()}}
+{\footnotesize\ttfamily void print\+\_\+binary (\begin{DoxyParamCaption}\item[{int}]{n }\end{DoxyParamCaption})}
+
+
+
+Print the given number in binary. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em n} & The number \\
+\hline
+\end{DoxyParams}
+\mbox{\Hypertarget{int__condenser_8c_ab3aa48bb968d9217f198e8453134682b}\label{int__condenser_8c_ab3aa48bb968d9217f198e8453134682b}} 
+\index{int\_condenser.c@{int\_condenser.c}!rand\_int@{rand\_int}}
+\index{rand\_int@{rand\_int}!int\_condenser.c@{int\_condenser.c}}
+\doxysubsubsection{\texorpdfstring{rand\_int()}{rand\_int()}}
+{\footnotesize\ttfamily int rand\+\_\+int (\begin{DoxyParamCaption}\item[{int}]{n }\end{DoxyParamCaption})}
+
+
+
+Generate a random number between 0 and n-\/1. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em n} & The upper bound \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+A random number between 0 and n-\/1 
+\end{DoxyReturn}
+\mbox{\Hypertarget{int__condenser_8c_a0f65db997bb3addda5128a079e158757}\label{int__condenser_8c_a0f65db997bb3addda5128a079e158757}} 
+\index{int\_condenser.c@{int\_condenser.c}!rand\_int\_n@{rand\_int\_n}}
+\index{rand\_int\_n@{rand\_int\_n}!int\_condenser.c@{int\_condenser.c}}
+\doxysubsubsection{\texorpdfstring{rand\_int\_n()}{rand\_int\_n()}}
+{\footnotesize\ttfamily int rand\+\_\+int\+\_\+n (\begin{DoxyParamCaption}\item[{int}]{n,  }\item[{int}]{max }\end{DoxyParamCaption})}
+
+
+
+Initialize a integer number with 1 in n random positions and 0 elsewhere. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em n} & The n positions to be set to 1 \\
+\hline
+{\em max} & The max value of 1s in the number \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+A random number with n 1s and the rest 0 
+\end{DoxyReturn}
+\begin{DoxyWarning}{Warning}
+rand is done on 32 bits 
+\end{DoxyWarning}
+\mbox{\Hypertarget{int__condenser_8c_aa4c2e380cc05a9450bed222ad62c7e89}\label{int__condenser_8c_aa4c2e380cc05a9450bed222ad62c7e89}} 
+\index{int\_condenser.c@{int\_condenser.c}!rand\_int\_n\_exclude@{rand\_int\_n\_exclude}}
+\index{rand\_int\_n\_exclude@{rand\_int\_n\_exclude}!int\_condenser.c@{int\_condenser.c}}
+\doxysubsubsection{\texorpdfstring{rand\_int\_n\_exclude()}{rand\_int\_n\_exclude()}}
+{\footnotesize\ttfamily int rand\+\_\+int\+\_\+n\+\_\+exclude (\begin{DoxyParamCaption}\item[{int}]{n,  }\item[{int}]{exclude,  }\item[{int}]{max }\end{DoxyParamCaption})}
+
+
+
+Initialize a integer number with 1 in n random positions excluding the one given and 0 elsewhere. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em n} & The n positions to be set to 1 \\
+\hline
+{\em exclude} & The position to be excluded \\
+\hline
+{\em max} & The max value of 1s in the number \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+A random number with n 1s and the rest 0 
+\end{DoxyReturn}
+\begin{DoxyWarning}{Warning}
+rand is done on 32 bits 
+\end{DoxyWarning}
+\mbox{\Hypertarget{int__condenser_8c_a6e0fcce4999af283391c8323a3099668}\label{int__condenser_8c_a6e0fcce4999af283391c8323a3099668}} 
+\index{int\_condenser.c@{int\_condenser.c}!rand\_int\_n\_pos@{rand\_int\_n\_pos}}
+\index{rand\_int\_n\_pos@{rand\_int\_n\_pos}!int\_condenser.c@{int\_condenser.c}}
+\doxysubsubsection{\texorpdfstring{rand\_int\_n\_pos()}{rand\_int\_n\_pos()}}
+{\footnotesize\ttfamily int rand\+\_\+int\+\_\+n\+\_\+pos (\begin{DoxyParamCaption}\item[{int}]{n }\end{DoxyParamCaption})}
+
+
+
+Get a random 1 position in the given number. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em n} & The number \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+The position of a random 1 in the given number 
+\end{DoxyReturn}
+\mbox{\Hypertarget{int__condenser_8c_a90269aec4aabc892a25b2a31a0747d00}\label{int__condenser_8c_a90269aec4aabc892a25b2a31a0747d00}} 
+\index{int\_condenser.c@{int\_condenser.c}!rand\_int\_range@{rand\_int\_range}}
+\index{rand\_int\_range@{rand\_int\_range}!int\_condenser.c@{int\_condenser.c}}
+\doxysubsubsection{\texorpdfstring{rand\_int\_range()}{rand\_int\_range()}}
+{\footnotesize\ttfamily int rand\+\_\+int\+\_\+range (\begin{DoxyParamCaption}\item[{int}]{min,  }\item[{int}]{max }\end{DoxyParamCaption})}
+
+
+
+Generate a random number between min and max. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em min} & The lower bound \\
+\hline
+{\em max} & The upper bound \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+A random number between min and max 
+\end{DoxyReturn}
+\mbox{\Hypertarget{int__condenser_8c_a659844e9357a3daa8be110558c644c31}\label{int__condenser_8c_a659844e9357a3daa8be110558c644c31}} 
+\index{int\_condenser.c@{int\_condenser.c}!set\_one@{set\_one}}
+\index{set\_one@{set\_one}!int\_condenser.c@{int\_condenser.c}}
+\doxysubsubsection{\texorpdfstring{set\_one()}{set\_one()}}
+{\footnotesize\ttfamily int set\+\_\+one (\begin{DoxyParamCaption}\item[{int}]{n,  }\item[{int}]{pos }\end{DoxyParamCaption})}
+
+
+
+Insert a 1 in the given position in the given number. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em n} & The number \\
+\hline
+{\em pos} & The position \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+The number with a 1 in the given position 
+\end{DoxyReturn}

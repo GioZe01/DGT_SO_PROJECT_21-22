@@ -1,0 +1,75 @@
+\hypertarget{conf__file_8h}{}\doxysection{src/local\+\_\+lib/headers/conf\+\_\+file.h File Reference}
+\label{conf__file_8h}\index{src/local\_lib/headers/conf\_file.h@{src/local\_lib/headers/conf\_file.h}}
+
+
+Header file for the configuration file parser \mbox{\hyperlink{conf__file_8c}{conf\+\_\+file.\+c}}.  
+
+
+{\ttfamily \#include \char`\"{}boolean.\+h\char`\"{}}\newline
+Include dependency graph for conf\+\_\+file.\+h\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=196pt]{conf__file_8h__incl}
+\end{center}
+\end{figure}
+This graph shows which files directly or indirectly include this file\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{conf__file_8h__dep__incl}
+\end{center}
+\end{figure}
+\doxysubsection*{Data Structures}
+\begin{DoxyCompactItemize}
+\item 
+struct \mbox{\hyperlink{structconf}{conf}}
+\end{DoxyCompactItemize}
+\doxysubsection*{Macros}
+\begin{DoxyCompactItemize}
+\item 
+\#define \mbox{\hyperlink{conf__file_8h_a966421e8beed081c502732bce8066eb6}{CONFIGURATION\+\_\+\+FILE\+\_\+\+PATH}}~\char`\"{}/home/golia/CLion\+Projects/DGT\+\_\+\+SO\+\_\+\+PROJECT\+\_\+21-\/22/\mbox{\hyperlink{structconf}{conf}}\char`\"{}
+\end{DoxyCompactItemize}
+\doxysubsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+int \mbox{\hyperlink{conf__file_8h_ad5ea9194f626ba3a359bbc48a9a6b898}{load\+\_\+configuration}} (struct \mbox{\hyperlink{structconf}{conf}} $\ast$self)
+\begin{DoxyCompactList}\small\item\em Load the configuration in the conf struct specified Load the configuration present in the configuration file \textbackslash{}attention\+Warning Negative number are automatically converted to positive ! \end{DoxyCompactList}\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+Header file for the configuration file parser \mbox{\hyperlink{conf__file_8c}{conf\+\_\+file.\+c}}. 
+
+\begin{DoxyAuthor}{Author}
+Giovanni Terzuolo 
+\end{DoxyAuthor}
+
+
+\doxysubsection{Macro Definition Documentation}
+\mbox{\Hypertarget{conf__file_8h_a966421e8beed081c502732bce8066eb6}\label{conf__file_8h_a966421e8beed081c502732bce8066eb6}} 
+\index{conf\_file.h@{conf\_file.h}!CONFIGURATION\_FILE\_PATH@{CONFIGURATION\_FILE\_PATH}}
+\index{CONFIGURATION\_FILE\_PATH@{CONFIGURATION\_FILE\_PATH}!conf\_file.h@{conf\_file.h}}
+\doxysubsubsection{\texorpdfstring{CONFIGURATION\_FILE\_PATH}{CONFIGURATION\_FILE\_PATH}}
+{\footnotesize\ttfamily \#define CONFIGURATION\+\_\+\+FILE\+\_\+\+PATH~\char`\"{}/home/golia/CLion\+Projects/DGT\+\_\+\+SO\+\_\+\+PROJECT\+\_\+21-\/22/\mbox{\hyperlink{structconf}{conf}}\char`\"{}}
+
+
+
+\doxysubsection{Function Documentation}
+\mbox{\Hypertarget{conf__file_8h_ad5ea9194f626ba3a359bbc48a9a6b898}\label{conf__file_8h_ad5ea9194f626ba3a359bbc48a9a6b898}} 
+\index{conf\_file.h@{conf\_file.h}!load\_configuration@{load\_configuration}}
+\index{load\_configuration@{load\_configuration}!conf\_file.h@{conf\_file.h}}
+\doxysubsubsection{\texorpdfstring{load\_configuration()}{load\_configuration()}}
+{\footnotesize\ttfamily int load\+\_\+configuration (\begin{DoxyParamCaption}\item[{struct \mbox{\hyperlink{structconf}{conf}} $\ast$}]{self }\end{DoxyParamCaption})}
+
+
+
+Load the configuration in the conf struct specified Load the configuration present in the configuration file \textbackslash{}attention\+Warning Negative number are automatically converted to positive ! 
+
+
+\begin{DoxyParams}{Parameters}
+{\em self} & \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+Return Types\+: 1) -\/1 if file absent or empty for some filds required for conf 2) -\/2 if a params does\textquotesingle{}t respect type def. or some internal logic of the simulations ex\+: no budgets 3) -\/3 if at least two users and one node and zero hops 4) -\/4 min max not respected 5) -\/5 if node rewards is max for budget init. Or so\+\_\+num\+\_\+friends \texorpdfstring{$>$}{>} MAX\+\_\+\+FRIENDS 
+\end{DoxyReturn}

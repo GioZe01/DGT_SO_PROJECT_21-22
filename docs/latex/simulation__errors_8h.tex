@@ -1,0 +1,150 @@
+\hypertarget{simulation__errors_8h}{}\doxysection{src/local\+\_\+lib/headers/simulation\+\_\+errors.h File Reference}
+\label{simulation__errors_8h}\index{src/local\_lib/headers/simulation\_errors.h@{src/local\_lib/headers/simulation\_errors.h}}
+
+
+Macros for the procedure of ending the different types of processes in case of error. Contains macros and definition of functions.  
+
+
+{\ttfamily \#include $<$string.\+h$>$}\newline
+{\ttfamily \#include $<$errno.\+h$>$}\newline
+{\ttfamily \#include \char`\"{}glob.\+h\char`\"{}}\newline
+Include dependency graph for simulation\+\_\+errors.\+h\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=321pt]{simulation__errors_8h__incl}
+\end{center}
+\end{figure}
+This graph shows which files directly or indirectly include this file\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{simulation__errors_8h__dep__incl}
+\end{center}
+\end{figure}
+\doxysubsection*{Macros}
+\begin{DoxyCompactItemize}
+\item 
+\#define \mbox{\hyperlink{simulation__errors_8h_ab1dba548f6214a02d86560bba3214d8c}{EXIT\+\_\+\+PROCEDURE\+\_\+\+MAIN}}(exit\+\_\+value)
+\begin{DoxyCompactList}\small\item\em Macro for the procedure of ending the main process in case of error. \end{DoxyCompactList}\item 
+\#define \mbox{\hyperlink{group___e_x_i_t_ga0dfcd2bc4401273614b80746ce74a6c1}{EXIT\+\_\+\+PROCEDURE\+\_\+\+USER}}(exit\+\_\+value)
+\item 
+\#define \mbox{\hyperlink{group___e_x_i_t_gaf242bf8300ff9c792976876fd9c83df7}{EXIT\+\_\+\+PROCEDURE\+\_\+\+NODE}}(exit\+\_\+value)
+\item 
+\#define \mbox{\hyperlink{simulation__errors_8h_a3361e4404cd111be303ad514abea1f52}{ERROR\+\_\+\+MESSAGE}}(err\+\_\+mex)~fprintf(stderr, \char`\"{}\%s\%s Error\+: \%s -\/$>$ $\vert$ file\+: \%s $\vert$ line\+: \%d $\vert$ proc\+\_\+pid\+: \%d $\vert$ \textbackslash{}n (-\/) \%d\textbackslash{}n(-\/)\%s\textbackslash{}n \%s\textbackslash{}n\char`\"{}, COLOR\+\_\+\+RESET\+\_\+\+ANSI\+\_\+\+CODE, \mbox{\hyperlink{group___c_o_l_o_r_ga1aef55df029d2a394bfc1f0bc919b041}{COLOR\+\_\+\+RED\+\_\+\+ANSI\+\_\+\+CODE}},err\+\_\+mex, \+\_\+\+\_\+\+FILE\+\_\+\+\_\+, \+\_\+\+\_\+\+LINE\+\_\+\+\_\+ ,getpid(), errno, strerror(errno),\mbox{\hyperlink{group___c_o_l_o_r_gadf1e0460998b025f712ef8b327a295b2}{COLOR\+\_\+\+RESET\+\_\+\+ANSI\+\_\+\+CODE}})
+\item 
+\#define \mbox{\hyperlink{group___e_r_r_o_r_gaf5443cfb24409cbb68dbbe9bc8cabb44}{ERROR\+\_\+\+EXIT\+\_\+\+SEQUENCE\+\_\+\+MAIN}}(str)
+\item 
+\#define \mbox{\hyperlink{group___e_r_r_o_r_ga162993553cf79cddb1716629dd84d2f5}{ERROR\+\_\+\+EXIT\+\_\+\+SEQUENCE\+\_\+\+USER}}(str)
+\item 
+\#define \mbox{\hyperlink{group___e_r_r_o_r_gad9a11684a1eee8d301143dab730f6f6a}{ERROR\+\_\+\+EXIT\+\_\+\+SEQUENCE\+\_\+\+NODE}}(str)
+\end{DoxyCompactItemize}
+\doxysubsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+void \mbox{\hyperlink{simulation__errors_8h_ac379c799940e7126b56cf088db5f90ac}{wait\+\_\+kids}} ()
+\item 
+void \mbox{\hyperlink{simulation__errors_8h_a5dc3e8d6f7b91131cc37078d736f96fa}{kill\+\_\+kids}} ()
+\item 
+void \mbox{\hyperlink{simulation__errors_8h_a5b86e611e659eb33da1bf16fa0f0f706}{free\+\_\+mem}} ()
+\item 
+void \mbox{\hyperlink{simulation__errors_8h_af12135b661432807367ffcda3659303a}{free\+\_\+sys\+Var}} ()
+\item 
+void \mbox{\hyperlink{simulation__errors_8h_a7aa28a9ba366e148da782c85968076db}{free\+\_\+mem\+\_\+user}} ()
+\item 
+void \mbox{\hyperlink{simulation__errors_8h_a9fc9fdbd09f3e40f4556e5fa7151c539}{free\+\_\+sys\+Var\+\_\+user}} ()
+\item 
+void \mbox{\hyperlink{simulation__errors_8h_ae9717df6876ca8e6137c741e7ff7d45b}{free\+\_\+mem\+\_\+node}} ()
+\item 
+void \mbox{\hyperlink{simulation__errors_8h_a46473129a15bf041dd63752927a292dd}{free\+\_\+sys\+Var\+\_\+node}} ()
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+Macros for the procedure of ending the different types of processes in case of error. Contains macros and definition of functions. 
+
+\begin{DoxyWarning}{Warning}
+The functions must be implemented directly in the file where they are used. 
+\end{DoxyWarning}
+\begin{DoxyAuthor}{Author}
+Giovanni Terzuolo 
+\end{DoxyAuthor}
+
+
+\doxysubsection{Macro Definition Documentation}
+\mbox{\Hypertarget{simulation__errors_8h_a3361e4404cd111be303ad514abea1f52}\label{simulation__errors_8h_a3361e4404cd111be303ad514abea1f52}} 
+\index{simulation\_errors.h@{simulation\_errors.h}!ERROR\_MESSAGE@{ERROR\_MESSAGE}}
+\index{ERROR\_MESSAGE@{ERROR\_MESSAGE}!simulation\_errors.h@{simulation\_errors.h}}
+\doxysubsubsection{\texorpdfstring{ERROR\_MESSAGE}{ERROR\_MESSAGE}}
+{\footnotesize\ttfamily \#define ERROR\+\_\+\+MESSAGE(\begin{DoxyParamCaption}\item[{}]{err\+\_\+mex }\end{DoxyParamCaption})~fprintf(stderr, \char`\"{}\%s\%s Error\+: \%s -\/$>$ $\vert$ file\+: \%s $\vert$ line\+: \%d $\vert$ proc\+\_\+pid\+: \%d $\vert$ \textbackslash{}n (-\/) \%d\textbackslash{}n(-\/)\%s\textbackslash{}n \%s\textbackslash{}n\char`\"{}, COLOR\+\_\+\+RESET\+\_\+\+ANSI\+\_\+\+CODE, \mbox{\hyperlink{group___c_o_l_o_r_ga1aef55df029d2a394bfc1f0bc919b041}{COLOR\+\_\+\+RED\+\_\+\+ANSI\+\_\+\+CODE}},err\+\_\+mex, \+\_\+\+\_\+\+FILE\+\_\+\+\_\+, \+\_\+\+\_\+\+LINE\+\_\+\+\_\+ ,getpid(), errno, strerror(errno),\mbox{\hyperlink{group___c_o_l_o_r_gadf1e0460998b025f712ef8b327a295b2}{COLOR\+\_\+\+RESET\+\_\+\+ANSI\+\_\+\+CODE}})}
+
+Macro for printing the error message given. \mbox{\Hypertarget{simulation__errors_8h_ab1dba548f6214a02d86560bba3214d8c}\label{simulation__errors_8h_ab1dba548f6214a02d86560bba3214d8c}} 
+\index{simulation\_errors.h@{simulation\_errors.h}!EXIT\_PROCEDURE\_MAIN@{EXIT\_PROCEDURE\_MAIN}}
+\index{EXIT\_PROCEDURE\_MAIN@{EXIT\_PROCEDURE\_MAIN}!simulation\_errors.h@{simulation\_errors.h}}
+\doxysubsubsection{\texorpdfstring{EXIT\_PROCEDURE\_MAIN}{EXIT\_PROCEDURE\_MAIN}}
+{\footnotesize\ttfamily \#define EXIT\+\_\+\+PROCEDURE\+\_\+\+MAIN(\begin{DoxyParamCaption}\item[{}]{exit\+\_\+value }\end{DoxyParamCaption})}
+
+{\bfseries Value\+:}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{                                \mbox{\hyperlink{simulation__errors_8h_ac379c799940e7126b56cf088db5f90ac}{wait\_kids}}();     \(\backslash\)}
+\DoxyCodeLine{                                kill\_kids();        \(\backslash\)}
+\DoxyCodeLine{                                free\_mem();         \(\backslash\)}
+\DoxyCodeLine{                                free\_sysVar();      \(\backslash\)}
+\DoxyCodeLine{                                exit(exit\_value)}
+
+\end{DoxyCode}
+
+
+Macro for the procedure of ending the main process in case of error. 
+
+
+
+\doxysubsection{Function Documentation}
+\mbox{\Hypertarget{simulation__errors_8h_a5b86e611e659eb33da1bf16fa0f0f706}\label{simulation__errors_8h_a5b86e611e659eb33da1bf16fa0f0f706}} 
+\index{simulation\_errors.h@{simulation\_errors.h}!free\_mem@{free\_mem}}
+\index{free\_mem@{free\_mem}!simulation\_errors.h@{simulation\_errors.h}}
+\doxysubsubsection{\texorpdfstring{free\_mem()}{free\_mem()}}
+{\footnotesize\ttfamily void free\+\_\+mem (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{simulation__errors_8h_ae9717df6876ca8e6137c741e7ff7d45b}\label{simulation__errors_8h_ae9717df6876ca8e6137c741e7ff7d45b}} 
+\index{simulation\_errors.h@{simulation\_errors.h}!free\_mem\_node@{free\_mem\_node}}
+\index{free\_mem\_node@{free\_mem\_node}!simulation\_errors.h@{simulation\_errors.h}}
+\doxysubsubsection{\texorpdfstring{free\_mem\_node()}{free\_mem\_node()}}
+{\footnotesize\ttfamily void free\+\_\+mem\+\_\+node (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{simulation__errors_8h_a7aa28a9ba366e148da782c85968076db}\label{simulation__errors_8h_a7aa28a9ba366e148da782c85968076db}} 
+\index{simulation\_errors.h@{simulation\_errors.h}!free\_mem\_user@{free\_mem\_user}}
+\index{free\_mem\_user@{free\_mem\_user}!simulation\_errors.h@{simulation\_errors.h}}
+\doxysubsubsection{\texorpdfstring{free\_mem\_user()}{free\_mem\_user()}}
+{\footnotesize\ttfamily void free\+\_\+mem\+\_\+user (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{simulation__errors_8h_af12135b661432807367ffcda3659303a}\label{simulation__errors_8h_af12135b661432807367ffcda3659303a}} 
+\index{simulation\_errors.h@{simulation\_errors.h}!free\_sysVar@{free\_sysVar}}
+\index{free\_sysVar@{free\_sysVar}!simulation\_errors.h@{simulation\_errors.h}}
+\doxysubsubsection{\texorpdfstring{free\_sysVar()}{free\_sysVar()}}
+{\footnotesize\ttfamily void free\+\_\+sys\+Var (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{simulation__errors_8h_a46473129a15bf041dd63752927a292dd}\label{simulation__errors_8h_a46473129a15bf041dd63752927a292dd}} 
+\index{simulation\_errors.h@{simulation\_errors.h}!free\_sysVar\_node@{free\_sysVar\_node}}
+\index{free\_sysVar\_node@{free\_sysVar\_node}!simulation\_errors.h@{simulation\_errors.h}}
+\doxysubsubsection{\texorpdfstring{free\_sysVar\_node()}{free\_sysVar\_node()}}
+{\footnotesize\ttfamily void free\+\_\+sys\+Var\+\_\+node (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})}
+
+If the process is in INIT STATE his termination can block the whole simulation. So it need to lock the sart semaphore. If the semaphore\+\_\+start\+\_\+id is impossible to retrive ( = -\/1) nothing can be done.\mbox{\Hypertarget{simulation__errors_8h_a9fc9fdbd09f3e40f4556e5fa7151c539}\label{simulation__errors_8h_a9fc9fdbd09f3e40f4556e5fa7151c539}} 
+\index{simulation\_errors.h@{simulation\_errors.h}!free\_sysVar\_user@{free\_sysVar\_user}}
+\index{free\_sysVar\_user@{free\_sysVar\_user}!simulation\_errors.h@{simulation\_errors.h}}
+\doxysubsubsection{\texorpdfstring{free\_sysVar\_user()}{free\_sysVar\_user()}}
+{\footnotesize\ttfamily void free\+\_\+sys\+Var\+\_\+user (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{simulation__errors_8h_a5dc3e8d6f7b91131cc37078d736f96fa}\label{simulation__errors_8h_a5dc3e8d6f7b91131cc37078d736f96fa}} 
+\index{simulation\_errors.h@{simulation\_errors.h}!kill\_kids@{kill\_kids}}
+\index{kill\_kids@{kill\_kids}!simulation\_errors.h@{simulation\_errors.h}}
+\doxysubsubsection{\texorpdfstring{kill\_kids()}{kill\_kids()}}
+{\footnotesize\ttfamily void kill\+\_\+kids (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{simulation__errors_8h_ac379c799940e7126b56cf088db5f90ac}\label{simulation__errors_8h_ac379c799940e7126b56cf088db5f90ac}} 
+\index{simulation\_errors.h@{simulation\_errors.h}!wait\_kids@{wait\_kids}}
+\index{wait\_kids@{wait\_kids}!simulation\_errors.h@{simulation\_errors.h}}
+\doxysubsubsection{\texorpdfstring{wait\_kids()}{wait\_kids()}}
+{\footnotesize\ttfamily void wait\+\_\+kids (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})}
+

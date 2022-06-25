@@ -1,0 +1,55 @@
+\hypertarget{simulation__errors_8h_source}{}\doxysection{simulation\+\_\+errors.\+h}
+\label{simulation__errors_8h_source}\index{src/local\_lib/headers/simulation\_errors.h@{src/local\_lib/headers/simulation\_errors.h}}
+\mbox{\hyperlink{simulation__errors_8h}{Go to the documentation of this file.}}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{1 }
+\DoxyCodeLine{8 \textcolor{preprocessor}{\#ifndef DGT\_SO\_PROJECT\_21\_22\_SIMULATION\_ERRORS\_H}}
+\DoxyCodeLine{9 \textcolor{preprocessor}{\#define DGT\_SO\_PROJECT\_21\_22\_SIMULATION\_ERRORS\_H}}
+\DoxyCodeLine{10 }
+\DoxyCodeLine{11 \textcolor{preprocessor}{\#include <string.h>}}
+\DoxyCodeLine{12 \textcolor{preprocessor}{\#include <errno.h>}}
+\DoxyCodeLine{13 \textcolor{preprocessor}{\#include "{}\mbox{\hyperlink{glob_8h}{glob.h}}"{}}}
+\DoxyCodeLine{17 \textcolor{preprocessor}{\#define EXIT\_PROCEDURE\_MAIN(exit\_value) wait\_kids();     \(\backslash\)}}
+\DoxyCodeLine{18 \textcolor{preprocessor}{                                kill\_kids();        \(\backslash\)}}
+\DoxyCodeLine{19 \textcolor{preprocessor}{                                free\_mem();         \(\backslash\)}}
+\DoxyCodeLine{20 \textcolor{preprocessor}{                                free\_sysVar();      \(\backslash\)}}
+\DoxyCodeLine{21 \textcolor{preprocessor}{                                exit(exit\_value)}}
+\DoxyCodeLine{27 \textcolor{preprocessor}{\#define EXIT\_PROCEDURE\_USER(exit\_value) free\_mem\_user();         \(\backslash\)}}
+\DoxyCodeLine{28 \textcolor{preprocessor}{                                free\_sysVar\_user();      \(\backslash\)}}
+\DoxyCodeLine{29 \textcolor{preprocessor}{                                exit(exit\_value)}}
+\DoxyCodeLine{30 }
+\DoxyCodeLine{31 \textcolor{preprocessor}{\#define EXIT\_PROCEDURE\_NODE(exit\_value) free\_mem\_node();         \(\backslash\)}}
+\DoxyCodeLine{32 \textcolor{preprocessor}{                                free\_sysVar\_node();      \(\backslash\)}}
+\DoxyCodeLine{33 \textcolor{preprocessor}{                                exit(exit\_value)}}
+\DoxyCodeLine{38 \textcolor{preprocessor}{\#define ERROR\_MESSAGE(err\_mex)fprintf(stderr, "{}\%s\%s Error: \%s -\/> | file: \%s | line: \%d | proc\_pid: \%d | \(\backslash\)n (-\/) \%d\(\backslash\)n(-\/)\%s\(\backslash\)n \%s\(\backslash\)n"{}}, COLOR\_RESET\_ANSI\_CODE, COLOR\_RED\_ANSI\_CODE,err\_mex, \_\_FILE\_\_, \_\_LINE\_\_ ,getpid(), errno, strerror(errno),COLOR\_RESET\_ANSI\_CODE)}
+\DoxyCodeLine{39 }
+\DoxyCodeLine{45 \textcolor{preprocessor}{\#define ERROR\_EXIT\_SEQUENCE\_MAIN(str) ERROR\_MESSAGE(str);\(\backslash\)}}
+\DoxyCodeLine{46 \textcolor{preprocessor}{                            EXIT\_PROCEDURE\_MAIN(EXIT\_FAILURE)}}
+\DoxyCodeLine{47 \textcolor{preprocessor}{\#define ERROR\_EXIT\_SEQUENCE\_USER(str) ERROR\_MESSAGE(str); \(\backslash\)}}
+\DoxyCodeLine{48 \textcolor{preprocessor}{                            EXIT\_PROCEDURE\_USER(EXIT\_FAILURE)}}
+\DoxyCodeLine{49 }
+\DoxyCodeLine{50 \textcolor{preprocessor}{\#define ERROR\_EXIT\_SEQUENCE\_NODE(str) ERROR\_MESSAGE(str); \(\backslash\)}}
+\DoxyCodeLine{51 \textcolor{preprocessor}{                            EXIT\_PROCEDURE\_NODE(EXIT\_FAILURE)}}
+\DoxyCodeLine{53 \textcolor{comment}{/*  FUNCTIONS TO PROTECT EXIT SEQUENCE MAIN*/}}
+\DoxyCodeLine{54 }
+\DoxyCodeLine{55 \textcolor{keywordtype}{void} \mbox{\hyperlink{simulation__errors_8h_ac379c799940e7126b56cf088db5f90ac}{wait\_kids}}();}
+\DoxyCodeLine{56 }
+\DoxyCodeLine{57 \textcolor{keywordtype}{void} \mbox{\hyperlink{simulation__errors_8h_a5dc3e8d6f7b91131cc37078d736f96fa}{kill\_kids}}();}
+\DoxyCodeLine{58 }
+\DoxyCodeLine{59 \textcolor{keywordtype}{void} \mbox{\hyperlink{simulation__errors_8h_a5b86e611e659eb33da1bf16fa0f0f706}{free\_mem}}();}
+\DoxyCodeLine{60 }
+\DoxyCodeLine{61 \textcolor{keywordtype}{void} \mbox{\hyperlink{simulation__errors_8h_af12135b661432807367ffcda3659303a}{free\_sysVar}}();}
+\DoxyCodeLine{62 }
+\DoxyCodeLine{63 \textcolor{comment}{/*  FUNCTIONS TO PROTECT EXIT SEQUENCE USER*/}}
+\DoxyCodeLine{64 \textcolor{keywordtype}{void} \mbox{\hyperlink{simulation__errors_8h_a7aa28a9ba366e148da782c85968076db}{free\_mem\_user}}();}
+\DoxyCodeLine{65 }
+\DoxyCodeLine{66 \textcolor{keywordtype}{void} \mbox{\hyperlink{simulation__errors_8h_a9fc9fdbd09f3e40f4556e5fa7151c539}{free\_sysVar\_user}}();}
+\DoxyCodeLine{67 }
+\DoxyCodeLine{68 \textcolor{comment}{/*  FUNCTIONS TO PROTECT EXIT SEQUENCE NODE*/}}
+\DoxyCodeLine{69 \textcolor{keywordtype}{void} \mbox{\hyperlink{simulation__errors_8h_ae9717df6876ca8e6137c741e7ff7d45b}{free\_mem\_node}}();}
+\DoxyCodeLine{70 }
+\DoxyCodeLine{71 \textcolor{keywordtype}{void} \mbox{\hyperlink{simulation__errors_8h_a46473129a15bf041dd63752927a292dd}{free\_sysVar\_node}}();}
+\DoxyCodeLine{72 }
+\DoxyCodeLine{73 \textcolor{preprocessor}{\#endif }\textcolor{comment}{/*DGT\_SO\_PROJECT\_21\_22\_ERRORS\_H*/}\textcolor{preprocessor}{}}
+
+\end{DoxyCode}

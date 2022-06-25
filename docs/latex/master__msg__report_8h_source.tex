@@ -1,0 +1,76 @@
+\hypertarget{master__msg__report_8h_source}{}\doxysection{master\+\_\+msg\+\_\+report.\+h}
+\label{master__msg__report_8h_source}\index{src/local\_lib/headers/master\_msg\_report.h@{src/local\_lib/headers/master\_msg\_report.h}}
+\mbox{\hyperlink{master__msg__report_8h}{Go to the documentation of this file.}}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{1 }
+\DoxyCodeLine{7 \textcolor{preprocessor}{\#ifndef DGT\_SO\_PROJECT\_21\_22\_MASTER\_MSG\_REPORT\_H}}
+\DoxyCodeLine{8 \textcolor{preprocessor}{\#define DGT\_SO\_PROJECT\_21\_22\_MASTER\_MSG\_REPORT\_H}}
+\DoxyCodeLine{9 \textcolor{comment}{/* Std */}}
+\DoxyCodeLine{10 \textcolor{preprocessor}{\#include <unistd.h>}}
+\DoxyCodeLine{11 }
+\DoxyCodeLine{12 \textcolor{comment}{/* Local */}}
+\DoxyCodeLine{13 \textcolor{preprocessor}{\#include "{}\mbox{\hyperlink{boolean_8h}{boolean.h}}"{}}}
+\DoxyCodeLine{14 \textcolor{preprocessor}{\#include "{}\mbox{\hyperlink{process__info__list_8h}{process\_info\_list.h}}"{}}}
+\DoxyCodeLine{15 \textcolor{preprocessor}{\#include "{}\mbox{\hyperlink{transaction__list_8h}{transaction\_list.h}}"{}}}
+\DoxyCodeLine{16 }
+\DoxyCodeLine{21 \textcolor{keyword}{typedef} \textcolor{keyword}{enum} \{}
+\DoxyCodeLine{22     \mbox{\hyperlink{master__msg__report_8h_a6e099f781173abb91e40d526a8740725a0735199acbedd655906cac51dbfa8779}{PROC\_STATE\_INIT}}, \mbox{\hyperlink{master__msg__report_8h_a6e099f781173abb91e40d526a8740725ae8fd2c67df21f90e0e79d86936f863c9}{PROC\_STATE\_RUNNING}}, \mbox{\hyperlink{master__msg__report_8h_a6e099f781173abb91e40d526a8740725a9e9b57a002c12d8d66ce8a6df66c6c12}{PROC\_STATE\_TERMINATED}}, \mbox{\hyperlink{master__msg__report_8h_a6e099f781173abb91e40d526a8740725a61226cd95f82a52c32fc8f3bf7267562}{PROC\_STATE\_WAITING}}, \mbox{\hyperlink{master__msg__report_8h_a6e099f781173abb91e40d526a8740725a16904ee3cd3d0b80510c79f6e8f3c92e}{PROC\_STATE\_NODE\_SERV\_TRANS}}}
+\DoxyCodeLine{23 \} \mbox{\hyperlink{master__msg__report_8h_a6e099f781173abb91e40d526a8740725}{PROCSTATE}};}
+\DoxyCodeLine{28 \textcolor{keyword}{typedef} \textcolor{keyword}{enum} \{}
+\DoxyCodeLine{29     \mbox{\hyperlink{master__msg__report_8h_adfefd10d55df8fad52b3d2f8d68dc66aa213d4c91683a8280bccd19c95f7d1aac}{TERMINATION\_END\_CORRECTLY}} = 1,}
+\DoxyCodeLine{30     \mbox{\hyperlink{master__msg__report_8h_adfefd10d55df8fad52b3d2f8d68dc66aa45049a88e2ca58b4578b3ad4e568720d}{IMPOSSIBLE\_TO\_SEND\_TRANSACTION}} = 2,}
+\DoxyCodeLine{31     \mbox{\hyperlink{master__msg__report_8h_adfefd10d55df8fad52b3d2f8d68dc66aaf88e804772b4b0748e725a03158f9ef2}{IMPOSSIBLE\_TO\_CONNECT\_TO\_SHM}} = 3,}
+\DoxyCodeLine{32     \mbox{\hyperlink{master__msg__report_8h_adfefd10d55df8fad52b3d2f8d68dc66aae0e67a56c2a6e805bd8b8e879bc1bba3}{IMPOSSIBLE\_TO\_COMUNICATE\_WITH\_QUEUE}} = 4,}
+\DoxyCodeLine{33     \mbox{\hyperlink{master__msg__report_8h_adfefd10d55df8fad52b3d2f8d68dc66aad16fa5101d88fbe4b8ac2c42f6831207}{IMPOSSIBLE\_TO\_GENERATE\_TRANSACTION}} = 5,}
+\DoxyCodeLine{34     \mbox{\hyperlink{master__msg__report_8h_adfefd10d55df8fad52b3d2f8d68dc66aa9532de64f7ba61646888e0c64af2e225}{IMPOSSIBLE\_TO\_ACQUIRE\_SEMAPHORE}} = 6,}
+\DoxyCodeLine{35     \mbox{\hyperlink{master__msg__report_8h_adfefd10d55df8fad52b3d2f8d68dc66aa74e05f8d8c79ca9838cf900c98835423}{IMPOSSIBLE\_TO\_LOAD\_CONFIGURATION}} = 7,}
+\DoxyCodeLine{36     \mbox{\hyperlink{master__msg__report_8h_adfefd10d55df8fad52b3d2f8d68dc66aa7b6e6b26218ad4aa39d9ac5dcba6ecca}{SIGNALS\_OF\_TERM\_RECEIVED}} = 8,}
+\DoxyCodeLine{37     \mbox{\hyperlink{master__msg__report_8h_adfefd10d55df8fad52b3d2f8d68dc66aa46ce5c6851cb937209abfe57922ad21c}{INFO\_BUDGET}} = 9,}
+\DoxyCodeLine{38     \mbox{\hyperlink{master__msg__report_8h_adfefd10d55df8fad52b3d2f8d68dc66aae1ceebc90f55f4de7a710e3e461b2d53}{TP\_FULL}} = 10,}
+\DoxyCodeLine{39     \mbox{\hyperlink{master__msg__report_8h_adfefd10d55df8fad52b3d2f8d68dc66aa7744da48892e0b14d23651946592220a}{UNUSED\_PROC}} = 11,}
+\DoxyCodeLine{40     \mbox{\hyperlink{master__msg__report_8h_adfefd10d55df8fad52b3d2f8d68dc66aad8903462ac42f21e5e3aea7b8533bbdb}{MAX\_FAILURE\_SHM\_REACHED}} = 12,}
+\DoxyCodeLine{41 \} \mbox{\hyperlink{master__msg__report_8h_adfefd10d55df8fad52b3d2f8d68dc66a}{MSG\_REPORT\_TYPE}};}
+\DoxyCodeLine{42 }
+\DoxyCodeLine{47 \textcolor{keyword}{typedef} \textcolor{keyword}{enum} \{}
+\DoxyCodeLine{48     \mbox{\hyperlink{master__msg__report_8h_ae5f7d8398bf1a7251be5beb94f345347ae2d30a195cee6b2961cc2c23ea4b520b}{USER}},}
+\DoxyCodeLine{49     \mbox{\hyperlink{master__msg__report_8h_ae5f7d8398bf1a7251be5beb94f345347a59a889456a2d742fdca191dccb3e871d}{NODE}},}
+\DoxyCodeLine{50 \} \mbox{\hyperlink{master__msg__report_8h_ae5f7d8398bf1a7251be5beb94f345347}{PROC\_TYPE}};}
+\DoxyCodeLine{51 }
+\DoxyCodeLine{57 \textcolor{keyword}{struct }\mbox{\hyperlink{structmaster__msg__report}{master\_msg\_report}} \{}
+\DoxyCodeLine{58     \textcolor{keywordtype}{long} \mbox{\hyperlink{structmaster__msg__report_a6a83a8677f7c78fd146859325e08209a}{type}}; }
+\DoxyCodeLine{59     \textcolor{keywordtype}{long} \mbox{\hyperlink{structmaster__msg__report_ac533f6b3d58c0d4529d6698ba20bbdd3}{proc\_type}}; }
+\DoxyCodeLine{60     pid\_t \mbox{\hyperlink{structmaster__msg__report_a7d2e6afe0d983572b540b9bb159e29f2}{sender\_pid}}; }
+\DoxyCodeLine{61     \textcolor{keywordtype}{short} \textcolor{keywordtype}{int} \mbox{\hyperlink{structmaster__msg__report_a150c6705ecfe8e8276120ddef9df807d}{state}}; }
+\DoxyCodeLine{62     \textcolor{keywordtype}{float} \mbox{\hyperlink{structmaster__msg__report_aba96c1bfea2a8500bcdbbd1c64fddffb}{budget}}; }
+\DoxyCodeLine{63     \textcolor{keyword}{struct }\mbox{\hyperlink{struct_transaction}{Transaction}} \mbox{\hyperlink{structmaster__msg__report_a56bd9d2b5fdd55a29ec318130a05d84f}{t}}; }
+\DoxyCodeLine{64 \};}
+\DoxyCodeLine{65 }
+\DoxyCodeLine{75 \textcolor{keywordtype}{void}}
+\DoxyCodeLine{76 \mbox{\hyperlink{master__msg__report_8h_af7a614d004b16a9af604bc20aaef5052}{master\_msg\_report\_create}}(\textcolor{keyword}{struct} \mbox{\hyperlink{structmaster__msg__report}{master\_msg\_report}} *self, \textcolor{keywordtype}{long} type, \textcolor{keywordtype}{long} proc\_type, pid\_t sender\_pid, \textcolor{keywordtype}{short} \textcolor{keywordtype}{int} state,}
+\DoxyCodeLine{77                          \textcolor{keywordtype}{float} budget, \textcolor{keyword}{struct} \mbox{\hyperlink{struct_transaction}{Transaction}} t);}
+\DoxyCodeLine{78 }
+\DoxyCodeLine{83 \textcolor{keywordtype}{void} \mbox{\hyperlink{master__msg__report_8h_a1a0bcafd2b8d1846c9c062f64933803c}{master\_msg\_report\_print}}(\textcolor{keyword}{const} \textcolor{keyword}{struct} \mbox{\hyperlink{structmaster__msg__report}{master\_msg\_report}} *self);}
+\DoxyCodeLine{84 }
+\DoxyCodeLine{96 \textcolor{keywordtype}{int}}
+\DoxyCodeLine{97 \mbox{\hyperlink{master__msg__report_8h_af8899f02009bbd24127a10a85693c055}{master\_msg\_send}}(\textcolor{keywordtype}{int} \textcolor{keywordtype}{id}, \textcolor{keyword}{struct} \mbox{\hyperlink{structmaster__msg__report}{master\_msg\_report}} *self, \textcolor{keywordtype}{long} type, \textcolor{keywordtype}{long} proc\_type, pid\_t sender\_pid, \textcolor{keywordtype}{short} \textcolor{keywordtype}{int} state,}
+\DoxyCodeLine{98                 \mbox{\hyperlink{boolean_8h_afdcfe6db5bea87bd493a3fe2c513d5ef}{Bool}} create, \textcolor{keywordtype}{float} budget, \textcolor{keyword}{struct} \mbox{\hyperlink{struct_transaction}{Transaction}} *t);}
+\DoxyCodeLine{99 }
+\DoxyCodeLine{108 \textcolor{keywordtype}{int} \mbox{\hyperlink{master__msg__report_8h_a5b0b59b8fe68d3dac53549dc54def7eb}{master\_msg\_receive}}(\textcolor{keywordtype}{int} \textcolor{keywordtype}{id}, \textcolor{keyword}{struct} \mbox{\hyperlink{structmaster__msg__report}{master\_msg\_report}} *self);}
+\DoxyCodeLine{109 }
+\DoxyCodeLine{117 \textcolor{keywordtype}{int} \mbox{\hyperlink{master__msg__report_8h_a2572db5ab2c2b87f9cd0c7cecf1a9cd3}{check\_msg\_report}}(\textcolor{keyword}{struct} \mbox{\hyperlink{structmaster__msg__report}{master\_msg\_report}} *msg\_report, \textcolor{keywordtype}{int} \mbox{\hyperlink{main_8c_acf2b73ea2f17461b2dc97b4722fe894e}{msg\_report\_id\_master}}, ProcList \mbox{\hyperlink{main_8c_a203f1362008a8171971c8ac1bd6bce04}{proc\_list}});}
+\DoxyCodeLine{118 }
+\DoxyCodeLine{126 \textcolor{keywordtype}{int} \mbox{\hyperlink{master__msg__report_8h_aa8bf408b87d797d8d9ef136604532d13}{master\_msg\_receive\_info}}(\textcolor{keywordtype}{int} \textcolor{keywordtype}{id}, \textcolor{keyword}{struct} \mbox{\hyperlink{structmaster__msg__report}{master\_msg\_report}} *self);}
+\DoxyCodeLine{127 }
+\DoxyCodeLine{135 \textcolor{keywordtype}{int} \mbox{\hyperlink{master__msg__report_8h_a585ee28bd7f9c703c6457a05bda2a417}{acknowledge}}(\textcolor{keyword}{struct} \mbox{\hyperlink{structmaster__msg__report}{master\_msg\_report}} *self, ProcList list);}
+\DoxyCodeLine{136 }
+\DoxyCodeLine{142 \textcolor{keywordtype}{char} *\mbox{\hyperlink{master__msg__report_8h_a0c0bd350e260dbcb9ea9d43150ab1468}{from\_type\_to\_string}}(\textcolor{keywordtype}{long} type);}
+\DoxyCodeLine{143 }
+\DoxyCodeLine{149 \textcolor{keywordtype}{void} \mbox{\hyperlink{master__msg__report_8h_ad42a72e7d4906b623c8f69162e4e9049}{from\_procstate\_to\_string}}(\textcolor{keywordtype}{int} state, \textcolor{keywordtype}{char} *\textcolor{keywordtype}{string});}
+\DoxyCodeLine{150 }
+\DoxyCodeLine{156 \textcolor{keywordtype}{char} *\mbox{\hyperlink{master__msg__report_8h_a72f267f18ee542db51e5791318d61bef}{from\_proctype\_to\_string}}(\textcolor{keywordtype}{long} proc\_type);}
+\DoxyCodeLine{157 }
+\DoxyCodeLine{166 \textcolor{keywordtype}{int} \mbox{\hyperlink{master__msg__report_8h_acfcfbd83891fc949f98fe0bd39b93972}{check\_for\_termination}}(\textcolor{keyword}{struct} \mbox{\hyperlink{structmaster__msg__report}{master\_msg\_report}} *msg\_report, \textcolor{keywordtype}{int} \mbox{\hyperlink{main_8c_acf2b73ea2f17461b2dc97b4722fe894e}{msg\_report\_id\_master}}, \textcolor{keywordtype}{int} *ris, ProcList \mbox{\hyperlink{main_8c_a203f1362008a8171971c8ac1bd6bce04}{proc\_list}});}
+\DoxyCodeLine{167 }
+\DoxyCodeLine{168 \textcolor{preprocessor}{\#endif }\textcolor{comment}{/*DGT\_SO\_PROJECT\_21\_22\_MASTER\_MSG\_REPORT\_H*/}\textcolor{preprocessor}{}}
+
+\end{DoxyCode}

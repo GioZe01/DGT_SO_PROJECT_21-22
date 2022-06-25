@@ -1,0 +1,141 @@
+\hypertarget{user__msg__report_8h}{}\doxysection{src/local\+\_\+lib/headers/user\+\_\+msg\+\_\+report.h File Reference}
+\label{user__msg__report_8h}\index{src/local\_lib/headers/user\_msg\_report.h@{src/local\_lib/headers/user\_msg\_report.h}}
+
+
+Header file for \mbox{\hyperlink{user__msg__report_8c}{user\+\_\+msg\+\_\+report.\+c}} Contains the function prototypes for \mbox{\hyperlink{user__msg__report_8c}{user\+\_\+msg\+\_\+report.\+c}} and the structs used in it.  
+
+
+{\ttfamily \#include $<$unistd.\+h$>$}\newline
+{\ttfamily \#include \char`\"{}transaction\+\_\+list.\+h\char`\"{}}\newline
+{\ttfamily \#include \char`\"{}boolean.\+h\char`\"{}}\newline
+Include dependency graph for user\+\_\+msg\+\_\+report.\+h\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{user__msg__report_8h__incl}
+\end{center}
+\end{figure}
+This graph shows which files directly or indirectly include this file\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{user__msg__report_8h__dep__incl}
+\end{center}
+\end{figure}
+\doxysubsection*{Data Structures}
+\begin{DoxyCompactItemize}
+\item 
+struct \mbox{\hyperlink{structuser__msg}{user\+\_\+msg}}
+\end{DoxyCompactItemize}
+\doxysubsection*{Macros}
+\begin{DoxyCompactItemize}
+\item 
+\#define \mbox{\hyperlink{group___u_s_e_r_gaf63ffa8c3f268a0ce52c5b8a45b9566c}{DELTA\+\_\+\+USER\+\_\+\+MSG\+\_\+\+TYPE}}~3
+\item 
+\#define \mbox{\hyperlink{group___u_s_e_r_ga071c1908a56aeafd888fba62980aef3a}{MSG\+\_\+\+TRANSACTION\+\_\+\+FAILED\+\_\+\+TYPE}}~1
+\item 
+\#define \mbox{\hyperlink{group___u_s_e_r_ga181a295a92b90ec0b14303838ae7e49b}{MSG\+\_\+\+TRANSACTION\+\_\+\+INCOME\+\_\+\+TYPE}}~2
+\item 
+\#define \mbox{\hyperlink{group___u_s_e_r_gaeb9c9818aa167e67f7843dbf9087222d}{MSG\+\_\+\+TRANSACTION\+\_\+\+CONFIRMED\+\_\+\+TYPE}}~3
+\end{DoxyCompactItemize}
+\doxysubsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+int \mbox{\hyperlink{user__msg__report_8h_a70931919d75ef21c15c14ffc2466c9b5}{user\+\_\+msg\+\_\+create}} (struct \mbox{\hyperlink{structuser__msg}{user\+\_\+msg}} $\ast$self, long type, pid\+\_\+t sender\+\_\+pid, struct \mbox{\hyperlink{struct_transaction}{Transaction}} $\ast$t)
+\item 
+void \mbox{\hyperlink{user__msg__report_8h_abb2adc878af3fa7a417e7f484b971d13}{user\+\_\+msg\+\_\+print}} (struct \mbox{\hyperlink{structuser__msg}{user\+\_\+msg}} $\ast$self, long type)
+\item 
+int \mbox{\hyperlink{user__msg__report_8h_ae1398ede7a53c7c3417e97363195d035}{user\+\_\+msg\+\_\+snd}} (int id, struct \mbox{\hyperlink{structuser__msg}{user\+\_\+msg}} $\ast$msg, long type, struct \mbox{\hyperlink{struct_transaction}{Transaction}} $\ast$t, pid\+\_\+t sender, \mbox{\hyperlink{boolean_8h_afdcfe6db5bea87bd493a3fe2c513d5ef}{Bool}} crete, int queue\+\_\+id)
+\item 
+int \mbox{\hyperlink{user__msg__report_8h_ad64c218fba74de9d28ec05f9f17d8d04}{user\+\_\+msg\+\_\+receive}} (int id, struct \mbox{\hyperlink{structuser__msg}{user\+\_\+msg}} $\ast$msg, long type)
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+Header file for \mbox{\hyperlink{user__msg__report_8c}{user\+\_\+msg\+\_\+report.\+c}} Contains the function prototypes for \mbox{\hyperlink{user__msg__report_8c}{user\+\_\+msg\+\_\+report.\+c}} and the structs used in it. 
+
+\begin{DoxyAuthor}{Author}
+Giovanni Terzuolo 
+\end{DoxyAuthor}
+
+
+\doxysubsection{Function Documentation}
+\mbox{\Hypertarget{user__msg__report_8h_a70931919d75ef21c15c14ffc2466c9b5}\label{user__msg__report_8h_a70931919d75ef21c15c14ffc2466c9b5}} 
+\index{user\_msg\_report.h@{user\_msg\_report.h}!user\_msg\_create@{user\_msg\_create}}
+\index{user\_msg\_create@{user\_msg\_create}!user\_msg\_report.h@{user\_msg\_report.h}}
+\doxysubsubsection{\texorpdfstring{user\_msg\_create()}{user\_msg\_create()}}
+{\footnotesize\ttfamily int user\+\_\+msg\+\_\+create (\begin{DoxyParamCaption}\item[{struct \mbox{\hyperlink{structuser__msg}{user\+\_\+msg}} $\ast$}]{self,  }\item[{long}]{type,  }\item[{pid\+\_\+t}]{sender\+\_\+pid,  }\item[{struct \mbox{\hyperlink{struct_transaction}{Transaction}} $\ast$}]{t }\end{DoxyParamCaption})}
+
+Create the message given as param as address to a \mbox{\hyperlink{structuser__msg}{user\+\_\+msg}} struct based on the given parameter 
+\begin{DoxyParams}{Parameters}
+{\em self} & give the add of your struct \\
+\hline
+{\em type} & type of message to be send, has to be one of the defined in this .h \\
+\hline
+{\em sender\+\_\+pid} & pid of the current process how\textquotesingle{}s calling this function \\
+\hline
+{\em data} & user\+\_\+data to send \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+0 if success. -\/1 in case of failure 
+\end{DoxyReturn}
+\mbox{\Hypertarget{user__msg__report_8h_abb2adc878af3fa7a417e7f484b971d13}\label{user__msg__report_8h_abb2adc878af3fa7a417e7f484b971d13}} 
+\index{user\_msg\_report.h@{user\_msg\_report.h}!user\_msg\_print@{user\_msg\_print}}
+\index{user\_msg\_print@{user\_msg\_print}!user\_msg\_report.h@{user\_msg\_report.h}}
+\doxysubsubsection{\texorpdfstring{user\_msg\_print()}{user\_msg\_print()}}
+{\footnotesize\ttfamily void user\+\_\+msg\+\_\+print (\begin{DoxyParamCaption}\item[{struct \mbox{\hyperlink{structuser__msg}{user\+\_\+msg}} $\ast$}]{self,  }\item[{long}]{type }\end{DoxyParamCaption})}
+
+Print the msg based on his type 
+\begin{DoxyParams}{Parameters}
+{\em self} & the message to be printed \\
+\hline
+{\em type} & the type of the message \\
+\hline
+\end{DoxyParams}
+\mbox{\Hypertarget{user__msg__report_8h_ad64c218fba74de9d28ec05f9f17d8d04}\label{user__msg__report_8h_ad64c218fba74de9d28ec05f9f17d8d04}} 
+\index{user\_msg\_report.h@{user\_msg\_report.h}!user\_msg\_receive@{user\_msg\_receive}}
+\index{user\_msg\_receive@{user\_msg\_receive}!user\_msg\_report.h@{user\_msg\_report.h}}
+\doxysubsubsection{\texorpdfstring{user\_msg\_receive()}{user\_msg\_receive()}}
+{\footnotesize\ttfamily int user\+\_\+msg\+\_\+receive (\begin{DoxyParamCaption}\item[{int}]{id,  }\item[{struct \mbox{\hyperlink{structuser__msg}{user\+\_\+msg}} $\ast$}]{msg,  }\item[{long}]{type }\end{DoxyParamCaption})}
+
+Retrieve the message\+\_\+user\+\_\+report on the specified message queue \begin{DoxyWarning}{Warning}
+send is repeated until it succeed or errno != EINTR Config type wait until receive 
+\end{DoxyWarning}
+
+\begin{DoxyParams}{Parameters}
+{\em id} & of the message queue \\
+\hline
+{\em msg} & to be caught \\
+\hline
+{\em type} & of message expected \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+-\/2 if no message on queue, -\/1 in case of failure. 0 otherwise. 
+\end{DoxyReturn}
+\mbox{\Hypertarget{user__msg__report_8h_ae1398ede7a53c7c3417e97363195d035}\label{user__msg__report_8h_ae1398ede7a53c7c3417e97363195d035}} 
+\index{user\_msg\_report.h@{user\_msg\_report.h}!user\_msg\_snd@{user\_msg\_snd}}
+\index{user\_msg\_snd@{user\_msg\_snd}!user\_msg\_report.h@{user\_msg\_report.h}}
+\doxysubsubsection{\texorpdfstring{user\_msg\_snd()}{user\_msg\_snd()}}
+{\footnotesize\ttfamily int user\+\_\+msg\+\_\+snd (\begin{DoxyParamCaption}\item[{int}]{id,  }\item[{struct \mbox{\hyperlink{structuser__msg}{user\+\_\+msg}} $\ast$}]{msg,  }\item[{long}]{type,  }\item[{struct \mbox{\hyperlink{struct_transaction}{Transaction}} $\ast$}]{t,  }\item[{pid\+\_\+t}]{sender,  }\item[{\mbox{\hyperlink{boolean_8h_afdcfe6db5bea87bd493a3fe2c513d5ef}{Bool}}}]{crete,  }\item[{int}]{queue\+\_\+id }\end{DoxyParamCaption})}
+
+(Create if selected) and Send the message on ipc user\+\_\+queue with the key as specified 
+\begin{DoxyParams}{Parameters}
+{\em id} & of the message queue \\
+\hline
+{\em msg} & the message to be sent to \\
+\hline
+{\em data} & user\+\_\+data to be sent \\
+\hline
+{\em sender} & pid\+\_\+t of the sender of this message \\
+\hline
+{\em crete} & TRUE if u want to create it before sending. \\
+\hline
+{\em queue\+\_\+id} & number rappresenting the current user into the message queue \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+-\/1 in case of failure, -\/1 otherwise 
+\end{DoxyReturn}
+Check if there is space in the node message queue

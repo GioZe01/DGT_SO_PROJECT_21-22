@@ -1,0 +1,303 @@
+\hypertarget{user__proc_8c}{}\doxysection{src/user\+\_\+proc.c File Reference}
+\label{user__proc_8c}\index{src/user\_proc.c@{src/user\_proc.c}}
+{\ttfamily \#include $<$stdio.\+h$>$}\newline
+{\ttfamily \#include $<$stdlib.\+h$>$}\newline
+{\ttfamily \#include $<$string.\+h$>$}\newline
+{\ttfamily \#include $<$signal.\+h$>$}\newline
+{\ttfamily \#include $<$errno.\+h$>$}\newline
+{\ttfamily \#include $<$unistd.\+h$>$}\newline
+{\ttfamily \#include $<$time.\+h$>$}\newline
+{\ttfamily \#include $<$sys/sem.\+h$>$}\newline
+{\ttfamily \#include $<$sys/msg.\+h$>$}\newline
+{\ttfamily \#include $<$sys/shm.\+h$>$}\newline
+{\ttfamily \#include \char`\"{}local\+\_\+lib/headers/simulation\+\_\+errors.\+h\char`\"{}}\newline
+{\ttfamily \#include \char`\"{}local\+\_\+lib/headers/transaction\+\_\+list.\+h\char`\"{}}\newline
+{\ttfamily \#include \char`\"{}local\+\_\+lib/headers/user\+\_\+transaction.\+h\char`\"{}}\newline
+{\ttfamily \#include \char`\"{}local\+\_\+lib/headers/semaphore.\+h\char`\"{}}\newline
+{\ttfamily \#include \char`\"{}local\+\_\+lib/headers/conf\+\_\+file.\+h\char`\"{}}\newline
+{\ttfamily \#include \char`\"{}local\+\_\+lib/headers/user\+\_\+msg\+\_\+report.\+h\char`\"{}}\newline
+{\ttfamily \#include \char`\"{}local\+\_\+lib/headers/node\+\_\+msg\+\_\+report.\+h\char`\"{}}\newline
+{\ttfamily \#include \char`\"{}local\+\_\+lib/headers/master\+\_\+msg\+\_\+report.\+h\char`\"{}}\newline
+{\ttfamily \#include \char`\"{}local\+\_\+lib/headers/boolean.\+h\char`\"{}}\newline
+{\ttfamily \#include \char`\"{}local\+\_\+lib/headers/conf\+\_\+shm.\+h\char`\"{}}\newline
+{\ttfamily \#include \char`\"{}local\+\_\+lib/headers/debug\+\_\+utility.\+h\char`\"{}}\newline
+{\ttfamily \#include \char`\"{}local\+\_\+lib/headers/gt\+\_\+sig\+\_\+handler.\+h\char`\"{}}\newline
+Include dependency graph for user\+\_\+proc.\+c\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{user__proc_8c__incl}
+\end{center}
+\end{figure}
+\doxysubsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+void \mbox{\hyperlink{user__proc_8c_abc129d1714860d417e1190d554cd3440}{advice\+\_\+master\+\_\+of\+\_\+termination}} (long termination\+\_\+type)
+\item 
+void \mbox{\hyperlink{user__proc_8c_a5d8a16cab7f370d9a65db397afadc879}{connect\+\_\+to\+\_\+queues}} (void)
+\item 
+void \mbox{\hyperlink{user__proc_8c_af0d295cc39a8a3c9e93f198b52d4902c}{signals\+\_\+handler\+\_\+user}} (int signum)
+\item 
+\mbox{\hyperlink{boolean_8h_afdcfe6db5bea87bd493a3fe2c513d5ef}{Bool}} \mbox{\hyperlink{user__proc_8c_a66ab7d08549d235aa0f9deedc0fae07c}{check\+\_\+argument}} (int argc, char const $\ast$argv\mbox{[}$\,$\mbox{]})
+\item 
+\mbox{\hyperlink{boolean_8h_afdcfe6db5bea87bd493a3fe2c513d5ef}{Bool}} \mbox{\hyperlink{user__proc_8c_a713c2a9ac57a1f4e96da6610c9d1f9bb}{check\+\_\+for\+\_\+transactions\+\_\+confirmed}} (void)
+\item 
+\mbox{\hyperlink{boolean_8h_afdcfe6db5bea87bd493a3fe2c513d5ef}{Bool}} \mbox{\hyperlink{user__proc_8c_a7071f09c1fc2adb27d68c6d2ac44f263}{check\+\_\+for\+\_\+transactions\+\_\+failed}} (void)
+\item 
+\mbox{\hyperlink{boolean_8h_afdcfe6db5bea87bd493a3fe2c513d5ef}{Bool}} \mbox{\hyperlink{user__proc_8c_a26a8c4fd29996539b344d7bb4e4396d0}{set\+\_\+signal\+\_\+handler\+\_\+user}} (struct sigaction sa)
+\item 
+\mbox{\hyperlink{boolean_8h_afdcfe6db5bea87bd493a3fe2c513d5ef}{Bool}} \mbox{\hyperlink{user__proc_8c_a1c60ebb388756179310b61db4bfafbd1}{read\+\_\+conf}} ()
+\begin{DoxyCompactList}\small\item\em Read the conf file present in te project dir load the configuration directly in the struct conf configuration that is a Sys\+Var. \end{DoxyCompactList}\item 
+int \mbox{\hyperlink{user__proc_8c_a1087b51fb0698b2c97b13520a44f4477}{send\+\_\+to\+\_\+node}} (void)
+\begin{DoxyCompactList}\small\item\em Send to the node all the transaction that still need to be processed and pop them from the \mbox{\hyperlink{structtransaction__list}{transaction\+\_\+list}} with range block size if cashing is active. \end{DoxyCompactList}\item 
+void \mbox{\hyperlink{user__proc_8c_aaf6efbd7058a54d7b59c1ce4ee18318e}{attach\+\_\+to\+\_\+shm\+\_\+conf}} (void)
+\item 
+void \mbox{\hyperlink{user__proc_8c_a554bf92a718c4ab8bd8427b24d91377c}{generating\+\_\+transactions}} (void)
+\item 
+\mbox{\hyperlink{boolean_8h_afdcfe6db5bea87bd493a3fe2c513d5ef}{Bool}} \mbox{\hyperlink{user__proc_8c_a0a2e2de5379aa90d65d0b87425acfee2}{getting\+\_\+richer}} (void)
+\item 
+void \mbox{\hyperlink{user__proc_8c_a9e8e0c9a43bed5c0d6efd886e07c4e02}{gen\+\_\+sleep\+\_\+time}} (struct timespec $\ast$ts)
+\begin{DoxyCompactList}\small\item\em Generate sleep time using the conf file. \end{DoxyCompactList}\item 
+int \mbox{\hyperlink{user__proc_8c_ae78f05b51b6e7ae75e3782eb3d6c1dee}{main}} (int arc, char const $\ast$argv\mbox{[}$\,$\mbox{]})
+\item 
+void \mbox{\hyperlink{user__proc_8c_a7aa28a9ba366e148da782c85968076db}{free\+\_\+mem\+\_\+user}} ()
+\item 
+void \mbox{\hyperlink{user__proc_8c_a9fc9fdbd09f3e40f4556e5fa7151c539}{free\+\_\+sys\+Var\+\_\+user}} ()
+\end{DoxyCompactItemize}
+\doxysubsection*{Variables}
+\begin{DoxyCompactItemize}
+\item 
+int \mbox{\hyperlink{user__proc_8c_ac62b22414674bece75bc2fea3847c48f}{semaphore\+\_\+start\+\_\+id}} = -\/1
+\item 
+int \mbox{\hyperlink{user__proc_8c_a1ccf22d1a76cc0edb493206dd91a063e}{queue\+\_\+node\+\_\+id}} = -\/1
+\item 
+int \mbox{\hyperlink{user__proc_8c_a81b4a7a6586efbb012387c887f004c4c}{queue\+\_\+user\+\_\+id}} = -\/1
+\item 
+int \mbox{\hyperlink{user__proc_8c_aa08429407287f0f88618f338895be369}{queue\+\_\+master\+\_\+id}} = -\/1
+\item 
+int \mbox{\hyperlink{user__proc_8c_a8084294edcd0a07608d70b83ab7d5f72}{user\+\_\+id}} = -\/1
+\item 
+sigset\+\_\+t \mbox{\hyperlink{user__proc_8c_a230c4eaa89fdddbb7c42f1b6019fa3b1}{current\+\_\+mask}}
+\item 
+struct \mbox{\hyperlink{structuser__transaction}{user\+\_\+transaction}} \mbox{\hyperlink{user__proc_8c_aac346eec477aed9732da0906621da5ce}{current\+\_\+user}}
+\item 
+struct \mbox{\hyperlink{structconf}{conf}} \mbox{\hyperlink{user__proc_8c_ae680050004de2d6f18cb69167cf4de3f}{configuration}}
+\item 
+struct \mbox{\hyperlink{structshm__conf}{shm\+\_\+conf}} $\ast$ \mbox{\hyperlink{user__proc_8c_afec317dfe8d38f10717665f51bec0f93}{shm\+\_\+conf\+\_\+pointer}}
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Function Documentation}
+\mbox{\Hypertarget{user__proc_8c_abc129d1714860d417e1190d554cd3440}\label{user__proc_8c_abc129d1714860d417e1190d554cd3440}} 
+\index{user\_proc.c@{user\_proc.c}!advice\_master\_of\_termination@{advice\_master\_of\_termination}}
+\index{advice\_master\_of\_termination@{advice\_master\_of\_termination}!user\_proc.c@{user\_proc.c}}
+\doxysubsubsection{\texorpdfstring{advice\_master\_of\_termination()}{advice\_master\_of\_termination()}}
+{\footnotesize\ttfamily void advice\+\_\+master\+\_\+of\+\_\+termination (\begin{DoxyParamCaption}\item[{long}]{termination\+\_\+type }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{user__proc_8c_aaf6efbd7058a54d7b59c1ce4ee18318e}\label{user__proc_8c_aaf6efbd7058a54d7b59c1ce4ee18318e}} 
+\index{user\_proc.c@{user\_proc.c}!attach\_to\_shm\_conf@{attach\_to\_shm\_conf}}
+\index{attach\_to\_shm\_conf@{attach\_to\_shm\_conf}!user\_proc.c@{user\_proc.c}}
+\doxysubsubsection{\texorpdfstring{attach\_to\_shm\_conf()}{attach\_to\_shm\_conf()}}
+{\footnotesize\ttfamily void attach\+\_\+to\+\_\+shm\+\_\+conf (\begin{DoxyParamCaption}\item[{void}]{ }\end{DoxyParamCaption})}
+
+Make the shm\+\_\+conf\+\_\+pointer points to the correct conf shm \mbox{\Hypertarget{user__proc_8c_a66ab7d08549d235aa0f9deedc0fae07c}\label{user__proc_8c_a66ab7d08549d235aa0f9deedc0fae07c}} 
+\index{user\_proc.c@{user\_proc.c}!check\_argument@{check\_argument}}
+\index{check\_argument@{check\_argument}!user\_proc.c@{user\_proc.c}}
+\doxysubsubsection{\texorpdfstring{check\_argument()}{check\_argument()}}
+{\footnotesize\ttfamily \mbox{\hyperlink{boolean_8h_afdcfe6db5bea87bd493a3fe2c513d5ef}{Bool}} check\+\_\+argument (\begin{DoxyParamCaption}\item[{int}]{argc,  }\item[{char const $\ast$}]{argv\mbox{[}$\,$\mbox{]} }\end{DoxyParamCaption})}
+
+Check the argc and argv to match with project specification 
+\begin{DoxyParams}{Parameters}
+{\em argc} & number of argument given \\
+\hline
+{\em argv} & pointer to a char list of params given \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+FALSE in case of FAILURE, TRUE otherwise 
+\end{DoxyReturn}
+\mbox{\Hypertarget{user__proc_8c_a713c2a9ac57a1f4e96da6610c9d1f9bb}\label{user__proc_8c_a713c2a9ac57a1f4e96da6610c9d1f9bb}} 
+\index{user\_proc.c@{user\_proc.c}!check\_for\_transactions\_confirmed@{check\_for\_transactions\_confirmed}}
+\index{check\_for\_transactions\_confirmed@{check\_for\_transactions\_confirmed}!user\_proc.c@{user\_proc.c}}
+\doxysubsubsection{\texorpdfstring{check\_for\_transactions\_confirmed()}{check\_for\_transactions\_confirmed()}}
+{\footnotesize\ttfamily \mbox{\hyperlink{boolean_8h_afdcfe6db5bea87bd493a3fe2c513d5ef}{Bool}} check\+\_\+for\+\_\+transactions\+\_\+confirmed (\begin{DoxyParamCaption}\item[{void}]{ }\end{DoxyParamCaption})}
+
+Check for the presence of a confirmed transaction and eventually handles it \begin{DoxyReturn}{Returns}
+
+\end{DoxyReturn}
+\mbox{\Hypertarget{user__proc_8c_a7071f09c1fc2adb27d68c6d2ac44f263}\label{user__proc_8c_a7071f09c1fc2adb27d68c6d2ac44f263}} 
+\index{user\_proc.c@{user\_proc.c}!check\_for\_transactions\_failed@{check\_for\_transactions\_failed}}
+\index{check\_for\_transactions\_failed@{check\_for\_transactions\_failed}!user\_proc.c@{user\_proc.c}}
+\doxysubsubsection{\texorpdfstring{check\_for\_transactions\_failed()}{check\_for\_transactions\_failed()}}
+{\footnotesize\ttfamily \mbox{\hyperlink{boolean_8h_afdcfe6db5bea87bd493a3fe2c513d5ef}{Bool}} check\+\_\+for\+\_\+transactions\+\_\+failed (\begin{DoxyParamCaption}\item[{void}]{ }\end{DoxyParamCaption})}
+
+Check for the presence of a failed transaction and eventually handles it \begin{DoxyReturn}{Returns}
+
+\end{DoxyReturn}
+\mbox{\Hypertarget{user__proc_8c_a5d8a16cab7f370d9a65db397afadc879}\label{user__proc_8c_a5d8a16cab7f370d9a65db397afadc879}} 
+\index{user\_proc.c@{user\_proc.c}!connect\_to\_queues@{connect\_to\_queues}}
+\index{connect\_to\_queues@{connect\_to\_queues}!user\_proc.c@{user\_proc.c}}
+\doxysubsubsection{\texorpdfstring{connect\_to\_queues()}{connect\_to\_queues()}}
+{\footnotesize\ttfamily void connect\+\_\+to\+\_\+queues (\begin{DoxyParamCaption}\item[{void}]{ }\end{DoxyParamCaption})}
+
+Connects to the differents queues\+: master, node\textquotesingle{}s and user\textquotesingle{}s \mbox{\Hypertarget{user__proc_8c_a7aa28a9ba366e148da782c85968076db}\label{user__proc_8c_a7aa28a9ba366e148da782c85968076db}} 
+\index{user\_proc.c@{user\_proc.c}!free\_mem\_user@{free\_mem\_user}}
+\index{free\_mem\_user@{free\_mem\_user}!user\_proc.c@{user\_proc.c}}
+\doxysubsubsection{\texorpdfstring{free\_mem\_user()}{free\_mem\_user()}}
+{\footnotesize\ttfamily void free\+\_\+mem\+\_\+user (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{user__proc_8c_a9fc9fdbd09f3e40f4556e5fa7151c539}\label{user__proc_8c_a9fc9fdbd09f3e40f4556e5fa7151c539}} 
+\index{user\_proc.c@{user\_proc.c}!free\_sysVar\_user@{free\_sysVar\_user}}
+\index{free\_sysVar\_user@{free\_sysVar\_user}!user\_proc.c@{user\_proc.c}}
+\doxysubsubsection{\texorpdfstring{free\_sysVar\_user()}{free\_sysVar\_user()}}
+{\footnotesize\ttfamily void free\+\_\+sys\+Var\+\_\+user (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{user__proc_8c_a9e8e0c9a43bed5c0d6efd886e07c4e02}\label{user__proc_8c_a9e8e0c9a43bed5c0d6efd886e07c4e02}} 
+\index{user\_proc.c@{user\_proc.c}!gen\_sleep\_time@{gen\_sleep\_time}}
+\index{gen\_sleep\_time@{gen\_sleep\_time}!user\_proc.c@{user\_proc.c}}
+\doxysubsubsection{\texorpdfstring{gen\_sleep\_time()}{gen\_sleep\_time()}}
+{\footnotesize\ttfamily void gen\+\_\+sleep\+\_\+time (\begin{DoxyParamCaption}\item[{struct timespec $\ast$}]{ts }\end{DoxyParamCaption})}
+
+
+
+Generate sleep time using the conf file. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em ts} & \\
+\hline
+\end{DoxyParams}
+\mbox{\Hypertarget{user__proc_8c_a554bf92a718c4ab8bd8427b24d91377c}\label{user__proc_8c_a554bf92a718c4ab8bd8427b24d91377c}} 
+\index{user\_proc.c@{user\_proc.c}!generating\_transactions@{generating\_transactions}}
+\index{generating\_transactions@{generating\_transactions}!user\_proc.c@{user\_proc.c}}
+\doxysubsubsection{\texorpdfstring{generating\_transactions()}{generating\_transactions()}}
+{\footnotesize\ttfamily void generating\+\_\+transactions (\begin{DoxyParamCaption}\item[{void}]{ }\end{DoxyParamCaption})}
+
+generate the transactions, and take knowledge of usr\+\_\+msg int usr\+\_\+msg\+\_\+queue Blocking signals
+
+Check if there is space in the node message queue
+
+Generating sleep time using configuration.\+so\+\_\+max\+\_\+trans\+\_\+gen\+\_\+nsec
+
+Unblocking Signals\mbox{\Hypertarget{user__proc_8c_a0a2e2de5379aa90d65d0b87425acfee2}\label{user__proc_8c_a0a2e2de5379aa90d65d0b87425acfee2}} 
+\index{user\_proc.c@{user\_proc.c}!getting\_richer@{getting\_richer}}
+\index{getting\_richer@{getting\_richer}!user\_proc.c@{user\_proc.c}}
+\doxysubsubsection{\texorpdfstring{getting\_richer()}{getting\_richer()}}
+{\footnotesize\ttfamily \mbox{\hyperlink{boolean_8h_afdcfe6db5bea87bd493a3fe2c513d5ef}{Bool}} getting\+\_\+richer (\begin{DoxyParamCaption}\item[{void}]{ }\end{DoxyParamCaption})}
+
+Check for incoming transactions with him as receiver \mbox{\Hypertarget{user__proc_8c_ae78f05b51b6e7ae75e3782eb3d6c1dee}\label{user__proc_8c_ae78f05b51b6e7ae75e3782eb3d6c1dee}} 
+\index{user\_proc.c@{user\_proc.c}!main@{main}}
+\index{main@{main}!user\_proc.c@{user\_proc.c}}
+\doxysubsubsection{\texorpdfstring{main()}{main()}}
+{\footnotesize\ttfamily int main (\begin{DoxyParamCaption}\item[{int}]{arc,  }\item[{char const $\ast$}]{argv\mbox{[}$\,$\mbox{]} }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{user__proc_8c_a1c60ebb388756179310b61db4bfafbd1}\label{user__proc_8c_a1c60ebb388756179310b61db4bfafbd1}} 
+\index{user\_proc.c@{user\_proc.c}!read\_conf@{read\_conf}}
+\index{read\_conf@{read\_conf}!user\_proc.c@{user\_proc.c}}
+\doxysubsubsection{\texorpdfstring{read\_conf()}{read\_conf()}}
+{\footnotesize\ttfamily \mbox{\hyperlink{boolean_8h_afdcfe6db5bea87bd493a3fe2c513d5ef}{Bool}} read\+\_\+conf (\begin{DoxyParamCaption}\item[{void}]{ }\end{DoxyParamCaption})}
+
+
+
+Read the conf file present in te project dir load the configuration directly in the struct conf configuration that is a Sys\+Var. 
+
+\begin{DoxyReturn}{Returns}
+FALSE in case of FAILURE, TRUE otherwise 
+\end{DoxyReturn}
+\mbox{\Hypertarget{user__proc_8c_a1087b51fb0698b2c97b13520a44f4477}\label{user__proc_8c_a1087b51fb0698b2c97b13520a44f4477}} 
+\index{user\_proc.c@{user\_proc.c}!send\_to\_node@{send\_to\_node}}
+\index{send\_to\_node@{send\_to\_node}!user\_proc.c@{user\_proc.c}}
+\doxysubsubsection{\texorpdfstring{send\_to\_node()}{send\_to\_node()}}
+{\footnotesize\ttfamily int send\+\_\+to\+\_\+node (\begin{DoxyParamCaption}\item[{void}]{ }\end{DoxyParamCaption})}
+
+
+
+Send to the node all the transaction that still need to be processed and pop them from the \mbox{\hyperlink{structtransaction__list}{transaction\+\_\+list}} with range block size if cashing is active. 
+
+\begin{DoxyReturn}{Returns}
+-\/1 in case of FAILURE. 0 otherwise 
+\end{DoxyReturn}
+Check if there is space in the node message queue\mbox{\Hypertarget{user__proc_8c_a26a8c4fd29996539b344d7bb4e4396d0}\label{user__proc_8c_a26a8c4fd29996539b344d7bb4e4396d0}} 
+\index{user\_proc.c@{user\_proc.c}!set\_signal\_handler\_user@{set\_signal\_handler\_user}}
+\index{set\_signal\_handler\_user@{set\_signal\_handler\_user}!user\_proc.c@{user\_proc.c}}
+\doxysubsubsection{\texorpdfstring{set\_signal\_handler\_user()}{set\_signal\_handler\_user()}}
+{\footnotesize\ttfamily \mbox{\hyperlink{boolean_8h_afdcfe6db5bea87bd493a3fe2c513d5ef}{Bool}} set\+\_\+signal\+\_\+handler\+\_\+user (\begin{DoxyParamCaption}\item[{struct sigaction}]{sa }\end{DoxyParamCaption})}
+
+Set the handler for signals of the current user\+\_\+proc 
+\begin{DoxyParams}{Parameters}
+{\em sa} & describe the type of action to be performed when a signal arrive \\
+\hline
+{\em sigmask} & the mask to be applied \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+FALSE in case of FAILURE, TRUE otherwise 
+\end{DoxyReturn}
+\mbox{\Hypertarget{user__proc_8c_af0d295cc39a8a3c9e93f198b52d4902c}\label{user__proc_8c_af0d295cc39a8a3c9e93f198b52d4902c}} 
+\index{user\_proc.c@{user\_proc.c}!signals\_handler\_user@{signals\_handler\_user}}
+\index{signals\_handler\_user@{signals\_handler\_user}!user\_proc.c@{user\_proc.c}}
+\doxysubsubsection{\texorpdfstring{signals\_handler\_user()}{signals\_handler\_user()}}
+{\footnotesize\ttfamily void signals\+\_\+handler\+\_\+user (\begin{DoxyParamCaption}\item[{int}]{signum }\end{DoxyParamCaption})}
+
+handler of the signal 
+\begin{DoxyParams}{Parameters}
+{\em signum} & type of signal to be handled \\
+\hline
+\end{DoxyParams}
+
+
+\doxysubsection{Variable Documentation}
+\mbox{\Hypertarget{user__proc_8c_ae680050004de2d6f18cb69167cf4de3f}\label{user__proc_8c_ae680050004de2d6f18cb69167cf4de3f}} 
+\index{user\_proc.c@{user\_proc.c}!configuration@{configuration}}
+\index{configuration@{configuration}!user\_proc.c@{user\_proc.c}}
+\doxysubsubsection{\texorpdfstring{configuration}{configuration}}
+{\footnotesize\ttfamily struct \mbox{\hyperlink{structconf}{conf}} configuration}
+
+\mbox{\Hypertarget{user__proc_8c_a230c4eaa89fdddbb7c42f1b6019fa3b1}\label{user__proc_8c_a230c4eaa89fdddbb7c42f1b6019fa3b1}} 
+\index{user\_proc.c@{user\_proc.c}!current\_mask@{current\_mask}}
+\index{current\_mask@{current\_mask}!user\_proc.c@{user\_proc.c}}
+\doxysubsubsection{\texorpdfstring{current\_mask}{current\_mask}}
+{\footnotesize\ttfamily sigset\+\_\+t current\+\_\+mask}
+
+\mbox{\Hypertarget{user__proc_8c_aac346eec477aed9732da0906621da5ce}\label{user__proc_8c_aac346eec477aed9732da0906621da5ce}} 
+\index{user\_proc.c@{user\_proc.c}!current\_user@{current\_user}}
+\index{current\_user@{current\_user}!user\_proc.c@{user\_proc.c}}
+\doxysubsubsection{\texorpdfstring{current\_user}{current\_user}}
+{\footnotesize\ttfamily struct \mbox{\hyperlink{structuser__transaction}{user\+\_\+transaction}} current\+\_\+user}
+
+\mbox{\Hypertarget{user__proc_8c_aa08429407287f0f88618f338895be369}\label{user__proc_8c_aa08429407287f0f88618f338895be369}} 
+\index{user\_proc.c@{user\_proc.c}!queue\_master\_id@{queue\_master\_id}}
+\index{queue\_master\_id@{queue\_master\_id}!user\_proc.c@{user\_proc.c}}
+\doxysubsubsection{\texorpdfstring{queue\_master\_id}{queue\_master\_id}}
+{\footnotesize\ttfamily int queue\+\_\+master\+\_\+id = -\/1}
+
+\mbox{\Hypertarget{user__proc_8c_a1ccf22d1a76cc0edb493206dd91a063e}\label{user__proc_8c_a1ccf22d1a76cc0edb493206dd91a063e}} 
+\index{user\_proc.c@{user\_proc.c}!queue\_node\_id@{queue\_node\_id}}
+\index{queue\_node\_id@{queue\_node\_id}!user\_proc.c@{user\_proc.c}}
+\doxysubsubsection{\texorpdfstring{queue\_node\_id}{queue\_node\_id}}
+{\footnotesize\ttfamily int queue\+\_\+node\+\_\+id = -\/1}
+
+\mbox{\Hypertarget{user__proc_8c_a81b4a7a6586efbb012387c887f004c4c}\label{user__proc_8c_a81b4a7a6586efbb012387c887f004c4c}} 
+\index{user\_proc.c@{user\_proc.c}!queue\_user\_id@{queue\_user\_id}}
+\index{queue\_user\_id@{queue\_user\_id}!user\_proc.c@{user\_proc.c}}
+\doxysubsubsection{\texorpdfstring{queue\_user\_id}{queue\_user\_id}}
+{\footnotesize\ttfamily int queue\+\_\+user\+\_\+id = -\/1}
+
+\mbox{\Hypertarget{user__proc_8c_ac62b22414674bece75bc2fea3847c48f}\label{user__proc_8c_ac62b22414674bece75bc2fea3847c48f}} 
+\index{user\_proc.c@{user\_proc.c}!semaphore\_start\_id@{semaphore\_start\_id}}
+\index{semaphore\_start\_id@{semaphore\_start\_id}!user\_proc.c@{user\_proc.c}}
+\doxysubsubsection{\texorpdfstring{semaphore\_start\_id}{semaphore\_start\_id}}
+{\footnotesize\ttfamily int semaphore\+\_\+start\+\_\+id = -\/1}
+
+\mbox{\Hypertarget{user__proc_8c_afec317dfe8d38f10717665f51bec0f93}\label{user__proc_8c_afec317dfe8d38f10717665f51bec0f93}} 
+\index{user\_proc.c@{user\_proc.c}!shm\_conf\_pointer@{shm\_conf\_pointer}}
+\index{shm\_conf\_pointer@{shm\_conf\_pointer}!user\_proc.c@{user\_proc.c}}
+\doxysubsubsection{\texorpdfstring{shm\_conf\_pointer}{shm\_conf\_pointer}}
+{\footnotesize\ttfamily struct \mbox{\hyperlink{structshm__conf}{shm\+\_\+conf}}$\ast$ shm\+\_\+conf\+\_\+pointer}
+
+\mbox{\Hypertarget{user__proc_8c_a8084294edcd0a07608d70b83ab7d5f72}\label{user__proc_8c_a8084294edcd0a07608d70b83ab7d5f72}} 
+\index{user\_proc.c@{user\_proc.c}!user\_id@{user\_id}}
+\index{user\_id@{user\_id}!user\_proc.c@{user\_proc.c}}
+\doxysubsubsection{\texorpdfstring{user\_id}{user\_id}}
+{\footnotesize\ttfamily int user\+\_\+id = -\/1}
+

@@ -1,0 +1,418 @@
+\hypertarget{transaction__list_8c}{}\doxysection{src/local\+\_\+lib/transaction\+\_\+list.c File Reference}
+\label{transaction__list_8c}\index{src/local\_lib/transaction\_list.c@{src/local\_lib/transaction\_list.c}}
+{\ttfamily \#include $<$stdio.\+h$>$}\newline
+{\ttfamily \#include $<$stdlib.\+h$>$}\newline
+{\ttfamily \#include $<$errno.\+h$>$}\newline
+{\ttfamily \#include $<$unistd.\+h$>$}\newline
+{\ttfamily \#include $<$string.\+h$>$}\newline
+{\ttfamily \#include $<$time.\+h$>$}\newline
+{\ttfamily \#include \char`\"{}headers/transaction\+\_\+list.\+h\char`\"{}}\newline
+{\ttfamily \#include \char`\"{}headers/simulation\+\_\+errors.\+h\char`\"{}}\newline
+{\ttfamily \#include \char`\"{}headers/glob.\+h\char`\"{}}\newline
+{\ttfamily \#include \char`\"{}headers/boolean.\+h\char`\"{}}\newline
+Include dependency graph for transaction\+\_\+list.\+c\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{transaction__list_8c__incl}
+\end{center}
+\end{figure}
+\doxysubsection*{Data Structures}
+\begin{DoxyCompactItemize}
+\item 
+struct \mbox{\hyperlink{structnode}{node}}
+\begin{DoxyCompactList}\small\item\em Node structure used to represent a node. \end{DoxyCompactList}\item 
+struct \mbox{\hyperlink{structtransaction__list}{Queue}}
+\end{DoxyCompactItemize}
+\doxysubsection*{Macros}
+\begin{DoxyCompactItemize}
+\item 
+\#define \mbox{\hyperlink{transaction__list_8c_a3cadae3112a6a16fb452b1c1f79d7238}{DEBUG\+\_\+\+NOTIFY\+\_\+\+ACTIVITY\+\_\+\+RUNNING}}(mex)
+\item 
+\#define \mbox{\hyperlink{transaction__list_8c_af1bd9f6cef6eeb1f8e13af06c4ec9778}{DEBUG\+\_\+\+NOTIFY\+\_\+\+ACTIVITY\+\_\+\+DONE}}(mex)
+\item 
+\#define \mbox{\hyperlink{transaction__list_8c_a69277eff22ca52a411c09982c8be3ac8}{DEBUG\+\_\+\+MESSAGE}}(mex)
+\item 
+\#define \mbox{\hyperlink{transaction__list_8c_a6c474120d64f1aa7019f35511b21c50f}{DEBUG\+\_\+\+SIGNAL}}(mex,  signum)
+\item 
+\#define \mbox{\hyperlink{transaction__list_8c_a051f61037f4c5dd41bccc0c6b165c001}{DEBUG\+\_\+\+ERROR\+\_\+\+MESSAGE}}(mex)
+\end{DoxyCompactItemize}
+\doxysubsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+void \mbox{\hyperlink{transaction__list_8c_a37daab12ccdcadc445b3800e7105fe08}{get\+\_\+status}} (char char\+\_\+type\mbox{[}80\mbox{]}, int t\+\_\+type)
+\item 
+\mbox{\hyperlink{boolean_8h_afdcfe6db5bea87bd493a3fe2c513d5ef}{Bool}} \mbox{\hyperlink{transaction__list_8c_a72a846627664851171718ee217721137}{compare\+\_\+transaction}} (struct \mbox{\hyperlink{struct_transaction}{Transaction}} t1, struct \mbox{\hyperlink{struct_transaction}{Transaction}} t2)
+\item 
+void \mbox{\hyperlink{transaction__list_8c_a7d0b5b994366dabb64ef38d367c0dd5a}{append\+\_\+to\+\_\+node}} (struct \mbox{\hyperlink{structnode}{node}} $\ast$where, struct \mbox{\hyperlink{structnode}{node}} $\ast$to\+\_\+append)
+\item 
+void \mbox{\hyperlink{transaction__list_8c_aa800cb1cf4fca227ec58d3e9194bd87d}{create\+\_\+empty\+\_\+transaction}} (struct \mbox{\hyperlink{struct_transaction}{Transaction}} $\ast$t)
+\item 
+int \mbox{\hyperlink{transaction__list_8c_a2a36e946d79aa2164121998cb2a60d75}{create\+\_\+transaction}} (struct \mbox{\hyperlink{struct_transaction}{Transaction}} $\ast$t, pid\+\_\+t sender, pid\+\_\+t receiver, float amount)
+\item 
+Queue \mbox{\hyperlink{transaction__list_8c_ae6317b30ec264253ecd46210b62be0fe}{queue\+\_\+create}} ()
+\item 
+void \mbox{\hyperlink{transaction__list_8c_a4b43e06a4ecbf63d97c657b2713c482e}{queue\+\_\+destroy}} (Queue q)
+\item 
+void \mbox{\hyperlink{transaction__list_8c_ad4e71b33c67d7c97003a968baee1fb4d}{empty\+\_\+queue}} (Queue q)
+\item 
+void \mbox{\hyperlink{transaction__list_8c_a947d0e1565cb5d2f938c1c260b832774}{queue\+\_\+append}} (Queue q, struct \mbox{\hyperlink{struct_transaction}{Transaction}} t)
+\item 
+void \mbox{\hyperlink{transaction__list_8c_a58f069167e5ce83fd53fc0472e446c9a}{queue\+\_\+remove\+\_\+head}} (Queue q)
+\item 
+int \mbox{\hyperlink{transaction__list_8c_ad74e2425d2e9d8d7300c877fc321cbfa}{queue\+\_\+remove}} (Queue q, struct \mbox{\hyperlink{struct_transaction}{Transaction}} t)
+\item 
+struct \mbox{\hyperlink{struct_transaction}{Transaction}} $\ast$ \mbox{\hyperlink{transaction__list_8c_ad6e2542da82cf7ad128342f55af7168b}{queue\+\_\+head}} (Queue q)
+\item 
+struct \mbox{\hyperlink{struct_transaction}{Transaction}} \mbox{\hyperlink{transaction__list_8c_a0822880f1cc2fc8be1497d1c075ce602}{queue\+\_\+last}} (Queue q)
+\item 
+\mbox{\hyperlink{boolean_8h_afdcfe6db5bea87bd493a3fe2c513d5ef}{Bool}} \mbox{\hyperlink{transaction__list_8c_ae770c903ab121bcd43dd5914c731b931}{queue\+\_\+is\+\_\+empty}} (Queue q)
+\item 
+float \mbox{\hyperlink{transaction__list_8c_a54c8919b16e7e3a12c3455c5ca31fc2e}{queue\+\_\+apt\+\_\+amount\+\_\+reward}} (Queue q, float percentage)
+\item 
+float \mbox{\hyperlink{transaction__list_8c_ab7181a1b1aea65ba8a23c0be5268de2d}{queue\+\_\+get\+\_\+reward}} (Queue q)
+\item 
+void \mbox{\hyperlink{transaction__list_8c_a01a21c03bc602f27f94653f323d0e4ef}{queue\+\_\+print}} (Queue q)
+\item 
+void \mbox{\hyperlink{transaction__list_8c_a2ea5e61e8576c1c4c1751f63d4f77cab}{transaction\+\_\+print}} (struct \mbox{\hyperlink{struct_transaction}{Transaction}} t)
+\item 
+int \mbox{\hyperlink{transaction__list_8c_ae8be3c873d5030e3205e21cfc2288185}{get\+\_\+num\+\_\+transactions}} (Queue q)
+\item 
+int \mbox{\hyperlink{transaction__list_8c_a3e4c3831c9ed465484f5047cf70a884e}{queue\+\_\+to\+\_\+array}} (Queue q, struct \mbox{\hyperlink{struct_transaction}{Transaction}} vector\mbox{[}$\,$\mbox{]})
+\item 
+int \mbox{\hyperlink{transaction__list_8c_a9e3b375d7349e6135e54e63bf55274f9}{array\+\_\+to\+\_\+queue}} (Queue q, struct \mbox{\hyperlink{struct_transaction}{Transaction}} $\ast$vector)
+\item 
+\mbox{\hyperlink{boolean_8h_afdcfe6db5bea87bd493a3fe2c513d5ef}{Bool}} \mbox{\hyperlink{transaction__list_8c_ad8fc45e2f26ef0060da11359d4d87cfe}{queue\+\_\+copy\+\_\+n\+\_\+transactions}} (Queue q, Queue r, int n)
+\item 
+int \mbox{\hyperlink{transaction__list_8c_a734dc553e25dce539c134e72ac979219}{copy\+\_\+transaction}} (struct \mbox{\hyperlink{struct_transaction}{Transaction}} $\ast$t, struct \mbox{\hyperlink{struct_transaction}{Transaction}} $\ast$t\+\_\+copy)
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Macro Definition Documentation}
+\mbox{\Hypertarget{transaction__list_8c_a051f61037f4c5dd41bccc0c6b165c001}\label{transaction__list_8c_a051f61037f4c5dd41bccc0c6b165c001}} 
+\index{transaction\_list.c@{transaction\_list.c}!DEBUG\_ERROR\_MESSAGE@{DEBUG\_ERROR\_MESSAGE}}
+\index{DEBUG\_ERROR\_MESSAGE@{DEBUG\_ERROR\_MESSAGE}!transaction\_list.c@{transaction\_list.c}}
+\doxysubsubsection{\texorpdfstring{DEBUG\_ERROR\_MESSAGE}{DEBUG\_ERROR\_MESSAGE}}
+{\footnotesize\ttfamily \#define DEBUG\+\_\+\+ERROR\+\_\+\+MESSAGE(\begin{DoxyParamCaption}\item[{}]{mex }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{transaction__list_8c_a69277eff22ca52a411c09982c8be3ac8}\label{transaction__list_8c_a69277eff22ca52a411c09982c8be3ac8}} 
+\index{transaction\_list.c@{transaction\_list.c}!DEBUG\_MESSAGE@{DEBUG\_MESSAGE}}
+\index{DEBUG\_MESSAGE@{DEBUG\_MESSAGE}!transaction\_list.c@{transaction\_list.c}}
+\doxysubsubsection{\texorpdfstring{DEBUG\_MESSAGE}{DEBUG\_MESSAGE}}
+{\footnotesize\ttfamily \#define DEBUG\+\_\+\+MESSAGE(\begin{DoxyParamCaption}\item[{}]{mex }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{transaction__list_8c_af1bd9f6cef6eeb1f8e13af06c4ec9778}\label{transaction__list_8c_af1bd9f6cef6eeb1f8e13af06c4ec9778}} 
+\index{transaction\_list.c@{transaction\_list.c}!DEBUG\_NOTIFY\_ACTIVITY\_DONE@{DEBUG\_NOTIFY\_ACTIVITY\_DONE}}
+\index{DEBUG\_NOTIFY\_ACTIVITY\_DONE@{DEBUG\_NOTIFY\_ACTIVITY\_DONE}!transaction\_list.c@{transaction\_list.c}}
+\doxysubsubsection{\texorpdfstring{DEBUG\_NOTIFY\_ACTIVITY\_DONE}{DEBUG\_NOTIFY\_ACTIVITY\_DONE}}
+{\footnotesize\ttfamily \#define DEBUG\+\_\+\+NOTIFY\+\_\+\+ACTIVITY\+\_\+\+DONE(\begin{DoxyParamCaption}\item[{}]{mex }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{transaction__list_8c_a3cadae3112a6a16fb452b1c1f79d7238}\label{transaction__list_8c_a3cadae3112a6a16fb452b1c1f79d7238}} 
+\index{transaction\_list.c@{transaction\_list.c}!DEBUG\_NOTIFY\_ACTIVITY\_RUNNING@{DEBUG\_NOTIFY\_ACTIVITY\_RUNNING}}
+\index{DEBUG\_NOTIFY\_ACTIVITY\_RUNNING@{DEBUG\_NOTIFY\_ACTIVITY\_RUNNING}!transaction\_list.c@{transaction\_list.c}}
+\doxysubsubsection{\texorpdfstring{DEBUG\_NOTIFY\_ACTIVITY\_RUNNING}{DEBUG\_NOTIFY\_ACTIVITY\_RUNNING}}
+{\footnotesize\ttfamily \#define DEBUG\+\_\+\+NOTIFY\+\_\+\+ACTIVITY\+\_\+\+RUNNING(\begin{DoxyParamCaption}\item[{}]{mex }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{transaction__list_8c_a6c474120d64f1aa7019f35511b21c50f}\label{transaction__list_8c_a6c474120d64f1aa7019f35511b21c50f}} 
+\index{transaction\_list.c@{transaction\_list.c}!DEBUG\_SIGNAL@{DEBUG\_SIGNAL}}
+\index{DEBUG\_SIGNAL@{DEBUG\_SIGNAL}!transaction\_list.c@{transaction\_list.c}}
+\doxysubsubsection{\texorpdfstring{DEBUG\_SIGNAL}{DEBUG\_SIGNAL}}
+{\footnotesize\ttfamily \#define DEBUG\+\_\+\+SIGNAL(\begin{DoxyParamCaption}\item[{}]{mex,  }\item[{}]{signum }\end{DoxyParamCaption})}
+
+
+
+\doxysubsection{Function Documentation}
+\mbox{\Hypertarget{transaction__list_8c_a7d0b5b994366dabb64ef38d367c0dd5a}\label{transaction__list_8c_a7d0b5b994366dabb64ef38d367c0dd5a}} 
+\index{transaction\_list.c@{transaction\_list.c}!append\_to\_node@{append\_to\_node}}
+\index{append\_to\_node@{append\_to\_node}!transaction\_list.c@{transaction\_list.c}}
+\doxysubsubsection{\texorpdfstring{append\_to\_node()}{append\_to\_node()}}
+{\footnotesize\ttfamily void append\+\_\+to\+\_\+node (\begin{DoxyParamCaption}\item[{struct \mbox{\hyperlink{structnode}{node}} $\ast$}]{where,  }\item[{struct \mbox{\hyperlink{structnode}{node}} $\ast$}]{to\+\_\+append }\end{DoxyParamCaption})}
+
+Append the corrend node to the next one 
+\begin{DoxyParams}{Parameters}
+{\em where} & u want to append the node \\
+\hline
+{\em to\+\_\+append} & the node to append to the previous \\
+\hline
+\end{DoxyParams}
+\mbox{\Hypertarget{transaction__list_8c_a9e3b375d7349e6135e54e63bf55274f9}\label{transaction__list_8c_a9e3b375d7349e6135e54e63bf55274f9}} 
+\index{transaction\_list.c@{transaction\_list.c}!array\_to\_queue@{array\_to\_queue}}
+\index{array\_to\_queue@{array\_to\_queue}!transaction\_list.c@{transaction\_list.c}}
+\doxysubsubsection{\texorpdfstring{array\_to\_queue()}{array\_to\_queue()}}
+{\footnotesize\ttfamily int array\+\_\+to\+\_\+queue (\begin{DoxyParamCaption}\item[{Queue}]{q,  }\item[{struct \mbox{\hyperlink{struct_transaction}{Transaction}} $\ast$}]{vector }\end{DoxyParamCaption})}
+
+From the given vector load the data into the given queue 
+\begin{DoxyParams}{Parameters}
+{\em q} & the queue to load the data from \\
+\hline
+{\em vector} & pointer of transactions to be loaded \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+-\/1 in case of failure. 0 otherwise 
+\end{DoxyReturn}
+\mbox{\Hypertarget{transaction__list_8c_a72a846627664851171718ee217721137}\label{transaction__list_8c_a72a846627664851171718ee217721137}} 
+\index{transaction\_list.c@{transaction\_list.c}!compare\_transaction@{compare\_transaction}}
+\index{compare\_transaction@{compare\_transaction}!transaction\_list.c@{transaction\_list.c}}
+\doxysubsubsection{\texorpdfstring{compare\_transaction()}{compare\_transaction()}}
+{\footnotesize\ttfamily \mbox{\hyperlink{boolean_8h_afdcfe6db5bea87bd493a3fe2c513d5ef}{Bool}} compare\+\_\+transaction (\begin{DoxyParamCaption}\item[{struct \mbox{\hyperlink{struct_transaction}{Transaction}}}]{t1,  }\item[{struct \mbox{\hyperlink{struct_transaction}{Transaction}}}]{t2 }\end{DoxyParamCaption})}
+
+Compare to transaction 
+\begin{DoxyParams}{Parameters}
+{\em t1} & transaction 1 \\
+\hline
+{\em t2} & transaction 2 \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+TRUE if ==, FALSE otherwise 
+\end{DoxyReturn}
+\mbox{\Hypertarget{transaction__list_8c_a734dc553e25dce539c134e72ac979219}\label{transaction__list_8c_a734dc553e25dce539c134e72ac979219}} 
+\index{transaction\_list.c@{transaction\_list.c}!copy\_transaction@{copy\_transaction}}
+\index{copy\_transaction@{copy\_transaction}!transaction\_list.c@{transaction\_list.c}}
+\doxysubsubsection{\texorpdfstring{copy\_transaction()}{copy\_transaction()}}
+{\footnotesize\ttfamily int copy\+\_\+transaction (\begin{DoxyParamCaption}\item[{struct \mbox{\hyperlink{struct_transaction}{Transaction}} $\ast$}]{t,  }\item[{struct \mbox{\hyperlink{struct_transaction}{Transaction}} $\ast$}]{t\+\_\+copy }\end{DoxyParamCaption})}
+
+Copy the given transaction into the given transaction 
+\begin{DoxyParams}{Parameters}
+{\em t} & the transaction to copy from \\
+\hline
+{\em t\+\_\+copy} & the transaction to copy into \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+-\/1 in case of failure 0 otherwise 
+\end{DoxyReturn}
+\mbox{\Hypertarget{transaction__list_8c_aa800cb1cf4fca227ec58d3e9194bd87d}\label{transaction__list_8c_aa800cb1cf4fca227ec58d3e9194bd87d}} 
+\index{transaction\_list.c@{transaction\_list.c}!create\_empty\_transaction@{create\_empty\_transaction}}
+\index{create\_empty\_transaction@{create\_empty\_transaction}!transaction\_list.c@{transaction\_list.c}}
+\doxysubsubsection{\texorpdfstring{create\_empty\_transaction()}{create\_empty\_transaction()}}
+{\footnotesize\ttfamily void create\+\_\+empty\+\_\+transaction (\begin{DoxyParamCaption}\item[{struct \mbox{\hyperlink{struct_transaction}{Transaction}} $\ast$}]{t }\end{DoxyParamCaption})}
+
+Create a empty transaction 
+\begin{DoxyParams}{Parameters}
+{\em t} & the transaction to be created \\
+\hline
+\end{DoxyParams}
+\mbox{\Hypertarget{transaction__list_8c_a2a36e946d79aa2164121998cb2a60d75}\label{transaction__list_8c_a2a36e946d79aa2164121998cb2a60d75}} 
+\index{transaction\_list.c@{transaction\_list.c}!create\_transaction@{create\_transaction}}
+\index{create\_transaction@{create\_transaction}!transaction\_list.c@{transaction\_list.c}}
+\doxysubsubsection{\texorpdfstring{create\_transaction()}{create\_transaction()}}
+{\footnotesize\ttfamily int create\+\_\+transaction (\begin{DoxyParamCaption}\item[{struct \mbox{\hyperlink{struct_transaction}{Transaction}} $\ast$}]{t,  }\item[{pid\+\_\+t}]{sender,  }\item[{pid\+\_\+t}]{receiver,  }\item[{float}]{amount }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{transaction__list_8c_ad4e71b33c67d7c97003a968baee1fb4d}\label{transaction__list_8c_ad4e71b33c67d7c97003a968baee1fb4d}} 
+\index{transaction\_list.c@{transaction\_list.c}!empty\_queue@{empty\_queue}}
+\index{empty\_queue@{empty\_queue}!transaction\_list.c@{transaction\_list.c}}
+\doxysubsubsection{\texorpdfstring{empty\_queue()}{empty\_queue()}}
+{\footnotesize\ttfamily void empty\+\_\+queue (\begin{DoxyParamCaption}\item[{Queue}]{q }\end{DoxyParamCaption})}
+
+Tells whether or not the given queue is empty or not 
+\begin{DoxyParams}{Parameters}
+{\em q} & the queue to perform the check on \\
+\hline
+\end{DoxyParams}
+\mbox{\Hypertarget{transaction__list_8c_ae8be3c873d5030e3205e21cfc2288185}\label{transaction__list_8c_ae8be3c873d5030e3205e21cfc2288185}} 
+\index{transaction\_list.c@{transaction\_list.c}!get\_num\_transactions@{get\_num\_transactions}}
+\index{get\_num\_transactions@{get\_num\_transactions}!transaction\_list.c@{transaction\_list.c}}
+\doxysubsubsection{\texorpdfstring{get\_num\_transactions()}{get\_num\_transactions()}}
+{\footnotesize\ttfamily int get\+\_\+num\+\_\+transactions (\begin{DoxyParamCaption}\item[{Queue}]{q }\end{DoxyParamCaption})}
+
+Return the number of transactions in the linked list 
+\begin{DoxyParams}{Parameters}
+{\em q} & the list to get the num of transactions \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+the number of transaction. -\/1 in case of error. 
+\end{DoxyReturn}
+\mbox{\Hypertarget{transaction__list_8c_a37daab12ccdcadc445b3800e7105fe08}\label{transaction__list_8c_a37daab12ccdcadc445b3800e7105fe08}} 
+\index{transaction\_list.c@{transaction\_list.c}!get\_status@{get\_status}}
+\index{get\_status@{get\_status}!transaction\_list.c@{transaction\_list.c}}
+\doxysubsubsection{\texorpdfstring{get\_status()}{get\_status()}}
+{\footnotesize\ttfamily void get\+\_\+status (\begin{DoxyParamCaption}\item[{char}]{char\+\_\+type\mbox{[}80\mbox{]},  }\item[{int}]{t\+\_\+type }\end{DoxyParamCaption})}
+
+Transform the type given into a formatted char string 
+\begin{DoxyParams}{Parameters}
+{\em char\+\_\+type} & the string in which u want the char string to be saved \\
+\hline
+{\em t\+\_\+type} & type of transaction to be transformed \\
+\hline
+\end{DoxyParams}
+\mbox{\Hypertarget{transaction__list_8c_a947d0e1565cb5d2f938c1c260b832774}\label{transaction__list_8c_a947d0e1565cb5d2f938c1c260b832774}} 
+\index{transaction\_list.c@{transaction\_list.c}!queue\_append@{queue\_append}}
+\index{queue\_append@{queue\_append}!transaction\_list.c@{transaction\_list.c}}
+\doxysubsubsection{\texorpdfstring{queue\_append()}{queue\_append()}}
+{\footnotesize\ttfamily void queue\+\_\+append (\begin{DoxyParamCaption}\item[{Queue}]{q,  }\item[{struct \mbox{\hyperlink{struct_transaction}{Transaction}}}]{i }\end{DoxyParamCaption})}
+
+Insert a transaction in the given queue 
+\begin{DoxyParams}{Parameters}
+{\em q} & the queue to operate on \\
+\hline
+{\em i} & transaction to be added \\
+\hline
+\end{DoxyParams}
+\mbox{\Hypertarget{transaction__list_8c_a54c8919b16e7e3a12c3455c5ca31fc2e}\label{transaction__list_8c_a54c8919b16e7e3a12c3455c5ca31fc2e}} 
+\index{transaction\_list.c@{transaction\_list.c}!queue\_apt\_amount\_reward@{queue\_apt\_amount\_reward}}
+\index{queue\_apt\_amount\_reward@{queue\_apt\_amount\_reward}!transaction\_list.c@{transaction\_list.c}}
+\doxysubsubsection{\texorpdfstring{queue\_apt\_amount\_reward()}{queue\_apt\_amount\_reward()}}
+{\footnotesize\ttfamily float queue\+\_\+apt\+\_\+amount\+\_\+reward (\begin{DoxyParamCaption}\item[{Queue}]{q,  }\item[{float}]{percentage }\end{DoxyParamCaption})}
+
+Calculate the reward for each transaction with give perc and apt the amount 
+\begin{DoxyParams}{Parameters}
+{\em q} & the queue from whom is calculated the reward \\
+\hline
+{\em percentage} & the percentage to calculate 4 each transaction \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+-\/1 in case of FAILURE. positive float otherwise 
+\end{DoxyReturn}
+\mbox{\Hypertarget{transaction__list_8c_ad8fc45e2f26ef0060da11359d4d87cfe}\label{transaction__list_8c_ad8fc45e2f26ef0060da11359d4d87cfe}} 
+\index{transaction\_list.c@{transaction\_list.c}!queue\_copy\_n\_transactions@{queue\_copy\_n\_transactions}}
+\index{queue\_copy\_n\_transactions@{queue\_copy\_n\_transactions}!transaction\_list.c@{transaction\_list.c}}
+\doxysubsubsection{\texorpdfstring{queue\_copy\_n\_transactions()}{queue\_copy\_n\_transactions()}}
+{\footnotesize\ttfamily \mbox{\hyperlink{boolean_8h_afdcfe6db5bea87bd493a3fe2c513d5ef}{Bool}} queue\+\_\+copy\+\_\+n\+\_\+transactions (\begin{DoxyParamCaption}\item[{Queue}]{q,  }\item[{Queue}]{r,  }\item[{int}]{n }\end{DoxyParamCaption})}
+
+Copy n transactions from queue q to queue r and remove them from q 
+\begin{DoxyParams}{Parameters}
+{\em q} & the queue to copy from \\
+\hline
+{\em r} & the queue to copy to \\
+\hline
+{\em n} & the number of transactions to copy \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+FALSE in case of failure. TRUE otherwise 
+\end{DoxyReturn}
+\mbox{\Hypertarget{transaction__list_8c_ae6317b30ec264253ecd46210b62be0fe}\label{transaction__list_8c_ae6317b30ec264253ecd46210b62be0fe}} 
+\index{transaction\_list.c@{transaction\_list.c}!queue\_create@{queue\_create}}
+\index{queue\_create@{queue\_create}!transaction\_list.c@{transaction\_list.c}}
+\doxysubsubsection{\texorpdfstring{queue\_create()}{queue\_create()}}
+{\footnotesize\ttfamily Queue queue\+\_\+create (\begin{DoxyParamCaption}\item[{void}]{ }\end{DoxyParamCaption})}
+
+Initialize the queue; \begin{DoxyReturn}{Returns}
+the queue initialized 
+\end{DoxyReturn}
+\mbox{\Hypertarget{transaction__list_8c_a4b43e06a4ecbf63d97c657b2713c482e}\label{transaction__list_8c_a4b43e06a4ecbf63d97c657b2713c482e}} 
+\index{transaction\_list.c@{transaction\_list.c}!queue\_destroy@{queue\_destroy}}
+\index{queue\_destroy@{queue\_destroy}!transaction\_list.c@{transaction\_list.c}}
+\doxysubsubsection{\texorpdfstring{queue\_destroy()}{queue\_destroy()}}
+{\footnotesize\ttfamily void queue\+\_\+destroy (\begin{DoxyParamCaption}\item[{Queue}]{q }\end{DoxyParamCaption})}
+
+Free the memory from the queue 
+\begin{DoxyParams}{Parameters}
+{\em q} & the queue to be destroyed \\
+\hline
+\end{DoxyParams}
+\mbox{\Hypertarget{transaction__list_8c_ab7181a1b1aea65ba8a23c0be5268de2d}\label{transaction__list_8c_ab7181a1b1aea65ba8a23c0be5268de2d}} 
+\index{transaction\_list.c@{transaction\_list.c}!queue\_get\_reward@{queue\_get\_reward}}
+\index{queue\_get\_reward@{queue\_get\_reward}!transaction\_list.c@{transaction\_list.c}}
+\doxysubsubsection{\texorpdfstring{queue\_get\_reward()}{queue\_get\_reward()}}
+{\footnotesize\ttfamily float queue\+\_\+get\+\_\+reward (\begin{DoxyParamCaption}\item[{Queue}]{q }\end{DoxyParamCaption})}
+
+Return the total reward summing each transaction reward 
+\begin{DoxyParams}{Parameters}
+{\em q} & queue to make the operation on \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+-\/1 in case of FAILURE, the total reward amount otherwise 
+\end{DoxyReturn}
+\mbox{\Hypertarget{transaction__list_8c_ad6e2542da82cf7ad128342f55af7168b}\label{transaction__list_8c_ad6e2542da82cf7ad128342f55af7168b}} 
+\index{transaction\_list.c@{transaction\_list.c}!queue\_head@{queue\_head}}
+\index{queue\_head@{queue\_head}!transaction\_list.c@{transaction\_list.c}}
+\doxysubsubsection{\texorpdfstring{queue\_head()}{queue\_head()}}
+{\footnotesize\ttfamily struct \mbox{\hyperlink{struct_transaction}{Transaction}} $\ast$ queue\+\_\+head (\begin{DoxyParamCaption}\item[{Queue}]{q }\end{DoxyParamCaption})}
+
+Get the first element of the queue 
+\begin{DoxyParams}{Parameters}
+{\em q} & the queue to operate on \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+The first \mbox{\hyperlink{struct_transaction}{Transaction}} of the queue 
+\end{DoxyReturn}
+\mbox{\Hypertarget{transaction__list_8c_ae770c903ab121bcd43dd5914c731b931}\label{transaction__list_8c_ae770c903ab121bcd43dd5914c731b931}} 
+\index{transaction\_list.c@{transaction\_list.c}!queue\_is\_empty@{queue\_is\_empty}}
+\index{queue\_is\_empty@{queue\_is\_empty}!transaction\_list.c@{transaction\_list.c}}
+\doxysubsubsection{\texorpdfstring{queue\_is\_empty()}{queue\_is\_empty()}}
+{\footnotesize\ttfamily \mbox{\hyperlink{boolean_8h_afdcfe6db5bea87bd493a3fe2c513d5ef}{Bool}} queue\+\_\+is\+\_\+empty (\begin{DoxyParamCaption}\item[{Queue}]{q }\end{DoxyParamCaption})}
+
+Check if the queue contains element 
+\begin{DoxyParams}{Parameters}
+{\em q} & the queue to operate on \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+TRUE if it\textquotesingle{}s empty. FALSE otherwise 
+\end{DoxyReturn}
+\mbox{\Hypertarget{transaction__list_8c_a0822880f1cc2fc8be1497d1c075ce602}\label{transaction__list_8c_a0822880f1cc2fc8be1497d1c075ce602}} 
+\index{transaction\_list.c@{transaction\_list.c}!queue\_last@{queue\_last}}
+\index{queue\_last@{queue\_last}!transaction\_list.c@{transaction\_list.c}}
+\doxysubsubsection{\texorpdfstring{queue\_last()}{queue\_last()}}
+{\footnotesize\ttfamily struct \mbox{\hyperlink{struct_transaction}{Transaction}} queue\+\_\+last (\begin{DoxyParamCaption}\item[{Queue}]{q }\end{DoxyParamCaption})}
+
+Get the last element of the queue 
+\begin{DoxyParams}{Parameters}
+{\em q} & \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+The last \mbox{\hyperlink{struct_transaction}{Transaction}} of the queue 
+\end{DoxyReturn}
+\mbox{\Hypertarget{transaction__list_8c_a01a21c03bc602f27f94653f323d0e4ef}\label{transaction__list_8c_a01a21c03bc602f27f94653f323d0e4ef}} 
+\index{transaction\_list.c@{transaction\_list.c}!queue\_print@{queue\_print}}
+\index{queue\_print@{queue\_print}!transaction\_list.c@{transaction\_list.c}}
+\doxysubsubsection{\texorpdfstring{queue\_print()}{queue\_print()}}
+{\footnotesize\ttfamily void queue\+\_\+print (\begin{DoxyParamCaption}\item[{Queue}]{q }\end{DoxyParamCaption})}
+
+Print the queue in a prettify kinda way 
+\begin{DoxyParams}{Parameters}
+{\em q} & the queue to be printed \\
+\hline
+\end{DoxyParams}
+\mbox{\Hypertarget{transaction__list_8c_ad74e2425d2e9d8d7300c877fc321cbfa}\label{transaction__list_8c_ad74e2425d2e9d8d7300c877fc321cbfa}} 
+\index{transaction\_list.c@{transaction\_list.c}!queue\_remove@{queue\_remove}}
+\index{queue\_remove@{queue\_remove}!transaction\_list.c@{transaction\_list.c}}
+\doxysubsubsection{\texorpdfstring{queue\_remove()}{queue\_remove()}}
+{\footnotesize\ttfamily int queue\+\_\+remove (\begin{DoxyParamCaption}\item[{Queue}]{q,  }\item[{struct \mbox{\hyperlink{struct_transaction}{Transaction}}}]{t }\end{DoxyParamCaption})}
+
+Remove the transaction from the list 
+\begin{DoxyParams}{Parameters}
+{\em q} & the transaction list \\
+\hline
+{\em t} & the transaction to check for remove \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+-\/1 in case of Failure, -\/2 in case of empty queue. 0 otherwise. 
+\end{DoxyReturn}
+\mbox{\Hypertarget{transaction__list_8c_a58f069167e5ce83fd53fc0472e446c9a}\label{transaction__list_8c_a58f069167e5ce83fd53fc0472e446c9a}} 
+\index{transaction\_list.c@{transaction\_list.c}!queue\_remove\_head@{queue\_remove\_head}}
+\index{queue\_remove\_head@{queue\_remove\_head}!transaction\_list.c@{transaction\_list.c}}
+\doxysubsubsection{\texorpdfstring{queue\_remove\_head()}{queue\_remove\_head()}}
+{\footnotesize\ttfamily void queue\+\_\+remove\+\_\+head (\begin{DoxyParamCaption}\item[{Queue}]{q }\end{DoxyParamCaption})}
+
+Remove the first \mbox{\hyperlink{struct_transaction}{Transaction}} in the queue 
+\begin{DoxyParams}{Parameters}
+{\em q} & the queue to operate on \\
+\hline
+\end{DoxyParams}
+\mbox{\Hypertarget{transaction__list_8c_a3e4c3831c9ed465484f5047cf70a884e}\label{transaction__list_8c_a3e4c3831c9ed465484f5047cf70a884e}} 
+\index{transaction\_list.c@{transaction\_list.c}!queue\_to\_array@{queue\_to\_array}}
+\index{queue\_to\_array@{queue\_to\_array}!transaction\_list.c@{transaction\_list.c}}
+\doxysubsubsection{\texorpdfstring{queue\_to\_array()}{queue\_to\_array()}}
+{\footnotesize\ttfamily int queue\+\_\+to\+\_\+array (\begin{DoxyParamCaption}\item[{Queue}]{q,  }\item[{struct \mbox{\hyperlink{struct_transaction}{Transaction}}}]{vector\mbox{[}$\,$\mbox{]} }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{transaction__list_8c_a2ea5e61e8576c1c4c1751f63d4f77cab}\label{transaction__list_8c_a2ea5e61e8576c1c4c1751f63d4f77cab}} 
+\index{transaction\_list.c@{transaction\_list.c}!transaction\_print@{transaction\_print}}
+\index{transaction\_print@{transaction\_print}!transaction\_list.c@{transaction\_list.c}}
+\doxysubsubsection{\texorpdfstring{transaction\_print()}{transaction\_print()}}
+{\footnotesize\ttfamily void transaction\+\_\+print (\begin{DoxyParamCaption}\item[{struct \mbox{\hyperlink{struct_transaction}{Transaction}}}]{t }\end{DoxyParamCaption})}
+
+Print the transaction given 
+\begin{DoxyParams}{Parameters}
+{\em t} & the transaction to be printed \\
+\hline
+\end{DoxyParams}

@@ -1,0 +1,72 @@
+\DoxyHorRuler{0}
+ \hypertarget{md__r_e_a_d_m_e_autotoc_md2}{}\doxysection{Description of the project}\label{md__r_e_a_d_m_e_autotoc_md2}
+The project is meant to be an example of the use of IPC (Inter-\/\+Process Communication) between different processes; simulating a ledger. Utilizing the IPC, the project will be able to send and receive messages between different processes\+:
+
+
+\begin{DoxyItemize}
+\item A {\bfseries{master}} for the handling of the simulation, the creation of the other processes, etc..
+\item SO\+\_\+\+USER\+\_\+\+NUM number of {\bfseries{users}}, each one of them will be able to send money to other users via transactions.
+\item SO\+\_\+\+NODE\+\_\+\+NUM number of {\bfseries{nodes}} that elaborate the transactions.
+\end{DoxyItemize}
+
+For the full text of the project, please visit the \href{/docs/2021.12.19_consegna_progetto.pdf}{\texttt{ Consegna Progetto}}.\textbackslash{} The implementation follows the SYSTEM V IPC (Semaphores, Shared Memory, Message Queues) model and C89 standard. \hypertarget{md__r_e_a_d_m_e_autotoc_md3}{}\doxysection{Requirements}\label{md__r_e_a_d_m_e_autotoc_md3}
+
+\begin{DoxyItemize}
+\item Doxygen\+: for rendering the documentation
+\item Unix Sys\+: Tested on Ubuntu 21.\+10
+\item GCC or GDB\+: make sure to set the {\itshape {\bfseries{correct compiler flags into the Makefile}}}
+\item Cmake
+\end{DoxyItemize}\hypertarget{md__r_e_a_d_m_e_autotoc_md4}{}\doxysection{Installing}\label{md__r_e_a_d_m_e_autotoc_md4}
+Using .zip file\+: 
+\begin{DoxyCode}{0}
+\DoxyCodeLine{unzip gt-\/so-\/project-\/21-\/22.zip}
+
+\end{DoxyCode}
+ Using git\+: 
+\begin{DoxyCode}{0}
+\DoxyCodeLine{Not allowed by University of Turin :zipper\_mouth\_face:}
+
+\end{DoxyCode}
+\hypertarget{md__r_e_a_d_m_e_autotoc_md5}{}\doxysection{Information about the chosen implementation}\label{md__r_e_a_d_m_e_autotoc_md5}
+\doxysubparagraph*{Signals utilized by the project}
+
+
+\begin{DoxyItemize}
+\item SIGINT\+: used to terminate the program
+\item SIGALRM\+: used to simulate the time of the program and make routine tasks by the processes
+\item SIGUSR2\+: used by the Master to get the status of the processes
+\item SIGUSR1\+: involved in the handling of a new node process (the node process is created by the Master)
+\end{DoxyItemize}
+
+\doxysubparagraph*{Master proc\+:}
+
+
+\begin{DoxyEnumerate}
+\item The master process read the conf file, creates all the necessary IPC resources starting from the semaphores and the shared memory. It creates a shm for the configuration in order to share between the processes the information about the number of users and the number of nodes and their positioning into the message queue, and in case of the nodes the friends of each node.\textbackslash{}
+\item Proceeds to create the processes of the users and the nodes adding them to the shm for the configuration.\textbackslash{}
+\item Fill the friends positioning into the shm for the configuration.\textbackslash{}
+\item Configure a signal handler
+\item start\textquotesingle{}s the simulation utilizing a semaphore to sinchronize the processes.\textbackslash{}
+\item Lunch a SIGALRM to print information about the current status of the simulation.
+\item Wait for the SIGINT signal to terminate the program.
+\end{DoxyEnumerate}
+
+\doxysubparagraph*{Users\+:}
+
+
+\begin{DoxyEnumerate}
+\item The user after reading the conf file attaches to the IPC resources and waits on the starting semaphore.\textbackslash{}
+\item Lunch a SIGALRM to generate a transaction. (is not related to point 3)\textbackslash{}
+\item Start generating transactions. until the balance allows to do so.\textbackslash{}
+\item Wants to get richer, and if it is possible, it does and get back to point 3.\textbackslash{}
+\end{DoxyEnumerate}
+
+\doxysubparagraph*{Nodes\+:}
+
+
+\begin{DoxyEnumerate}
+\item The node after reading the conf file attaches to the IPC resources and waits on the starting semaphore.\textbackslash{}
+\item Lunch a SIGALRM to generate send a transaction to a random node friend. (is not related to point 3)\textbackslash{}
+\item Handle transactions.
+\item 
+\end{DoxyEnumerate}

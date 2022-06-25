@@ -1,0 +1,35 @@
+\hypertarget{conf__shm_8h_source}{}\doxysection{conf\+\_\+shm.\+h}
+\label{conf__shm_8h_source}\index{src/local\_lib/headers/conf\_shm.h@{src/local\_lib/headers/conf\_shm.h}}
+\mbox{\hyperlink{conf__shm_8h}{Go to the documentation of this file.}}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{1 }
+\DoxyCodeLine{7 \textcolor{preprocessor}{\#ifndef DGT\_SO\_PROJECT\_21\_22\_CONF\_SHM\_H}}
+\DoxyCodeLine{8 \textcolor{preprocessor}{\#define DGT\_SO\_PROJECT\_21\_22\_CONF\_SHM\_H}}
+\DoxyCodeLine{9 }
+\DoxyCodeLine{10 \textcolor{preprocessor}{\#include "{}\mbox{\hyperlink{glob_8h}{glob.h}}"{}}}
+\DoxyCodeLine{11 \textcolor{preprocessor}{\#include "{}\mbox{\hyperlink{boolean_8h}{boolean.h}}"{}}}
+\DoxyCodeLine{12 }
+\DoxyCodeLine{21 \textcolor{keyword}{struct }\mbox{\hyperlink{structshm__conf}{shm\_conf}} \{}
+\DoxyCodeLine{22     \textcolor{keywordtype}{int} \mbox{\hyperlink{structshm__conf_a44c0bacd273eb3cb5c247800977a3d51}{users\_snapshots}}[\mbox{\hyperlink{group___n_u_m_gae06302813b35864e23de62f0cb0d0786}{USERS\_MAX}}][2]; }
+\DoxyCodeLine{23     \textcolor{keywordtype}{int} \mbox{\hyperlink{structshm__conf_a756b65d31554e7bbc47f2f0bc156b6ac}{nodes\_snapshots}}[\mbox{\hyperlink{group___n_u_m_gafa04adbda4886a89c58926abb351386c}{NODES\_MAX}}][3]; }
+\DoxyCodeLine{24 \};}
+\DoxyCodeLine{25 }
+\DoxyCodeLine{37 \textcolor{keywordtype}{int}}
+\DoxyCodeLine{38 \mbox{\hyperlink{conf__shm_8h_a5d2705dac03735e607a53b3c6a911b16}{shm\_conf\_create}}(\textcolor{keyword}{struct} \mbox{\hyperlink{structshm__conf}{shm\_conf}} *self, \textcolor{keywordtype}{int} *users\_pids, \textcolor{keywordtype}{int} *users\_queues\_ids, \textcolor{keywordtype}{int} *nodes\_pids, \textcolor{keywordtype}{int} *nodes\_queues\_ids,}
+\DoxyCodeLine{39                 \textcolor{keywordtype}{int} *nodes\_friends);}
+\DoxyCodeLine{40 }
+\DoxyCodeLine{45 \textcolor{keywordtype}{void} \mbox{\hyperlink{conf__shm_8h_aee99d2b9c42f033510e1212aba80b38c}{shm\_conf\_print}}(\textcolor{keyword}{struct} \mbox{\hyperlink{structshm__conf}{shm\_conf}} *self);}
+\DoxyCodeLine{46 }
+\DoxyCodeLine{53 \textcolor{keywordtype}{void} \mbox{\hyperlink{conf__shm_8h_a11c9df2f462ec214165c6528cae7a2a1}{shm\_copy\_snapshots\_users}}(\textcolor{keywordtype}{int} (*snapshot)[2], \textcolor{keywordtype}{int} *pids, \textcolor{keywordtype}{int} *queues\_ids);}
+\DoxyCodeLine{54 }
+\DoxyCodeLine{62 \textcolor{keywordtype}{void} \mbox{\hyperlink{conf__shm_8h_a1bd121ff7e6b2651deb1f99b96414fe2}{shm\_copy\_snapshots\_nodes}}(\textcolor{keywordtype}{int} (*snapshot)[3], \textcolor{keywordtype}{int} *pids, \textcolor{keywordtype}{int} *queues\_ids, \textcolor{keywordtype}{int} *\mbox{\hyperlink{node__proc_8c_aed763209d90cbafd9a1c8b3b1602daba}{friends}});}
+\DoxyCodeLine{63 }
+\DoxyCodeLine{71 \textcolor{keywordtype}{int} \mbox{\hyperlink{conf__shm_8h_acba6da79a99bccd104b6236a0b6c2b74}{get\_queueid\_by\_pid}}(\textcolor{keyword}{struct} \mbox{\hyperlink{structshm__conf}{shm\_conf}} *self, \textcolor{keywordtype}{int} pid, \mbox{\hyperlink{boolean_8h_afdcfe6db5bea87bd493a3fe2c513d5ef}{Bool}} in\_users);}
+\DoxyCodeLine{72 }
+\DoxyCodeLine{79 \textcolor{keywordtype}{int} \mbox{\hyperlink{conf__shm_8h_ac08742b59044f460f3fdbcd2bb8df17c}{get\_node\_position\_by\_pid}}(\textcolor{keyword}{struct} \mbox{\hyperlink{structshm__conf}{shm\_conf}} *self, \textcolor{keywordtype}{int} pid);}
+\DoxyCodeLine{80 }
+\DoxyCodeLine{89 \mbox{\hyperlink{boolean_8h_afdcfe6db5bea87bd493a3fe2c513d5ef}{Bool}} \mbox{\hyperlink{conf__shm_8h_afd64946d792d030bc538a51b8b899bb5}{shm\_conf\_add\_node}}(\textcolor{keyword}{struct} \mbox{\hyperlink{structshm__conf}{shm\_conf}} *self, \textcolor{keywordtype}{int} pid, \textcolor{keywordtype}{int} queue\_id, \textcolor{keywordtype}{int} \mbox{\hyperlink{node__proc_8c_aed763209d90cbafd9a1c8b3b1602daba}{friends}});}
+\DoxyCodeLine{90 }
+\DoxyCodeLine{91 \textcolor{preprocessor}{\#endif }\textcolor{comment}{/*DGT\_SO\_PROJECT\_21\_22\_CONF\_SHM\_H*/}\textcolor{preprocessor}{}}
+
+\end{DoxyCode}

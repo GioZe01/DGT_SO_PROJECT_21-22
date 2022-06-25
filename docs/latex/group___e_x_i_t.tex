@@ -1,0 +1,48 @@
+\hypertarget{group___e_x_i_t}{}\doxysection{PROCEDURES}
+\label{group___e_x_i_t}\index{PROCEDURES@{PROCEDURES}}
+
+
+Macros for the procedure of ending the child process in case of error.  
+
+
+\doxysubsection*{Macros}
+\begin{DoxyCompactItemize}
+\item 
+\#define \mbox{\hyperlink{group___e_x_i_t_ga0dfcd2bc4401273614b80746ce74a6c1}{EXIT\+\_\+\+PROCEDURE\+\_\+\+USER}}(exit\+\_\+value)
+\item 
+\#define \mbox{\hyperlink{group___e_x_i_t_gaf242bf8300ff9c792976876fd9c83df7}{EXIT\+\_\+\+PROCEDURE\+\_\+\+NODE}}(exit\+\_\+value)
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+Macros for the procedure of ending the child process in case of error. 
+
+
+
+\doxysubsection{Macro Definition Documentation}
+\mbox{\Hypertarget{group___e_x_i_t_gaf242bf8300ff9c792976876fd9c83df7}\label{group___e_x_i_t_gaf242bf8300ff9c792976876fd9c83df7}} 
+\index{PROCEDURES@{PROCEDURES}!EXIT\_PROCEDURE\_NODE@{EXIT\_PROCEDURE\_NODE}}
+\index{EXIT\_PROCEDURE\_NODE@{EXIT\_PROCEDURE\_NODE}!PROCEDURES@{PROCEDURES}}
+\doxysubsubsection{\texorpdfstring{EXIT\_PROCEDURE\_NODE}{EXIT\_PROCEDURE\_NODE}}
+{\footnotesize\ttfamily \#define EXIT\+\_\+\+PROCEDURE\+\_\+\+NODE(\begin{DoxyParamCaption}\item[{}]{exit\+\_\+value }\end{DoxyParamCaption})}
+
+{\bfseries Value\+:}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{                                \mbox{\hyperlink{simulation__errors_8h_ae9717df6876ca8e6137c741e7ff7d45b}{free\_mem\_node}}();         \(\backslash\)}
+\DoxyCodeLine{                                free\_sysVar\_node();      \(\backslash\)}
+\DoxyCodeLine{                                exit(exit\_value)}
+
+\end{DoxyCode}
+\mbox{\Hypertarget{group___e_x_i_t_ga0dfcd2bc4401273614b80746ce74a6c1}\label{group___e_x_i_t_ga0dfcd2bc4401273614b80746ce74a6c1}} 
+\index{PROCEDURES@{PROCEDURES}!EXIT\_PROCEDURE\_USER@{EXIT\_PROCEDURE\_USER}}
+\index{EXIT\_PROCEDURE\_USER@{EXIT\_PROCEDURE\_USER}!PROCEDURES@{PROCEDURES}}
+\doxysubsubsection{\texorpdfstring{EXIT\_PROCEDURE\_USER}{EXIT\_PROCEDURE\_USER}}
+{\footnotesize\ttfamily \#define EXIT\+\_\+\+PROCEDURE\+\_\+\+USER(\begin{DoxyParamCaption}\item[{}]{exit\+\_\+value }\end{DoxyParamCaption})}
+
+{\bfseries Value\+:}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{                                \mbox{\hyperlink{simulation__errors_8h_a7aa28a9ba366e148da782c85968076db}{free\_mem\_user}}();         \(\backslash\)}
+\DoxyCodeLine{                                free\_sysVar\_user();      \(\backslash\)}
+\DoxyCodeLine{                                exit(exit\_value)}
+
+\end{DoxyCode}

@@ -1,0 +1,4 @@
+<map id="MASTER_QUEUE_KEY" name="MASTER_QUEUE_KEY">
+<area shape="rect" id="node1" title="The key for the master report queue." alt="" coords="100,5,261,31"/>
+<area shape="rect" id="node2" href="$group___q_u_e_u_e.html" title="The key for the queue semaphore values ranges from 71 to 80." alt="" coords="5,5,52,31"/>
+</map>

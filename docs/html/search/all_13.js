@@ -1,0 +1,27 @@
+var searchData=
+[
+  ['t_0',['t',['../structmaster__msg__report.html#a56bd9d2b5fdd55a29ec318130a05d84f',1,'master_msg_report::t()'],['../structnode__msg.html#a56bd9d2b5fdd55a29ec318130a05d84f',1,'node_msg::t()'],['../structuser__msg.html#a56bd9d2b5fdd55a29ec318130a05d84f',1,'user_msg::t()'],['../structnode.html#a56bd9d2b5fdd55a29ec318130a05d84f',1,'node::t()']]],
+  ['t_5ftype_1',['t_type',['../struct_transaction.html#ab1b70be237357a0db43b60039356d9b6',1,'Transaction']]],
+  ['termination_5fend_5fcorrectly_2',['TERMINATION_END_CORRECTLY',['../master__msg__report_8h.html#adfefd10d55df8fad52b3d2f8d68dc66aa213d4c91683a8280bccd19c95f7d1aac',1,'master_msg_report.h']]],
+  ['terminator_3',['terminator',['../process__info__list_8c.html#a7fffb7531f2b35fee3264db43fba017d',1,'terminator(ProcList self):&#160;process_info_list.c'],['../process__info__list_8h.html#a7fffb7531f2b35fee3264db43fba017d',1,'terminator(ProcList self):&#160;process_info_list.c']]],
+  ['timestamp_4',['timestamp',['../struct_transaction.html#a2aace03835c4d951b3dee117b328ef87',1,'Transaction']]],
+  ['to_5ffill_5',['to_fill',['../structshm__book__master.html#a57ca1625efeacaa8eb3a7001f2065c90',1,'shm_book_master']]],
+  ['to_5fwait_5ftransaction_6',['to_wait_transaction',['../structuser__transaction.html#a1257927113a04c56e2ea12b142441dc4',1,'user_transaction']]],
+  ['tp_5ffull_7',['TP_FULL',['../master__msg__report_8h.html#adfefd10d55df8fad52b3d2f8d68dc66aae1ceebc90f55f4de7a710e3e461b2d53',1,'master_msg_report.h']]],
+  ['tp_5ffull_5fhandler_8',['tp_full_handler',['../main_8c.html#a0f8bcf452d847d662611b193956d0fbc',1,'main.c']]],
+  ['tp_5fsize_9',['tp_size',['../structnode.html#a4815db050d5f27d4b4e922d61bf6ca88',1,'node']]],
+  ['transaction_10',['Transaction',['../struct_transaction.html',1,'']]],
+  ['transaction_5ffailed_11',['TRANSACTION_FAILED',['../group___t_r_a_n_s_a_c_t_i_o_n.html#gae014e4ccad1cdab524116fe12eeeb019',1,'transaction_list.h']]],
+  ['transaction_5flist_12',['transaction_list',['../structtransaction__list.html',1,'']]],
+  ['transaction_5flist_2ec_13',['transaction_list.c',['../transaction__list_8c.html',1,'']]],
+  ['transaction_5flist_2eh_14',['transaction_list.h',['../transaction__list_8h.html',1,'']]],
+  ['transaction_5fprint_15',['transaction_print',['../transaction__list_8c.html#a2ea5e61e8576c1c4c1751f63d4f77cab',1,'transaction_print(struct Transaction t):&#160;transaction_list.c'],['../transaction__list_8h.html#a2ea5e61e8576c1c4c1751f63d4f77cab',1,'transaction_print(struct Transaction t):&#160;transaction_list.c']]],
+  ['transaction_5fsucces_16',['TRANSACTION_SUCCES',['../group___t_r_a_n_s_a_c_t_i_o_n.html#gab9ac4ae07455898e68aba90097416561',1,'transaction_list.h']]],
+  ['transaction_5fwaiting_17',['TRANSACTION_WAITING',['../group___t_r_a_n_s_a_c_t_i_o_n.html#ga372cf53d1af73707059cb2cbae422bad',1,'transaction_list.h']]],
+  ['transactions_18',['transactions',['../structtransaction__list.html#a7169b4da974ef828f97adf2a4c6aad9c',1,'transaction_list']]],
+  ['transactions_5fblock_19',['transactions_block',['../structnode.html#a37423ab7a4227ac1171c72cbb63b6c18',1,'node']]],
+  ['transactions_5ffailed_20',['transactions_failed',['../structuser__transaction.html#a803647f7a567ae42a3b8d261552bd101',1,'user_transaction']]],
+  ['transactions_5fpool_21',['transactions_pool',['../structnode.html#acd48ecee26244dc76aa4268dfce00f3b',1,'node']]],
+  ['true_22',['TRUE',['../boolean_8h.html#aa8cecfc5c5c054d2875c03e77b7be15d',1,'boolean.h']]],
+  ['type_23',['type',['../structuser__msg.html#a6a83a8677f7c78fd146859325e08209a',1,'user_msg::type()'],['../structnode__msg.html#a6a83a8677f7c78fd146859325e08209a',1,'node_msg::type()'],['../structmaster__msg__report.html#a6a83a8677f7c78fd146859325e08209a',1,'master_msg_report::type()']]]
+];

@@ -1,0 +1,28 @@
+var user__proc_8c =
+[
+    [ "advice_master_of_termination", "user__proc_8c.html#abc129d1714860d417e1190d554cd3440", null ],
+    [ "attach_to_shm_conf", "user__proc_8c.html#aaf6efbd7058a54d7b59c1ce4ee18318e", null ],
+    [ "check_argument", "user__proc_8c.html#a66ab7d08549d235aa0f9deedc0fae07c", null ],
+    [ "check_for_transactions_confirmed", "user__proc_8c.html#a713c2a9ac57a1f4e96da6610c9d1f9bb", null ],
+    [ "check_for_transactions_failed", "user__proc_8c.html#a7071f09c1fc2adb27d68c6d2ac44f263", null ],
+    [ "connect_to_queues", "user__proc_8c.html#a5d8a16cab7f370d9a65db397afadc879", null ],
+    [ "free_mem_user", "user__proc_8c.html#a7aa28a9ba366e148da782c85968076db", null ],
+    [ "free_sysVar_user", "user__proc_8c.html#a9fc9fdbd09f3e40f4556e5fa7151c539", null ],
+    [ "gen_sleep_time", "user__proc_8c.html#a9e8e0c9a43bed5c0d6efd886e07c4e02", null ],
+    [ "generating_transactions", "user__proc_8c.html#a554bf92a718c4ab8bd8427b24d91377c", null ],
+    [ "getting_richer", "user__proc_8c.html#a0a2e2de5379aa90d65d0b87425acfee2", null ],
+    [ "main", "user__proc_8c.html#ae78f05b51b6e7ae75e3782eb3d6c1dee", null ],
+    [ "read_conf", "user__proc_8c.html#a1c60ebb388756179310b61db4bfafbd1", null ],
+    [ "send_to_node", "user__proc_8c.html#a1087b51fb0698b2c97b13520a44f4477", null ],
+    [ "set_signal_handler_user", "user__proc_8c.html#a26a8c4fd29996539b344d7bb4e4396d0", null ],
+    [ "signals_handler_user", "user__proc_8c.html#af0d295cc39a8a3c9e93f198b52d4902c", null ],
+    [ "configuration", "user__proc_8c.html#ae680050004de2d6f18cb69167cf4de3f", null ],
+    [ "current_mask", "user__proc_8c.html#a230c4eaa89fdddbb7c42f1b6019fa3b1", null ],
+    [ "current_user", "user__proc_8c.html#aac346eec477aed9732da0906621da5ce", null ],
+    [ "queue_master_id", "user__proc_8c.html#aa08429407287f0f88618f338895be369", null ],
+    [ "queue_node_id", "user__proc_8c.html#a1ccf22d1a76cc0edb493206dd91a063e", null ],
+    [ "queue_user_id", "user__proc_8c.html#a81b4a7a6586efbb012387c887f004c4c", null ],
+    [ "semaphore_start_id", "user__proc_8c.html#ac62b22414674bece75bc2fea3847c48f", null ],
+    [ "shm_conf_pointer", "user__proc_8c.html#afec317dfe8d38f10717665f51bec0f93", null ],
+    [ "user_id", "user__proc_8c.html#a8084294edcd0a07608d70b83ab7d5f72", null ]
+];

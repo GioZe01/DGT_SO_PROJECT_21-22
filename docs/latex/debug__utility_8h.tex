@@ -1,0 +1,92 @@
+\hypertarget{debug__utility_8h}{}\doxysection{src/local\+\_\+lib/headers/debug\+\_\+utility.h File Reference}
+\label{debug__utility_8h}\index{src/local\_lib/headers/debug\_utility.h@{src/local\_lib/headers/debug\_utility.h}}
+
+
+Debug utility macros.  
+
+
+{\ttfamily \#include \char`\"{}glob.\+h\char`\"{}}\newline
+Include dependency graph for debug\+\_\+utility.\+h\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=226pt]{debug__utility_8h__incl}
+\end{center}
+\end{figure}
+This graph shows which files directly or indirectly include this file\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{debug__utility_8h__dep__incl}
+\end{center}
+\end{figure}
+\doxysubsection*{Macros}
+\begin{DoxyCompactItemize}
+\item 
+\#define \mbox{\hyperlink{debug__utility_8h_a3cadae3112a6a16fb452b1c1f79d7238}{DEBUG\+\_\+\+NOTIFY\+\_\+\+ACTIVITY\+\_\+\+RUNNING}}(mex)
+\item 
+\#define \mbox{\hyperlink{debug__utility_8h_af1bd9f6cef6eeb1f8e13af06c4ec9778}{DEBUG\+\_\+\+NOTIFY\+\_\+\+ACTIVITY\+\_\+\+DONE}}(mex)
+\item 
+\#define \mbox{\hyperlink{debug__utility_8h_a69277eff22ca52a411c09982c8be3ac8}{DEBUG\+\_\+\+MESSAGE}}(mex)
+\item 
+\#define \mbox{\hyperlink{debug__utility_8h_a6c474120d64f1aa7019f35511b21c50f}{DEBUG\+\_\+\+SIGNAL}}(mex,  signum)
+\item 
+\#define \mbox{\hyperlink{debug__utility_8h_a051f61037f4c5dd41bccc0c6b165c001}{DEBUG\+\_\+\+ERROR\+\_\+\+MESSAGE}}(mex)
+\item 
+\#define \mbox{\hyperlink{debug__utility_8h_a5e74bd4e0c73e1fab6362178369bb2b5}{DEBUG\+\_\+\+BLOCK\+\_\+\+ACTION\+\_\+\+START}}(mex)
+\item 
+\#define \mbox{\hyperlink{debug__utility_8h_a6f0ef9068f49969a24c689bed4f51f41}{DEBUG\+\_\+\+BLOCK\+\_\+\+ACTION\+\_\+\+END}}()
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+Debug utility macros. 
+
+\begin{DoxyAuthor}{Author}
+Giovanni Terzuolo 
+\end{DoxyAuthor}
+
+
+\doxysubsection{Macro Definition Documentation}
+\mbox{\Hypertarget{debug__utility_8h_a6f0ef9068f49969a24c689bed4f51f41}\label{debug__utility_8h_a6f0ef9068f49969a24c689bed4f51f41}} 
+\index{debug\_utility.h@{debug\_utility.h}!DEBUG\_BLOCK\_ACTION\_END@{DEBUG\_BLOCK\_ACTION\_END}}
+\index{DEBUG\_BLOCK\_ACTION\_END@{DEBUG\_BLOCK\_ACTION\_END}!debug\_utility.h@{debug\_utility.h}}
+\doxysubsubsection{\texorpdfstring{DEBUG\_BLOCK\_ACTION\_END}{DEBUG\_BLOCK\_ACTION\_END}}
+{\footnotesize\ttfamily \#define DEBUG\+\_\+\+BLOCK\+\_\+\+ACTION\+\_\+\+END(\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{debug__utility_8h_a5e74bd4e0c73e1fab6362178369bb2b5}\label{debug__utility_8h_a5e74bd4e0c73e1fab6362178369bb2b5}} 
+\index{debug\_utility.h@{debug\_utility.h}!DEBUG\_BLOCK\_ACTION\_START@{DEBUG\_BLOCK\_ACTION\_START}}
+\index{DEBUG\_BLOCK\_ACTION\_START@{DEBUG\_BLOCK\_ACTION\_START}!debug\_utility.h@{debug\_utility.h}}
+\doxysubsubsection{\texorpdfstring{DEBUG\_BLOCK\_ACTION\_START}{DEBUG\_BLOCK\_ACTION\_START}}
+{\footnotesize\ttfamily \#define DEBUG\+\_\+\+BLOCK\+\_\+\+ACTION\+\_\+\+START(\begin{DoxyParamCaption}\item[{}]{mex }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{debug__utility_8h_a051f61037f4c5dd41bccc0c6b165c001}\label{debug__utility_8h_a051f61037f4c5dd41bccc0c6b165c001}} 
+\index{debug\_utility.h@{debug\_utility.h}!DEBUG\_ERROR\_MESSAGE@{DEBUG\_ERROR\_MESSAGE}}
+\index{DEBUG\_ERROR\_MESSAGE@{DEBUG\_ERROR\_MESSAGE}!debug\_utility.h@{debug\_utility.h}}
+\doxysubsubsection{\texorpdfstring{DEBUG\_ERROR\_MESSAGE}{DEBUG\_ERROR\_MESSAGE}}
+{\footnotesize\ttfamily \#define DEBUG\+\_\+\+ERROR\+\_\+\+MESSAGE(\begin{DoxyParamCaption}\item[{}]{mex }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{debug__utility_8h_a69277eff22ca52a411c09982c8be3ac8}\label{debug__utility_8h_a69277eff22ca52a411c09982c8be3ac8}} 
+\index{debug\_utility.h@{debug\_utility.h}!DEBUG\_MESSAGE@{DEBUG\_MESSAGE}}
+\index{DEBUG\_MESSAGE@{DEBUG\_MESSAGE}!debug\_utility.h@{debug\_utility.h}}
+\doxysubsubsection{\texorpdfstring{DEBUG\_MESSAGE}{DEBUG\_MESSAGE}}
+{\footnotesize\ttfamily \#define DEBUG\+\_\+\+MESSAGE(\begin{DoxyParamCaption}\item[{}]{mex }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{debug__utility_8h_af1bd9f6cef6eeb1f8e13af06c4ec9778}\label{debug__utility_8h_af1bd9f6cef6eeb1f8e13af06c4ec9778}} 
+\index{debug\_utility.h@{debug\_utility.h}!DEBUG\_NOTIFY\_ACTIVITY\_DONE@{DEBUG\_NOTIFY\_ACTIVITY\_DONE}}
+\index{DEBUG\_NOTIFY\_ACTIVITY\_DONE@{DEBUG\_NOTIFY\_ACTIVITY\_DONE}!debug\_utility.h@{debug\_utility.h}}
+\doxysubsubsection{\texorpdfstring{DEBUG\_NOTIFY\_ACTIVITY\_DONE}{DEBUG\_NOTIFY\_ACTIVITY\_DONE}}
+{\footnotesize\ttfamily \#define DEBUG\+\_\+\+NOTIFY\+\_\+\+ACTIVITY\+\_\+\+DONE(\begin{DoxyParamCaption}\item[{}]{mex }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{debug__utility_8h_a3cadae3112a6a16fb452b1c1f79d7238}\label{debug__utility_8h_a3cadae3112a6a16fb452b1c1f79d7238}} 
+\index{debug\_utility.h@{debug\_utility.h}!DEBUG\_NOTIFY\_ACTIVITY\_RUNNING@{DEBUG\_NOTIFY\_ACTIVITY\_RUNNING}}
+\index{DEBUG\_NOTIFY\_ACTIVITY\_RUNNING@{DEBUG\_NOTIFY\_ACTIVITY\_RUNNING}!debug\_utility.h@{debug\_utility.h}}
+\doxysubsubsection{\texorpdfstring{DEBUG\_NOTIFY\_ACTIVITY\_RUNNING}{DEBUG\_NOTIFY\_ACTIVITY\_RUNNING}}
+{\footnotesize\ttfamily \#define DEBUG\+\_\+\+NOTIFY\+\_\+\+ACTIVITY\+\_\+\+RUNNING(\begin{DoxyParamCaption}\item[{}]{mex }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{debug__utility_8h_a6c474120d64f1aa7019f35511b21c50f}\label{debug__utility_8h_a6c474120d64f1aa7019f35511b21c50f}} 
+\index{debug\_utility.h@{debug\_utility.h}!DEBUG\_SIGNAL@{DEBUG\_SIGNAL}}
+\index{DEBUG\_SIGNAL@{DEBUG\_SIGNAL}!debug\_utility.h@{debug\_utility.h}}
+\doxysubsubsection{\texorpdfstring{DEBUG\_SIGNAL}{DEBUG\_SIGNAL}}
+{\footnotesize\ttfamily \#define DEBUG\+\_\+\+SIGNAL(\begin{DoxyParamCaption}\item[{}]{mex,  }\item[{}]{signum }\end{DoxyParamCaption})}
+

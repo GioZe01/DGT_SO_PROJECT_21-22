@@ -1,0 +1,9 @@
+<map id="src/local_lib/headers/conf_shm.h" name="src/local_lib/headers/conf_shm.h">
+<area shape="rect" id="node1" title="Header file for shm_conf.c Define the shared memory structure and the functions to create and destroy..." alt="" coords="245,5,400,47"/>
+<area shape="rect" id="node2" href="$user__transaction_8h.html" title="Header file for user_transaction.c Contains the definition of the struct user_transaction and the fun..." alt="" coords="68,95,223,136"/>
+<area shape="rect" id="node3" href="$user__transaction_8c.html" title=" " alt="" coords="5,184,136,225"/>
+<area shape="rect" id="node4" href="$user__proc_8c.html" title=" " alt="" coords="179,191,298,218"/>
+<area shape="rect" id="node5" href="$shm__conf_8c.html" title=" " alt="" coords="297,102,473,129"/>
+<area shape="rect" id="node6" href="$main_8c.html" title=" " alt="" coords="498,102,587,129"/>
+<area shape="rect" id="node7" href="$node__proc_8c.html" title=" " alt="" coords="612,102,735,129"/>
+</map>

@@ -1,0 +1,16 @@
+<map id="src/local_lib/node_msg_report.c" name="src/local_lib/node_msg_report.c">
+<area shape="rect" id="node1" title=" " alt="" coords="413,5,547,47"/>
+<area shape="rect" id="node2" title=" " alt="" coords="5,259,72,285"/>
+<area shape="rect" id="node3" title=" " alt="" coords="625,102,695,129"/>
+<area shape="rect" id="node4" title=" " alt="" coords="481,184,549,211"/>
+<area shape="rect" id="node5" title=" " alt="" coords="720,102,808,129"/>
+<area shape="rect" id="node6" href="$node__msg__report_8h.html" title="Header file for node_msg_report.c Contains the definition of the functions and structures used to han..." alt="" coords="75,102,277,129"/>
+<area shape="rect" id="node8" href="$transaction__list_8h.html" title="Header file for the transaction_list.c file. Contains the definition of the Transaction structure and..." alt="" coords="141,184,275,211"/>
+<area shape="rect" id="node11" href="$boolean_8h.html" title="Type Definition for the boolean type using integer values Done for C89 compatibility." alt="" coords="473,259,559,285"/>
+<area shape="rect" id="node12" href="$simulation__errors_8h.html" title="Macros for the procedure of ending the different types of processes in case of error...." alt="" coords="352,95,499,136"/>
+<area shape="rect" id="node7" title=" " alt="" coords="96,259,171,285"/>
+<area shape="rect" id="node9" title=" " alt="" coords="195,259,259,285"/>
+<area shape="rect" id="node10" title=" " alt="" coords="283,259,379,285"/>
+<area shape="rect" id="node13" title=" " alt="" coords="386,184,457,211"/>
+<area shape="rect" id="node14" href="$glob_8h.html" title="Definition of Values and Macros for the project." alt="" coords="299,184,362,211"/>
+</map>

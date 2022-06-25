@@ -1,0 +1,17 @@
+<map id="src/local_lib/master_msg_report.c" name="src/local_lib/master_msg_report.c">
+<area shape="rect" id="node1" title=" " alt="" coords="413,5,563,47"/>
+<area shape="rect" id="node2" title=" " alt="" coords="5,259,72,285"/>
+<area shape="rect" id="node3" title=" " alt="" coords="790,184,858,211"/>
+<area shape="rect" id="node4" title=" " alt="" coords="871,102,959,129"/>
+<area shape="rect" id="node5" href="$master__msg__report_8h.html" title="Header file for the master_msg_report.c module. Contains the definitions of the functions,..." alt="" coords="167,95,326,136"/>
+<area shape="rect" id="node8" href="$process__info__list_8h.html" title="Header file for the process_info_list.c file. Contains the definition of the ProcessInfo structure an..." alt="" coords="330,184,473,211"/>
+<area shape="rect" id="node10" href="$transaction__list_8h.html" title="Header file for the transaction_list.c file. Contains the definition of the Transaction structure and..." alt="" coords="69,184,203,211"/>
+<area shape="rect" id="node12" href="$glob_8h.html" title="Definition of Values and Macros for the project." alt="" coords="497,184,615,211"/>
+<area shape="rect" id="node13" href="$simulation__errors_8h.html" title="Macros for the procedure of ending the different types of processes in case of error...." alt="" coords="649,95,796,136"/>
+<area shape="rect" id="node15" href="$debug__utility_8h.html" title="Debug utility macros." alt="" coords="401,102,575,129"/>
+<area shape="rect" id="node6" title=" " alt="" coords="307,259,381,285"/>
+<area shape="rect" id="node7" href="$boolean_8h.html" title="Type Definition for the boolean type using integer values Done for C89 compatibility." alt="" coords="195,259,282,285"/>
+<area shape="rect" id="node9" title=" " alt="" coords="405,259,501,285"/>
+<area shape="rect" id="node11" title=" " alt="" coords="104,259,168,285"/>
+<area shape="rect" id="node14" title=" " alt="" coords="687,184,758,211"/>
+</map>

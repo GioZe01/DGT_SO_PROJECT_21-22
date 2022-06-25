@@ -1,0 +1,10 @@
+<map id="src/local_lib/headers/book_master_shm.h" name="src/local_lib/headers/book_master_shm.h">
+<area shape="rect" id="node1" title="header file for the book_master_shm.c file Defines the functions used to create and manage the shared..." alt="" coords="117,5,275,47"/>
+<area shape="rect" id="node2" href="$transaction__list_8h.html" title="Header file for the transaction_list.c file. Contains the definition of the Transaction structure and..." alt="" coords="190,95,325,121"/>
+<area shape="rect" id="node8" href="$glob_8h.html" title="Definition of Values and Macros for the project." alt="" coords="103,95,166,121"/>
+<area shape="rect" id="node3" title=" " alt="" coords="224,169,291,196"/>
+<area shape="rect" id="node4" title=" " alt="" coords="125,169,200,196"/>
+<area shape="rect" id="node5" title=" " alt="" coords="315,169,379,196"/>
+<area shape="rect" id="node6" title=" " alt="" coords="5,169,101,196"/>
+<area shape="rect" id="node7" href="$boolean_8h.html" title="Type Definition for the boolean type using integer values Done for C89 compatibility." alt="" coords="403,169,490,196"/>
+</map>

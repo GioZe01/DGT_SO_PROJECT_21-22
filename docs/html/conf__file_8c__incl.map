@@ -1,0 +1,13 @@
+<map id="src/local_lib/conf_file.c" name="src/local_lib/conf_file.c">
+<area shape="rect" id="node1" title=" " alt="" coords="195,5,325,47"/>
+<area shape="rect" id="node2" title=" " alt="" coords="5,102,72,129"/>
+<area shape="rect" id="node3" title=" " alt="" coords="97,102,167,129"/>
+<area shape="rect" id="node4" title=" " alt="" coords="324,259,399,285"/>
+<area shape="rect" id="node5" href="$conf__file_8h.html" title="Header file for the configuration file parser conf_file.c." alt="" coords="243,102,389,129"/>
+<area shape="rect" id="node6" href="$boolean_8h.html" title="Type Definition for the boolean type using integer values Done for C89 compatibility." alt="" coords="279,184,366,211"/>
+<area shape="rect" id="node7" href="$simulation__errors_8h.html" title="Macros for the procedure of ending the different types of processes in case of error...." alt="" coords="464,95,611,136"/>
+<area shape="rect" id="node8" title=" " alt="" coords="402,184,473,211"/>
+<area shape="rect" id="node9" title=" " alt="" coords="497,184,565,211"/>
+<area shape="rect" id="node10" href="$glob_8h.html" title="Definition of Values and Macros for the project." alt="" coords="589,184,651,211"/>
+<area shape="rect" id="node11" title=" " alt="" coords="572,259,668,285"/>
+</map>

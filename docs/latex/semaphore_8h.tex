@@ -1,0 +1,82 @@
+\hypertarget{semaphore_8h}{}\doxysection{src/local\+\_\+lib/headers/semaphore.h File Reference}
+\label{semaphore_8h}\index{src/local\_lib/headers/semaphore.h@{src/local\_lib/headers/semaphore.h}}
+
+
+Semaphore header file.  
+
+
+This graph shows which files directly or indirectly include this file\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{semaphore_8h__dep__incl}
+\end{center}
+\end{figure}
+\doxysubsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+int \mbox{\hyperlink{semaphore_8h_aa486d6d7ed75bdb056c96ed6d5e71300}{semaphore\+\_\+lock}} (int semaphore\+\_\+id, int semaphore\+\_\+index)
+\item 
+int \mbox{\hyperlink{semaphore_8h_a429f2d96dd401386b2b3573b66d97d35}{semaphore\+\_\+unlock}} (int semaphore\+\_\+id, int sempahore\+\_\+index)
+\item 
+int \mbox{\hyperlink{semaphore_8h_ae2d4584ea1c93e9ef0b725807b4a0b3c}{semaphore\+\_\+wait\+\_\+for\+\_\+sinc}} (int semaphore\+\_\+id, int semaphore\+\_\+index)
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+Semaphore header file. 
+
+\begin{DoxyAuthor}{Author}
+Giovanni Terzuolo 
+\end{DoxyAuthor}
+
+
+\doxysubsection{Function Documentation}
+\mbox{\Hypertarget{semaphore_8h_aa486d6d7ed75bdb056c96ed6d5e71300}\label{semaphore_8h_aa486d6d7ed75bdb056c96ed6d5e71300}} 
+\index{semaphore.h@{semaphore.h}!semaphore\_lock@{semaphore\_lock}}
+\index{semaphore\_lock@{semaphore\_lock}!semaphore.h@{semaphore.h}}
+\doxysubsubsection{\texorpdfstring{semaphore\_lock()}{semaphore\_lock()}}
+{\footnotesize\ttfamily int semaphore\+\_\+lock (\begin{DoxyParamCaption}\item[{int}]{semaphore\+\_\+id,  }\item[{int}]{semaphore\+\_\+index }\end{DoxyParamCaption})}
+
+Execute a lock on semaphore\+\_\+index of semaphore\+\_\+id array 
+\begin{DoxyParams}{Parameters}
+{\em semaphore\+\_\+id} & array of semaphores indexs \\
+\hline
+{\em semaphore\+\_\+index} & index of the semaphore to exe the lock on \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+0 in case of success, -\/1 otherwise 
+\end{DoxyReturn}
+\mbox{\Hypertarget{semaphore_8h_a429f2d96dd401386b2b3573b66d97d35}\label{semaphore_8h_a429f2d96dd401386b2b3573b66d97d35}} 
+\index{semaphore.h@{semaphore.h}!semaphore\_unlock@{semaphore\_unlock}}
+\index{semaphore\_unlock@{semaphore\_unlock}!semaphore.h@{semaphore.h}}
+\doxysubsubsection{\texorpdfstring{semaphore\_unlock()}{semaphore\_unlock()}}
+{\footnotesize\ttfamily int semaphore\+\_\+unlock (\begin{DoxyParamCaption}\item[{int}]{semaphore\+\_\+id,  }\item[{int}]{sempahore\+\_\+index }\end{DoxyParamCaption})}
+
+Execute an unlock on sempaphore\+\_\+index of semaphore\+\_\+id array 
+\begin{DoxyParams}{Parameters}
+{\em semaphore\+\_\+id} & array of semaphores indexs \\
+\hline
+{\em semaphore\+\_\+index} & index of the semaphore to exe the lock on \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+0 in case of success, -\/1 otherwise 
+\end{DoxyReturn}
+\mbox{\Hypertarget{semaphore_8h_ae2d4584ea1c93e9ef0b725807b4a0b3c}\label{semaphore_8h_ae2d4584ea1c93e9ef0b725807b4a0b3c}} 
+\index{semaphore.h@{semaphore.h}!semaphore\_wait\_for\_sinc@{semaphore\_wait\_for\_sinc}}
+\index{semaphore\_wait\_for\_sinc@{semaphore\_wait\_for\_sinc}!semaphore.h@{semaphore.h}}
+\doxysubsubsection{\texorpdfstring{semaphore\_wait\_for\_sinc()}{semaphore\_wait\_for\_sinc()}}
+{\footnotesize\ttfamily int semaphore\+\_\+wait\+\_\+for\+\_\+sinc (\begin{DoxyParamCaption}\item[{int}]{semaphore\+\_\+id,  }\item[{int}]{semaphore\+\_\+index }\end{DoxyParamCaption})}
+
+Execute a wait for zero on sempaphore\+\_\+index of semaphore\+\_\+id array 
+\begin{DoxyParams}{Parameters}
+{\em semaphore\+\_\+id} & array of semaphores indexs \\
+\hline
+{\em semaphore\+\_\+index} & index of the semaphore to exe the lock on \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+0 in case of success, -\/1 otherwise 
+\end{DoxyReturn}

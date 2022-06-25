@@ -1,0 +1,31 @@
+\hypertarget{book__master__shm_8h_source}{}\doxysection{book\+\_\+master\+\_\+shm.\+h}
+\label{book__master__shm_8h_source}\index{src/local\_lib/headers/book\_master\_shm.h@{src/local\_lib/headers/book\_master\_shm.h}}
+\mbox{\hyperlink{book__master__shm_8h}{Go to the documentation of this file.}}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{1 }
+\DoxyCodeLine{7 \textcolor{preprocessor}{\#ifndef DGT\_SO\_PROJECT\_21\_22\_BOOK\_MASTER\_SHM\_H}}
+\DoxyCodeLine{8 \textcolor{preprocessor}{\#define DGT\_SO\_PROJECT\_21\_22\_BOOK\_MASTER\_SHM\_H}}
+\DoxyCodeLine{9 \textcolor{comment}{/*Local Import*/}}
+\DoxyCodeLine{10 \textcolor{preprocessor}{\#include "{}\mbox{\hyperlink{transaction__list_8h}{transaction\_list.h}}"{}}}
+\DoxyCodeLine{11 \textcolor{preprocessor}{\#include "{}\mbox{\hyperlink{glob_8h}{glob.h}}"{}}}
+\DoxyCodeLine{12 }
+\DoxyCodeLine{13 \textcolor{keyword}{union }\mbox{\hyperlink{union_block}{Block}} \{}
+\DoxyCodeLine{14     \textcolor{keyword}{struct }\mbox{\hyperlink{struct_transaction}{Transaction}} \mbox{\hyperlink{union_block_a9bd4c7a376efce58aef8cd7eb5d4f5fc}{block\_t}}[\mbox{\hyperlink{group___a_t_ga320169181de72ba0b5203555e14103c4}{SO\_BLOCK\_SIZE}}]; }
+\DoxyCodeLine{15     \textcolor{keywordtype}{int} \mbox{\hyperlink{union_block_a750b5d744c39a06bfb13e6eb010e35d0}{index}}; }
+\DoxyCodeLine{16 \};}
+\DoxyCodeLine{17 \textcolor{keyword}{struct }\mbox{\hyperlink{structshm__book__master}{shm\_book\_master}} \{}
+\DoxyCodeLine{18     \textcolor{keyword}{union }\mbox{\hyperlink{union_block}{Block}} \mbox{\hyperlink{structshm__book__master_ae218862f90cd129aa93d7aa20dac1b99}{blocks}}[\mbox{\hyperlink{group___a_t_gaae9d8904fbca80e9986482d75e345f98}{SO\_REGISTRY\_SIZE}}][2]; }
+\DoxyCodeLine{19     \textcolor{keywordtype}{int} \mbox{\hyperlink{structshm__book__master_a57ca1625efeacaa8eb3a7001f2065c90}{to\_fill}}; }
+\DoxyCodeLine{20 \};}
+\DoxyCodeLine{21 \textcolor{comment}{/*          0                   1}}
+\DoxyCodeLine{22 \textcolor{comment}{ * 0    block\_transactions      index   <-\/  ;}}
+\DoxyCodeLine{23 \textcolor{comment}{ * */}}
+\DoxyCodeLine{30 \textcolor{keywordtype}{int} \mbox{\hyperlink{book__master__shm_8h_a498e1dcf6ec8a65f8a039b06d945183c}{shm\_book\_master\_create}}(\textcolor{keyword}{struct} \mbox{\hyperlink{structshm__book__master}{shm\_book\_master}} *self, \textcolor{keywordtype}{int} sem\_access\_id);}
+\DoxyCodeLine{31 }
+\DoxyCodeLine{36 \textcolor{keywordtype}{void} \mbox{\hyperlink{book__master__shm_8h_a4f30050c1a27f09b3341b3c9dcf65264}{shm\_book\_master\_print}}(\textcolor{keyword}{struct} \mbox{\hyperlink{structshm__book__master}{shm\_book\_master}} *self);}
+\DoxyCodeLine{37 }
+\DoxyCodeLine{44 \textcolor{keywordtype}{int} \mbox{\hyperlink{book__master__shm_8h_a3dfc9c8b702da13acb0a0f8499a4c349}{insert\_block}}(\textcolor{keyword}{struct} \mbox{\hyperlink{structshm__book__master}{shm\_book\_master}} *self, \textcolor{keyword}{struct} \mbox{\hyperlink{struct_transaction}{Transaction}} \mbox{\hyperlink{union_block_a9bd4c7a376efce58aef8cd7eb5d4f5fc}{block\_t}}[\mbox{\hyperlink{group___a_t_ga320169181de72ba0b5203555e14103c4}{SO\_BLOCK\_SIZE}}]);}
+\DoxyCodeLine{45 }
+\DoxyCodeLine{46 \textcolor{preprocessor}{\#endif }\textcolor{comment}{/*DGT\_SO\_PROJECT\_21\_22\_BOOK\_MASTER\_SHM\_H*/}\textcolor{preprocessor}{}}
+
+\end{DoxyCode}

@@ -1,0 +1,4 @@
+<map id="USERS_MAX" name="USERS_MAX">
+<area shape="rect" id="node1" href="$group___n_u_m.html" title="defines the number of processes" alt="" coords="5,5,132,31"/>
+<area shape="rect" id="node2" title="The number of processes that can be created." alt="" coords="180,5,283,31"/>
+</map>

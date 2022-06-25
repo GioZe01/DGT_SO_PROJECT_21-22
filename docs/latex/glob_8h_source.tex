@@ -1,0 +1,58 @@
+\hypertarget{glob_8h_source}{}\doxysection{glob.\+h}
+\label{glob_8h_source}\index{src/local\_lib/headers/glob.h@{src/local\_lib/headers/glob.h}}
+\mbox{\hyperlink{glob_8h}{Go to the documentation of this file.}}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{1 }
+\DoxyCodeLine{6 \textcolor{preprocessor}{\#ifndef DGT\_SO\_PROJECT\_21\_22\_GLOB\_H}}
+\DoxyCodeLine{7 \textcolor{preprocessor}{\#define DGT\_SO\_PROJECT\_21\_22\_GLOB\_H}}
+\DoxyCodeLine{8 }
+\DoxyCodeLine{9 \textcolor{preprocessor}{\#include <unistd.h>}}
+\DoxyCodeLine{10 \textcolor{preprocessor}{\#include "{}sys/types.h"{}}}
+\DoxyCodeLine{15 \textcolor{preprocessor}{\#define PATH\_TO\_USER "{}build/bin/user"{}}}
+\DoxyCodeLine{16 \textcolor{preprocessor}{\#define PATH\_TO\_NODE "{}build/bin/node"{}}}
+\DoxyCodeLine{17 \textcolor{preprocessor}{\#define PATH\_TO\_NODE\_TP "{}build/bin/node\_tp"{}}}
+\DoxyCodeLine{27 \textcolor{preprocessor}{\#define USERS\_MAX 1000}}
+\DoxyCodeLine{31 \textcolor{preprocessor}{\#define NODES\_MAX 100}}
+\DoxyCodeLine{42 \textcolor{preprocessor}{\#define SEMAPHORE\_SINC\_KEY\_START 0x60}}
+\DoxyCodeLine{46 \textcolor{preprocessor}{\#define SEMAPHORE\_MASTER\_BOOK\_ACCESS\_KEY 0x61}}
+\DoxyCodeLine{50 \textcolor{preprocessor}{\#define SEMAPHORE\_MASTER\_BOOK\_TO\_FILL\_KEY 0X62}}
+\DoxyCodeLine{61 \textcolor{preprocessor}{\#define MASTER\_QUEUE\_KEY 0x71}}
+\DoxyCodeLine{65 \textcolor{preprocessor}{\#define USERS\_QUEUE\_KEY 0x72}}
+\DoxyCodeLine{69 \textcolor{preprocessor}{\#define NODES\_QUEUE\_KEY 0x73}}
+\DoxyCodeLine{80 \textcolor{preprocessor}{\#define SHM\_CONFIGURATION 0x81}}
+\DoxyCodeLine{84 \textcolor{preprocessor}{\#define MASTER\_BOOK\_SHM\_KEY 0x82}}
+\DoxyCodeLine{94 \textcolor{preprocessor}{\#define COLOR\_RED\_ANSI\_CODE "{}\(\backslash\)x1b[31m"{}}}
+\DoxyCodeLine{98 \textcolor{preprocessor}{\#define COLOR\_GREEN\_ANSI\_CODE "{}\(\backslash\)x1b[32m"{}}}
+\DoxyCodeLine{102 \textcolor{preprocessor}{\#define COLOR\_YELLOW\_ANSI\_CODE "{}\(\backslash\)x1b[33m"{}}}
+\DoxyCodeLine{106 \textcolor{preprocessor}{\#define COLOR\_BLUE\_ANSI\_CODE    "{}\(\backslash\)x1b[34m"{}}}
+\DoxyCodeLine{110 \textcolor{preprocessor}{\#define COLOR\_WHITE\_ANSI\_CODE "{}\(\backslash\)x1b[37m"{}}}
+\DoxyCodeLine{114 \textcolor{preprocessor}{\#define COLOR\_RESET\_ANSI\_CODE "{}\(\backslash\)x1b[0m"{}}}
+\DoxyCodeLine{125 \textcolor{preprocessor}{\#ifndef SO\_REGISTRY\_SIZE}}
+\DoxyCodeLine{126 \textcolor{preprocessor}{\#define SO\_REGISTRY\_SIZE 100}}
+\DoxyCodeLine{127 \textcolor{preprocessor}{\#endif}}
+\DoxyCodeLine{131 \textcolor{preprocessor}{\#ifndef SO\_BLOCK\_SIZE}}
+\DoxyCodeLine{132 \textcolor{preprocessor}{\#define SO\_BLOCK\_SIZE 10}}
+\DoxyCodeLine{133 \textcolor{preprocessor}{\#endif}}
+\DoxyCodeLine{139 \textcolor{preprocessor}{\#define REALLOC\_MARGIN 10 }}
+\DoxyCodeLine{140 \textcolor{preprocessor}{\#define MAX\_FAILURE\_SHM\_LOADING 1000 }}
+\DoxyCodeLine{141 \textcolor{preprocessor}{\#define MAX\_UNSED\_CICLE\_OF\_NODE\_PROC 10000000 }}
+\DoxyCodeLine{142 \textcolor{preprocessor}{\#define MAX\_WAITING\_TIME\_FOR\_UPDATE 10000 }}
+\DoxyCodeLine{143 \textcolor{preprocessor}{\#define MAX\_FAILURE\_SHM\_BOOKMASTER\_LOCKING 10 }}
+\DoxyCodeLine{144 \textcolor{preprocessor}{\#define MAX\_PROC\_TO\_PRINT 1000}}
+\DoxyCodeLine{145 \textcolor{preprocessor}{\#define MAX\_FRIENDS 32 }}
+\DoxyCodeLine{146 \textcolor{preprocessor}{\#define MAX\_RETRY\_UPDATE\_KIDS\_INFO 100000 }}
+\DoxyCodeLine{147 \textcolor{preprocessor}{\#define MAX\_TIME\_NSEC 999999999 }}
+\DoxyCodeLine{148 \textcolor{preprocessor}{\#define SLEEP\_TIME\_UPDATE\_KIDS\_INFO 10000 }}
+\DoxyCodeLine{150 \textcolor{comment}{/*SIMULATION END TYPES*/}}
+\DoxyCodeLine{154 \textcolor{keyword}{enum} \mbox{\hyperlink{glob_8h_a974c3938b8c9549612d1ca3062ed3bef}{SIMULATION\_END\_TYPE}} \{}
+\DoxyCodeLine{155     \mbox{\hyperlink{glob_8h_a974c3938b8c9549612d1ca3062ed3befa90a199823951918a5d0f204115e625a4}{SIMULATION\_END\_BY\_USER}}, }
+\DoxyCodeLine{156     \mbox{\hyperlink{glob_8h_a974c3938b8c9549612d1ca3062ed3befa2df98673d6108fc2dba20ccc4e85b3ee}{SIMULATION\_END\_BY\_TIME}}, }
+\DoxyCodeLine{157     \mbox{\hyperlink{glob_8h_a974c3938b8c9549612d1ca3062ed3befabdef3ee17c868d4951c7464f711a82a2}{SIMULATION\_END\_BY\_SO\_REGISTRY\_FULL}}, }
+\DoxyCodeLine{158     \mbox{\hyperlink{glob_8h_a974c3938b8c9549612d1ca3062ed3befad839d023cbf0fe8ef4e9a77ddd8c5944}{SIMULATION\_END\_BY\_NO\_PROC\_RUNNING}}, }
+\DoxyCodeLine{159     \mbox{\hyperlink{glob_8h_a974c3938b8c9549612d1ca3062ed3befa3b78a26bb39d291adc297f3beeb38dc7}{SIMULATION\_END\_PROPERLY\_TERMINATED}}, }
+\DoxyCodeLine{160     \mbox{\hyperlink{glob_8h_a974c3938b8c9549612d1ca3062ed3befa731e5fa866d699e5f8e2cef11e3690c3}{SIMULATION\_END\_BY\_MAX\_NODE\_GEN\_REACHED}}, }
+\DoxyCodeLine{161 \};}
+\DoxyCodeLine{162 }
+\DoxyCodeLine{163 \textcolor{preprocessor}{\#endif }\textcolor{comment}{/*DGT\_SO\_PROJECT\_21\_22\_GLOB\_H*/}\textcolor{preprocessor}{}}
+
+\end{DoxyCode}

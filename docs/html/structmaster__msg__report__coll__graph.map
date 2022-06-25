@@ -1,0 +1,4 @@
+<map id="master_msg_report" name="master_msg_report">
+<area shape="rect" id="node1" title="Structure used to store the information about a process." alt="" coords="5,95,155,121"/>
+<area shape="rect" id="node2" href="$struct_transaction.html" title="Structure for the transaction." alt="" coords="32,5,128,32"/>
+</map>

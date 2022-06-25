@@ -1,0 +1,4 @@
+<map id="node_msg" name="node_msg">
+<area shape="rect" id="node1" title="Message structure." alt="" coords="9,95,98,121"/>
+<area shape="rect" id="node2" href="$struct_transaction.html" title="Structure for the transaction." alt="" coords="5,5,101,32"/>
+</map>

@@ -1,0 +1,28 @@
+\hypertarget{structconf__shm}{}\doxysection{conf\+\_\+shm Struct Reference}
+\label{structconf__shm}\index{conf\_shm@{conf\_shm}}
+
+
+The configuration of the shared memory Is the configuration used by each node and user process to akcnowledge and process transactions and inter process communication.  
+
+
+
+
+{\ttfamily \#include $<$conf\+\_\+shm.\+h$>$}
+
+
+
+\doxysubsection{Detailed Description}
+The configuration of the shared memory Is the configuration used by each node and user process to akcnowledge and process transactions and inter process communication. 
+
+
+\begin{DoxyItemize}
+\item users\+\_\+snapshot\+: column \mbox{[}0\mbox{]} is the user pid, column \mbox{[}1\mbox{]} is the queue\+\_\+id
+\item nodes\+\_\+snapshot\+: column \mbox{[}0\mbox{]} is the node pid, column \mbox{[}1\mbox{]} is the queue\+\_\+id, column \mbox{[}2\mbox{]} is the node\+\_\+friends\+\_\+num \begin{DoxyWarning}{Warning}
+node\+\_\+friends\+\_\+num is the number of friends of the node, so need to be embedded into an int value \#int\+\_\+condenser.\+h 
+\end{DoxyWarning}
+
+\end{DoxyItemize}
+
+The documentation for this struct was generated from the following file\+:\begin{DoxyCompactItemize}
+\item 
+src/local\+\_\+lib/headers/\mbox{\hyperlink{conf__shm_8h}{conf\+\_\+shm.\+h}}\end{DoxyCompactItemize}

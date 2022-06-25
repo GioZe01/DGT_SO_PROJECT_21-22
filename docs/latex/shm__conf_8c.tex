@@ -1,0 +1,165 @@
+\hypertarget{shm__conf_8c}{}\doxysection{src/local\+\_\+lib/shm\+\_\+conf.c File Reference}
+\label{shm__conf_8c}\index{src/local\_lib/shm\_conf.c@{src/local\_lib/shm\_conf.c}}
+{\ttfamily \#include $<$stdio.\+h$>$}\newline
+{\ttfamily \#include \char`\"{}headers/conf\+\_\+shm.\+h\char`\"{}}\newline
+{\ttfamily \#include \char`\"{}headers/boolean.\+h\char`\"{}}\newline
+Include dependency graph for shm\+\_\+conf.\+c\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=319pt]{shm__conf_8c__incl}
+\end{center}
+\end{figure}
+\doxysubsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+int \mbox{\hyperlink{shm__conf_8c_a5d2705dac03735e607a53b3c6a911b16}{shm\+\_\+conf\+\_\+create}} (struct \mbox{\hyperlink{structshm__conf}{shm\+\_\+conf}} $\ast$self, int $\ast$users\+\_\+pids, int $\ast$users\+\_\+queues\+\_\+ids, int $\ast$nodes\+\_\+pids, int $\ast$nodes\+\_\+queues\+\_\+ids, int $\ast$nodes\+\_\+friends)
+\item 
+void \mbox{\hyperlink{shm__conf_8c_aee99d2b9c42f033510e1212aba80b38c}{shm\+\_\+conf\+\_\+print}} (struct \mbox{\hyperlink{structshm__conf}{shm\+\_\+conf}} $\ast$self)
+\item 
+void \mbox{\hyperlink{shm__conf_8c_a11c9df2f462ec214165c6528cae7a2a1}{shm\+\_\+copy\+\_\+snapshots\+\_\+users}} (int($\ast$snapshot)\mbox{[}2\mbox{]}, int $\ast$pids, int $\ast$queues\+\_\+ids)
+\item 
+void \mbox{\hyperlink{shm__conf_8c_a1bd121ff7e6b2651deb1f99b96414fe2}{shm\+\_\+copy\+\_\+snapshots\+\_\+nodes}} (int($\ast$snapshot)\mbox{[}3\mbox{]}, int $\ast$pids, int $\ast$queues\+\_\+ids, int $\ast$\mbox{\hyperlink{node__proc_8c_aed763209d90cbafd9a1c8b3b1602daba}{friends}})
+\item 
+int \mbox{\hyperlink{shm__conf_8c_acba6da79a99bccd104b6236a0b6c2b74}{get\+\_\+queueid\+\_\+by\+\_\+pid}} (struct \mbox{\hyperlink{structshm__conf}{shm\+\_\+conf}} $\ast$self, int pid, \mbox{\hyperlink{boolean_8h_afdcfe6db5bea87bd493a3fe2c513d5ef}{Bool}} in\+\_\+users)
+\begin{DoxyCompactList}\small\item\em Get the queue id from the given shm conf and the pid TODO\+: Implement a non linear search. \end{DoxyCompactList}\item 
+int \mbox{\hyperlink{shm__conf_8c_ac08742b59044f460f3fdbcd2bb8df17c}{get\+\_\+node\+\_\+position\+\_\+by\+\_\+pid}} (struct \mbox{\hyperlink{structshm__conf}{shm\+\_\+conf}} $\ast$self, int pid)
+\begin{DoxyCompactList}\small\item\em get the index of the node in the shm conf \end{DoxyCompactList}\item 
+\mbox{\hyperlink{boolean_8h_afdcfe6db5bea87bd493a3fe2c513d5ef}{Bool}} \mbox{\hyperlink{shm__conf_8c_afd64946d792d030bc538a51b8b899bb5}{shm\+\_\+conf\+\_\+add\+\_\+node}} (struct \mbox{\hyperlink{structshm__conf}{shm\+\_\+conf}} $\ast$self, int pid, int queue\+\_\+id, int \mbox{\hyperlink{node__proc_8c_aed763209d90cbafd9a1c8b3b1602daba}{friends}})
+\begin{DoxyCompactList}\small\item\em Add a new node to the shm conf nodes\+\_\+snapshots. \end{DoxyCompactList}\end{DoxyCompactItemize}
+
+
+\doxysubsection{Function Documentation}
+\mbox{\Hypertarget{shm__conf_8c_ac08742b59044f460f3fdbcd2bb8df17c}\label{shm__conf_8c_ac08742b59044f460f3fdbcd2bb8df17c}} 
+\index{shm\_conf.c@{shm\_conf.c}!get\_node\_position\_by\_pid@{get\_node\_position\_by\_pid}}
+\index{get\_node\_position\_by\_pid@{get\_node\_position\_by\_pid}!shm\_conf.c@{shm\_conf.c}}
+\doxysubsubsection{\texorpdfstring{get\_node\_position\_by\_pid()}{get\_node\_position\_by\_pid()}}
+{\footnotesize\ttfamily int get\+\_\+node\+\_\+position\+\_\+by\+\_\+pid (\begin{DoxyParamCaption}\item[{struct \mbox{\hyperlink{structshm__conf}{shm\+\_\+conf}} $\ast$}]{self,  }\item[{int}]{pid }\end{DoxyParamCaption})}
+
+
+
+get the index of the node in the shm conf 
+
+
+\begin{DoxyParams}{Parameters}
+{\em self} & the shm conf \\
+\hline
+{\em pid} & the pid to search for \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+-\/1 in case of no pid found, the value otherwise 
+\end{DoxyReturn}
+\mbox{\Hypertarget{shm__conf_8c_acba6da79a99bccd104b6236a0b6c2b74}\label{shm__conf_8c_acba6da79a99bccd104b6236a0b6c2b74}} 
+\index{shm\_conf.c@{shm\_conf.c}!get\_queueid\_by\_pid@{get\_queueid\_by\_pid}}
+\index{get\_queueid\_by\_pid@{get\_queueid\_by\_pid}!shm\_conf.c@{shm\_conf.c}}
+\doxysubsubsection{\texorpdfstring{get\_queueid\_by\_pid()}{get\_queueid\_by\_pid()}}
+{\footnotesize\ttfamily int get\+\_\+queueid\+\_\+by\+\_\+pid (\begin{DoxyParamCaption}\item[{struct \mbox{\hyperlink{structshm__conf}{shm\+\_\+conf}} $\ast$}]{self,  }\item[{int}]{pid,  }\item[{\mbox{\hyperlink{boolean_8h_afdcfe6db5bea87bd493a3fe2c513d5ef}{Bool}}}]{in\+\_\+users }\end{DoxyParamCaption})}
+
+
+
+Get the queue id from the given shm conf and the pid TODO\+: Implement a non linear search. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em self} & the shm conf \\
+\hline
+{\em pid} & the pid to search for \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+-\/1 in case of no pid found, the value otherwise 
+\end{DoxyReturn}
+\mbox{\Hypertarget{shm__conf_8c_afd64946d792d030bc538a51b8b899bb5}\label{shm__conf_8c_afd64946d792d030bc538a51b8b899bb5}} 
+\index{shm\_conf.c@{shm\_conf.c}!shm\_conf\_add\_node@{shm\_conf\_add\_node}}
+\index{shm\_conf\_add\_node@{shm\_conf\_add\_node}!shm\_conf.c@{shm\_conf.c}}
+\doxysubsubsection{\texorpdfstring{shm\_conf\_add\_node()}{shm\_conf\_add\_node()}}
+{\footnotesize\ttfamily \mbox{\hyperlink{boolean_8h_afdcfe6db5bea87bd493a3fe2c513d5ef}{Bool}} shm\+\_\+conf\+\_\+add\+\_\+node (\begin{DoxyParamCaption}\item[{struct \mbox{\hyperlink{structshm__conf}{shm\+\_\+conf}} $\ast$}]{self,  }\item[{int}]{pid,  }\item[{int}]{queue\+\_\+id,  }\item[{int}]{friends }\end{DoxyParamCaption})}
+
+
+
+Add a new node to the shm conf nodes\+\_\+snapshots. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em self} & the shm conf \\
+\hline
+{\em pid} & the pid of the node \\
+\hline
+{\em queue\+\_\+id} & the queue id of the node \\
+\hline
+{\em friends} & the friends of the node \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+TRUE in case of success, FALSE otherwise 
+\end{DoxyReturn}
+Check if queue\+\_\+id is already used
+
+Add the node information to the snapshot at snapshot\mbox{[}0\mbox{]}\mbox{[}0\mbox{]} +1 position\mbox{\Hypertarget{shm__conf_8c_a5d2705dac03735e607a53b3c6a911b16}\label{shm__conf_8c_a5d2705dac03735e607a53b3c6a911b16}} 
+\index{shm\_conf.c@{shm\_conf.c}!shm\_conf\_create@{shm\_conf\_create}}
+\index{shm\_conf\_create@{shm\_conf\_create}!shm\_conf.c@{shm\_conf.c}}
+\doxysubsubsection{\texorpdfstring{shm\_conf\_create()}{shm\_conf\_create()}}
+{\footnotesize\ttfamily int shm\+\_\+conf\+\_\+create (\begin{DoxyParamCaption}\item[{struct \mbox{\hyperlink{structshm__conf}{shm\+\_\+conf}} $\ast$}]{self,  }\item[{int $\ast$}]{users\+\_\+pids,  }\item[{int $\ast$}]{users\+\_\+queues\+\_\+ids,  }\item[{int $\ast$}]{nodes\+\_\+pids,  }\item[{int $\ast$}]{nodes\+\_\+queues\+\_\+ids,  }\item[{int $\ast$}]{nodes\+\_\+friends }\end{DoxyParamCaption})}
+
+Create and initialize the shm structure given each parameter pointer is a pointer to a vector of int 
+\begin{DoxyParams}{Parameters}
+{\em self} & the shm struct to be initialized \\
+\hline
+{\em users\+\_\+pids} & the pids of the users \\
+\hline
+{\em nodes\+\_\+pids} & the pids of the nodes \\
+\hline
+{\em users\+\_\+queues\+\_\+ids} & the ids of the users queues \\
+\hline
+{\em nodes\+\_\+queues\+\_\+ids} & the ids of the nodes queues \\
+\hline
+{\em nodes\+\_\+friends} & the ids of the nodes friends \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+-\/1 in case of UNKNOWN FAILURE. 0 otherwise 
+\end{DoxyReturn}
+\mbox{\Hypertarget{shm__conf_8c_aee99d2b9c42f033510e1212aba80b38c}\label{shm__conf_8c_aee99d2b9c42f033510e1212aba80b38c}} 
+\index{shm\_conf.c@{shm\_conf.c}!shm\_conf\_print@{shm\_conf\_print}}
+\index{shm\_conf\_print@{shm\_conf\_print}!shm\_conf.c@{shm\_conf.c}}
+\doxysubsubsection{\texorpdfstring{shm\_conf\_print()}{shm\_conf\_print()}}
+{\footnotesize\ttfamily void shm\+\_\+conf\+\_\+print (\begin{DoxyParamCaption}\item[{struct \mbox{\hyperlink{structshm__conf}{shm\+\_\+conf}} $\ast$}]{self }\end{DoxyParamCaption})}
+
+Print the shared memory size on console 
+\begin{DoxyParams}{Parameters}
+{\em self} & the shm struct to be printed \\
+\hline
+\end{DoxyParams}
+\mbox{\Hypertarget{shm__conf_8c_a1bd121ff7e6b2651deb1f99b96414fe2}\label{shm__conf_8c_a1bd121ff7e6b2651deb1f99b96414fe2}} 
+\index{shm\_conf.c@{shm\_conf.c}!shm\_copy\_snapshots\_nodes@{shm\_copy\_snapshots\_nodes}}
+\index{shm\_copy\_snapshots\_nodes@{shm\_copy\_snapshots\_nodes}!shm\_conf.c@{shm\_conf.c}}
+\doxysubsubsection{\texorpdfstring{shm\_copy\_snapshots\_nodes()}{shm\_copy\_snapshots\_nodes()}}
+{\footnotesize\ttfamily void shm\+\_\+copy\+\_\+snapshots\+\_\+nodes (\begin{DoxyParamCaption}\item[{int($\ast$)}]{snapshot\mbox{[}3\mbox{]},  }\item[{int $\ast$}]{pids,  }\item[{int $\ast$}]{queues\+\_\+ids,  }\item[{int $\ast$}]{friends }\end{DoxyParamCaption})}
+
+Copy the two pointers given into 3d pointer 
+\begin{DoxyParams}{Parameters}
+{\em snapshot} & pointer to the nodes snapshot \\
+\hline
+{\em pids} & the pointer that\textquotesingle{}s gonna to fill column 0 \\
+\hline
+{\em queues\+\_\+ids} & the pointer that\textquotesingle{}s gonna fill column 1 \\
+\hline
+{\em friends} & the pointer that\textquotesingle{}s gonna fill column 2. If NULL is not filled the column \\
+\hline
+\end{DoxyParams}
+\mbox{\Hypertarget{shm__conf_8c_a11c9df2f462ec214165c6528cae7a2a1}\label{shm__conf_8c_a11c9df2f462ec214165c6528cae7a2a1}} 
+\index{shm\_conf.c@{shm\_conf.c}!shm\_copy\_snapshots\_users@{shm\_copy\_snapshots\_users}}
+\index{shm\_copy\_snapshots\_users@{shm\_copy\_snapshots\_users}!shm\_conf.c@{shm\_conf.c}}
+\doxysubsubsection{\texorpdfstring{shm\_copy\_snapshots\_users()}{shm\_copy\_snapshots\_users()}}
+{\footnotesize\ttfamily void shm\+\_\+copy\+\_\+snapshots\+\_\+users (\begin{DoxyParamCaption}\item[{int($\ast$)}]{snapshot\mbox{[}2\mbox{]},  }\item[{int $\ast$}]{pids,  }\item[{int $\ast$}]{queues\+\_\+ids }\end{DoxyParamCaption})}
+
+Copy the two pointers given into 2d pointer 
+\begin{DoxyParams}{Parameters}
+{\em snapshot} & pointer to the users snapshot \\
+\hline
+{\em pids} & the pointer that\textquotesingle{}s gonna to fill column 0 \\
+\hline
+{\em queues\+\_\+ids} & the pointer that\textquotesingle{}s gonna fill column 1 \\
+\hline
+\end{DoxyParams}

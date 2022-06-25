@@ -1,0 +1,17 @@
+var searchData=
+[
+  ['false_0',['FALSE',['../boolean_8h.html#aa93f0eb578d23995850d61f7d61c55c1',1,'boolean.h']]],
+  ['first_1',['first',['../structtransaction__list.html#a79c4fb3e3d60016370473a25a7a0582d',1,'transaction_list::first()'],['../structprocesses__info__list.html#a79c4fb3e3d60016370473a25a7a0582d',1,'processes_info_list::first()']]],
+  ['free_5fmem_2',['free_mem',['../simulation__errors_8h.html#a5b86e611e659eb33da1bf16fa0f0f706',1,'free_mem():&#160;main.c'],['../main_8c.html#a5b86e611e659eb33da1bf16fa0f0f706',1,'free_mem():&#160;main.c']]],
+  ['free_5fmem_5fnode_3',['free_mem_node',['../simulation__errors_8h.html#ae9717df6876ca8e6137c741e7ff7d45b',1,'free_mem_node():&#160;node_proc.c'],['../node__proc_8c.html#ae9717df6876ca8e6137c741e7ff7d45b',1,'free_mem_node():&#160;node_proc.c']]],
+  ['free_5fmem_5fuser_4',['free_mem_user',['../simulation__errors_8h.html#a7aa28a9ba366e148da782c85968076db',1,'free_mem_user():&#160;user_proc.c'],['../user__proc_8c.html#a7aa28a9ba366e148da782c85968076db',1,'free_mem_user():&#160;user_proc.c']]],
+  ['free_5fnode_5',['free_node',['../node__transactor_8h.html#a299d12e82c779a508560581eb517e732',1,'free_node(struct node *self):&#160;node_transactor.c'],['../node__transactor_8c.html#a299d12e82c779a508560581eb517e732',1,'free_node(struct node *self):&#160;node_transactor.c']]],
+  ['free_5fsysvar_6',['free_sysVar',['../simulation__errors_8h.html#af12135b661432807367ffcda3659303a',1,'free_sysVar():&#160;main.c'],['../main_8c.html#af12135b661432807367ffcda3659303a',1,'free_sysVar():&#160;main.c']]],
+  ['free_5fsysvar_5fnode_7',['free_sysVar_node',['../simulation__errors_8h.html#a46473129a15bf041dd63752927a292dd',1,'free_sysVar_node():&#160;node_proc.c'],['../node__proc_8c.html#a46473129a15bf041dd63752927a292dd',1,'free_sysVar_node():&#160;node_proc.c']]],
+  ['free_5fsysvar_5fuser_8',['free_sysVar_user',['../simulation__errors_8h.html#a9fc9fdbd09f3e40f4556e5fa7151c539',1,'free_sysVar_user():&#160;user_proc.c'],['../user__proc_8c.html#a9fc9fdbd09f3e40f4556e5fa7151c539',1,'free_sysVar_user():&#160;user_proc.c']]],
+  ['free_5fuser_9',['free_user',['../user__transaction_8h.html#adaf2d10629cd9163c7aa828b7df95b18',1,'free_user(struct user_transaction *self):&#160;user_transaction.c'],['../user__transaction_8c.html#adaf2d10629cd9163c7aa828b7df95b18',1,'free_user(struct user_transaction *self):&#160;user_transaction.c']]],
+  ['friends_10',['friends',['../node__proc_8c.html#aed763209d90cbafd9a1c8b3b1602daba',1,'node_proc.c']]],
+  ['from_5fprocstate_5fto_5fstring_11',['from_procstate_to_string',['../master__msg__report_8h.html#ad42a72e7d4906b623c8f69162e4e9049',1,'from_procstate_to_string(int state, char *string):&#160;master_msg_report.c'],['../master__msg__report_8c.html#ad42a72e7d4906b623c8f69162e4e9049',1,'from_procstate_to_string(int state, char *string):&#160;master_msg_report.c']]],
+  ['from_5fproctype_5fto_5fstring_12',['from_proctype_to_string',['../master__msg__report_8h.html#a72f267f18ee542db51e5791318d61bef',1,'from_proctype_to_string(long proc_type):&#160;master_msg_report.c'],['../master__msg__report_8c.html#a72f267f18ee542db51e5791318d61bef',1,'from_proctype_to_string(long proc_type):&#160;master_msg_report.c']]],
+  ['from_5ftype_5fto_5fstring_13',['from_type_to_string',['../master__msg__report_8h.html#a0c0bd350e260dbcb9ea9d43150ab1468',1,'from_type_to_string(long type):&#160;master_msg_report.c'],['../master__msg__report_8c.html#a0c0bd350e260dbcb9ea9d43150ab1468',1,'from_type_to_string(long type):&#160;master_msg_report.c']]]
+];

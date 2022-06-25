@@ -1,0 +1,114 @@
+\hypertarget{structuser__transaction}{}\doxysection{user\+\_\+transaction Struct Reference}
+\label{structuser__transaction}\index{user\_transaction@{user\_transaction}}
+
+
+Structure used to represent a user.  
+
+
+
+
+{\ttfamily \#include $<$user\+\_\+transaction.\+h$>$}
+
+
+
+Collaboration diagram for user\+\_\+transaction\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=284pt]{structuser__transaction__coll__graph}
+\end{center}
+\end{figure}
+\doxysubsection*{Data Fields}
+\begin{DoxyCompactItemize}
+\item 
+int \mbox{\hyperlink{structuser__transaction_af500917c052066b40cf47f96b43c607b}{pid}}
+\item 
+short int \mbox{\hyperlink{structuser__transaction_ae7a9d7856dc91cc7dfe694046d892b85}{exec\+\_\+state}}
+\item 
+float \mbox{\hyperlink{structuser__transaction_aba96c1bfea2a8500bcdbbd1c64fddffb}{budget}}
+\item 
+\mbox{\hyperlink{user__transaction_8h_a8da11bb7001f47668dc77eb45e836a57}{Balance}} \mbox{\hyperlink{structuser__transaction_a0d326a0179d51cc3790b655a5d041005}{u\+\_\+balance}}
+\item 
+Queue \mbox{\hyperlink{structuser__transaction_a803647f7a567ae42a3b8d261552bd101}{transactions\+\_\+failed}}
+\item 
+Queue \mbox{\hyperlink{structuser__transaction_a3a248273d087a26b6e8da2feae1cdc5a}{in\+\_\+process}}
+\item 
+\mbox{\hyperlink{struct_u_cash_flow}{UCash\+Flow}} \mbox{\hyperlink{structuser__transaction_a6ed4e9784f0c91f3cce29588c964670a}{cash\+\_\+flow}}
+\item 
+\mbox{\hyperlink{user__transaction_8h_a2716d248a8d94065d106e7e28b9f5152}{Calc\+Cash\+Flow}} \mbox{\hyperlink{structuser__transaction_ade3fba652eaf8c5ccaab91129daae043}{update\+\_\+cash\+\_\+flow}}
+\item 
+float \mbox{\hyperlink{structuser__transaction_a3fda27938e5de4961b5bb6b94acdcc26}{expected\+\_\+out}}
+\item 
+int \mbox{\hyperlink{structuser__transaction_a1257927113a04c56e2ea12b142441dc4}{to\+\_\+wait\+\_\+transaction}}
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+Structure used to represent a user. 
+
+\doxysubsection{Field Documentation}
+\mbox{\Hypertarget{structuser__transaction_aba96c1bfea2a8500bcdbbd1c64fddffb}\label{structuser__transaction_aba96c1bfea2a8500bcdbbd1c64fddffb}} 
+\index{user\_transaction@{user\_transaction}!budget@{budget}}
+\index{budget@{budget}!user\_transaction@{user\_transaction}}
+\doxysubsubsection{\texorpdfstring{budget}{budget}}
+{\footnotesize\ttfamily float budget}
+
+Contains the confirmed by nodes value in the pocket of the current user \mbox{\Hypertarget{structuser__transaction_a6ed4e9784f0c91f3cce29588c964670a}\label{structuser__transaction_a6ed4e9784f0c91f3cce29588c964670a}} 
+\index{user\_transaction@{user\_transaction}!cash\_flow@{cash\_flow}}
+\index{cash\_flow@{cash\_flow}!user\_transaction@{user\_transaction}}
+\doxysubsubsection{\texorpdfstring{cash\_flow}{cash\_flow}}
+{\footnotesize\ttfamily \mbox{\hyperlink{struct_u_cash_flow}{UCash\+Flow}} cash\+\_\+flow}
+
+Cash flow of the user \mbox{\Hypertarget{structuser__transaction_ae7a9d7856dc91cc7dfe694046d892b85}\label{structuser__transaction_ae7a9d7856dc91cc7dfe694046d892b85}} 
+\index{user\_transaction@{user\_transaction}!exec\_state@{exec\_state}}
+\index{exec\_state@{exec\_state}!user\_transaction@{user\_transaction}}
+\doxysubsubsection{\texorpdfstring{exec\_state}{exec\_state}}
+{\footnotesize\ttfamily short int exec\+\_\+state}
+
+Current execution state of the user proc \mbox{\Hypertarget{structuser__transaction_a3fda27938e5de4961b5bb6b94acdcc26}\label{structuser__transaction_a3fda27938e5de4961b5bb6b94acdcc26}} 
+\index{user\_transaction@{user\_transaction}!expected\_out@{expected\_out}}
+\index{expected\_out@{expected\_out}!user\_transaction@{user\_transaction}}
+\doxysubsubsection{\texorpdfstring{expected\_out}{expected\_out}}
+{\footnotesize\ttfamily float expected\+\_\+out}
+
+Expected outcomes to still be processed \mbox{\Hypertarget{structuser__transaction_a3a248273d087a26b6e8da2feae1cdc5a}\label{structuser__transaction_a3a248273d087a26b6e8da2feae1cdc5a}} 
+\index{user\_transaction@{user\_transaction}!in\_process@{in\_process}}
+\index{in\_process@{in\_process}!user\_transaction@{user\_transaction}}
+\doxysubsubsection{\texorpdfstring{in\_process}{in\_process}}
+{\footnotesize\ttfamily Queue in\+\_\+process}
+
+Validated, but still to be confirmed by the nodes\+\_\+proc \mbox{\Hypertarget{structuser__transaction_af500917c052066b40cf47f96b43c607b}\label{structuser__transaction_af500917c052066b40cf47f96b43c607b}} 
+\index{user\_transaction@{user\_transaction}!pid@{pid}}
+\index{pid@{pid}!user\_transaction@{user\_transaction}}
+\doxysubsubsection{\texorpdfstring{pid}{pid}}
+{\footnotesize\ttfamily int pid}
+
+PID of the user proc \mbox{\Hypertarget{structuser__transaction_a1257927113a04c56e2ea12b142441dc4}\label{structuser__transaction_a1257927113a04c56e2ea12b142441dc4}} 
+\index{user\_transaction@{user\_transaction}!to\_wait\_transaction@{to\_wait\_transaction}}
+\index{to\_wait\_transaction@{to\_wait\_transaction}!user\_transaction@{user\_transaction}}
+\doxysubsubsection{\texorpdfstring{to\_wait\_transaction}{to\_wait\_transaction}}
+{\footnotesize\ttfamily int to\+\_\+wait\+\_\+transaction}
+
+Num Transactions to wait for the conformation of processing \mbox{\Hypertarget{structuser__transaction_a803647f7a567ae42a3b8d261552bd101}\label{structuser__transaction_a803647f7a567ae42a3b8d261552bd101}} 
+\index{user\_transaction@{user\_transaction}!transactions\_failed@{transactions\_failed}}
+\index{transactions\_failed@{transactions\_failed}!user\_transaction@{user\_transaction}}
+\doxysubsubsection{\texorpdfstring{transactions\_failed}{transactions\_failed}}
+{\footnotesize\ttfamily Queue transactions\+\_\+failed}
+
+Transactions\+\_\+failed not processed by any node \mbox{\Hypertarget{structuser__transaction_a0d326a0179d51cc3790b655a5d041005}\label{structuser__transaction_a0d326a0179d51cc3790b655a5d041005}} 
+\index{user\_transaction@{user\_transaction}!u\_balance@{u\_balance}}
+\index{u\_balance@{u\_balance}!user\_transaction@{user\_transaction}}
+\doxysubsubsection{\texorpdfstring{u\_balance}{u\_balance}}
+{\footnotesize\ttfamily \mbox{\hyperlink{user__transaction_8h_a8da11bb7001f47668dc77eb45e836a57}{Balance}} u\+\_\+balance}
+
+Function pointer to the balance function of the user \mbox{\Hypertarget{structuser__transaction_ade3fba652eaf8c5ccaab91129daae043}\label{structuser__transaction_ade3fba652eaf8c5ccaab91129daae043}} 
+\index{user\_transaction@{user\_transaction}!update\_cash\_flow@{update\_cash\_flow}}
+\index{update\_cash\_flow@{update\_cash\_flow}!user\_transaction@{user\_transaction}}
+\doxysubsubsection{\texorpdfstring{update\_cash\_flow}{update\_cash\_flow}}
+{\footnotesize\ttfamily \mbox{\hyperlink{user__transaction_8h_a2716d248a8d94065d106e7e28b9f5152}{Calc\+Cash\+Flow}} update\+\_\+cash\+\_\+flow}
+
+Function pointer to the calc\+Cash\+Flow function of the user 
+
+The documentation for this struct was generated from the following file\+:\begin{DoxyCompactItemize}
+\item 
+src/local\+\_\+lib/headers/\mbox{\hyperlink{user__transaction_8h}{user\+\_\+transaction.\+h}}\end{DoxyCompactItemize}

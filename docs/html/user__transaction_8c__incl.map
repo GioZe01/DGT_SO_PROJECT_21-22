@@ -1,0 +1,17 @@
+<map id="src/local_lib/user_transaction.c" name="src/local_lib/user_transaction.c">
+<area shape="rect" id="node1" title=" " alt="" coords="307,5,438,47"/>
+<area shape="rect" id="node2" title=" " alt="" coords="37,259,103,285"/>
+<area shape="rect" id="node3" title=" " alt="" coords="581,102,652,129"/>
+<area shape="rect" id="node4" title=" " alt="" coords="676,102,744,129"/>
+<area shape="rect" id="node5" title=" " alt="" coords="103,333,178,360"/>
+<area shape="rect" id="node6" href="$user__transaction_8h.html" title="Header file for user_transaction.c Contains the definition of the struct user_transaction and the fun..." alt="" coords="137,102,336,129"/>
+<area shape="rect" id="node11" href="$conf__shm_8h.html" title="Header file for shm_conf.c Define the shared memory structure and the functions to create and destroy..." alt="" coords="324,184,421,211"/>
+<area shape="rect" id="node13" href="$simulation__errors_8h.html" title="Macros for the procedure of ending the different types of processes in case of error...." alt="" coords="410,95,557,136"/>
+<area shape="rect" id="node7" href="$boolean_8h.html" title="Type Definition for the boolean type using integer values Done for C89 compatibility." alt="" coords="317,259,404,285"/>
+<area shape="rect" id="node8" href="$transaction__list_8h.html" title="Header file for the transaction_list.c file. Contains the definition of the Transaction structure and..." alt="" coords="113,184,248,211"/>
+<area shape="rect" id="node9" title=" " alt="" coords="178,259,242,285"/>
+<area shape="rect" id="node10" title=" " alt="" coords="321,333,417,360"/>
+<area shape="rect" id="node12" href="$glob_8h.html" title="Definition of Values and Macros for the project." alt="" coords="428,259,491,285"/>
+<area shape="rect" id="node14" title=" " alt="" coords="589,184,660,211"/>
+<area shape="rect" id="node15" title=" " alt="" coords="497,184,565,211"/>
+</map>

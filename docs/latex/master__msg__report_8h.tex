@@ -1,0 +1,396 @@
+\hypertarget{master__msg__report_8h}{}\doxysection{src/local\+\_\+lib/headers/master\+\_\+msg\+\_\+report.h File Reference}
+\label{master__msg__report_8h}\index{src/local\_lib/headers/master\_msg\_report.h@{src/local\_lib/headers/master\_msg\_report.h}}
+
+
+Header file for the \mbox{\hyperlink{master__msg__report_8c}{master\+\_\+msg\+\_\+report.\+c}} module. Contains the definitions of the functions,structures and types used to handle the \mbox{\hyperlink{master__msg__report_8c}{master\+\_\+msg\+\_\+report.\+c}} module.  
+
+
+{\ttfamily \#include $<$unistd.\+h$>$}\newline
+{\ttfamily \#include \char`\"{}boolean.\+h\char`\"{}}\newline
+{\ttfamily \#include \char`\"{}process\+\_\+info\+\_\+list.\+h\char`\"{}}\newline
+{\ttfamily \#include \char`\"{}transaction\+\_\+list.\+h\char`\"{}}\newline
+Include dependency graph for master\+\_\+msg\+\_\+report.\+h\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{master__msg__report_8h__incl}
+\end{center}
+\end{figure}
+This graph shows which files directly or indirectly include this file\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{master__msg__report_8h__dep__incl}
+\end{center}
+\end{figure}
+\doxysubsection*{Data Structures}
+\begin{DoxyCompactItemize}
+\item 
+struct \mbox{\hyperlink{structmaster__msg__report}{master\+\_\+msg\+\_\+report}}
+\begin{DoxyCompactList}\small\item\em Structure used to store the information about a process. \end{DoxyCompactList}\end{DoxyCompactItemize}
+\doxysubsection*{Enumerations}
+\begin{DoxyCompactItemize}
+\item 
+enum \mbox{\hyperlink{master__msg__report_8h_a6e099f781173abb91e40d526a8740725}{PROCSTATE}} \{ \newline
+\mbox{\hyperlink{master__msg__report_8h_a6e099f781173abb91e40d526a8740725a0735199acbedd655906cac51dbfa8779}{PROC\+\_\+\+STATE\+\_\+\+INIT}}
+, \mbox{\hyperlink{master__msg__report_8h_a6e099f781173abb91e40d526a8740725ae8fd2c67df21f90e0e79d86936f863c9}{PROC\+\_\+\+STATE\+\_\+\+RUNNING}}
+, \mbox{\hyperlink{master__msg__report_8h_a6e099f781173abb91e40d526a8740725a9e9b57a002c12d8d66ce8a6df66c6c12}{PROC\+\_\+\+STATE\+\_\+\+TERMINATED}}
+, \mbox{\hyperlink{master__msg__report_8h_a6e099f781173abb91e40d526a8740725a61226cd95f82a52c32fc8f3bf7267562}{PROC\+\_\+\+STATE\+\_\+\+WAITING}}
+, \newline
+\mbox{\hyperlink{master__msg__report_8h_a6e099f781173abb91e40d526a8740725a16904ee3cd3d0b80510c79f6e8f3c92e}{PROC\+\_\+\+STATE\+\_\+\+NODE\+\_\+\+SERV\+\_\+\+TRANS}}
+ \}
+\item 
+enum \mbox{\hyperlink{master__msg__report_8h_adfefd10d55df8fad52b3d2f8d68dc66a}{MSG\+\_\+\+REPORT\+\_\+\+TYPE}} \{ \newline
+\mbox{\hyperlink{master__msg__report_8h_adfefd10d55df8fad52b3d2f8d68dc66aa213d4c91683a8280bccd19c95f7d1aac}{TERMINATION\+\_\+\+END\+\_\+\+CORRECTLY}} = 1
+, \mbox{\hyperlink{master__msg__report_8h_adfefd10d55df8fad52b3d2f8d68dc66aa45049a88e2ca58b4578b3ad4e568720d}{IMPOSSIBLE\+\_\+\+TO\+\_\+\+SEND\+\_\+\+TRANSACTION}} = 2
+, \mbox{\hyperlink{master__msg__report_8h_adfefd10d55df8fad52b3d2f8d68dc66aaf88e804772b4b0748e725a03158f9ef2}{IMPOSSIBLE\+\_\+\+TO\+\_\+\+CONNECT\+\_\+\+TO\+\_\+\+SHM}} = 3
+, \mbox{\hyperlink{master__msg__report_8h_adfefd10d55df8fad52b3d2f8d68dc66aae0e67a56c2a6e805bd8b8e879bc1bba3}{IMPOSSIBLE\+\_\+\+TO\+\_\+\+COMUNICATE\+\_\+\+WITH\+\_\+\+QUEUE}} = 4
+, \newline
+\mbox{\hyperlink{master__msg__report_8h_adfefd10d55df8fad52b3d2f8d68dc66aad16fa5101d88fbe4b8ac2c42f6831207}{IMPOSSIBLE\+\_\+\+TO\+\_\+\+GENERATE\+\_\+\+TRANSACTION}} = 5
+, \mbox{\hyperlink{master__msg__report_8h_adfefd10d55df8fad52b3d2f8d68dc66aa9532de64f7ba61646888e0c64af2e225}{IMPOSSIBLE\+\_\+\+TO\+\_\+\+ACQUIRE\+\_\+\+SEMAPHORE}} = 6
+, \mbox{\hyperlink{master__msg__report_8h_adfefd10d55df8fad52b3d2f8d68dc66aa74e05f8d8c79ca9838cf900c98835423}{IMPOSSIBLE\+\_\+\+TO\+\_\+\+LOAD\+\_\+\+CONFIGURATION}} = 7
+, \mbox{\hyperlink{master__msg__report_8h_adfefd10d55df8fad52b3d2f8d68dc66aa7b6e6b26218ad4aa39d9ac5dcba6ecca}{SIGNALS\+\_\+\+OF\+\_\+\+TERM\+\_\+\+RECEIVED}} = 8
+, \newline
+\mbox{\hyperlink{master__msg__report_8h_adfefd10d55df8fad52b3d2f8d68dc66aa46ce5c6851cb937209abfe57922ad21c}{INFO\+\_\+\+BUDGET}} = 9
+, \mbox{\hyperlink{master__msg__report_8h_adfefd10d55df8fad52b3d2f8d68dc66aae1ceebc90f55f4de7a710e3e461b2d53}{TP\+\_\+\+FULL}} = 10
+, \mbox{\hyperlink{master__msg__report_8h_adfefd10d55df8fad52b3d2f8d68dc66aa7744da48892e0b14d23651946592220a}{UNUSED\+\_\+\+PROC}} = 11
+, \mbox{\hyperlink{master__msg__report_8h_adfefd10d55df8fad52b3d2f8d68dc66aad8903462ac42f21e5e3aea7b8533bbdb}{MAX\+\_\+\+FAILURE\+\_\+\+SHM\+\_\+\+REACHED}} = 12
+ \}
+\item 
+enum \mbox{\hyperlink{master__msg__report_8h_ae5f7d8398bf1a7251be5beb94f345347}{PROC\+\_\+\+TYPE}} \{ \mbox{\hyperlink{master__msg__report_8h_ae5f7d8398bf1a7251be5beb94f345347ae2d30a195cee6b2961cc2c23ea4b520b}{USER}}
+, \mbox{\hyperlink{master__msg__report_8h_ae5f7d8398bf1a7251be5beb94f345347a59a889456a2d742fdca191dccb3e871d}{NODE}}
+ \}
+\end{DoxyCompactItemize}
+\doxysubsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+void \mbox{\hyperlink{master__msg__report_8h_af7a614d004b16a9af604bc20aaef5052}{master\+\_\+msg\+\_\+report\+\_\+create}} (struct \mbox{\hyperlink{structmaster__msg__report}{master\+\_\+msg\+\_\+report}} $\ast$self, long type, long proc\+\_\+type, pid\+\_\+t sender\+\_\+pid, short int state, float budget, struct \mbox{\hyperlink{struct_transaction}{Transaction}} t)
+\item 
+void \mbox{\hyperlink{master__msg__report_8h_a1a0bcafd2b8d1846c9c062f64933803c}{master\+\_\+msg\+\_\+report\+\_\+print}} (const struct \mbox{\hyperlink{structmaster__msg__report}{master\+\_\+msg\+\_\+report}} $\ast$self)
+\item 
+int \mbox{\hyperlink{master__msg__report_8h_af8899f02009bbd24127a10a85693c055}{master\+\_\+msg\+\_\+send}} (int id, struct \mbox{\hyperlink{structmaster__msg__report}{master\+\_\+msg\+\_\+report}} $\ast$self, long type, long proc\+\_\+type, pid\+\_\+t sender\+\_\+pid, short int state, \mbox{\hyperlink{boolean_8h_afdcfe6db5bea87bd493a3fe2c513d5ef}{Bool}} create, float budget, struct \mbox{\hyperlink{struct_transaction}{Transaction}} $\ast$t)
+\item 
+int \mbox{\hyperlink{master__msg__report_8h_a5b0b59b8fe68d3dac53549dc54def7eb}{master\+\_\+msg\+\_\+receive}} (int id, struct \mbox{\hyperlink{structmaster__msg__report}{master\+\_\+msg\+\_\+report}} $\ast$self)
+\item 
+int \mbox{\hyperlink{master__msg__report_8h_a2572db5ab2c2b87f9cd0c7cecf1a9cd3}{check\+\_\+msg\+\_\+report}} (struct \mbox{\hyperlink{structmaster__msg__report}{master\+\_\+msg\+\_\+report}} $\ast$msg\+\_\+report, int \mbox{\hyperlink{main_8c_acf2b73ea2f17461b2dc97b4722fe894e}{msg\+\_\+report\+\_\+id\+\_\+master}}, Proc\+List \mbox{\hyperlink{main_8c_a203f1362008a8171971c8ac1bd6bce04}{proc\+\_\+list}})
+\item 
+int \mbox{\hyperlink{master__msg__report_8h_aa8bf408b87d797d8d9ef136604532d13}{master\+\_\+msg\+\_\+receive\+\_\+info}} (int id, struct \mbox{\hyperlink{structmaster__msg__report}{master\+\_\+msg\+\_\+report}} $\ast$self)
+\item 
+int \mbox{\hyperlink{master__msg__report_8h_a585ee28bd7f9c703c6457a05bda2a417}{acknowledge}} (struct \mbox{\hyperlink{structmaster__msg__report}{master\+\_\+msg\+\_\+report}} $\ast$self, Proc\+List list)
+\item 
+char $\ast$ \mbox{\hyperlink{master__msg__report_8h_a0c0bd350e260dbcb9ea9d43150ab1468}{from\+\_\+type\+\_\+to\+\_\+string}} (long type)
+\item 
+void \mbox{\hyperlink{master__msg__report_8h_ad42a72e7d4906b623c8f69162e4e9049}{from\+\_\+procstate\+\_\+to\+\_\+string}} (int state, char $\ast$string)
+\item 
+char $\ast$ \mbox{\hyperlink{master__msg__report_8h_a72f267f18ee542db51e5791318d61bef}{from\+\_\+proctype\+\_\+to\+\_\+string}} (long proc\+\_\+type)
+\item 
+int \mbox{\hyperlink{master__msg__report_8h_acfcfbd83891fc949f98fe0bd39b93972}{check\+\_\+for\+\_\+termination}} (struct \mbox{\hyperlink{structmaster__msg__report}{master\+\_\+msg\+\_\+report}} $\ast$msg\+\_\+report, int \mbox{\hyperlink{main_8c_acf2b73ea2f17461b2dc97b4722fe894e}{msg\+\_\+report\+\_\+id\+\_\+master}}, int $\ast$ris, Proc\+List \mbox{\hyperlink{main_8c_a203f1362008a8171971c8ac1bd6bce04}{proc\+\_\+list}})
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+Header file for the \mbox{\hyperlink{master__msg__report_8c}{master\+\_\+msg\+\_\+report.\+c}} module. Contains the definitions of the functions,structures and types used to handle the \mbox{\hyperlink{master__msg__report_8c}{master\+\_\+msg\+\_\+report.\+c}} module. 
+
+\begin{DoxyAuthor}{Author}
+Giovanni Terzuolo 
+\end{DoxyAuthor}
+
+
+\doxysubsection{Enumeration Type Documentation}
+\mbox{\Hypertarget{master__msg__report_8h_adfefd10d55df8fad52b3d2f8d68dc66a}\label{master__msg__report_8h_adfefd10d55df8fad52b3d2f8d68dc66a}} 
+\index{master\_msg\_report.h@{master\_msg\_report.h}!MSG\_REPORT\_TYPE@{MSG\_REPORT\_TYPE}}
+\index{MSG\_REPORT\_TYPE@{MSG\_REPORT\_TYPE}!master\_msg\_report.h@{master\_msg\_report.h}}
+\doxysubsubsection{\texorpdfstring{MSG\_REPORT\_TYPE}{MSG\_REPORT\_TYPE}}
+{\footnotesize\ttfamily enum \mbox{\hyperlink{master__msg__report_8h_adfefd10d55df8fad52b3d2f8d68dc66a}{MSG\+\_\+\+REPORT\+\_\+\+TYPE}}}
+
+\begin{DoxyEnumFields}{Enumerator}
+\raisebox{\heightof{T}}[0pt][0pt]{\index{TERMINATION\_END\_CORRECTLY@{TERMINATION\_END\_CORRECTLY}!master\_msg\_report.h@{master\_msg\_report.h}}\index{master\_msg\_report.h@{master\_msg\_report.h}!TERMINATION\_END\_CORRECTLY@{TERMINATION\_END\_CORRECTLY}}}\mbox{\Hypertarget{master__msg__report_8h_adfefd10d55df8fad52b3d2f8d68dc66aa213d4c91683a8280bccd19c95f7d1aac}\label{master__msg__report_8h_adfefd10d55df8fad52b3d2f8d68dc66aa213d4c91683a8280bccd19c95f7d1aac}} 
+TERMINATION\+\_\+\+END\+\_\+\+CORRECTLY&\\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{IMPOSSIBLE\_TO\_SEND\_TRANSACTION@{IMPOSSIBLE\_TO\_SEND\_TRANSACTION}!master\_msg\_report.h@{master\_msg\_report.h}}\index{master\_msg\_report.h@{master\_msg\_report.h}!IMPOSSIBLE\_TO\_SEND\_TRANSACTION@{IMPOSSIBLE\_TO\_SEND\_TRANSACTION}}}\mbox{\Hypertarget{master__msg__report_8h_adfefd10d55df8fad52b3d2f8d68dc66aa45049a88e2ca58b4578b3ad4e568720d}\label{master__msg__report_8h_adfefd10d55df8fad52b3d2f8d68dc66aa45049a88e2ca58b4578b3ad4e568720d}} 
+IMPOSSIBLE\+\_\+\+TO\+\_\+\+SEND\+\_\+\+TRANSACTION&\\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{IMPOSSIBLE\_TO\_CONNECT\_TO\_SHM@{IMPOSSIBLE\_TO\_CONNECT\_TO\_SHM}!master\_msg\_report.h@{master\_msg\_report.h}}\index{master\_msg\_report.h@{master\_msg\_report.h}!IMPOSSIBLE\_TO\_CONNECT\_TO\_SHM@{IMPOSSIBLE\_TO\_CONNECT\_TO\_SHM}}}\mbox{\Hypertarget{master__msg__report_8h_adfefd10d55df8fad52b3d2f8d68dc66aaf88e804772b4b0748e725a03158f9ef2}\label{master__msg__report_8h_adfefd10d55df8fad52b3d2f8d68dc66aaf88e804772b4b0748e725a03158f9ef2}} 
+IMPOSSIBLE\+\_\+\+TO\+\_\+\+CONNECT\+\_\+\+TO\+\_\+\+SHM&\\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{IMPOSSIBLE\_TO\_COMUNICATE\_WITH\_QUEUE@{IMPOSSIBLE\_TO\_COMUNICATE\_WITH\_QUEUE}!master\_msg\_report.h@{master\_msg\_report.h}}\index{master\_msg\_report.h@{master\_msg\_report.h}!IMPOSSIBLE\_TO\_COMUNICATE\_WITH\_QUEUE@{IMPOSSIBLE\_TO\_COMUNICATE\_WITH\_QUEUE}}}\mbox{\Hypertarget{master__msg__report_8h_adfefd10d55df8fad52b3d2f8d68dc66aae0e67a56c2a6e805bd8b8e879bc1bba3}\label{master__msg__report_8h_adfefd10d55df8fad52b3d2f8d68dc66aae0e67a56c2a6e805bd8b8e879bc1bba3}} 
+IMPOSSIBLE\+\_\+\+TO\+\_\+\+COMUNICATE\+\_\+\+WITH\+\_\+\+QUEUE&\\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{IMPOSSIBLE\_TO\_GENERATE\_TRANSACTION@{IMPOSSIBLE\_TO\_GENERATE\_TRANSACTION}!master\_msg\_report.h@{master\_msg\_report.h}}\index{master\_msg\_report.h@{master\_msg\_report.h}!IMPOSSIBLE\_TO\_GENERATE\_TRANSACTION@{IMPOSSIBLE\_TO\_GENERATE\_TRANSACTION}}}\mbox{\Hypertarget{master__msg__report_8h_adfefd10d55df8fad52b3d2f8d68dc66aad16fa5101d88fbe4b8ac2c42f6831207}\label{master__msg__report_8h_adfefd10d55df8fad52b3d2f8d68dc66aad16fa5101d88fbe4b8ac2c42f6831207}} 
+IMPOSSIBLE\+\_\+\+TO\+\_\+\+GENERATE\+\_\+\+TRANSACTION&\\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{IMPOSSIBLE\_TO\_ACQUIRE\_SEMAPHORE@{IMPOSSIBLE\_TO\_ACQUIRE\_SEMAPHORE}!master\_msg\_report.h@{master\_msg\_report.h}}\index{master\_msg\_report.h@{master\_msg\_report.h}!IMPOSSIBLE\_TO\_ACQUIRE\_SEMAPHORE@{IMPOSSIBLE\_TO\_ACQUIRE\_SEMAPHORE}}}\mbox{\Hypertarget{master__msg__report_8h_adfefd10d55df8fad52b3d2f8d68dc66aa9532de64f7ba61646888e0c64af2e225}\label{master__msg__report_8h_adfefd10d55df8fad52b3d2f8d68dc66aa9532de64f7ba61646888e0c64af2e225}} 
+IMPOSSIBLE\+\_\+\+TO\+\_\+\+ACQUIRE\+\_\+\+SEMAPHORE&\\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{IMPOSSIBLE\_TO\_LOAD\_CONFIGURATION@{IMPOSSIBLE\_TO\_LOAD\_CONFIGURATION}!master\_msg\_report.h@{master\_msg\_report.h}}\index{master\_msg\_report.h@{master\_msg\_report.h}!IMPOSSIBLE\_TO\_LOAD\_CONFIGURATION@{IMPOSSIBLE\_TO\_LOAD\_CONFIGURATION}}}\mbox{\Hypertarget{master__msg__report_8h_adfefd10d55df8fad52b3d2f8d68dc66aa74e05f8d8c79ca9838cf900c98835423}\label{master__msg__report_8h_adfefd10d55df8fad52b3d2f8d68dc66aa74e05f8d8c79ca9838cf900c98835423}} 
+IMPOSSIBLE\+\_\+\+TO\+\_\+\+LOAD\+\_\+\+CONFIGURATION&\\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{SIGNALS\_OF\_TERM\_RECEIVED@{SIGNALS\_OF\_TERM\_RECEIVED}!master\_msg\_report.h@{master\_msg\_report.h}}\index{master\_msg\_report.h@{master\_msg\_report.h}!SIGNALS\_OF\_TERM\_RECEIVED@{SIGNALS\_OF\_TERM\_RECEIVED}}}\mbox{\Hypertarget{master__msg__report_8h_adfefd10d55df8fad52b3d2f8d68dc66aa7b6e6b26218ad4aa39d9ac5dcba6ecca}\label{master__msg__report_8h_adfefd10d55df8fad52b3d2f8d68dc66aa7b6e6b26218ad4aa39d9ac5dcba6ecca}} 
+SIGNALS\+\_\+\+OF\+\_\+\+TERM\+\_\+\+RECEIVED&\\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{INFO\_BUDGET@{INFO\_BUDGET}!master\_msg\_report.h@{master\_msg\_report.h}}\index{master\_msg\_report.h@{master\_msg\_report.h}!INFO\_BUDGET@{INFO\_BUDGET}}}\mbox{\Hypertarget{master__msg__report_8h_adfefd10d55df8fad52b3d2f8d68dc66aa46ce5c6851cb937209abfe57922ad21c}\label{master__msg__report_8h_adfefd10d55df8fad52b3d2f8d68dc66aa46ce5c6851cb937209abfe57922ad21c}} 
+INFO\+\_\+\+BUDGET&\\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{TP\_FULL@{TP\_FULL}!master\_msg\_report.h@{master\_msg\_report.h}}\index{master\_msg\_report.h@{master\_msg\_report.h}!TP\_FULL@{TP\_FULL}}}\mbox{\Hypertarget{master__msg__report_8h_adfefd10d55df8fad52b3d2f8d68dc66aae1ceebc90f55f4de7a710e3e461b2d53}\label{master__msg__report_8h_adfefd10d55df8fad52b3d2f8d68dc66aae1ceebc90f55f4de7a710e3e461b2d53}} 
+TP\+\_\+\+FULL&\\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{UNUSED\_PROC@{UNUSED\_PROC}!master\_msg\_report.h@{master\_msg\_report.h}}\index{master\_msg\_report.h@{master\_msg\_report.h}!UNUSED\_PROC@{UNUSED\_PROC}}}\mbox{\Hypertarget{master__msg__report_8h_adfefd10d55df8fad52b3d2f8d68dc66aa7744da48892e0b14d23651946592220a}\label{master__msg__report_8h_adfefd10d55df8fad52b3d2f8d68dc66aa7744da48892e0b14d23651946592220a}} 
+UNUSED\+\_\+\+PROC&\\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{MAX\_FAILURE\_SHM\_REACHED@{MAX\_FAILURE\_SHM\_REACHED}!master\_msg\_report.h@{master\_msg\_report.h}}\index{master\_msg\_report.h@{master\_msg\_report.h}!MAX\_FAILURE\_SHM\_REACHED@{MAX\_FAILURE\_SHM\_REACHED}}}\mbox{\Hypertarget{master__msg__report_8h_adfefd10d55df8fad52b3d2f8d68dc66aad8903462ac42f21e5e3aea7b8533bbdb}\label{master__msg__report_8h_adfefd10d55df8fad52b3d2f8d68dc66aad8903462ac42f21e5e3aea7b8533bbdb}} 
+MAX\+\_\+\+FAILURE\+\_\+\+SHM\+\_\+\+REACHED&\\
+\hline
+
+\end{DoxyEnumFields}
+\mbox{\Hypertarget{master__msg__report_8h_ae5f7d8398bf1a7251be5beb94f345347}\label{master__msg__report_8h_ae5f7d8398bf1a7251be5beb94f345347}} 
+\index{master\_msg\_report.h@{master\_msg\_report.h}!PROC\_TYPE@{PROC\_TYPE}}
+\index{PROC\_TYPE@{PROC\_TYPE}!master\_msg\_report.h@{master\_msg\_report.h}}
+\doxysubsubsection{\texorpdfstring{PROC\_TYPE}{PROC\_TYPE}}
+{\footnotesize\ttfamily enum \mbox{\hyperlink{master__msg__report_8h_ae5f7d8398bf1a7251be5beb94f345347}{PROC\+\_\+\+TYPE}}}
+
+\begin{DoxyEnumFields}{Enumerator}
+\raisebox{\heightof{T}}[0pt][0pt]{\index{USER@{USER}!master\_msg\_report.h@{master\_msg\_report.h}}\index{master\_msg\_report.h@{master\_msg\_report.h}!USER@{USER}}}\mbox{\Hypertarget{master__msg__report_8h_ae5f7d8398bf1a7251be5beb94f345347ae2d30a195cee6b2961cc2c23ea4b520b}\label{master__msg__report_8h_ae5f7d8398bf1a7251be5beb94f345347ae2d30a195cee6b2961cc2c23ea4b520b}} 
+USER&\\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{NODE@{NODE}!master\_msg\_report.h@{master\_msg\_report.h}}\index{master\_msg\_report.h@{master\_msg\_report.h}!NODE@{NODE}}}\mbox{\Hypertarget{master__msg__report_8h_ae5f7d8398bf1a7251be5beb94f345347a59a889456a2d742fdca191dccb3e871d}\label{master__msg__report_8h_ae5f7d8398bf1a7251be5beb94f345347a59a889456a2d742fdca191dccb3e871d}} 
+NODE&\\
+\hline
+
+\end{DoxyEnumFields}
+\mbox{\Hypertarget{master__msg__report_8h_a6e099f781173abb91e40d526a8740725}\label{master__msg__report_8h_a6e099f781173abb91e40d526a8740725}} 
+\index{master\_msg\_report.h@{master\_msg\_report.h}!PROCSTATE@{PROCSTATE}}
+\index{PROCSTATE@{PROCSTATE}!master\_msg\_report.h@{master\_msg\_report.h}}
+\doxysubsubsection{\texorpdfstring{PROCSTATE}{PROCSTATE}}
+{\footnotesize\ttfamily enum \mbox{\hyperlink{master__msg__report_8h_a6e099f781173abb91e40d526a8740725}{PROCSTATE}}}
+
+\begin{DoxyEnumFields}{Enumerator}
+\raisebox{\heightof{T}}[0pt][0pt]{\index{PROC\_STATE\_INIT@{PROC\_STATE\_INIT}!master\_msg\_report.h@{master\_msg\_report.h}}\index{master\_msg\_report.h@{master\_msg\_report.h}!PROC\_STATE\_INIT@{PROC\_STATE\_INIT}}}\mbox{\Hypertarget{master__msg__report_8h_a6e099f781173abb91e40d526a8740725a0735199acbedd655906cac51dbfa8779}\label{master__msg__report_8h_a6e099f781173abb91e40d526a8740725a0735199acbedd655906cac51dbfa8779}} 
+PROC\+\_\+\+STATE\+\_\+\+INIT&\\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{PROC\_STATE\_RUNNING@{PROC\_STATE\_RUNNING}!master\_msg\_report.h@{master\_msg\_report.h}}\index{master\_msg\_report.h@{master\_msg\_report.h}!PROC\_STATE\_RUNNING@{PROC\_STATE\_RUNNING}}}\mbox{\Hypertarget{master__msg__report_8h_a6e099f781173abb91e40d526a8740725ae8fd2c67df21f90e0e79d86936f863c9}\label{master__msg__report_8h_a6e099f781173abb91e40d526a8740725ae8fd2c67df21f90e0e79d86936f863c9}} 
+PROC\+\_\+\+STATE\+\_\+\+RUNNING&\\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{PROC\_STATE\_TERMINATED@{PROC\_STATE\_TERMINATED}!master\_msg\_report.h@{master\_msg\_report.h}}\index{master\_msg\_report.h@{master\_msg\_report.h}!PROC\_STATE\_TERMINATED@{PROC\_STATE\_TERMINATED}}}\mbox{\Hypertarget{master__msg__report_8h_a6e099f781173abb91e40d526a8740725a9e9b57a002c12d8d66ce8a6df66c6c12}\label{master__msg__report_8h_a6e099f781173abb91e40d526a8740725a9e9b57a002c12d8d66ce8a6df66c6c12}} 
+PROC\+\_\+\+STATE\+\_\+\+TERMINATED&\\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{PROC\_STATE\_WAITING@{PROC\_STATE\_WAITING}!master\_msg\_report.h@{master\_msg\_report.h}}\index{master\_msg\_report.h@{master\_msg\_report.h}!PROC\_STATE\_WAITING@{PROC\_STATE\_WAITING}}}\mbox{\Hypertarget{master__msg__report_8h_a6e099f781173abb91e40d526a8740725a61226cd95f82a52c32fc8f3bf7267562}\label{master__msg__report_8h_a6e099f781173abb91e40d526a8740725a61226cd95f82a52c32fc8f3bf7267562}} 
+PROC\+\_\+\+STATE\+\_\+\+WAITING&\\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{PROC\_STATE\_NODE\_SERV\_TRANS@{PROC\_STATE\_NODE\_SERV\_TRANS}!master\_msg\_report.h@{master\_msg\_report.h}}\index{master\_msg\_report.h@{master\_msg\_report.h}!PROC\_STATE\_NODE\_SERV\_TRANS@{PROC\_STATE\_NODE\_SERV\_TRANS}}}\mbox{\Hypertarget{master__msg__report_8h_a6e099f781173abb91e40d526a8740725a16904ee3cd3d0b80510c79f6e8f3c92e}\label{master__msg__report_8h_a6e099f781173abb91e40d526a8740725a16904ee3cd3d0b80510c79f6e8f3c92e}} 
+PROC\+\_\+\+STATE\+\_\+\+NODE\+\_\+\+SERV\+\_\+\+TRANS&\\
+\hline
+
+\end{DoxyEnumFields}
+
+
+\doxysubsection{Function Documentation}
+\mbox{\Hypertarget{master__msg__report_8h_a585ee28bd7f9c703c6457a05bda2a417}\label{master__msg__report_8h_a585ee28bd7f9c703c6457a05bda2a417}} 
+\index{master\_msg\_report.h@{master\_msg\_report.h}!acknowledge@{acknowledge}}
+\index{acknowledge@{acknowledge}!master\_msg\_report.h@{master\_msg\_report.h}}
+\doxysubsubsection{\texorpdfstring{acknowledge()}{acknowledge()}}
+{\footnotesize\ttfamily int acknowledge (\begin{DoxyParamCaption}\item[{struct \mbox{\hyperlink{structmaster__msg__report}{master\+\_\+msg\+\_\+report}} $\ast$}]{self,  }\item[{Proc\+List}]{list }\end{DoxyParamCaption})}
+
+Based on the given master msg, load and modify the data in proc list 
+\begin{DoxyParams}{Parameters}
+{\em self} & the message \\
+\hline
+{\em list} & the list of process to be updated \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+-\/2 in case of no sender pid in proc\+\_\+list.-\/1 in case of wrong msg\+\_\+type.-\/3 in case of TP\+\_\+\+FULL. The pid of the sender otherwise . TODO\+: Implement termination info in the list of proc (Cause that determined the termination) 
+\end{DoxyReturn}
+\mbox{\Hypertarget{master__msg__report_8h_acfcfbd83891fc949f98fe0bd39b93972}\label{master__msg__report_8h_acfcfbd83891fc949f98fe0bd39b93972}} 
+\index{master\_msg\_report.h@{master\_msg\_report.h}!check\_for\_termination@{check\_for\_termination}}
+\index{check\_for\_termination@{check\_for\_termination}!master\_msg\_report.h@{master\_msg\_report.h}}
+\doxysubsubsection{\texorpdfstring{check\_for\_termination()}{check\_for\_termination()}}
+{\footnotesize\ttfamily int check\+\_\+for\+\_\+termination (\begin{DoxyParamCaption}\item[{struct \mbox{\hyperlink{structmaster__msg__report}{master\+\_\+msg\+\_\+report}} $\ast$}]{msg\+\_\+report,  }\item[{int}]{msg\+\_\+report\+\_\+id\+\_\+master,  }\item[{int $\ast$}]{ris,  }\item[{Proc\+List}]{proc\+\_\+list }\end{DoxyParamCaption})}
+
+Get all the pids of the processes that have send a message to the master of termination type 
+\begin{DoxyParams}{Parameters}
+{\em msg\+\_\+report} & the message to be checked \\
+\hline
+{\em msg\+\_\+report\+\_\+id\+\_\+master} & id of the queue \\
+\hline
+{\em ris} & the list of pids \\
+\hline
+{\em proc\+\_\+list} & the list of processes to be checked \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+-\/3 in case of tp\+\_\+full, -\/1 in case of failure. 0 otherwise 
+\end{DoxyReturn}
+\mbox{\Hypertarget{master__msg__report_8h_a2572db5ab2c2b87f9cd0c7cecf1a9cd3}\label{master__msg__report_8h_a2572db5ab2c2b87f9cd0c7cecf1a9cd3}} 
+\index{master\_msg\_report.h@{master\_msg\_report.h}!check\_msg\_report@{check\_msg\_report}}
+\index{check\_msg\_report@{check\_msg\_report}!master\_msg\_report.h@{master\_msg\_report.h}}
+\doxysubsubsection{\texorpdfstring{check\_msg\_report()}{check\_msg\_report()}}
+{\footnotesize\ttfamily int check\+\_\+msg\+\_\+report (\begin{DoxyParamCaption}\item[{struct \mbox{\hyperlink{structmaster__msg__report}{master\+\_\+msg\+\_\+report}} $\ast$}]{msg\+\_\+report,  }\item[{int}]{msg\+\_\+report\+\_\+id\+\_\+master,  }\item[{Proc\+List}]{proc\+\_\+list }\end{DoxyParamCaption})}
+
+Check for messages in the master msg\+\_\+queue 
+\begin{DoxyParams}{Parameters}
+{\em msg\+\_\+report} & pointer to the struct representing the msg in the master msg queue \\
+\hline
+{\em msg\+\_\+report\+\_\+id\+\_\+master} & id of the queue \\
+\hline
+{\em proc\+\_\+list} & list of the process to check msg for \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+-\/1 in case of FAILURE. 2 in case of msg found. 0 otherwise 
+\end{DoxyReturn}
+\mbox{\Hypertarget{master__msg__report_8h_ad42a72e7d4906b623c8f69162e4e9049}\label{master__msg__report_8h_ad42a72e7d4906b623c8f69162e4e9049}} 
+\index{master\_msg\_report.h@{master\_msg\_report.h}!from\_procstate\_to\_string@{from\_procstate\_to\_string}}
+\index{from\_procstate\_to\_string@{from\_procstate\_to\_string}!master\_msg\_report.h@{master\_msg\_report.h}}
+\doxysubsubsection{\texorpdfstring{from\_procstate\_to\_string()}{from\_procstate\_to\_string()}}
+{\footnotesize\ttfamily void from\+\_\+procstate\+\_\+to\+\_\+string (\begin{DoxyParamCaption}\item[{int}]{state,  }\item[{char $\ast$}]{string }\end{DoxyParamCaption})}
+
+Convert the given exec type into his equivalent string 
+\begin{DoxyParams}{Parameters}
+{\em state} & current state of the proc \\
+\hline
+{\em string} & var in wich the method save the equivalent string \\
+\hline
+\end{DoxyParams}
+\mbox{\Hypertarget{master__msg__report_8h_a72f267f18ee542db51e5791318d61bef}\label{master__msg__report_8h_a72f267f18ee542db51e5791318d61bef}} 
+\index{master\_msg\_report.h@{master\_msg\_report.h}!from\_proctype\_to\_string@{from\_proctype\_to\_string}}
+\index{from\_proctype\_to\_string@{from\_proctype\_to\_string}!master\_msg\_report.h@{master\_msg\_report.h}}
+\doxysubsubsection{\texorpdfstring{from\_proctype\_to\_string()}{from\_proctype\_to\_string()}}
+{\footnotesize\ttfamily char $\ast$ from\+\_\+proctype\+\_\+to\+\_\+string (\begin{DoxyParamCaption}\item[{long}]{proc\+\_\+type }\end{DoxyParamCaption})}
+
+Convert the given proc\+\_\+type into his relative string 
+\begin{DoxyParams}{Parameters}
+{\em proc\+\_\+type} & the process type to be converted \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+the equivalent string 
+\end{DoxyReturn}
+\mbox{\Hypertarget{master__msg__report_8h_a0c0bd350e260dbcb9ea9d43150ab1468}\label{master__msg__report_8h_a0c0bd350e260dbcb9ea9d43150ab1468}} 
+\index{master\_msg\_report.h@{master\_msg\_report.h}!from\_type\_to\_string@{from\_type\_to\_string}}
+\index{from\_type\_to\_string@{from\_type\_to\_string}!master\_msg\_report.h@{master\_msg\_report.h}}
+\doxysubsubsection{\texorpdfstring{from\_type\_to\_string()}{from\_type\_to\_string()}}
+{\footnotesize\ttfamily char $\ast$ from\+\_\+type\+\_\+to\+\_\+string (\begin{DoxyParamCaption}\item[{long}]{type }\end{DoxyParamCaption})}
+
+Convert the given type into his relative string 
+\begin{DoxyParams}{Parameters}
+{\em type} & the type of the message \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+the string equivalent 
+\end{DoxyReturn}
+\mbox{\Hypertarget{master__msg__report_8h_a5b0b59b8fe68d3dac53549dc54def7eb}\label{master__msg__report_8h_a5b0b59b8fe68d3dac53549dc54def7eb}} 
+\index{master\_msg\_report.h@{master\_msg\_report.h}!master\_msg\_receive@{master\_msg\_receive}}
+\index{master\_msg\_receive@{master\_msg\_receive}!master\_msg\_report.h@{master\_msg\_report.h}}
+\doxysubsubsection{\texorpdfstring{master\_msg\_receive()}{master\_msg\_receive()}}
+{\footnotesize\ttfamily int master\+\_\+msg\+\_\+receive (\begin{DoxyParamCaption}\item[{int}]{id,  }\item[{struct \mbox{\hyperlink{structmaster__msg__report}{master\+\_\+msg\+\_\+report}} $\ast$}]{self }\end{DoxyParamCaption})}
+
+Retrive the message\+\_\+node\+\_\+report on the specified message queue \begin{DoxyWarning}{Warning}
+the retriving operation is repeated until it succeed or errno != EINTR 
+\end{DoxyWarning}
+
+\begin{DoxyParams}{Parameters}
+{\em id} & of the message queue \\
+\hline
+{\em msg} & to be caught \\
+\hline
+{\em type} & of the message, see MSG\+\_\+\+REPORT\+\_\+\+ABORTED\+\_\+\+PROC as exmp. \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+-\/2 in case of no msg on queue. -\/1 in case of failure. 0 otherwise 
+\end{DoxyReturn}
+\mbox{\Hypertarget{master__msg__report_8h_aa8bf408b87d797d8d9ef136604532d13}\label{master__msg__report_8h_aa8bf408b87d797d8d9ef136604532d13}} 
+\index{master\_msg\_report.h@{master\_msg\_report.h}!master\_msg\_receive\_info@{master\_msg\_receive\_info}}
+\index{master\_msg\_receive\_info@{master\_msg\_receive\_info}!master\_msg\_report.h@{master\_msg\_report.h}}
+\doxysubsubsection{\texorpdfstring{master\_msg\_receive\_info()}{master\_msg\_receive\_info()}}
+{\footnotesize\ttfamily int master\+\_\+msg\+\_\+receive\+\_\+info (\begin{DoxyParamCaption}\item[{int}]{id,  }\item[{struct \mbox{\hyperlink{structmaster__msg__report}{master\+\_\+msg\+\_\+report}} $\ast$}]{self }\end{DoxyParamCaption})}
+
+Retrive the message\+\_\+node\+\_\+report on the specified message queue \begin{DoxyWarning}{Warning}
+the retriving operation is repeated until it succeed or errno != EINTR 
+\end{DoxyWarning}
+
+\begin{DoxyParams}{Parameters}
+{\em id} & of the message queue \\
+\hline
+{\em msg} & to be caught \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+-\/2 in case of no msg on queue. -\/1 in case of failure. 0 otherwise 
+\end{DoxyReturn}
+\mbox{\Hypertarget{master__msg__report_8h_af7a614d004b16a9af604bc20aaef5052}\label{master__msg__report_8h_af7a614d004b16a9af604bc20aaef5052}} 
+\index{master\_msg\_report.h@{master\_msg\_report.h}!master\_msg\_report\_create@{master\_msg\_report\_create}}
+\index{master\_msg\_report\_create@{master\_msg\_report\_create}!master\_msg\_report.h@{master\_msg\_report.h}}
+\doxysubsubsection{\texorpdfstring{master\_msg\_report\_create()}{master\_msg\_report\_create()}}
+{\footnotesize\ttfamily void master\+\_\+msg\+\_\+report\+\_\+create (\begin{DoxyParamCaption}\item[{struct \mbox{\hyperlink{structmaster__msg__report}{master\+\_\+msg\+\_\+report}} $\ast$}]{self,  }\item[{long}]{type,  }\item[{long}]{proc\+\_\+type,  }\item[{pid\+\_\+t}]{sender\+\_\+pid,  }\item[{short int}]{state,  }\item[{float}]{budget,  }\item[{struct \mbox{\hyperlink{struct_transaction}{Transaction}}}]{t }\end{DoxyParamCaption})}
+
+Constructor for the message to be sent to the master\+\_\+proc 
+\begin{DoxyParams}{Parameters}
+{\em self} & the message \\
+\hline
+{\em type} & of the message, see MSG\+\_\+\+REPORT\+\_\+\+ABORTED\+\_\+\+PROC as exmp. \\
+\hline
+{\em sender\+\_\+pid} & the pid of the user to sent this msg \\
+\hline
+{\em state} & state of the current proc who\textquotesingle{}s sending this message \\
+\hline
+{\em budget} & (Optional -\/1 as value), set if type is INFO\+\_\+\+BUDGET otherwise budget set to 0 \\
+\hline
+{\em t} & set if type is TP\+\_\+\+FULL otherwise t set to empty \\
+\hline
+\end{DoxyParams}
+\mbox{\Hypertarget{master__msg__report_8h_a1a0bcafd2b8d1846c9c062f64933803c}\label{master__msg__report_8h_a1a0bcafd2b8d1846c9c062f64933803c}} 
+\index{master\_msg\_report.h@{master\_msg\_report.h}!master\_msg\_report\_print@{master\_msg\_report\_print}}
+\index{master\_msg\_report\_print@{master\_msg\_report\_print}!master\_msg\_report.h@{master\_msg\_report.h}}
+\doxysubsubsection{\texorpdfstring{master\_msg\_report\_print()}{master\_msg\_report\_print()}}
+{\footnotesize\ttfamily void master\+\_\+msg\+\_\+report\+\_\+print (\begin{DoxyParamCaption}\item[{const struct \mbox{\hyperlink{structmaster__msg__report}{master\+\_\+msg\+\_\+report}} $\ast$}]{self }\end{DoxyParamCaption})}
+
+Print the message based on his type 
+\begin{DoxyParams}{Parameters}
+{\em sel} & the messagge to be printed \\
+\hline
+\end{DoxyParams}
+\mbox{\Hypertarget{master__msg__report_8h_af8899f02009bbd24127a10a85693c055}\label{master__msg__report_8h_af8899f02009bbd24127a10a85693c055}} 
+\index{master\_msg\_report.h@{master\_msg\_report.h}!master\_msg\_send@{master\_msg\_send}}
+\index{master\_msg\_send@{master\_msg\_send}!master\_msg\_report.h@{master\_msg\_report.h}}
+\doxysubsubsection{\texorpdfstring{master\_msg\_send()}{master\_msg\_send()}}
+{\footnotesize\ttfamily int master\+\_\+msg\+\_\+send (\begin{DoxyParamCaption}\item[{int}]{id,  }\item[{struct \mbox{\hyperlink{structmaster__msg__report}{master\+\_\+msg\+\_\+report}} $\ast$}]{self,  }\item[{long}]{type,  }\item[{long}]{proc\+\_\+type,  }\item[{pid\+\_\+t}]{sender\+\_\+pid,  }\item[{short int}]{state,  }\item[{\mbox{\hyperlink{boolean_8h_afdcfe6db5bea87bd493a3fe2c513d5ef}{Bool}}}]{create,  }\item[{float}]{budget,  }\item[{struct \mbox{\hyperlink{struct_transaction}{Transaction}} $\ast$}]{t }\end{DoxyParamCaption})}
+
+(Create if option selected) and Send the message on ipc master\+\_\+msg\+\_\+queue with the given key \begin{DoxyWarning}{Warning}
+send is repeated until it succeed or errno != EINTR 
+\end{DoxyWarning}
+
+\begin{DoxyParams}{Parameters}
+{\em self} & the message \\
+\hline
+{\em type} & of the message, see MSG\+\_\+\+REPORT\+\_\+\+ABORTED\+\_\+\+PROC as exmp. \\
+\hline
+{\em sender\+\_\+pid} & the pid of the user to sent this msg \\
+\hline
+{\em state} & state of the current proc who\textquotesingle{}s sending this message \\
+\hline
+{\em budget} & (Optional -\/1 as value), set if type is INFO\+\_\+\+BUDGET otherwise budget set to 0 \\
+\hline
+{\em t} & set if type is TP\+\_\+\+FULL otherwise t set to empty \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+-\/1 in case of failure. 0 otherwise 
+\end{DoxyReturn}

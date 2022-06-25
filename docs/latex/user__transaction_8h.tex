@@ -1,0 +1,221 @@
+\hypertarget{user__transaction_8h}{}\doxysection{src/local\+\_\+lib/headers/user\+\_\+transaction.h File Reference}
+\label{user__transaction_8h}\index{src/local\_lib/headers/user\_transaction.h@{src/local\_lib/headers/user\_transaction.h}}
+
+
+Header file for \mbox{\hyperlink{user__transaction_8c}{user\+\_\+transaction.\+c}} Contains the definition of the struct \mbox{\hyperlink{structuser__transaction}{user\+\_\+transaction}} and the functions used to manipulate it.  
+
+
+{\ttfamily \#include \char`\"{}boolean.\+h\char`\"{}}\newline
+{\ttfamily \#include \char`\"{}transaction\+\_\+list.\+h\char`\"{}}\newline
+{\ttfamily \#include \char`\"{}conf\+\_\+shm.\+h\char`\"{}}\newline
+Include dependency graph for user\+\_\+transaction.\+h\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{user__transaction_8h__incl}
+\end{center}
+\end{figure}
+This graph shows which files directly or indirectly include this file\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=285pt]{user__transaction_8h__dep__incl}
+\end{center}
+\end{figure}
+\doxysubsection*{Data Structures}
+\begin{DoxyCompactItemize}
+\item 
+struct \mbox{\hyperlink{struct_u_cash_flow}{UCash\+Flow}}
+\item 
+struct \mbox{\hyperlink{structuser__transaction}{user\+\_\+transaction}}
+\begin{DoxyCompactList}\small\item\em Structure used to represent a user. \end{DoxyCompactList}\end{DoxyCompactItemize}
+\doxysubsection*{Typedefs}
+\begin{DoxyCompactItemize}
+\item 
+typedef double($\ast$ \mbox{\hyperlink{user__transaction_8h_a8da11bb7001f47668dc77eb45e836a57}{Balance}}) (struct \mbox{\hyperlink{structuser__transaction}{user\+\_\+transaction}} $\ast$self)
+\item 
+typedef int($\ast$ \mbox{\hyperlink{user__transaction_8h_a2716d248a8d94065d106e7e28b9f5152}{Calc\+Cash\+Flow}}) (struct \mbox{\hyperlink{structuser__transaction}{user\+\_\+transaction}} $\ast$self, struct \mbox{\hyperlink{struct_transaction}{Transaction}} t)
+\end{DoxyCompactItemize}
+\doxysubsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+void \mbox{\hyperlink{user__transaction_8h_aa4a0ebd304fcd3fac7008881298f00ee}{user\+\_\+create}} (struct \mbox{\hyperlink{structuser__transaction}{user\+\_\+transaction}} $\ast$self, float budget, int pid, \mbox{\hyperlink{user__transaction_8h_a8da11bb7001f47668dc77eb45e836a57}{Balance}} balance, \mbox{\hyperlink{user__transaction_8h_a2716d248a8d94065d106e7e28b9f5152}{Calc\+Cash\+Flow}} \mbox{\hyperlink{user__transaction_8c_a43560cdc24df530757a439519c168b21}{update\+\_\+cash\+\_\+flow}})
+\item 
+void \mbox{\hyperlink{user__transaction_8h_adaf2d10629cd9163c7aa828b7df95b18}{free\+\_\+user}} (struct \mbox{\hyperlink{structuser__transaction}{user\+\_\+transaction}} $\ast$self)
+\item 
+\mbox{\hyperlink{boolean_8h_afdcfe6db5bea87bd493a3fe2c513d5ef}{Bool}} \mbox{\hyperlink{user__transaction_8h_a51e80fbe86b17b1a79525465a44ae7aa}{check\+\_\+balance}} (struct \mbox{\hyperlink{structuser__transaction}{user\+\_\+transaction}} $\ast$self)
+\item 
+double \mbox{\hyperlink{user__transaction_8h_a7cef36bd17b42296f7cbffad20ba92a9}{calc\+\_\+balance}} (struct \mbox{\hyperlink{structuser__transaction}{user\+\_\+transaction}} $\ast$self)
+\item 
+void \mbox{\hyperlink{user__transaction_8h_a653dc85368697debe55ecb3d9d3cd10f}{print\+\_\+cashflow}} (struct \mbox{\hyperlink{structuser__transaction}{user\+\_\+transaction}} $\ast$self)
+\item 
+int \mbox{\hyperlink{user__transaction_8h_a43560cdc24df530757a439519c168b21}{update\+\_\+cash\+\_\+flow}} (struct \mbox{\hyperlink{structuser__transaction}{user\+\_\+transaction}} $\ast$self, struct \mbox{\hyperlink{struct_transaction}{Transaction}} t)
+\item 
+int \mbox{\hyperlink{user__transaction_8h_a616e43192442081a6066e5e6c7494daa}{generate\+\_\+transaction}} (struct \mbox{\hyperlink{structuser__transaction}{user\+\_\+transaction}} $\ast$self, pid\+\_\+t user\+\_\+proc\+\_\+pid, struct \mbox{\hyperlink{structshm__conf}{shm\+\_\+conf}} $\ast$\mbox{\hyperlink{structshm__conf}{shm\+\_\+conf}})
+\item 
+int \mbox{\hyperlink{user__transaction_8h_ad74e2425d2e9d8d7300c877fc321cbfa}{queue\+\_\+remove}} (Queue q, struct \mbox{\hyperlink{struct_transaction}{Transaction}} t)
+\item 
+int \mbox{\hyperlink{user__transaction_8h_af4447aa6d2f3582dd56456c22ca4e33b}{extract\+\_\+node}} (int nodes\+\_\+num)
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+Header file for \mbox{\hyperlink{user__transaction_8c}{user\+\_\+transaction.\+c}} Contains the definition of the struct \mbox{\hyperlink{structuser__transaction}{user\+\_\+transaction}} and the functions used to manipulate it. 
+
+\begin{DoxyAuthor}{Author}
+Giovanni Terzuolo 
+\end{DoxyAuthor}
+
+
+\doxysubsection{Typedef Documentation}
+\mbox{\Hypertarget{user__transaction_8h_a8da11bb7001f47668dc77eb45e836a57}\label{user__transaction_8h_a8da11bb7001f47668dc77eb45e836a57}} 
+\index{user\_transaction.h@{user\_transaction.h}!Balance@{Balance}}
+\index{Balance@{Balance}!user\_transaction.h@{user\_transaction.h}}
+\doxysubsubsection{\texorpdfstring{Balance}{Balance}}
+{\footnotesize\ttfamily typedef double($\ast$ Balance) (struct \mbox{\hyperlink{structuser__transaction}{user\+\_\+transaction}} $\ast$self)}
+
+\mbox{\Hypertarget{user__transaction_8h_a2716d248a8d94065d106e7e28b9f5152}\label{user__transaction_8h_a2716d248a8d94065d106e7e28b9f5152}} 
+\index{user\_transaction.h@{user\_transaction.h}!CalcCashFlow@{CalcCashFlow}}
+\index{CalcCashFlow@{CalcCashFlow}!user\_transaction.h@{user\_transaction.h}}
+\doxysubsubsection{\texorpdfstring{CalcCashFlow}{CalcCashFlow}}
+{\footnotesize\ttfamily typedef int($\ast$ Calc\+Cash\+Flow) (struct \mbox{\hyperlink{structuser__transaction}{user\+\_\+transaction}} $\ast$self, struct \mbox{\hyperlink{struct_transaction}{Transaction}} t)}
+
+
+
+\doxysubsection{Function Documentation}
+\mbox{\Hypertarget{user__transaction_8h_a7cef36bd17b42296f7cbffad20ba92a9}\label{user__transaction_8h_a7cef36bd17b42296f7cbffad20ba92a9}} 
+\index{user\_transaction.h@{user\_transaction.h}!calc\_balance@{calc\_balance}}
+\index{calc\_balance@{calc\_balance}!user\_transaction.h@{user\_transaction.h}}
+\doxysubsubsection{\texorpdfstring{calc\_balance()}{calc\_balance()}}
+{\footnotesize\ttfamily double calc\+\_\+balance (\begin{DoxyParamCaption}\item[{struct \mbox{\hyperlink{structuser__transaction}{user\+\_\+transaction}} $\ast$}]{self }\end{DoxyParamCaption})}
+
+Calculate the balance
+\begin{DoxyItemize}
+\item balance = entries -\/ outcomes -\/ expect\+\_\+out; 
+\begin{DoxyParams}{Parameters}
+{\em self} & \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+the current balance 
+\end{DoxyReturn}
+
+\end{DoxyItemize}\mbox{\Hypertarget{user__transaction_8h_a51e80fbe86b17b1a79525465a44ae7aa}\label{user__transaction_8h_a51e80fbe86b17b1a79525465a44ae7aa}} 
+\index{user\_transaction.h@{user\_transaction.h}!check\_balance@{check\_balance}}
+\index{check\_balance@{check\_balance}!user\_transaction.h@{user\_transaction.h}}
+\doxysubsubsection{\texorpdfstring{check\_balance()}{check\_balance()}}
+{\footnotesize\ttfamily \mbox{\hyperlink{boolean_8h_afdcfe6db5bea87bd493a3fe2c513d5ef}{Bool}} check\+\_\+balance (\begin{DoxyParamCaption}\item[{struct \mbox{\hyperlink{structuser__transaction}{user\+\_\+transaction}} $\ast$}]{self }\end{DoxyParamCaption})}
+
+Check if balance is \texorpdfstring{$>$}{>}= 2 
+\begin{DoxyParams}{Parameters}
+{\em self} & \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+TRUE if balance \texorpdfstring{$>$}{>}=2, FALSE otherwise 
+\end{DoxyReturn}
+\mbox{\Hypertarget{user__transaction_8h_af4447aa6d2f3582dd56456c22ca4e33b}\label{user__transaction_8h_af4447aa6d2f3582dd56456c22ca4e33b}} 
+\index{user\_transaction.h@{user\_transaction.h}!extract\_node@{extract\_node}}
+\index{extract\_node@{extract\_node}!user\_transaction.h@{user\_transaction.h}}
+\doxysubsubsection{\texorpdfstring{extract\_node()}{extract\_node()}}
+{\footnotesize\ttfamily int extract\+\_\+node (\begin{DoxyParamCaption}\item[{int}]{nodes\+\_\+num }\end{DoxyParamCaption})}
+
+Extract randomly a node id from 0 up to nodes\+\_\+num 
+\begin{DoxyParams}{Parameters}
+{\em nodes\+\_\+num} & limit for random extraction \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+the random id extracted 
+\end{DoxyReturn}
+\mbox{\Hypertarget{user__transaction_8h_adaf2d10629cd9163c7aa828b7df95b18}\label{user__transaction_8h_adaf2d10629cd9163c7aa828b7df95b18}} 
+\index{user\_transaction.h@{user\_transaction.h}!free\_user@{free\_user}}
+\index{free\_user@{free\_user}!user\_transaction.h@{user\_transaction.h}}
+\doxysubsubsection{\texorpdfstring{free\_user()}{free\_user()}}
+{\footnotesize\ttfamily void free\+\_\+user (\begin{DoxyParamCaption}\item[{struct \mbox{\hyperlink{structuser__transaction}{user\+\_\+transaction}} $\ast$}]{self }\end{DoxyParamCaption})}
+
+Free the memory from the queue list of transactions; 
+\begin{DoxyParams}{Parameters}
+{\em self} & \\
+\hline
+\end{DoxyParams}
+\mbox{\Hypertarget{user__transaction_8h_a616e43192442081a6066e5e6c7494daa}\label{user__transaction_8h_a616e43192442081a6066e5e6c7494daa}} 
+\index{user\_transaction.h@{user\_transaction.h}!generate\_transaction@{generate\_transaction}}
+\index{generate\_transaction@{generate\_transaction}!user\_transaction.h@{user\_transaction.h}}
+\doxysubsubsection{\texorpdfstring{generate\_transaction()}{generate\_transaction()}}
+{\footnotesize\ttfamily int generate\+\_\+transaction (\begin{DoxyParamCaption}\item[{struct \mbox{\hyperlink{structuser__transaction}{user\+\_\+transaction}} $\ast$}]{self,  }\item[{pid\+\_\+t}]{user\+\_\+proc\+\_\+pid,  }\item[{struct \mbox{\hyperlink{structshm__conf}{shm\+\_\+conf}} $\ast$}]{shm\+\_\+conf }\end{DoxyParamCaption})}
+
+Generate a new transaction for the self user and add it to in\+\_\+progress queue of the transaction 
+\begin{DoxyParams}{Parameters}
+{\em self} & pointer to the transaction to be generated \\
+\hline
+{\em user\+\_\+proc\+\_\+pid} & pid of the user generating the transaction \\
+\hline
+{\em users\+\_\+num} & pointer to a vector of users available \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+-\/1 in case o failure. 0 otherwise. 
+\end{DoxyReturn}
+\mbox{\Hypertarget{user__transaction_8h_a653dc85368697debe55ecb3d9d3cd10f}\label{user__transaction_8h_a653dc85368697debe55ecb3d9d3cd10f}} 
+\index{user\_transaction.h@{user\_transaction.h}!print\_cashflow@{print\_cashflow}}
+\index{print\_cashflow@{print\_cashflow}!user\_transaction.h@{user\_transaction.h}}
+\doxysubsubsection{\texorpdfstring{print\_cashflow()}{print\_cashflow()}}
+{\footnotesize\ttfamily void print\+\_\+cashflow (\begin{DoxyParamCaption}\item[{struct \mbox{\hyperlink{structuser__transaction}{user\+\_\+transaction}} $\ast$}]{self }\end{DoxyParamCaption})}
+
+Print the cashflow info 
+\begin{DoxyParams}{Parameters}
+{\em self} & the user to be printed \\
+\hline
+\end{DoxyParams}
+\mbox{\Hypertarget{user__transaction_8h_ad74e2425d2e9d8d7300c877fc321cbfa}\label{user__transaction_8h_ad74e2425d2e9d8d7300c877fc321cbfa}} 
+\index{user\_transaction.h@{user\_transaction.h}!queue\_remove@{queue\_remove}}
+\index{queue\_remove@{queue\_remove}!user\_transaction.h@{user\_transaction.h}}
+\doxysubsubsection{\texorpdfstring{queue\_remove()}{queue\_remove()}}
+{\footnotesize\ttfamily int queue\+\_\+remove (\begin{DoxyParamCaption}\item[{Queue}]{q,  }\item[{struct \mbox{\hyperlink{struct_transaction}{Transaction}}}]{t }\end{DoxyParamCaption})}
+
+Remove the transaction from the list 
+\begin{DoxyParams}{Parameters}
+{\em q} & the transaction list \\
+\hline
+{\em t} & the transaction to check for remove \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+-\/1 in case of Failure, -\/2 in case of empty queue. 0 otherwise. 
+\end{DoxyReturn}
+\mbox{\Hypertarget{user__transaction_8h_a43560cdc24df530757a439519c168b21}\label{user__transaction_8h_a43560cdc24df530757a439519c168b21}} 
+\index{user\_transaction.h@{user\_transaction.h}!update\_cash\_flow@{update\_cash\_flow}}
+\index{update\_cash\_flow@{update\_cash\_flow}!user\_transaction.h@{user\_transaction.h}}
+\doxysubsubsection{\texorpdfstring{update\_cash\_flow()}{update\_cash\_flow()}}
+{\footnotesize\ttfamily int update\+\_\+cash\+\_\+flow (\begin{DoxyParamCaption}\item[{struct \mbox{\hyperlink{structuser__transaction}{user\+\_\+transaction}} $\ast$}]{self,  }\item[{struct \mbox{\hyperlink{struct_transaction}{Transaction}}}]{t }\end{DoxyParamCaption})}
+
+Update entries, outcomes and budget based on transaction 
+\begin{DoxyParams}{Parameters}
+{\em t} & the transaction arrived \\
+\hline
+{\em self} & current user \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+-\/1 in case of failure, 0 otherwise 
+\end{DoxyReturn}
+\mbox{\Hypertarget{user__transaction_8h_aa4a0ebd304fcd3fac7008881298f00ee}\label{user__transaction_8h_aa4a0ebd304fcd3fac7008881298f00ee}} 
+\index{user\_transaction.h@{user\_transaction.h}!user\_create@{user\_create}}
+\index{user\_create@{user\_create}!user\_transaction.h@{user\_transaction.h}}
+\doxysubsubsection{\texorpdfstring{user\_create()}{user\_create()}}
+{\footnotesize\ttfamily void user\+\_\+create (\begin{DoxyParamCaption}\item[{struct \mbox{\hyperlink{structuser__transaction}{user\+\_\+transaction}} $\ast$}]{self,  }\item[{float}]{budget,  }\item[{int}]{pid,  }\item[{\mbox{\hyperlink{user__transaction_8h_a8da11bb7001f47668dc77eb45e836a57}{Balance}}}]{balance,  }\item[{\mbox{\hyperlink{user__transaction_8h_a2716d248a8d94065d106e7e28b9f5152}{Calc\+Cash\+Flow}}}]{update\+\_\+cash\+\_\+flow }\end{DoxyParamCaption})}
+
+Initialize the \mbox{\hyperlink{structuser__transaction}{user\+\_\+transaction}} to default value with entries set as budget given 
+\begin{DoxyParams}{Parameters}
+{\em self} & current user \\
+\hline
+{\em budget} & to start \\
+\hline
+{\em pid} & current proc\+\_\+pid \\
+\hline
+{\em balance} & pointer to function that calc balance \\
+\hline
+{\em update\+\_\+cash\+\_\+flow} & pointer to function that update cash flow $\vert$ and budget!! \\
+\hline
+\end{DoxyParams}

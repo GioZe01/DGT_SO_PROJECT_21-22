@@ -1,0 +1,103 @@
+\hypertarget{conf__file_8c}{}\doxysection{src/local\+\_\+lib/conf\+\_\+file.c File Reference}
+\label{conf__file_8c}\index{src/local\_lib/conf\_file.c@{src/local\_lib/conf\_file.c}}
+{\ttfamily \#include $<$stdio.\+h$>$}\newline
+{\ttfamily \#include $<$stdlib.\+h$>$}\newline
+{\ttfamily \#include $<$unistd.\+h$>$}\newline
+{\ttfamily \#include \char`\"{}headers/conf\+\_\+file.\+h\char`\"{}}\newline
+{\ttfamily \#include \char`\"{}headers/simulation\+\_\+errors.\+h\char`\"{}}\newline
+{\ttfamily \#include \char`\"{}headers/boolean.\+h\char`\"{}}\newline
+Include dependency graph for conf\+\_\+file.\+c\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{conf__file_8c__incl}
+\end{center}
+\end{figure}
+\doxysubsection*{Macros}
+\begin{DoxyCompactItemize}
+\item 
+\#define \mbox{\hyperlink{conf__file_8c_a3cadae3112a6a16fb452b1c1f79d7238}{DEBUG\+\_\+\+NOTIFY\+\_\+\+ACTIVITY\+\_\+\+RUNNING}}(mex)
+\item 
+\#define \mbox{\hyperlink{conf__file_8c_af1bd9f6cef6eeb1f8e13af06c4ec9778}{DEBUG\+\_\+\+NOTIFY\+\_\+\+ACTIVITY\+\_\+\+DONE}}(mex)
+\item 
+\#define \mbox{\hyperlink{conf__file_8c_a69277eff22ca52a411c09982c8be3ac8}{DEBUG\+\_\+\+MESSAGE}}(mex)
+\item 
+\#define \mbox{\hyperlink{conf__file_8c_a6c474120d64f1aa7019f35511b21c50f}{DEBUG\+\_\+\+SIGNAL}}(mex,  signum)
+\item 
+\#define \mbox{\hyperlink{conf__file_8c_a051f61037f4c5dd41bccc0c6b165c001}{DEBUG\+\_\+\+ERROR\+\_\+\+MESSAGE}}(mex)
+\item 
+\#define \mbox{\hyperlink{conf__file_8c_a19b65d33195bd8afd93f5847fe5dc5cf}{DEBUG\+\_\+\+BLOCK\+\_\+\+ACTION\+\_\+\+START}}~(mex)
+\item 
+\#define \mbox{\hyperlink{conf__file_8c_a97b4e364942b74f131837dc748f53650}{DEBUG\+\_\+\+BLOCK\+\_\+\+ACTION\+\_\+\+END}}~(mex)
+\end{DoxyCompactItemize}
+\doxysubsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+int \mbox{\hyperlink{conf__file_8c_ad5ea9194f626ba3a359bbc48a9a6b898}{load\+\_\+configuration}} (struct \mbox{\hyperlink{structconf}{conf}} $\ast$self)
+\begin{DoxyCompactList}\small\item\em Load the configuration in the conf struct specified Load the configuration present in the configuration file \textbackslash{}attention\+Warning Negative number are automatically converted to positive ! \end{DoxyCompactList}\end{DoxyCompactItemize}
+
+
+\doxysubsection{Macro Definition Documentation}
+\mbox{\Hypertarget{conf__file_8c_a97b4e364942b74f131837dc748f53650}\label{conf__file_8c_a97b4e364942b74f131837dc748f53650}} 
+\index{conf\_file.c@{conf\_file.c}!DEBUG\_BLOCK\_ACTION\_END@{DEBUG\_BLOCK\_ACTION\_END}}
+\index{DEBUG\_BLOCK\_ACTION\_END@{DEBUG\_BLOCK\_ACTION\_END}!conf\_file.c@{conf\_file.c}}
+\doxysubsubsection{\texorpdfstring{DEBUG\_BLOCK\_ACTION\_END}{DEBUG\_BLOCK\_ACTION\_END}}
+{\footnotesize\ttfamily \#define DEBUG\+\_\+\+BLOCK\+\_\+\+ACTION\+\_\+\+END~(mex)}
+
+\mbox{\Hypertarget{conf__file_8c_a19b65d33195bd8afd93f5847fe5dc5cf}\label{conf__file_8c_a19b65d33195bd8afd93f5847fe5dc5cf}} 
+\index{conf\_file.c@{conf\_file.c}!DEBUG\_BLOCK\_ACTION\_START@{DEBUG\_BLOCK\_ACTION\_START}}
+\index{DEBUG\_BLOCK\_ACTION\_START@{DEBUG\_BLOCK\_ACTION\_START}!conf\_file.c@{conf\_file.c}}
+\doxysubsubsection{\texorpdfstring{DEBUG\_BLOCK\_ACTION\_START}{DEBUG\_BLOCK\_ACTION\_START}}
+{\footnotesize\ttfamily \#define DEBUG\+\_\+\+BLOCK\+\_\+\+ACTION\+\_\+\+START~(mex)}
+
+\mbox{\Hypertarget{conf__file_8c_a051f61037f4c5dd41bccc0c6b165c001}\label{conf__file_8c_a051f61037f4c5dd41bccc0c6b165c001}} 
+\index{conf\_file.c@{conf\_file.c}!DEBUG\_ERROR\_MESSAGE@{DEBUG\_ERROR\_MESSAGE}}
+\index{DEBUG\_ERROR\_MESSAGE@{DEBUG\_ERROR\_MESSAGE}!conf\_file.c@{conf\_file.c}}
+\doxysubsubsection{\texorpdfstring{DEBUG\_ERROR\_MESSAGE}{DEBUG\_ERROR\_MESSAGE}}
+{\footnotesize\ttfamily \#define DEBUG\+\_\+\+ERROR\+\_\+\+MESSAGE(\begin{DoxyParamCaption}\item[{}]{mex }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{conf__file_8c_a69277eff22ca52a411c09982c8be3ac8}\label{conf__file_8c_a69277eff22ca52a411c09982c8be3ac8}} 
+\index{conf\_file.c@{conf\_file.c}!DEBUG\_MESSAGE@{DEBUG\_MESSAGE}}
+\index{DEBUG\_MESSAGE@{DEBUG\_MESSAGE}!conf\_file.c@{conf\_file.c}}
+\doxysubsubsection{\texorpdfstring{DEBUG\_MESSAGE}{DEBUG\_MESSAGE}}
+{\footnotesize\ttfamily \#define DEBUG\+\_\+\+MESSAGE(\begin{DoxyParamCaption}\item[{}]{mex }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{conf__file_8c_af1bd9f6cef6eeb1f8e13af06c4ec9778}\label{conf__file_8c_af1bd9f6cef6eeb1f8e13af06c4ec9778}} 
+\index{conf\_file.c@{conf\_file.c}!DEBUG\_NOTIFY\_ACTIVITY\_DONE@{DEBUG\_NOTIFY\_ACTIVITY\_DONE}}
+\index{DEBUG\_NOTIFY\_ACTIVITY\_DONE@{DEBUG\_NOTIFY\_ACTIVITY\_DONE}!conf\_file.c@{conf\_file.c}}
+\doxysubsubsection{\texorpdfstring{DEBUG\_NOTIFY\_ACTIVITY\_DONE}{DEBUG\_NOTIFY\_ACTIVITY\_DONE}}
+{\footnotesize\ttfamily \#define DEBUG\+\_\+\+NOTIFY\+\_\+\+ACTIVITY\+\_\+\+DONE(\begin{DoxyParamCaption}\item[{}]{mex }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{conf__file_8c_a3cadae3112a6a16fb452b1c1f79d7238}\label{conf__file_8c_a3cadae3112a6a16fb452b1c1f79d7238}} 
+\index{conf\_file.c@{conf\_file.c}!DEBUG\_NOTIFY\_ACTIVITY\_RUNNING@{DEBUG\_NOTIFY\_ACTIVITY\_RUNNING}}
+\index{DEBUG\_NOTIFY\_ACTIVITY\_RUNNING@{DEBUG\_NOTIFY\_ACTIVITY\_RUNNING}!conf\_file.c@{conf\_file.c}}
+\doxysubsubsection{\texorpdfstring{DEBUG\_NOTIFY\_ACTIVITY\_RUNNING}{DEBUG\_NOTIFY\_ACTIVITY\_RUNNING}}
+{\footnotesize\ttfamily \#define DEBUG\+\_\+\+NOTIFY\+\_\+\+ACTIVITY\+\_\+\+RUNNING(\begin{DoxyParamCaption}\item[{}]{mex }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{conf__file_8c_a6c474120d64f1aa7019f35511b21c50f}\label{conf__file_8c_a6c474120d64f1aa7019f35511b21c50f}} 
+\index{conf\_file.c@{conf\_file.c}!DEBUG\_SIGNAL@{DEBUG\_SIGNAL}}
+\index{DEBUG\_SIGNAL@{DEBUG\_SIGNAL}!conf\_file.c@{conf\_file.c}}
+\doxysubsubsection{\texorpdfstring{DEBUG\_SIGNAL}{DEBUG\_SIGNAL}}
+{\footnotesize\ttfamily \#define DEBUG\+\_\+\+SIGNAL(\begin{DoxyParamCaption}\item[{}]{mex,  }\item[{}]{signum }\end{DoxyParamCaption})}
+
+
+
+\doxysubsection{Function Documentation}
+\mbox{\Hypertarget{conf__file_8c_ad5ea9194f626ba3a359bbc48a9a6b898}\label{conf__file_8c_ad5ea9194f626ba3a359bbc48a9a6b898}} 
+\index{conf\_file.c@{conf\_file.c}!load\_configuration@{load\_configuration}}
+\index{load\_configuration@{load\_configuration}!conf\_file.c@{conf\_file.c}}
+\doxysubsubsection{\texorpdfstring{load\_configuration()}{load\_configuration()}}
+{\footnotesize\ttfamily int load\+\_\+configuration (\begin{DoxyParamCaption}\item[{struct \mbox{\hyperlink{structconf}{conf}} $\ast$}]{self }\end{DoxyParamCaption})}
+
+
+
+Load the configuration in the conf struct specified Load the configuration present in the configuration file \textbackslash{}attention\+Warning Negative number are automatically converted to positive ! 
+
+
+\begin{DoxyParams}{Parameters}
+{\em self} & \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+Return Types\+: 1) -\/1 if file absent or empty for some filds required for conf 2) -\/2 if a params does\textquotesingle{}t respect type def. or some internal logic of the simulations ex\+: no budgets 3) -\/3 if at least two users and one node and zero hops 4) -\/4 min max not respected 5) -\/5 if node rewards is max for budget init. Or so\+\_\+num\+\_\+friends \texorpdfstring{$>$}{>} MAX\+\_\+\+FRIENDS 
+\end{DoxyReturn}

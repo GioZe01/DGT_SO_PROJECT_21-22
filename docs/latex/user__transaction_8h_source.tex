@@ -1,0 +1,55 @@
+\hypertarget{user__transaction_8h_source}{}\doxysection{user\+\_\+transaction.\+h}
+\label{user__transaction_8h_source}\index{src/local\_lib/headers/user\_transaction.h@{src/local\_lib/headers/user\_transaction.h}}
+\mbox{\hyperlink{user__transaction_8h}{Go to the documentation of this file.}}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{1 }
+\DoxyCodeLine{7 \textcolor{preprocessor}{\#ifndef DGT\_SO\_PROJECT\_21\_22\_USER\_TRANSACTION\_H}}
+\DoxyCodeLine{8 \textcolor{preprocessor}{\#define DGT\_SO\_PROJECT\_21\_22\_USER\_TRANSACTION\_H}}
+\DoxyCodeLine{9 }
+\DoxyCodeLine{10 \textcolor{comment}{/* Local import */}}
+\DoxyCodeLine{11 \textcolor{preprocessor}{\#include "{}\mbox{\hyperlink{boolean_8h}{boolean.h}}"{}}}
+\DoxyCodeLine{12 \textcolor{preprocessor}{\#include "{}\mbox{\hyperlink{transaction__list_8h}{transaction\_list.h}}"{}}}
+\DoxyCodeLine{13 \textcolor{preprocessor}{\#include "{}\mbox{\hyperlink{conf__shm_8h}{conf\_shm.h}}"{}}}
+\DoxyCodeLine{14 }
+\DoxyCodeLine{20 \textcolor{keyword}{typedef} double (*\mbox{\hyperlink{user__transaction_8h_a8da11bb7001f47668dc77eb45e836a57}{Balance}})(\textcolor{keyword}{struct }\mbox{\hyperlink{structuser__transaction}{user\_transaction}} *self);}
+\DoxyCodeLine{21 }
+\DoxyCodeLine{28 \textcolor{keyword}{typedef} int (*\mbox{\hyperlink{user__transaction_8h_a2716d248a8d94065d106e7e28b9f5152}{CalcCashFlow}})(\textcolor{keyword}{struct }\mbox{\hyperlink{structuser__transaction}{user\_transaction}} *self, \textcolor{keyword}{struct }\mbox{\hyperlink{struct_transaction}{Transaction}} t);}
+\DoxyCodeLine{29 }
+\DoxyCodeLine{34 \textcolor{keyword}{typedef} \textcolor{keyword}{struct }\{}
+\DoxyCodeLine{35     \textcolor{keywordtype}{float} \mbox{\hyperlink{struct_u_cash_flow_a473a5611cb7f600e1a933ed73be156ea}{entries}}; }
+\DoxyCodeLine{36     \textcolor{keywordtype}{float} \mbox{\hyperlink{struct_u_cash_flow_ac08a67adfd4e364a5c73b5ed11a2facc}{outcomes}}; }
+\DoxyCodeLine{37 \} \mbox{\hyperlink{struct_u_cash_flow}{UCashFlow}};}
+\DoxyCodeLine{42 \textcolor{keyword}{struct }\mbox{\hyperlink{structuser__transaction}{user\_transaction}} \{}
+\DoxyCodeLine{43     \textcolor{keywordtype}{int} \mbox{\hyperlink{structuser__transaction_af500917c052066b40cf47f96b43c607b}{pid}}; }
+\DoxyCodeLine{44     \textcolor{keywordtype}{short} \textcolor{keywordtype}{int} \mbox{\hyperlink{structuser__transaction_ae7a9d7856dc91cc7dfe694046d892b85}{exec\_state}}; }
+\DoxyCodeLine{45     \textcolor{keywordtype}{float} \mbox{\hyperlink{structuser__transaction_aba96c1bfea2a8500bcdbbd1c64fddffb}{budget}}; }
+\DoxyCodeLine{46     \mbox{\hyperlink{user__transaction_8h_a8da11bb7001f47668dc77eb45e836a57}{Balance}} \mbox{\hyperlink{structuser__transaction_a0d326a0179d51cc3790b655a5d041005}{u\_balance}}; }
+\DoxyCodeLine{47     Queue \mbox{\hyperlink{structuser__transaction_a803647f7a567ae42a3b8d261552bd101}{transactions\_failed}}; }
+\DoxyCodeLine{48     Queue \mbox{\hyperlink{structuser__transaction_a3a248273d087a26b6e8da2feae1cdc5a}{in\_process}};}
+\DoxyCodeLine{49     \mbox{\hyperlink{struct_u_cash_flow}{UCashFlow}} \mbox{\hyperlink{structuser__transaction_a6ed4e9784f0c91f3cce29588c964670a}{cash\_flow}}; }
+\DoxyCodeLine{50     \mbox{\hyperlink{user__transaction_8h_a2716d248a8d94065d106e7e28b9f5152}{CalcCashFlow}} \mbox{\hyperlink{structuser__transaction_ade3fba652eaf8c5ccaab91129daae043}{update\_cash\_flow}}; }
+\DoxyCodeLine{51     \textcolor{keywordtype}{float} \mbox{\hyperlink{structuser__transaction_a3fda27938e5de4961b5bb6b94acdcc26}{expected\_out}}; }
+\DoxyCodeLine{52     \textcolor{keywordtype}{int} \mbox{\hyperlink{structuser__transaction_a1257927113a04c56e2ea12b142441dc4}{to\_wait\_transaction}};}
+\DoxyCodeLine{53 \};}
+\DoxyCodeLine{54 }
+\DoxyCodeLine{63 \textcolor{keywordtype}{void} \mbox{\hyperlink{user__transaction_8h_aa4a0ebd304fcd3fac7008881298f00ee}{user\_create}}(\textcolor{keyword}{struct} \mbox{\hyperlink{structuser__transaction}{user\_transaction}} *self, \textcolor{keywordtype}{float} budget, \textcolor{keywordtype}{int} pid, \mbox{\hyperlink{user__transaction_8h_a8da11bb7001f47668dc77eb45e836a57}{Balance}} balance, \mbox{\hyperlink{user__transaction_8h_a2716d248a8d94065d106e7e28b9f5152}{CalcCashFlow}} \mbox{\hyperlink{user__transaction_8h_a43560cdc24df530757a439519c168b21}{update\_cash\_flow}});}
+\DoxyCodeLine{64 }
+\DoxyCodeLine{69 \textcolor{keywordtype}{void} \mbox{\hyperlink{user__transaction_8h_adaf2d10629cd9163c7aa828b7df95b18}{free\_user}}(\textcolor{keyword}{struct} \mbox{\hyperlink{structuser__transaction}{user\_transaction}} *self);}
+\DoxyCodeLine{70 }
+\DoxyCodeLine{76 \mbox{\hyperlink{boolean_8h_afdcfe6db5bea87bd493a3fe2c513d5ef}{Bool}} \mbox{\hyperlink{user__transaction_8h_a51e80fbe86b17b1a79525465a44ae7aa}{check\_balance}}(\textcolor{keyword}{struct} \mbox{\hyperlink{structuser__transaction}{user\_transaction}} *self);}
+\DoxyCodeLine{77 }
+\DoxyCodeLine{84 \textcolor{keywordtype}{double} \mbox{\hyperlink{user__transaction_8h_a7cef36bd17b42296f7cbffad20ba92a9}{calc\_balance}}(\textcolor{keyword}{struct} \mbox{\hyperlink{structuser__transaction}{user\_transaction}} *self);}
+\DoxyCodeLine{85 }
+\DoxyCodeLine{90 \textcolor{keywordtype}{void} \mbox{\hyperlink{user__transaction_8h_a653dc85368697debe55ecb3d9d3cd10f}{print\_cashflow}}(\textcolor{keyword}{struct} \mbox{\hyperlink{structuser__transaction}{user\_transaction}} *self);}
+\DoxyCodeLine{91 }
+\DoxyCodeLine{98 \textcolor{keywordtype}{int} \mbox{\hyperlink{user__transaction_8h_a43560cdc24df530757a439519c168b21}{update\_cash\_flow}}(\textcolor{keyword}{struct} \mbox{\hyperlink{structuser__transaction}{user\_transaction}} *self, \textcolor{keyword}{struct} \mbox{\hyperlink{struct_transaction}{Transaction}} t);}
+\DoxyCodeLine{99 }
+\DoxyCodeLine{107 \textcolor{keywordtype}{int} \mbox{\hyperlink{user__transaction_8h_a616e43192442081a6066e5e6c7494daa}{generate\_transaction}}(\textcolor{keyword}{struct} \mbox{\hyperlink{structuser__transaction}{user\_transaction}} *self, pid\_t user\_proc\_pid, \textcolor{keyword}{struct} \mbox{\hyperlink{structshm__conf}{shm\_conf}} *\mbox{\hyperlink{structshm__conf}{shm\_conf}});}
+\DoxyCodeLine{108 }
+\DoxyCodeLine{115 \textcolor{keywordtype}{int} \mbox{\hyperlink{user__transaction_8h_ad74e2425d2e9d8d7300c877fc321cbfa}{queue\_remove}}(Queue q, \textcolor{keyword}{struct} \mbox{\hyperlink{struct_transaction}{Transaction}} t);}
+\DoxyCodeLine{116 }
+\DoxyCodeLine{122 \textcolor{keywordtype}{int} \mbox{\hyperlink{user__transaction_8h_af4447aa6d2f3582dd56456c22ca4e33b}{extract\_node}}(\textcolor{keywordtype}{int} nodes\_num);}
+\DoxyCodeLine{123 }
+\DoxyCodeLine{124 \textcolor{preprocessor}{\#endif }\textcolor{comment}{/*DGT\_SO\_PROJECT\_21\_22\_USER\_TRANSACTION\_H*/}\textcolor{preprocessor}{}}
+
+\end{DoxyCode}

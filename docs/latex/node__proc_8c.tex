@@ -1,0 +1,511 @@
+\hypertarget{node__proc_8c}{}\doxysection{src/node\+\_\+proc.c File Reference}
+\label{node__proc_8c}\index{src/node\_proc.c@{src/node\_proc.c}}
+{\ttfamily \#include $<$stdio.\+h$>$}\newline
+{\ttfamily \#include $<$stdlib.\+h$>$}\newline
+{\ttfamily \#include $<$sys/ipc.\+h$>$}\newline
+{\ttfamily \#include $<$sys/sem.\+h$>$}\newline
+{\ttfamily \#include $<$sys/wait.\+h$>$}\newline
+{\ttfamily \#include $<$sys/msg.\+h$>$}\newline
+{\ttfamily \#include $<$sys/shm.\+h$>$}\newline
+{\ttfamily \#include $<$string.\+h$>$}\newline
+{\ttfamily \#include $<$errno.\+h$>$}\newline
+{\ttfamily \#include $<$unistd.\+h$>$}\newline
+{\ttfamily \#include $<$signal.\+h$>$}\newline
+{\ttfamily \#include \char`\"{}local\+\_\+lib/headers/glob.\+h\char`\"{}}\newline
+{\ttfamily \#include \char`\"{}local\+\_\+lib/headers/boolean.\+h\char`\"{}}\newline
+{\ttfamily \#include \char`\"{}local\+\_\+lib/headers/conf\+\_\+file.\+h\char`\"{}}\newline
+{\ttfamily \#include \char`\"{}local\+\_\+lib/headers/simulation\+\_\+errors.\+h\char`\"{}}\newline
+{\ttfamily \#include \char`\"{}local\+\_\+lib/headers/semaphore.\+h\char`\"{}}\newline
+{\ttfamily \#include \char`\"{}local\+\_\+lib/headers/node\+\_\+transactor.\+h\char`\"{}}\newline
+{\ttfamily \#include \char`\"{}local\+\_\+lib/headers/user\+\_\+msg\+\_\+report.\+h\char`\"{}}\newline
+{\ttfamily \#include \char`\"{}local\+\_\+lib/headers/node\+\_\+msg\+\_\+report.\+h\char`\"{}}\newline
+{\ttfamily \#include \char`\"{}local\+\_\+lib/headers/conf\+\_\+shm.\+h\char`\"{}}\newline
+{\ttfamily \#include \char`\"{}local\+\_\+lib/headers/book\+\_\+master\+\_\+shm.\+h\char`\"{}}\newline
+{\ttfamily \#include \char`\"{}local\+\_\+lib/headers/master\+\_\+msg\+\_\+report.\+h\char`\"{}}\newline
+{\ttfamily \#include \char`\"{}local\+\_\+lib/headers/debug\+\_\+utility.\+h\char`\"{}}\newline
+{\ttfamily \#include \char`\"{}local\+\_\+lib/headers/transaction\+\_\+list.\+h\char`\"{}}\newline
+{\ttfamily \#include \char`\"{}local\+\_\+lib/headers/int\+\_\+condenser.\+h\char`\"{}}\newline
+{\ttfamily \#include \char`\"{}local\+\_\+lib/headers/gt\+\_\+sig\+\_\+handler.\+h\char`\"{}}\newline
+Include dependency graph for node\+\_\+proc.\+c\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{node__proc_8c__incl}
+\end{center}
+\end{figure}
+\doxysubsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+int \mbox{\hyperlink{node__proc_8c_a608eb8e7689dc6533d720665996a1951}{process\+\_\+node\+\_\+transaction}} (struct \mbox{\hyperlink{structnode__msg}{node\+\_\+msg}} $\ast$msg\+\_\+rep)
+\item 
+int \mbox{\hyperlink{node__proc_8c_a3d18d7bf55e6f451455ec2f4494d8e0e}{process\+\_\+simple\+\_\+transaction\+\_\+type}} (struct \mbox{\hyperlink{structnode__msg}{node\+\_\+msg}} $\ast$msg\+\_\+rep)
+\item 
+void \mbox{\hyperlink{node__proc_8c_aad3afee62d3687a994a0dbfc8a4832a0}{adv\+\_\+users\+\_\+of\+\_\+block}} (void)
+\item 
+void \mbox{\hyperlink{node__proc_8c_a6af3c0bed2d48bb950788acf54f4de74}{signals\+\_\+handler}} (int signum)
+\item 
+\mbox{\hyperlink{boolean_8h_afdcfe6db5bea87bd493a3fe2c513d5ef}{Bool}} \mbox{\hyperlink{node__proc_8c_a8a0737ae9dc852721a993a3cf3c0f107}{read\+\_\+conf\+\_\+node}} ()
+\begin{DoxyCompactList}\small\item\em Read the conf file present in te project dir load the configuration directly in the struct conf node\+\_\+configuration that is a Sys\+Var. \end{DoxyCompactList}\item 
+\mbox{\hyperlink{boolean_8h_afdcfe6db5bea87bd493a3fe2c513d5ef}{Bool}} \mbox{\hyperlink{node__proc_8c_a86e33836ed49c803366692915b2835a1}{set\+\_\+signal\+\_\+handler\+\_\+node}} (struct sigaction sa)
+\item 
+\mbox{\hyperlink{boolean_8h_afdcfe6db5bea87bd493a3fe2c513d5ef}{Bool}} \mbox{\hyperlink{node__proc_8c_ac0167f4bf97b048a59a4b0fe585c3a9b}{check\+\_\+arguments}} (int argc, char const $\ast$argv\mbox{[}$\,$\mbox{]})
+\item 
+void \mbox{\hyperlink{node__proc_8c_a353e5a8b6cd0325b15e15329dc62bc36}{attach\+\_\+to\+\_\+shms}} (void)
+\begin{DoxyCompactList}\small\item\em Attach the current node to the related shms Specificcaly\+: -\/book\+\_\+master\+\_\+shm -\/node\+\_\+tp\+\_\+shm. \end{DoxyCompactList}\item 
+int \mbox{\hyperlink{node__proc_8c_af5d398504ef9356c78c175e2a630c386}{process\+\_\+node\+\_\+block}} ()
+\item 
+void \mbox{\hyperlink{node__proc_8c_a5d8a16cab7f370d9a65db397afadc879}{connect\+\_\+to\+\_\+queues}} (void)
+\item 
+\mbox{\hyperlink{boolean_8h_afdcfe6db5bea87bd493a3fe2c513d5ef}{Bool}} \mbox{\hyperlink{node__proc_8c_aab73db0048b677faae7060acef181419}{load\+\_\+block}} (void)
+\item 
+void \mbox{\hyperlink{node__proc_8c_a3b65d4574d099e87fbb80dc8f8ac57f9}{load\+\_\+simple\+\_\+transaction}} (struct \mbox{\hyperlink{structnode__msg}{node\+\_\+msg}} $\ast$msg\+\_\+rep)
+\begin{DoxyCompactList}\small\item\em Load n simple transactions from the queue of the current node Where n is chosen randomly between 1 and so\+\_\+tp\+\_\+size. \end{DoxyCompactList}\item 
+void \mbox{\hyperlink{node__proc_8c_ae929ace3965074febe154987971de1a8}{acquire\+\_\+semaphore\+\_\+ids}} (void)
+\begin{DoxyCompactList}\small\item\em Acquire the semaphore\+\_\+id related to the node Specificcaly\+: \end{DoxyCompactList}\item 
+\mbox{\hyperlink{boolean_8h_afdcfe6db5bea87bd493a3fe2c513d5ef}{Bool}} \mbox{\hyperlink{node__proc_8c_aac0e5deb9274ca1158947fc49d3700bd}{lock\+\_\+shm\+\_\+masterbook}} (void)
+\begin{DoxyCompactList}\small\item\em Lock the shm book\+\_\+master via masterbook\+\_\+to\+\_\+fill param and the cell to fill index. \end{DoxyCompactList}\item 
+void \mbox{\hyperlink{node__proc_8c_a0fc598a9b6ec2290200171dd672e2a0a}{lock\+\_\+to\+\_\+fill\+\_\+sem}} (void)
+\begin{DoxyCompactList}\small\item\em Lock the to\+\_\+fill index saved in the shared\+\_\+memory access. \end{DoxyCompactList}\item 
+void \mbox{\hyperlink{node__proc_8c_a55d569a6b0581f026cc1312e9a593cc9}{lock\+\_\+masterbook\+\_\+cell\+\_\+access}} (int i\+\_\+cell\+\_\+block\+\_\+list)
+\begin{DoxyCompactList}\small\item\em Lock the current cell of the masterbook shm in which the node had written the block. \end{DoxyCompactList}\item 
+void \mbox{\hyperlink{node__proc_8c_a46f5e042689671e5fa02b034ea8867f3}{print\+\_\+node\+\_\+info}} ()
+\begin{DoxyCompactList}\small\item\em Print the current node configuration in the standard output. \end{DoxyCompactList}\item 
+void \mbox{\hyperlink{node__proc_8c_a3665c0aeb745da225e1b511ef9d23194}{unlock\+\_\+to\+\_\+fill\+\_\+sem}} ()
+\item 
+void \mbox{\hyperlink{node__proc_8c_a658f85056fd1f6482d41d09fff06caa9}{unlock\+\_\+masterbook\+\_\+cell\+\_\+access}} (int i\+\_\+cell\+\_\+block\+\_\+list)
+\item 
+void \mbox{\hyperlink{node__proc_8c_abc129d1714860d417e1190d554cd3440}{advice\+\_\+master\+\_\+of\+\_\+termination}} (long termination\+\_\+type)
+\begin{DoxyCompactList}\small\item\em Advice the master porc via master\+\_\+message queue by sending a master\+\_\+message. \end{DoxyCompactList}\item 
+\mbox{\hyperlink{boolean_8h_afdcfe6db5bea87bd493a3fe2c513d5ef}{Bool}} \mbox{\hyperlink{node__proc_8c_a813383a5628e7abf8df6443263d91894}{handle\+\_\+msg\+\_\+transaction}} (struct \mbox{\hyperlink{structnode__msg}{node\+\_\+msg}} $\ast$msg)
+\begin{DoxyCompactList}\small\item\em Handle the msg with the transaction received if tp is full check for hops in the transaction\+: if hops not exceeded send the transaction to the next node otherwise send the transaction to the master to be handled. \end{DoxyCompactList}\item 
+void \mbox{\hyperlink{node__proc_8c_a9e8e0c9a43bed5c0d6efd886e07c4e02}{gen\+\_\+sleep\+\_\+time}} (struct timespec $\ast$ts)
+\begin{DoxyCompactList}\small\item\em Generate sleep time using the conf file. \end{DoxyCompactList}\item 
+int \mbox{\hyperlink{node__proc_8c_abf9e6b7e6f15df4b525a2e7705ba3089}{main}} (int argc, char const $\ast$argv\mbox{[}$\,$\mbox{]})
+\item 
+void \mbox{\hyperlink{node__proc_8c_a46473129a15bf041dd63752927a292dd}{free\+\_\+sys\+Var\+\_\+node}} ()
+\item 
+void \mbox{\hyperlink{node__proc_8c_ae9717df6876ca8e6137c741e7ff7d45b}{free\+\_\+mem\+\_\+node}} ()
+\item 
+long int \mbox{\hyperlink{node__proc_8c_a87bf75bcd79810108a54667b24369eee}{get\+\_\+time\+\_\+processing}} (void)
+\end{DoxyCompactItemize}
+\doxysubsection*{Variables}
+\begin{DoxyCompactItemize}
+\item 
+int \mbox{\hyperlink{node__proc_8c_ac62b22414674bece75bc2fea3847c48f}{semaphore\+\_\+start\+\_\+id}} = -\/1
+\item 
+int \mbox{\hyperlink{node__proc_8c_a311818db5457e986b0808c3d6ddcb420}{semaphore\+\_\+masterbook\+\_\+id}} = -\/1
+\item 
+int \mbox{\hyperlink{node__proc_8c_ae5f591ad56c16a7b4c12125eae48a6f2}{semaphore\+\_\+to\+\_\+fill\+\_\+id}} = -\/1
+\item 
+int \mbox{\hyperlink{node__proc_8c_a1ccf22d1a76cc0edb493206dd91a063e}{queue\+\_\+node\+\_\+id}} = -\/1
+\item 
+int \mbox{\hyperlink{node__proc_8c_a81b4a7a6586efbb012387c887f004c4c}{queue\+\_\+user\+\_\+id}} = -\/1
+\item 
+int \mbox{\hyperlink{node__proc_8c_aa08429407287f0f88618f338895be369}{queue\+\_\+master\+\_\+id}} = -\/1
+\item 
+int \mbox{\hyperlink{node__proc_8c_a2bf13558c1e6e4526049a211cfe0937f}{node\+\_\+end}} = 0
+\item 
+float \mbox{\hyperlink{node__proc_8c_ae8366d1a6147417562a95f4dc8855459}{current\+\_\+block\+\_\+reward}} = 0
+\item 
+int \mbox{\hyperlink{node__proc_8c_a1d01d8e411dc32dde1ab25208eab05f8}{last\+\_\+signal}}
+\item 
+int \mbox{\hyperlink{node__proc_8c_aed763209d90cbafd9a1c8b3b1602daba}{friends}} = -\/1
+\item 
+sigset\+\_\+t \mbox{\hyperlink{node__proc_8c_a230c4eaa89fdddbb7c42f1b6019fa3b1}{current\+\_\+mask}}
+\item 
+struct \mbox{\hyperlink{structnode}{node}} \mbox{\hyperlink{node__proc_8c_afbda519df6aa2ad6ead24744c3907d79}{current\+\_\+node}}
+\item 
+struct \mbox{\hyperlink{structconf}{conf}} \mbox{\hyperlink{node__proc_8c_a76a3bc0f59489fc097d95c25e7053b75}{node\+\_\+configuration}}
+\item 
+struct \mbox{\hyperlink{structshm__conf}{shm\+\_\+conf}} $\ast$ \mbox{\hyperlink{node__proc_8c_a15f0de6e952f5f42e4054de6aa63f5bb}{shm\+\_\+conf\+\_\+pointer\+\_\+node}}
+\item 
+struct \mbox{\hyperlink{structshm__book__master}{shm\+\_\+book\+\_\+master}} $\ast$ \mbox{\hyperlink{node__proc_8c_a22ca1f6fad3851c36b9f56873280d4b0}{shm\+\_\+masterbook\+\_\+pointer}}
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Function Documentation}
+\mbox{\Hypertarget{node__proc_8c_ae929ace3965074febe154987971de1a8}\label{node__proc_8c_ae929ace3965074febe154987971de1a8}} 
+\index{node\_proc.c@{node\_proc.c}!acquire\_semaphore\_ids@{acquire\_semaphore\_ids}}
+\index{acquire\_semaphore\_ids@{acquire\_semaphore\_ids}!node\_proc.c@{node\_proc.c}}
+\doxysubsubsection{\texorpdfstring{acquire\_semaphore\_ids()}{acquire\_semaphore\_ids()}}
+{\footnotesize\ttfamily void acquire\+\_\+semaphore\+\_\+ids (\begin{DoxyParamCaption}\item[{void}]{ }\end{DoxyParamCaption})}
+
+
+
+Acquire the semaphore\+\_\+id related to the node Specificcaly\+: 
+
+
+\begin{DoxyItemize}
+\item semaphore\+\_\+start\+\_\+id
+\item semaphore\+\_\+masterbook\+\_\+id
+\item semaphore\+\_\+node\+\_\+tp\+\_\+shm\+\_\+access 
+\end{DoxyItemize}\mbox{\Hypertarget{node__proc_8c_aad3afee62d3687a994a0dbfc8a4832a0}\label{node__proc_8c_aad3afee62d3687a994a0dbfc8a4832a0}} 
+\index{node\_proc.c@{node\_proc.c}!adv\_users\_of\_block@{adv\_users\_of\_block}}
+\index{adv\_users\_of\_block@{adv\_users\_of\_block}!node\_proc.c@{node\_proc.c}}
+\doxysubsubsection{\texorpdfstring{adv\_users\_of\_block()}{adv\_users\_of\_block()}}
+{\footnotesize\ttfamily void adv\+\_\+users\+\_\+of\+\_\+block (\begin{DoxyParamCaption}\item[{void}]{ }\end{DoxyParamCaption})}
+
+Advice the users of the processed transactions, both receivers and senders \mbox{\Hypertarget{node__proc_8c_abc129d1714860d417e1190d554cd3440}\label{node__proc_8c_abc129d1714860d417e1190d554cd3440}} 
+\index{node\_proc.c@{node\_proc.c}!advice\_master\_of\_termination@{advice\_master\_of\_termination}}
+\index{advice\_master\_of\_termination@{advice\_master\_of\_termination}!node\_proc.c@{node\_proc.c}}
+\doxysubsubsection{\texorpdfstring{advice\_master\_of\_termination()}{advice\_master\_of\_termination()}}
+{\footnotesize\ttfamily void advice\+\_\+master\+\_\+of\+\_\+termination (\begin{DoxyParamCaption}\item[{long}]{termination\+\_\+type }\end{DoxyParamCaption})}
+
+
+
+Advice the master porc via master\+\_\+message queue by sending a master\+\_\+message. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em termination\+\_\+type} & MSG\+\_\+\+REPORT\+\_\+\+TYPE type process termination occured \\
+\hline
+\end{DoxyParams}
+\mbox{\Hypertarget{node__proc_8c_a353e5a8b6cd0325b15e15329dc62bc36}\label{node__proc_8c_a353e5a8b6cd0325b15e15329dc62bc36}} 
+\index{node\_proc.c@{node\_proc.c}!attach\_to\_shms@{attach\_to\_shms}}
+\index{attach\_to\_shms@{attach\_to\_shms}!node\_proc.c@{node\_proc.c}}
+\doxysubsubsection{\texorpdfstring{attach\_to\_shms()}{attach\_to\_shms()}}
+{\footnotesize\ttfamily void attach\+\_\+to\+\_\+shms (\begin{DoxyParamCaption}\item[{void}]{ }\end{DoxyParamCaption})}
+
+
+
+Attach the current node to the related shms Specificcaly\+: -\/book\+\_\+master\+\_\+shm -\/node\+\_\+tp\+\_\+shm. 
+
+\mbox{\Hypertarget{node__proc_8c_ac0167f4bf97b048a59a4b0fe585c3a9b}\label{node__proc_8c_ac0167f4bf97b048a59a4b0fe585c3a9b}} 
+\index{node\_proc.c@{node\_proc.c}!check\_arguments@{check\_arguments}}
+\index{check\_arguments@{check\_arguments}!node\_proc.c@{node\_proc.c}}
+\doxysubsubsection{\texorpdfstring{check\_arguments()}{check\_arguments()}}
+{\footnotesize\ttfamily \mbox{\hyperlink{boolean_8h_afdcfe6db5bea87bd493a3fe2c513d5ef}{Bool}} check\+\_\+arguments (\begin{DoxyParamCaption}\item[{int}]{argc,  }\item[{char const $\ast$}]{argv\mbox{[}$\,$\mbox{]} }\end{DoxyParamCaption})}
+
+Check the argc and argv to match with project specification 
+\begin{DoxyParams}{Parameters}
+{\em argc} & number of argument given \\
+\hline
+{\em argv} & pointer to a char list of params given \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+FALSE in case of FAILURE, TRUE otherwise 
+\end{DoxyReturn}
+\mbox{\Hypertarget{node__proc_8c_a5d8a16cab7f370d9a65db397afadc879}\label{node__proc_8c_a5d8a16cab7f370d9a65db397afadc879}} 
+\index{node\_proc.c@{node\_proc.c}!connect\_to\_queues@{connect\_to\_queues}}
+\index{connect\_to\_queues@{connect\_to\_queues}!node\_proc.c@{node\_proc.c}}
+\doxysubsubsection{\texorpdfstring{connect\_to\_queues()}{connect\_to\_queues()}}
+{\footnotesize\ttfamily void connect\+\_\+to\+\_\+queues (\begin{DoxyParamCaption}\item[{void}]{ }\end{DoxyParamCaption})}
+
+Connects to the differents queues\+: master, node\textquotesingle{}s and user\textquotesingle{}s \mbox{\Hypertarget{node__proc_8c_ae9717df6876ca8e6137c741e7ff7d45b}\label{node__proc_8c_ae9717df6876ca8e6137c741e7ff7d45b}} 
+\index{node\_proc.c@{node\_proc.c}!free\_mem\_node@{free\_mem\_node}}
+\index{free\_mem\_node@{free\_mem\_node}!node\_proc.c@{node\_proc.c}}
+\doxysubsubsection{\texorpdfstring{free\_mem\_node()}{free\_mem\_node()}}
+{\footnotesize\ttfamily void free\+\_\+mem\+\_\+node (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{node__proc_8c_a46473129a15bf041dd63752927a292dd}\label{node__proc_8c_a46473129a15bf041dd63752927a292dd}} 
+\index{node\_proc.c@{node\_proc.c}!free\_sysVar\_node@{free\_sysVar\_node}}
+\index{free\_sysVar\_node@{free\_sysVar\_node}!node\_proc.c@{node\_proc.c}}
+\doxysubsubsection{\texorpdfstring{free\_sysVar\_node()}{free\_sysVar\_node()}}
+{\footnotesize\ttfamily void free\+\_\+sys\+Var\+\_\+node (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})}
+
+If the process is in INIT STATE his termination can block the whole simulation. So it need to lock the sart semaphore. If the semaphore\+\_\+start\+\_\+id is impossible to retrive ( = -\/1) nothing can be done.\mbox{\Hypertarget{node__proc_8c_a9e8e0c9a43bed5c0d6efd886e07c4e02}\label{node__proc_8c_a9e8e0c9a43bed5c0d6efd886e07c4e02}} 
+\index{node\_proc.c@{node\_proc.c}!gen\_sleep\_time@{gen\_sleep\_time}}
+\index{gen\_sleep\_time@{gen\_sleep\_time}!node\_proc.c@{node\_proc.c}}
+\doxysubsubsection{\texorpdfstring{gen\_sleep\_time()}{gen\_sleep\_time()}}
+{\footnotesize\ttfamily void gen\+\_\+sleep\+\_\+time (\begin{DoxyParamCaption}\item[{struct timespec $\ast$}]{ts }\end{DoxyParamCaption})}
+
+
+
+Generate sleep time using the conf file. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em ts} & \\
+\hline
+\end{DoxyParams}
+\mbox{\Hypertarget{node__proc_8c_a87bf75bcd79810108a54667b24369eee}\label{node__proc_8c_a87bf75bcd79810108a54667b24369eee}} 
+\index{node\_proc.c@{node\_proc.c}!get\_time\_processing@{get\_time\_processing}}
+\index{get\_time\_processing@{get\_time\_processing}!node\_proc.c@{node\_proc.c}}
+\doxysubsubsection{\texorpdfstring{get\_time\_processing()}{get\_time\_processing()}}
+{\footnotesize\ttfamily long int get\+\_\+time\+\_\+processing (\begin{DoxyParamCaption}\item[{void}]{ }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{node__proc_8c_a813383a5628e7abf8df6443263d91894}\label{node__proc_8c_a813383a5628e7abf8df6443263d91894}} 
+\index{node\_proc.c@{node\_proc.c}!handle\_msg\_transaction@{handle\_msg\_transaction}}
+\index{handle\_msg\_transaction@{handle\_msg\_transaction}!node\_proc.c@{node\_proc.c}}
+\doxysubsubsection{\texorpdfstring{handle\_msg\_transaction()}{handle\_msg\_transaction()}}
+{\footnotesize\ttfamily \mbox{\hyperlink{boolean_8h_afdcfe6db5bea87bd493a3fe2c513d5ef}{Bool}} handle\+\_\+msg\+\_\+transaction (\begin{DoxyParamCaption}\item[{struct \mbox{\hyperlink{structnode__msg}{node\+\_\+msg}} $\ast$}]{msg }\end{DoxyParamCaption})}
+
+
+
+Handle the msg with the transaction received if tp is full check for hops in the transaction\+: if hops not exceeded send the transaction to the next node otherwise send the transaction to the master to be handled. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em msg} & the message received \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+TRUE if the message was handled, FALSE otherwise 
+\end{DoxyReturn}
+TP\+\_\+\+SIZE FULL Sending the transaction to a friend
+
+Check if there is space in the node message queue
+
+TP\+\_\+\+SIZE FULL AND HOPS EXCEEDED Reporting the transaction to the master\mbox{\Hypertarget{node__proc_8c_aab73db0048b677faae7060acef181419}\label{node__proc_8c_aab73db0048b677faae7060acef181419}} 
+\index{node\_proc.c@{node\_proc.c}!load\_block@{load\_block}}
+\index{load\_block@{load\_block}!node\_proc.c@{node\_proc.c}}
+\doxysubsubsection{\texorpdfstring{load\_block()}{load\_block()}}
+{\footnotesize\ttfamily \mbox{\hyperlink{boolean_8h_afdcfe6db5bea87bd493a3fe2c513d5ef}{Bool}} load\+\_\+block (\begin{DoxyParamCaption}\item[{void}]{ }\end{DoxyParamCaption})}
+
+load block\+\_\+size transactions from transaction pool into transaction block of the current node \begin{DoxyReturn}{Returns}
+TRUE if succeded, FALSE otherwise 
+\end{DoxyReturn}
+\mbox{\Hypertarget{node__proc_8c_a3b65d4574d099e87fbb80dc8f8ac57f9}\label{node__proc_8c_a3b65d4574d099e87fbb80dc8f8ac57f9}} 
+\index{node\_proc.c@{node\_proc.c}!load\_simple\_transaction@{load\_simple\_transaction}}
+\index{load\_simple\_transaction@{load\_simple\_transaction}!node\_proc.c@{node\_proc.c}}
+\doxysubsubsection{\texorpdfstring{load\_simple\_transaction()}{load\_simple\_transaction()}}
+{\footnotesize\ttfamily void load\+\_\+simple\+\_\+transaction (\begin{DoxyParamCaption}\item[{struct \mbox{\hyperlink{structnode__msg}{node\+\_\+msg}} $\ast$}]{msg\+\_\+rep }\end{DoxyParamCaption})}
+
+
+
+Load n simple transactions from the queue of the current node Where n is chosen randomly between 1 and so\+\_\+tp\+\_\+size. 
+
+\mbox{\Hypertarget{node__proc_8c_a55d569a6b0581f026cc1312e9a593cc9}\label{node__proc_8c_a55d569a6b0581f026cc1312e9a593cc9}} 
+\index{node\_proc.c@{node\_proc.c}!lock\_masterbook\_cell\_access@{lock\_masterbook\_cell\_access}}
+\index{lock\_masterbook\_cell\_access@{lock\_masterbook\_cell\_access}!node\_proc.c@{node\_proc.c}}
+\doxysubsubsection{\texorpdfstring{lock\_masterbook\_cell\_access()}{lock\_masterbook\_cell\_access()}}
+{\footnotesize\ttfamily void lock\+\_\+masterbook\+\_\+cell\+\_\+access (\begin{DoxyParamCaption}\item[{int}]{i\+\_\+cell\+\_\+block\+\_\+list }\end{DoxyParamCaption})}
+
+
+
+Lock the current cell of the masterbook shm in which the node had written the block. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em i\+\_\+cell\+\_\+block\+\_\+list} & index to be blocked \\
+\hline
+\end{DoxyParams}
+RICEZIONE DI SEGNALE\mbox{\Hypertarget{node__proc_8c_aac0e5deb9274ca1158947fc49d3700bd}\label{node__proc_8c_aac0e5deb9274ca1158947fc49d3700bd}} 
+\index{node\_proc.c@{node\_proc.c}!lock\_shm\_masterbook@{lock\_shm\_masterbook}}
+\index{lock\_shm\_masterbook@{lock\_shm\_masterbook}!node\_proc.c@{node\_proc.c}}
+\doxysubsubsection{\texorpdfstring{lock\_shm\_masterbook()}{lock\_shm\_masterbook()}}
+{\footnotesize\ttfamily \mbox{\hyperlink{boolean_8h_afdcfe6db5bea87bd493a3fe2c513d5ef}{Bool}} lock\+\_\+shm\+\_\+masterbook (\begin{DoxyParamCaption}\item[{void}]{ }\end{DoxyParamCaption})}
+
+
+
+Lock the shm book\+\_\+master via masterbook\+\_\+to\+\_\+fill param and the cell to fill index. 
+
+\begin{DoxyReturn}{Returns}
+FALSE in case of failure, TRUE otherwise 
+\end{DoxyReturn}
+\mbox{\Hypertarget{node__proc_8c_a0fc598a9b6ec2290200171dd672e2a0a}\label{node__proc_8c_a0fc598a9b6ec2290200171dd672e2a0a}} 
+\index{node\_proc.c@{node\_proc.c}!lock\_to\_fill\_sem@{lock\_to\_fill\_sem}}
+\index{lock\_to\_fill\_sem@{lock\_to\_fill\_sem}!node\_proc.c@{node\_proc.c}}
+\doxysubsubsection{\texorpdfstring{lock\_to\_fill\_sem()}{lock\_to\_fill\_sem()}}
+{\footnotesize\ttfamily void lock\+\_\+to\+\_\+fill\+\_\+sem (\begin{DoxyParamCaption}\item[{void}]{ }\end{DoxyParamCaption})}
+
+
+
+Lock the to\+\_\+fill index saved in the shared\+\_\+memory access. 
+
+\mbox{\Hypertarget{node__proc_8c_abf9e6b7e6f15df4b525a2e7705ba3089}\label{node__proc_8c_abf9e6b7e6f15df4b525a2e7705ba3089}} 
+\index{node\_proc.c@{node\_proc.c}!main@{main}}
+\index{main@{main}!node\_proc.c@{node\_proc.c}}
+\doxysubsubsection{\texorpdfstring{main()}{main()}}
+{\footnotesize\ttfamily int main (\begin{DoxyParamCaption}\item[{int}]{argc,  }\item[{char const $\ast$}]{argv\mbox{[}$\,$\mbox{]} }\end{DoxyParamCaption})}
+
+default value of sender\+\_\+pid is -\/1, if it is -\/1 it means that the transaction is not valid\mbox{\Hypertarget{node__proc_8c_a46f5e042689671e5fa02b034ea8867f3}\label{node__proc_8c_a46f5e042689671e5fa02b034ea8867f3}} 
+\index{node\_proc.c@{node\_proc.c}!print\_node\_info@{print\_node\_info}}
+\index{print\_node\_info@{print\_node\_info}!node\_proc.c@{node\_proc.c}}
+\doxysubsubsection{\texorpdfstring{print\_node\_info()}{print\_node\_info()}}
+{\footnotesize\ttfamily void print\+\_\+node\+\_\+info (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})}
+
+
+
+Print the current node configuration in the standard output. 
+
+\mbox{\Hypertarget{node__proc_8c_af5d398504ef9356c78c175e2a630c386}\label{node__proc_8c_af5d398504ef9356c78c175e2a630c386}} 
+\index{node\_proc.c@{node\_proc.c}!process\_node\_block@{process\_node\_block}}
+\index{process\_node\_block@{process\_node\_block}!node\_proc.c@{node\_proc.c}}
+\doxysubsubsection{\texorpdfstring{process\_node\_block()}{process\_node\_block()}}
+{\footnotesize\ttfamily int process\+\_\+node\+\_\+block (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})}
+
+If node\+\_\+transaction pool has at list node\+\_\+block\+\_\+size of transactions it load them in a transaction block and process them \begin{DoxyReturn}{Returns}
+-\/1 in case of failure. 2 in case of pool\+\_\+size\texorpdfstring{$<$}{<}block\+\_\+size. 0 otherwise 
+\end{DoxyReturn}
+\mbox{\Hypertarget{node__proc_8c_a608eb8e7689dc6533d720665996a1951}\label{node__proc_8c_a608eb8e7689dc6533d720665996a1951}} 
+\index{node\_proc.c@{node\_proc.c}!process\_node\_transaction@{process\_node\_transaction}}
+\index{process\_node\_transaction@{process\_node\_transaction}!node\_proc.c@{node\_proc.c}}
+\doxysubsubsection{\texorpdfstring{process\_node\_transaction()}{process\_node\_transaction()}}
+{\footnotesize\ttfamily int process\+\_\+node\+\_\+transaction (\begin{DoxyParamCaption}\item[{struct \mbox{\hyperlink{structnode__msg}{node\+\_\+msg}} $\ast$}]{msg\+\_\+rep }\end{DoxyParamCaption})}
+
+If it finds node msg of type NODE\+\_\+\+TRANSACTION it proccess them and make the aknowledgement 
+\begin{DoxyParams}{Parameters}
+{\em msg\+\_\+rep} & the messagge to be loaded if present in the queue \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+-\/1 if the transaction is not handled 0 otherwise 
+\end{DoxyReturn}
+\mbox{\Hypertarget{node__proc_8c_a3d18d7bf55e6f451455ec2f4494d8e0e}\label{node__proc_8c_a3d18d7bf55e6f451455ec2f4494d8e0e}} 
+\index{node\_proc.c@{node\_proc.c}!process\_simple\_transaction\_type@{process\_simple\_transaction\_type}}
+\index{process\_simple\_transaction\_type@{process\_simple\_transaction\_type}!node\_proc.c@{node\_proc.c}}
+\doxysubsubsection{\texorpdfstring{process\_simple\_transaction\_type()}{process\_simple\_transaction\_type()}}
+{\footnotesize\ttfamily int process\+\_\+simple\+\_\+transaction\+\_\+type (\begin{DoxyParamCaption}\item[{struct \mbox{\hyperlink{structnode__msg}{node\+\_\+msg}} $\ast$}]{msg\+\_\+rep }\end{DoxyParamCaption})}
+
+If it finds node msg of type TRANSACTION\+\_\+\+TYPE it process them and make the aknowledgement adding them to the transaction\+\_\+pool and the transaction\+\_\+block if need 
+\begin{DoxyParams}{Parameters}
+{\em msg\+\_\+rep} & the messagge to be loaded if present in the queue \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+-\/1 if the transaction is not added to the pool or handled correctly 
+\end{DoxyReturn}
+\mbox{\Hypertarget{node__proc_8c_a8a0737ae9dc852721a993a3cf3c0f107}\label{node__proc_8c_a8a0737ae9dc852721a993a3cf3c0f107}} 
+\index{node\_proc.c@{node\_proc.c}!read\_conf\_node@{read\_conf\_node}}
+\index{read\_conf\_node@{read\_conf\_node}!node\_proc.c@{node\_proc.c}}
+\doxysubsubsection{\texorpdfstring{read\_conf\_node()}{read\_conf\_node()}}
+{\footnotesize\ttfamily \mbox{\hyperlink{boolean_8h_afdcfe6db5bea87bd493a3fe2c513d5ef}{Bool}} read\+\_\+conf\+\_\+node (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})}
+
+
+
+Read the conf file present in te project dir load the configuration directly in the struct conf node\+\_\+configuration that is a Sys\+Var. 
+
+\begin{DoxyReturn}{Returns}
+FALSE in case of FAILURE, TRUE otherwise 
+\end{DoxyReturn}
+\mbox{\Hypertarget{node__proc_8c_a86e33836ed49c803366692915b2835a1}\label{node__proc_8c_a86e33836ed49c803366692915b2835a1}} 
+\index{node\_proc.c@{node\_proc.c}!set\_signal\_handler\_node@{set\_signal\_handler\_node}}
+\index{set\_signal\_handler\_node@{set\_signal\_handler\_node}!node\_proc.c@{node\_proc.c}}
+\doxysubsubsection{\texorpdfstring{set\_signal\_handler\_node()}{set\_signal\_handler\_node()}}
+{\footnotesize\ttfamily \mbox{\hyperlink{boolean_8h_afdcfe6db5bea87bd493a3fe2c513d5ef}{Bool}} set\+\_\+signal\+\_\+handler\+\_\+node (\begin{DoxyParamCaption}\item[{struct sigaction}]{sa }\end{DoxyParamCaption})}
+
+Set the handler for signals of the current node\+\_\+proc 
+\begin{DoxyParams}{Parameters}
+{\em sa} & describe the type of action to be performed when a signal arrives \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+FALSE in case of FAILURE, TRUE otherwise 
+\end{DoxyReturn}
+\mbox{\Hypertarget{node__proc_8c_a6af3c0bed2d48bb950788acf54f4de74}\label{node__proc_8c_a6af3c0bed2d48bb950788acf54f4de74}} 
+\index{node\_proc.c@{node\_proc.c}!signals\_handler@{signals\_handler}}
+\index{signals\_handler@{signals\_handler}!node\_proc.c@{node\_proc.c}}
+\doxysubsubsection{\texorpdfstring{signals\_handler()}{signals\_handler()}}
+{\footnotesize\ttfamily void signals\+\_\+handler (\begin{DoxyParamCaption}\item[{int}]{signum }\end{DoxyParamCaption})}
+
+handler of the signal 
+\begin{DoxyParams}{Parameters}
+{\em signum} & type of signal to be handled \\
+\hline
+\end{DoxyParams}
+Check if there is space in the node message queue
+
+Receive new friends from master and update the friends list
+
+Inform master of the node state\mbox{\Hypertarget{node__proc_8c_a658f85056fd1f6482d41d09fff06caa9}\label{node__proc_8c_a658f85056fd1f6482d41d09fff06caa9}} 
+\index{node\_proc.c@{node\_proc.c}!unlock\_masterbook\_cell\_access@{unlock\_masterbook\_cell\_access}}
+\index{unlock\_masterbook\_cell\_access@{unlock\_masterbook\_cell\_access}!node\_proc.c@{node\_proc.c}}
+\doxysubsubsection{\texorpdfstring{unlock\_masterbook\_cell\_access()}{unlock\_masterbook\_cell\_access()}}
+{\footnotesize\ttfamily void unlock\+\_\+masterbook\+\_\+cell\+\_\+access (\begin{DoxyParamCaption}\item[{int}]{i\+\_\+cell\+\_\+block\+\_\+list }\end{DoxyParamCaption})}
+
+Unlock the current cell of the masterbook shm in which the node had written the block 
+\begin{DoxyParams}{Parameters}
+{\em i\+\_\+cell\+\_\+block\+\_\+list} & index to be blocked \\
+\hline
+\end{DoxyParams}
+\mbox{\Hypertarget{node__proc_8c_a3665c0aeb745da225e1b511ef9d23194}\label{node__proc_8c_a3665c0aeb745da225e1b511ef9d23194}} 
+\index{node\_proc.c@{node\_proc.c}!unlock\_to\_fill\_sem@{unlock\_to\_fill\_sem}}
+\index{unlock\_to\_fill\_sem@{unlock\_to\_fill\_sem}!node\_proc.c@{node\_proc.c}}
+\doxysubsubsection{\texorpdfstring{unlock\_to\_fill\_sem()}{unlock\_to\_fill\_sem()}}
+{\footnotesize\ttfamily void unlock\+\_\+to\+\_\+fill\+\_\+sem (\begin{DoxyParamCaption}\item[{void}]{ }\end{DoxyParamCaption})}
+
+Unlock the to\+\_\+fill index saved in the shared\+\_\+memory access 
+
+\doxysubsection{Variable Documentation}
+\mbox{\Hypertarget{node__proc_8c_ae8366d1a6147417562a95f4dc8855459}\label{node__proc_8c_ae8366d1a6147417562a95f4dc8855459}} 
+\index{node\_proc.c@{node\_proc.c}!current\_block\_reward@{current\_block\_reward}}
+\index{current\_block\_reward@{current\_block\_reward}!node\_proc.c@{node\_proc.c}}
+\doxysubsubsection{\texorpdfstring{current\_block\_reward}{current\_block\_reward}}
+{\footnotesize\ttfamily float current\+\_\+block\+\_\+reward = 0}
+
+\mbox{\Hypertarget{node__proc_8c_a230c4eaa89fdddbb7c42f1b6019fa3b1}\label{node__proc_8c_a230c4eaa89fdddbb7c42f1b6019fa3b1}} 
+\index{node\_proc.c@{node\_proc.c}!current\_mask@{current\_mask}}
+\index{current\_mask@{current\_mask}!node\_proc.c@{node\_proc.c}}
+\doxysubsubsection{\texorpdfstring{current\_mask}{current\_mask}}
+{\footnotesize\ttfamily sigset\+\_\+t current\+\_\+mask}
+
+\mbox{\Hypertarget{node__proc_8c_afbda519df6aa2ad6ead24744c3907d79}\label{node__proc_8c_afbda519df6aa2ad6ead24744c3907d79}} 
+\index{node\_proc.c@{node\_proc.c}!current\_node@{current\_node}}
+\index{current\_node@{current\_node}!node\_proc.c@{node\_proc.c}}
+\doxysubsubsection{\texorpdfstring{current\_node}{current\_node}}
+{\footnotesize\ttfamily struct \mbox{\hyperlink{structnode}{node}} current\+\_\+node}
+
+\mbox{\Hypertarget{node__proc_8c_aed763209d90cbafd9a1c8b3b1602daba}\label{node__proc_8c_aed763209d90cbafd9a1c8b3b1602daba}} 
+\index{node\_proc.c@{node\_proc.c}!friends@{friends}}
+\index{friends@{friends}!node\_proc.c@{node\_proc.c}}
+\doxysubsubsection{\texorpdfstring{friends}{friends}}
+{\footnotesize\ttfamily int friends = -\/1}
+
+\mbox{\Hypertarget{node__proc_8c_a1d01d8e411dc32dde1ab25208eab05f8}\label{node__proc_8c_a1d01d8e411dc32dde1ab25208eab05f8}} 
+\index{node\_proc.c@{node\_proc.c}!last\_signal@{last\_signal}}
+\index{last\_signal@{last\_signal}!node\_proc.c@{node\_proc.c}}
+\doxysubsubsection{\texorpdfstring{last\_signal}{last\_signal}}
+{\footnotesize\ttfamily int last\+\_\+signal}
+
+\mbox{\Hypertarget{node__proc_8c_a76a3bc0f59489fc097d95c25e7053b75}\label{node__proc_8c_a76a3bc0f59489fc097d95c25e7053b75}} 
+\index{node\_proc.c@{node\_proc.c}!node\_configuration@{node\_configuration}}
+\index{node\_configuration@{node\_configuration}!node\_proc.c@{node\_proc.c}}
+\doxysubsubsection{\texorpdfstring{node\_configuration}{node\_configuration}}
+{\footnotesize\ttfamily struct \mbox{\hyperlink{structconf}{conf}} node\+\_\+configuration}
+
+\mbox{\Hypertarget{node__proc_8c_a2bf13558c1e6e4526049a211cfe0937f}\label{node__proc_8c_a2bf13558c1e6e4526049a211cfe0937f}} 
+\index{node\_proc.c@{node\_proc.c}!node\_end@{node\_end}}
+\index{node\_end@{node\_end}!node\_proc.c@{node\_proc.c}}
+\doxysubsubsection{\texorpdfstring{node\_end}{node\_end}}
+{\footnotesize\ttfamily int node\+\_\+end = 0}
+
+\mbox{\Hypertarget{node__proc_8c_aa08429407287f0f88618f338895be369}\label{node__proc_8c_aa08429407287f0f88618f338895be369}} 
+\index{node\_proc.c@{node\_proc.c}!queue\_master\_id@{queue\_master\_id}}
+\index{queue\_master\_id@{queue\_master\_id}!node\_proc.c@{node\_proc.c}}
+\doxysubsubsection{\texorpdfstring{queue\_master\_id}{queue\_master\_id}}
+{\footnotesize\ttfamily int queue\+\_\+master\+\_\+id = -\/1}
+
+\mbox{\Hypertarget{node__proc_8c_a1ccf22d1a76cc0edb493206dd91a063e}\label{node__proc_8c_a1ccf22d1a76cc0edb493206dd91a063e}} 
+\index{node\_proc.c@{node\_proc.c}!queue\_node\_id@{queue\_node\_id}}
+\index{queue\_node\_id@{queue\_node\_id}!node\_proc.c@{node\_proc.c}}
+\doxysubsubsection{\texorpdfstring{queue\_node\_id}{queue\_node\_id}}
+{\footnotesize\ttfamily int queue\+\_\+node\+\_\+id = -\/1}
+
+\mbox{\Hypertarget{node__proc_8c_a81b4a7a6586efbb012387c887f004c4c}\label{node__proc_8c_a81b4a7a6586efbb012387c887f004c4c}} 
+\index{node\_proc.c@{node\_proc.c}!queue\_user\_id@{queue\_user\_id}}
+\index{queue\_user\_id@{queue\_user\_id}!node\_proc.c@{node\_proc.c}}
+\doxysubsubsection{\texorpdfstring{queue\_user\_id}{queue\_user\_id}}
+{\footnotesize\ttfamily int queue\+\_\+user\+\_\+id = -\/1}
+
+\mbox{\Hypertarget{node__proc_8c_a311818db5457e986b0808c3d6ddcb420}\label{node__proc_8c_a311818db5457e986b0808c3d6ddcb420}} 
+\index{node\_proc.c@{node\_proc.c}!semaphore\_masterbook\_id@{semaphore\_masterbook\_id}}
+\index{semaphore\_masterbook\_id@{semaphore\_masterbook\_id}!node\_proc.c@{node\_proc.c}}
+\doxysubsubsection{\texorpdfstring{semaphore\_masterbook\_id}{semaphore\_masterbook\_id}}
+{\footnotesize\ttfamily int semaphore\+\_\+masterbook\+\_\+id = -\/1}
+
+\mbox{\Hypertarget{node__proc_8c_ac62b22414674bece75bc2fea3847c48f}\label{node__proc_8c_ac62b22414674bece75bc2fea3847c48f}} 
+\index{node\_proc.c@{node\_proc.c}!semaphore\_start\_id@{semaphore\_start\_id}}
+\index{semaphore\_start\_id@{semaphore\_start\_id}!node\_proc.c@{node\_proc.c}}
+\doxysubsubsection{\texorpdfstring{semaphore\_start\_id}{semaphore\_start\_id}}
+{\footnotesize\ttfamily int semaphore\+\_\+start\+\_\+id = -\/1}
+
+\mbox{\Hypertarget{node__proc_8c_ae5f591ad56c16a7b4c12125eae48a6f2}\label{node__proc_8c_ae5f591ad56c16a7b4c12125eae48a6f2}} 
+\index{node\_proc.c@{node\_proc.c}!semaphore\_to\_fill\_id@{semaphore\_to\_fill\_id}}
+\index{semaphore\_to\_fill\_id@{semaphore\_to\_fill\_id}!node\_proc.c@{node\_proc.c}}
+\doxysubsubsection{\texorpdfstring{semaphore\_to\_fill\_id}{semaphore\_to\_fill\_id}}
+{\footnotesize\ttfamily int semaphore\+\_\+to\+\_\+fill\+\_\+id = -\/1}
+
+\mbox{\Hypertarget{node__proc_8c_a15f0de6e952f5f42e4054de6aa63f5bb}\label{node__proc_8c_a15f0de6e952f5f42e4054de6aa63f5bb}} 
+\index{node\_proc.c@{node\_proc.c}!shm\_conf\_pointer\_node@{shm\_conf\_pointer\_node}}
+\index{shm\_conf\_pointer\_node@{shm\_conf\_pointer\_node}!node\_proc.c@{node\_proc.c}}
+\doxysubsubsection{\texorpdfstring{shm\_conf\_pointer\_node}{shm\_conf\_pointer\_node}}
+{\footnotesize\ttfamily struct \mbox{\hyperlink{structshm__conf}{shm\+\_\+conf}}$\ast$ shm\+\_\+conf\+\_\+pointer\+\_\+node}
+
+\mbox{\Hypertarget{node__proc_8c_a22ca1f6fad3851c36b9f56873280d4b0}\label{node__proc_8c_a22ca1f6fad3851c36b9f56873280d4b0}} 
+\index{node\_proc.c@{node\_proc.c}!shm\_masterbook\_pointer@{shm\_masterbook\_pointer}}
+\index{shm\_masterbook\_pointer@{shm\_masterbook\_pointer}!node\_proc.c@{node\_proc.c}}
+\doxysubsubsection{\texorpdfstring{shm\_masterbook\_pointer}{shm\_masterbook\_pointer}}
+{\footnotesize\ttfamily struct \mbox{\hyperlink{structshm__book__master}{shm\+\_\+book\+\_\+master}}$\ast$ shm\+\_\+masterbook\+\_\+pointer}
+

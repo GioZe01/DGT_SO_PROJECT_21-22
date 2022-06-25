@@ -1,0 +1,137 @@
+\hypertarget{node__msg__report_8c}{}\doxysection{src/local\+\_\+lib/node\+\_\+msg\+\_\+report.c File Reference}
+\label{node__msg__report_8c}\index{src/local\_lib/node\_msg\_report.c@{src/local\_lib/node\_msg\_report.c}}
+{\ttfamily \#include $<$stdio.\+h$>$}\newline
+{\ttfamily \#include $<$stdlib.\+h$>$}\newline
+{\ttfamily \#include $<$errno.\+h$>$}\newline
+{\ttfamily \#include $<$sys/msg.\+h$>$}\newline
+{\ttfamily \#include \char`\"{}headers/node\+\_\+msg\+\_\+report.\+h\char`\"{}}\newline
+{\ttfamily \#include \char`\"{}headers/simulation\+\_\+errors.\+h\char`\"{}}\newline
+{\ttfamily \#include \char`\"{}headers/transaction\+\_\+list.\+h\char`\"{}}\newline
+{\ttfamily \#include \char`\"{}headers/boolean.\+h\char`\"{}}\newline
+Include dependency graph for node\+\_\+msg\+\_\+report.\+c\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{node__msg__report_8c__incl}
+\end{center}
+\end{figure}
+\doxysubsection*{Macros}
+\begin{DoxyCompactItemize}
+\item 
+\#define \mbox{\hyperlink{node__msg__report_8c_a369266c24eacffb87046522897a570d5}{\+\_\+\+GNU\+\_\+\+SOURCE}}
+\end{DoxyCompactItemize}
+\doxysubsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+int \mbox{\hyperlink{node__msg__report_8c_aa6b2b214418ea32282019e1931f4b6a3}{check\+\_\+default}} (long type, int queue\+\_\+id)
+\item 
+int \mbox{\hyperlink{node__msg__report_8c_a9d2c934098d235a432f6b52fa970c208}{node\+\_\+msg\+\_\+create}} (struct \mbox{\hyperlink{structnode__msg}{node\+\_\+msg}} $\ast$self, long type, pid\+\_\+t sender\+\_\+pid, struct \mbox{\hyperlink{struct_transaction}{Transaction}} $\ast$t, int message\+\_\+type)
+\item 
+void \mbox{\hyperlink{node__msg__report_8c_abc4d6316c635d202764888c5d3a3b4c8}{node\+\_\+msg\+\_\+print}} (struct \mbox{\hyperlink{structnode__msg}{node\+\_\+msg}} $\ast$self)
+\item 
+int \mbox{\hyperlink{node__msg__report_8c_a121551da45b6b335f049615cef15a438}{node\+\_\+msg\+\_\+snd}} (int id, struct \mbox{\hyperlink{structnode__msg}{node\+\_\+msg}} $\ast$msg, long type, struct \mbox{\hyperlink{struct_transaction}{Transaction}} $\ast$t, pid\+\_\+t sender, \mbox{\hyperlink{boolean_8h_afdcfe6db5bea87bd493a3fe2c513d5ef}{Bool}} create, int so\+\_\+retry, int queue\+\_\+id)
+\item 
+int \mbox{\hyperlink{node__msg__report_8c_a2656196f431726550a66e94d6bcca92f}{node\+\_\+msg\+\_\+receive}} (int id, struct \mbox{\hyperlink{structnode__msg}{node\+\_\+msg}} $\ast$msg, long type)
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Macro Definition Documentation}
+\mbox{\Hypertarget{node__msg__report_8c_a369266c24eacffb87046522897a570d5}\label{node__msg__report_8c_a369266c24eacffb87046522897a570d5}} 
+\index{node\_msg\_report.c@{node\_msg\_report.c}!\_GNU\_SOURCE@{\_GNU\_SOURCE}}
+\index{\_GNU\_SOURCE@{\_GNU\_SOURCE}!node\_msg\_report.c@{node\_msg\_report.c}}
+\doxysubsubsection{\texorpdfstring{\_GNU\_SOURCE}{\_GNU\_SOURCE}}
+{\footnotesize\ttfamily \#define \+\_\+\+GNU\+\_\+\+SOURCE}
+
+
+
+\doxysubsection{Function Documentation}
+\mbox{\Hypertarget{node__msg__report_8c_aa6b2b214418ea32282019e1931f4b6a3}\label{node__msg__report_8c_aa6b2b214418ea32282019e1931f4b6a3}} 
+\index{node\_msg\_report.c@{node\_msg\_report.c}!check\_default@{check\_default}}
+\index{check\_default@{check\_default}!node\_msg\_report.c@{node\_msg\_report.c}}
+\doxysubsubsection{\texorpdfstring{check\_default()}{check\_default()}}
+{\footnotesize\ttfamily int check\+\_\+default (\begin{DoxyParamCaption}\item[{long}]{type,  }\item[{int}]{queue\+\_\+id }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{node__msg__report_8c_a9d2c934098d235a432f6b52fa970c208}\label{node__msg__report_8c_a9d2c934098d235a432f6b52fa970c208}} 
+\index{node\_msg\_report.c@{node\_msg\_report.c}!node\_msg\_create@{node\_msg\_create}}
+\index{node\_msg\_create@{node\_msg\_create}!node\_msg\_report.c@{node\_msg\_report.c}}
+\doxysubsubsection{\texorpdfstring{node\_msg\_create()}{node\_msg\_create()}}
+{\footnotesize\ttfamily int node\+\_\+msg\+\_\+create (\begin{DoxyParamCaption}\item[{struct \mbox{\hyperlink{structnode__msg}{node\+\_\+msg}} $\ast$}]{self,  }\item[{long}]{type,  }\item[{pid\+\_\+t}]{sender\+\_\+pid,  }\item[{struct \mbox{\hyperlink{struct_transaction}{Transaction}} $\ast$}]{t,  }\item[{int}]{message\+\_\+type }\end{DoxyParamCaption})}
+
+Create the message given as param as address to a \mbox{\hyperlink{structuser__msg}{user\+\_\+msg}} struct based on the given parameter 
+\begin{DoxyParams}{Parameters}
+{\em self} & give the add of your struct \\
+\hline
+{\em type} & type of message to be send, has to be one of the defined in this .h \\
+\hline
+{\em sender\+\_\+pid} & pid of the current process how\textquotesingle{}s calling this function \\
+\hline
+{\em message\+\_\+type} & type of message to be send, has to be one of the defined in this .h \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+0 if success. -\/1 in case of failure 
+\end{DoxyReturn}
+\mbox{\Hypertarget{node__msg__report_8c_abc4d6316c635d202764888c5d3a3b4c8}\label{node__msg__report_8c_abc4d6316c635d202764888c5d3a3b4c8}} 
+\index{node\_msg\_report.c@{node\_msg\_report.c}!node\_msg\_print@{node\_msg\_print}}
+\index{node\_msg\_print@{node\_msg\_print}!node\_msg\_report.c@{node\_msg\_report.c}}
+\doxysubsubsection{\texorpdfstring{node\_msg\_print()}{node\_msg\_print()}}
+{\footnotesize\ttfamily void node\+\_\+msg\+\_\+print (\begin{DoxyParamCaption}\item[{struct \mbox{\hyperlink{structnode__msg}{node\+\_\+msg}} $\ast$}]{self }\end{DoxyParamCaption})}
+
+Print the msg based on his type 
+\begin{DoxyParams}{Parameters}
+{\em self} & the message to be printed \\
+\hline
+\end{DoxyParams}
+\mbox{\Hypertarget{node__msg__report_8c_a2656196f431726550a66e94d6bcca92f}\label{node__msg__report_8c_a2656196f431726550a66e94d6bcca92f}} 
+\index{node\_msg\_report.c@{node\_msg\_report.c}!node\_msg\_receive@{node\_msg\_receive}}
+\index{node\_msg\_receive@{node\_msg\_receive}!node\_msg\_report.c@{node\_msg\_report.c}}
+\doxysubsubsection{\texorpdfstring{node\_msg\_receive()}{node\_msg\_receive()}}
+{\footnotesize\ttfamily int node\+\_\+msg\+\_\+receive (\begin{DoxyParamCaption}\item[{int}]{id,  }\item[{struct \mbox{\hyperlink{structnode__msg}{node\+\_\+msg}} $\ast$}]{msg,  }\item[{long}]{type }\end{DoxyParamCaption})}
+
+Retrieve the message\+\_\+user\+\_\+report on the specified message queue \begin{DoxyWarning}{Warning}
+the retriving operation is repeated until it succeed or errno != EINTR 
+\end{DoxyWarning}
+
+\begin{DoxyParams}{Parameters}
+{\em id} & of the message queue \\
+\hline
+{\em msg} & to be caught \\
+\hline
+{\em type} & of message expected \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+-\/2 if no message on queue, -\/1 in case of failure. 0 otherwise. 
+\end{DoxyReturn}
+\mbox{\Hypertarget{node__msg__report_8c_a121551da45b6b335f049615cef15a438}\label{node__msg__report_8c_a121551da45b6b335f049615cef15a438}} 
+\index{node\_msg\_report.c@{node\_msg\_report.c}!node\_msg\_snd@{node\_msg\_snd}}
+\index{node\_msg\_snd@{node\_msg\_snd}!node\_msg\_report.c@{node\_msg\_report.c}}
+\doxysubsubsection{\texorpdfstring{node\_msg\_snd()}{node\_msg\_snd()}}
+{\footnotesize\ttfamily int node\+\_\+msg\+\_\+snd (\begin{DoxyParamCaption}\item[{int}]{id,  }\item[{struct \mbox{\hyperlink{structnode__msg}{node\+\_\+msg}} $\ast$}]{msg,  }\item[{long}]{type,  }\item[{struct \mbox{\hyperlink{struct_transaction}{Transaction}} $\ast$}]{t,  }\item[{pid\+\_\+t}]{sender,  }\item[{\mbox{\hyperlink{boolean_8h_afdcfe6db5bea87bd493a3fe2c513d5ef}{Bool}}}]{crete,  }\item[{int}]{so\+\_\+retry,  }\item[{int}]{queue\+\_\+id }\end{DoxyParamCaption})}
+
+(Create if option selected) and Send the message on ipc user\+\_\+queue with the key as specified \begin{DoxyWarning}{Warning}
+send is repeated until it succeed or errno != EINTR or so\+\_\+retry is not reached 
+\end{DoxyWarning}
+
+\begin{DoxyParams}{Parameters}
+{\em id} & of the message queue \\
+\hline
+{\em msg} & the message to be sent to \\
+\hline
+{\em type} & type of message to be send, has to be one of the defined in this .h \\
+\hline
+{\em t} & the transaction to be sent \\
+\hline
+{\em sender} & pid\+\_\+t of the sender of this message \\
+\hline
+{\em crete} & TRUE if u want to create it before sending. \\
+\hline
+{\em so\+\_\+retry} & number of retry before failure occures. \\
+\hline
+{\em queue\+\_\+id} & number rappresenting the node id into the queue \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+-\/1 in case of failure, 0 otherwise 
+\end{DoxyReturn}
+Check if there is space in the node message queue

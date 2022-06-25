@@ -1,0 +1,73 @@
+\hypertarget{boolean_8h}{}\doxysection{src/local\+\_\+lib/headers/boolean.h File Reference}
+\label{boolean_8h}\index{src/local\_lib/headers/boolean.h@{src/local\_lib/headers/boolean.h}}
+
+
+Type Definition for the boolean type using integer values Done for C89 compatibility.  
+
+
+This graph shows which files directly or indirectly include this file\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{boolean_8h__dep__incl}
+\end{center}
+\end{figure}
+\doxysubsection*{Macros}
+\begin{DoxyCompactItemize}
+\item 
+\#define \mbox{\hyperlink{boolean_8h_aa8cecfc5c5c054d2875c03e77b7be15d}{TRUE}}~1
+\item 
+\#define \mbox{\hyperlink{boolean_8h_aa93f0eb578d23995850d61f7d61c55c1}{FALSE}}~0
+\end{DoxyCompactItemize}
+\doxysubsection*{Typedefs}
+\begin{DoxyCompactItemize}
+\item 
+typedef int \mbox{\hyperlink{boolean_8h_afdcfe6db5bea87bd493a3fe2c513d5ef}{Bool}}
+\end{DoxyCompactItemize}
+\doxysubsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+char $\ast$ \mbox{\hyperlink{boolean_8h_ac0966b200dbc877504966e4424cce4d1}{bool\+\_\+to\+\_\+string}} (\mbox{\hyperlink{boolean_8h_afdcfe6db5bea87bd493a3fe2c513d5ef}{Bool}} b)
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+Type Definition for the boolean type using integer values Done for C89 compatibility. 
+
+\begin{DoxyAuthor}{Author}
+Giovanni Terzuolo 
+\end{DoxyAuthor}
+
+
+\doxysubsection{Macro Definition Documentation}
+\mbox{\Hypertarget{boolean_8h_aa93f0eb578d23995850d61f7d61c55c1}\label{boolean_8h_aa93f0eb578d23995850d61f7d61c55c1}} 
+\index{boolean.h@{boolean.h}!FALSE@{FALSE}}
+\index{FALSE@{FALSE}!boolean.h@{boolean.h}}
+\doxysubsubsection{\texorpdfstring{FALSE}{FALSE}}
+{\footnotesize\ttfamily \#define FALSE~0}
+
+The value of the boolean false \mbox{\Hypertarget{boolean_8h_aa8cecfc5c5c054d2875c03e77b7be15d}\label{boolean_8h_aa8cecfc5c5c054d2875c03e77b7be15d}} 
+\index{boolean.h@{boolean.h}!TRUE@{TRUE}}
+\index{TRUE@{TRUE}!boolean.h@{boolean.h}}
+\doxysubsubsection{\texorpdfstring{TRUE}{TRUE}}
+{\footnotesize\ttfamily \#define TRUE~1}
+
+The value of the boolean true 
+
+\doxysubsection{Typedef Documentation}
+\mbox{\Hypertarget{boolean_8h_afdcfe6db5bea87bd493a3fe2c513d5ef}\label{boolean_8h_afdcfe6db5bea87bd493a3fe2c513d5ef}} 
+\index{boolean.h@{boolean.h}!Bool@{Bool}}
+\index{Bool@{Bool}!boolean.h@{boolean.h}}
+\doxysubsubsection{\texorpdfstring{Bool}{Bool}}
+{\footnotesize\ttfamily typedef int \mbox{\hyperlink{boolean_8h_afdcfe6db5bea87bd493a3fe2c513d5ef}{Bool}}}
+
+The type definition for the boolean type 
+
+\doxysubsection{Function Documentation}
+\mbox{\Hypertarget{boolean_8h_ac0966b200dbc877504966e4424cce4d1}\label{boolean_8h_ac0966b200dbc877504966e4424cce4d1}} 
+\index{boolean.h@{boolean.h}!bool\_to\_string@{bool\_to\_string}}
+\index{bool\_to\_string@{bool\_to\_string}!boolean.h@{boolean.h}}
+\doxysubsubsection{\texorpdfstring{bool\_to\_string()}{bool\_to\_string()}}
+{\footnotesize\ttfamily char $\ast$ bool\+\_\+to\+\_\+string (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{boolean_8h_afdcfe6db5bea87bd493a3fe2c513d5ef}{Bool}}}]{b }\end{DoxyParamCaption})}
+
+Convert the boolean value to a string 

@@ -1,0 +1,139 @@
+\hypertarget{user__msg__report_8c}{}\doxysection{src/local\+\_\+lib/user\+\_\+msg\+\_\+report.c File Reference}
+\label{user__msg__report_8c}\index{src/local\_lib/user\_msg\_report.c@{src/local\_lib/user\_msg\_report.c}}
+{\ttfamily \#include $<$stdio.\+h$>$}\newline
+{\ttfamily \#include $<$stdlib.\+h$>$}\newline
+{\ttfamily \#include $<$unistd.\+h$>$}\newline
+{\ttfamily \#include $<$sys/msg.\+h$>$}\newline
+{\ttfamily \#include \char`\"{}headers/user\+\_\+msg\+\_\+report.\+h\char`\"{}}\newline
+{\ttfamily \#include \char`\"{}headers/simulation\+\_\+errors.\+h\char`\"{}}\newline
+{\ttfamily \#include \char`\"{}headers/transaction\+\_\+list.\+h\char`\"{}}\newline
+{\ttfamily \#include \char`\"{}headers/glob.\+h\char`\"{}}\newline
+{\ttfamily \#include \char`\"{}headers/boolean.\+h\char`\"{}}\newline
+Include dependency graph for user\+\_\+msg\+\_\+report.\+c\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{user__msg__report_8c__incl}
+\end{center}
+\end{figure}
+\doxysubsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+int \mbox{\hyperlink{user__msg__report_8c_a86f08bf96c64801f5772b40fbc39d304}{get\+\_\+transaction\+\_\+type}} (int type)
+\begin{DoxyCompactList}\small\item\em Return the corrispondent type of transaction based on the msg type. \end{DoxyCompactList}\item 
+int \mbox{\hyperlink{user__msg__report_8c_ada863fd77248ce46bf4b1799c7b9c466}{check\+\_\+user\+\_\+type}} (int type\+\_\+given, int queue\+\_\+id)
+\item 
+int \mbox{\hyperlink{user__msg__report_8c_a70931919d75ef21c15c14ffc2466c9b5}{user\+\_\+msg\+\_\+create}} (struct \mbox{\hyperlink{structuser__msg}{user\+\_\+msg}} $\ast$self, long type, pid\+\_\+t sender\+\_\+pid, struct \mbox{\hyperlink{struct_transaction}{Transaction}} $\ast$t)
+\item 
+void \mbox{\hyperlink{user__msg__report_8c_abb2adc878af3fa7a417e7f484b971d13}{user\+\_\+msg\+\_\+print}} (struct \mbox{\hyperlink{structuser__msg}{user\+\_\+msg}} $\ast$self, long type)
+\item 
+int \mbox{\hyperlink{user__msg__report_8c_a05bc56bfa516161e80287c745418aefb}{user\+\_\+msg\+\_\+snd}} (int id, struct \mbox{\hyperlink{structuser__msg}{user\+\_\+msg}} $\ast$msg, long type, struct \mbox{\hyperlink{struct_transaction}{Transaction}} $\ast$t, pid\+\_\+t sender, \mbox{\hyperlink{boolean_8h_afdcfe6db5bea87bd493a3fe2c513d5ef}{Bool}} create, int queue\+\_\+id)
+\item 
+int \mbox{\hyperlink{user__msg__report_8c_ad64c218fba74de9d28ec05f9f17d8d04}{user\+\_\+msg\+\_\+receive}} (int id, struct \mbox{\hyperlink{structuser__msg}{user\+\_\+msg}} $\ast$msg, long type)
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Function Documentation}
+\mbox{\Hypertarget{user__msg__report_8c_ada863fd77248ce46bf4b1799c7b9c466}\label{user__msg__report_8c_ada863fd77248ce46bf4b1799c7b9c466}} 
+\index{user\_msg\_report.c@{user\_msg\_report.c}!check\_user\_type@{check\_user\_type}}
+\index{check\_user\_type@{check\_user\_type}!user\_msg\_report.c@{user\_msg\_report.c}}
+\doxysubsubsection{\texorpdfstring{check\_user\_type()}{check\_user\_type()}}
+{\footnotesize\ttfamily int check\+\_\+user\+\_\+type (\begin{DoxyParamCaption}\item[{int}]{type\+\_\+given,  }\item[{int}]{queue\+\_\+id }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{user__msg__report_8c_a86f08bf96c64801f5772b40fbc39d304}\label{user__msg__report_8c_a86f08bf96c64801f5772b40fbc39d304}} 
+\index{user\_msg\_report.c@{user\_msg\_report.c}!get\_transaction\_type@{get\_transaction\_type}}
+\index{get\_transaction\_type@{get\_transaction\_type}!user\_msg\_report.c@{user\_msg\_report.c}}
+\doxysubsubsection{\texorpdfstring{get\_transaction\_type()}{get\_transaction\_type()}}
+{\footnotesize\ttfamily int get\+\_\+transaction\+\_\+type (\begin{DoxyParamCaption}\item[{int}]{type }\end{DoxyParamCaption})}
+
+
+
+Return the corrispondent type of transaction based on the msg type. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em type} & The type of the message \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+The type of the transaction 
+\end{DoxyReturn}
+\mbox{\Hypertarget{user__msg__report_8c_a70931919d75ef21c15c14ffc2466c9b5}\label{user__msg__report_8c_a70931919d75ef21c15c14ffc2466c9b5}} 
+\index{user\_msg\_report.c@{user\_msg\_report.c}!user\_msg\_create@{user\_msg\_create}}
+\index{user\_msg\_create@{user\_msg\_create}!user\_msg\_report.c@{user\_msg\_report.c}}
+\doxysubsubsection{\texorpdfstring{user\_msg\_create()}{user\_msg\_create()}}
+{\footnotesize\ttfamily int user\+\_\+msg\+\_\+create (\begin{DoxyParamCaption}\item[{struct \mbox{\hyperlink{structuser__msg}{user\+\_\+msg}} $\ast$}]{self,  }\item[{long}]{type,  }\item[{pid\+\_\+t}]{sender\+\_\+pid,  }\item[{struct \mbox{\hyperlink{struct_transaction}{Transaction}} $\ast$}]{t }\end{DoxyParamCaption})}
+
+Create the message given as param as address to a \mbox{\hyperlink{structuser__msg}{user\+\_\+msg}} struct based on the given parameter 
+\begin{DoxyParams}{Parameters}
+{\em self} & give the add of your struct \\
+\hline
+{\em type} & type of message to be send, has to be one of the defined in this .h \\
+\hline
+{\em sender\+\_\+pid} & pid of the current process how\textquotesingle{}s calling this function \\
+\hline
+{\em data} & user\+\_\+data to send \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+0 if success. -\/1 in case of failure 
+\end{DoxyReturn}
+\mbox{\Hypertarget{user__msg__report_8c_abb2adc878af3fa7a417e7f484b971d13}\label{user__msg__report_8c_abb2adc878af3fa7a417e7f484b971d13}} 
+\index{user\_msg\_report.c@{user\_msg\_report.c}!user\_msg\_print@{user\_msg\_print}}
+\index{user\_msg\_print@{user\_msg\_print}!user\_msg\_report.c@{user\_msg\_report.c}}
+\doxysubsubsection{\texorpdfstring{user\_msg\_print()}{user\_msg\_print()}}
+{\footnotesize\ttfamily void user\+\_\+msg\+\_\+print (\begin{DoxyParamCaption}\item[{struct \mbox{\hyperlink{structuser__msg}{user\+\_\+msg}} $\ast$}]{self,  }\item[{long}]{type }\end{DoxyParamCaption})}
+
+Print the msg based on his type 
+\begin{DoxyParams}{Parameters}
+{\em self} & the message to be printed \\
+\hline
+{\em type} & the type of the message \\
+\hline
+\end{DoxyParams}
+\mbox{\Hypertarget{user__msg__report_8c_ad64c218fba74de9d28ec05f9f17d8d04}\label{user__msg__report_8c_ad64c218fba74de9d28ec05f9f17d8d04}} 
+\index{user\_msg\_report.c@{user\_msg\_report.c}!user\_msg\_receive@{user\_msg\_receive}}
+\index{user\_msg\_receive@{user\_msg\_receive}!user\_msg\_report.c@{user\_msg\_report.c}}
+\doxysubsubsection{\texorpdfstring{user\_msg\_receive()}{user\_msg\_receive()}}
+{\footnotesize\ttfamily int user\+\_\+msg\+\_\+receive (\begin{DoxyParamCaption}\item[{int}]{id,  }\item[{struct \mbox{\hyperlink{structuser__msg}{user\+\_\+msg}} $\ast$}]{msg,  }\item[{long}]{type }\end{DoxyParamCaption})}
+
+Retrieve the message\+\_\+user\+\_\+report on the specified message queue \begin{DoxyWarning}{Warning}
+send is repeated until it succeed or errno != EINTR Config type wait until receive 
+\end{DoxyWarning}
+
+\begin{DoxyParams}{Parameters}
+{\em id} & of the message queue \\
+\hline
+{\em msg} & to be caught \\
+\hline
+{\em type} & of message expected \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+-\/2 if no message on queue, -\/1 in case of failure. 0 otherwise. 
+\end{DoxyReturn}
+\mbox{\Hypertarget{user__msg__report_8c_a05bc56bfa516161e80287c745418aefb}\label{user__msg__report_8c_a05bc56bfa516161e80287c745418aefb}} 
+\index{user\_msg\_report.c@{user\_msg\_report.c}!user\_msg\_snd@{user\_msg\_snd}}
+\index{user\_msg\_snd@{user\_msg\_snd}!user\_msg\_report.c@{user\_msg\_report.c}}
+\doxysubsubsection{\texorpdfstring{user\_msg\_snd()}{user\_msg\_snd()}}
+{\footnotesize\ttfamily int user\+\_\+msg\+\_\+snd (\begin{DoxyParamCaption}\item[{int}]{id,  }\item[{struct \mbox{\hyperlink{structuser__msg}{user\+\_\+msg}} $\ast$}]{msg,  }\item[{long}]{type,  }\item[{struct \mbox{\hyperlink{struct_transaction}{Transaction}} $\ast$}]{t,  }\item[{pid\+\_\+t}]{sender,  }\item[{\mbox{\hyperlink{boolean_8h_afdcfe6db5bea87bd493a3fe2c513d5ef}{Bool}}}]{crete,  }\item[{int}]{queue\+\_\+id }\end{DoxyParamCaption})}
+
+(Create if selected) and Send the message on ipc user\+\_\+queue with the key as specified 
+\begin{DoxyParams}{Parameters}
+{\em id} & of the message queue \\
+\hline
+{\em msg} & the message to be sent to \\
+\hline
+{\em data} & user\+\_\+data to be sent \\
+\hline
+{\em sender} & pid\+\_\+t of the sender of this message \\
+\hline
+{\em crete} & TRUE if u want to create it before sending. \\
+\hline
+{\em queue\+\_\+id} & number rappresenting the current user into the message queue \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+-\/1 in case of failure, -\/1 otherwise 
+\end{DoxyReturn}
+Check if there is space in the node message queue

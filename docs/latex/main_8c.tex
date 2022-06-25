@@ -1,0 +1,525 @@
+\hypertarget{main_8c}{}\doxysection{src/main.c File Reference}
+\label{main_8c}\index{src/main.c@{src/main.c}}
+{\ttfamily \#include $<$stdio.\+h$>$}\newline
+{\ttfamily \#include $<$stdlib.\+h$>$}\newline
+{\ttfamily \#include $<$sys/ipc.\+h$>$}\newline
+{\ttfamily \#include $<$sys/sem.\+h$>$}\newline
+{\ttfamily \#include $<$sys/msg.\+h$>$}\newline
+{\ttfamily \#include $<$sys/shm.\+h$>$}\newline
+{\ttfamily \#include $<$string.\+h$>$}\newline
+{\ttfamily \#include $<$errno.\+h$>$}\newline
+{\ttfamily \#include $<$unistd.\+h$>$}\newline
+{\ttfamily \#include $<$signal.\+h$>$}\newline
+{\ttfamily \#include \char`\"{}local\+\_\+lib/headers/glob.\+h\char`\"{}}\newline
+{\ttfamily \#include \char`\"{}local\+\_\+lib/headers/int\+\_\+condenser.\+h\char`\"{}}\newline
+{\ttfamily \#include \char`\"{}local\+\_\+lib/headers/conf\+\_\+file.\+h\char`\"{}}\newline
+{\ttfamily \#include \char`\"{}local\+\_\+lib/headers/boolean.\+h\char`\"{}}\newline
+{\ttfamily \#include \char`\"{}local\+\_\+lib/headers/semaphore.\+h\char`\"{}}\newline
+{\ttfamily \#include \char`\"{}local\+\_\+lib/headers/simulation\+\_\+errors.\+h\char`\"{}}\newline
+{\ttfamily \#include \char`\"{}local\+\_\+lib/headers/user\+\_\+msg\+\_\+report.\+h\char`\"{}}\newline
+{\ttfamily \#include \char`\"{}local\+\_\+lib/headers/master\+\_\+msg\+\_\+report.\+h\char`\"{}}\newline
+{\ttfamily \#include \char`\"{}local\+\_\+lib/headers/node\+\_\+msg\+\_\+report.\+h\char`\"{}}\newline
+{\ttfamily \#include \char`\"{}local\+\_\+lib/headers/process\+\_\+info\+\_\+list.\+h\char`\"{}}\newline
+{\ttfamily \#include \char`\"{}local\+\_\+lib/headers/conf\+\_\+shm.\+h\char`\"{}}\newline
+{\ttfamily \#include \char`\"{}local\+\_\+lib/headers/book\+\_\+master\+\_\+shm.\+h\char`\"{}}\newline
+{\ttfamily \#include \char`\"{}local\+\_\+lib/headers/debug\+\_\+utility.\+h\char`\"{}}\newline
+{\ttfamily \#include \char`\"{}local\+\_\+lib/headers/gt\+\_\+sig\+\_\+handler.\+h\char`\"{}}\newline
+Include dependency graph for main.\+c\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{main_8c__incl}
+\end{center}
+\end{figure}
+\doxysubsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{boolean_8h_afdcfe6db5bea87bd493a3fe2c513d5ef}{Bool}} \mbox{\hyperlink{main_8c_a804c0d548beaeb2d3a5037cd13b887fc}{check\+\_\+runnability}} ()
+\begin{DoxyCompactList}\small\item\em Check if masterbook is full or not. If full, return FALSE, else TRUE. Check if there\textquotesingle{}re enough process running to fill the masterbook. \end{DoxyCompactList}\item 
+void \mbox{\hyperlink{main_8c_a9c6e451d2e0b4c649c326ef0989ff87b}{create\+\_\+shm\+\_\+conf}} (void)
+\item 
+int \mbox{\hyperlink{main_8c_acf67ebe761ac67252e1683a170dab724}{create\+\_\+node\+\_\+proc}} (int new\+\_\+node\+\_\+id)
+\item 
+void \mbox{\hyperlink{main_8c_a39cc218eef4b64fbdb8b4c3aa2f12400}{create\+\_\+masterbook}} (void)
+\item 
+void \mbox{\hyperlink{main_8c_a96f85df63ec1f6d9335fe42b6be328b6}{create\+\_\+master\+\_\+msg\+\_\+report\+\_\+queue}} (void)
+\item 
+void \mbox{\hyperlink{main_8c_a5a5b46995552658a135731aacb9a2827}{create\+\_\+semaphores}} (void)
+\item 
+int \mbox{\hyperlink{main_8c_a6e73c7a803b836c03a6dce53658d4064}{create\+\_\+users\+\_\+proc}} (int $\ast$users\+\_\+pids, int $\ast$users\+\_\+queues\+\_\+ids)
+\begin{DoxyCompactList}\small\item\em Create the users processes and lunch them with execve utilize simulation configuration in the file conf for generating the exact number of users. \end{DoxyCompactList}\item 
+void \mbox{\hyperlink{main_8c_adc8fa39ef258c14a949ec446ab34ae67}{create\+\_\+users\+\_\+msg\+\_\+queue}} (void)
+\item 
+void \mbox{\hyperlink{main_8c_a7193784c8c3bdb156ab81ec7e459c636}{create\+\_\+nodes\+\_\+msg\+\_\+queue}} (void)
+\item 
+int \mbox{\hyperlink{main_8c_a787b4bbeeeb79ff0f64710665794154f}{create\+\_\+nodes\+\_\+proc}} (int $\ast$nodes\+\_\+pids, int $\ast$nodes\+\_\+queues\+\_\+ids)
+\begin{DoxyCompactList}\small\item\em Create the nodes processes and lunch the with execve utilize simulation configuration in the file conf for generating the exact number of nodes. \end{DoxyCompactList}\item 
+char $\ast$ \mbox{\hyperlink{main_8c_a079743923282f767812eb0d3c397ead3}{get\+\_\+end\+\_\+simulation\+\_\+msg}} ()
+\begin{DoxyCompactList}\small\item\em Get the string related to the simulation end code. \end{DoxyCompactList}\item 
+void \mbox{\hyperlink{main_8c_aaf620aa55642ed2367a4360cbc692ee6}{generate\+\_\+nodes\+\_\+friends\+\_\+array}} (int $\ast$nodes\+\_\+friends, int $\ast$nodes)
+\begin{DoxyCompactList}\small\item\em Return an array of int with the friends of each nodes in the simulation. \end{DoxyCompactList}\item 
+void \mbox{\hyperlink{main_8c_aa63a9c12cbb017bbc6037d9fb3349c6f}{end\+\_\+simulation}} ()
+\begin{DoxyCompactList}\small\item\em End the simulation by killing all the processes and cleaning the shared memory. \end{DoxyCompactList}\item 
+void \mbox{\hyperlink{main_8c_a190b857174a83bb93fe2c99ee14b6e34}{print\+\_\+info}} (void)
+\item 
+\mbox{\hyperlink{boolean_8h_afdcfe6db5bea87bd493a3fe2c513d5ef}{Bool}} \mbox{\hyperlink{main_8c_a9e7667e03677146fe95909bacc2616df}{read\+\_\+conf}} (void)
+\begin{DoxyCompactList}\small\item\em Read the conf file present in te project dir load the configuration directly in the struct conf configuration that is a Sys\+Var. \end{DoxyCompactList}\item 
+void \mbox{\hyperlink{main_8c_a006432e4184f3dbe41eba8f06473b781}{set\+\_\+signal\+\_\+handlers}} (struct sigaction sa)
+\item 
+void \mbox{\hyperlink{main_8c_a6af3c0bed2d48bb950788acf54f4de74}{signals\+\_\+handler}} (int signum)
+\item 
+void \mbox{\hyperlink{main_8c_abaea341f02b3295f5823edb8b52b6380}{update\+\_\+kids\+\_\+info}} (void)
+\item 
+void \mbox{\hyperlink{main_8c_a0fc598a9b6ec2290200171dd672e2a0a}{lock\+\_\+to\+\_\+fill\+\_\+sem}} (void)
+\begin{DoxyCompactList}\small\item\em Lock the semaphore for to fill masterbook shared memory. \end{DoxyCompactList}\item 
+void \mbox{\hyperlink{main_8c_a59ca45fa14ad739571937371cbd4c7e4}{unlock\+\_\+to\+\_\+fill\+\_\+sem}} (void)
+\begin{DoxyCompactList}\small\item\em unlock the semaphore to fill the master book \end{DoxyCompactList}\item 
+void \mbox{\hyperlink{main_8c_a0f8bcf452d847d662611b193956d0fbc}{tp\+\_\+full\+\_\+handler}} (struct \mbox{\hyperlink{structmaster__msg__report}{master\+\_\+msg\+\_\+report}} $\ast$msg\+\_\+repo)
+\begin{DoxyCompactList}\small\item\em handle the message queue of type TP\+\_\+\+FULL \end{DoxyCompactList}\item 
+\mbox{\hyperlink{boolean_8h_afdcfe6db5bea87bd493a3fe2c513d5ef}{Bool}} \mbox{\hyperlink{main_8c_a0324001b34579cd20af7ded0bc581881}{remove\+\_\+proc\+\_\+from\+\_\+list}} (int $\ast$list, int pid)
+\begin{DoxyCompactList}\small\item\em Remove the pid in the given list. \end{DoxyCompactList}\item 
+\mbox{\hyperlink{boolean_8h_afdcfe6db5bea87bd493a3fe2c513d5ef}{Bool}} \mbox{\hyperlink{main_8c_a08fbcbe043cd5a696b4bd287c5844784}{remove\+\_\+processes\+\_\+from\+\_\+list}} (int $\ast$list, int $\ast$pids)
+\item 
+int \mbox{\hyperlink{main_8c_ae66f6b31b5ad750f1fe042a706a4e3d4}{main}} ()
+\item 
+void \mbox{\hyperlink{main_8c_ac379c799940e7126b56cf088db5f90ac}{wait\+\_\+kids}} ()
+\item 
+void \mbox{\hyperlink{main_8c_a5dc3e8d6f7b91131cc37078d736f96fa}{kill\+\_\+kids}} ()
+\item 
+void \mbox{\hyperlink{main_8c_a5b86e611e659eb33da1bf16fa0f0f706}{free\+\_\+mem}} ()
+\item 
+void \mbox{\hyperlink{main_8c_af12135b661432807367ffcda3659303a}{free\+\_\+sys\+Var}} ()
+\end{DoxyCompactItemize}
+\doxysubsection*{Variables}
+\begin{DoxyCompactItemize}
+\item 
+struct \mbox{\hyperlink{structconf}{conf}} \mbox{\hyperlink{main_8c_a9088e3a86cb03d1836e53b1c141d458b}{simulation\+\_\+conf}}
+\item 
+Proc\+List \mbox{\hyperlink{main_8c_a203f1362008a8171971c8ac1bd6bce04}{proc\+\_\+list}}
+\item 
+sigset\+\_\+t \mbox{\hyperlink{main_8c_a230c4eaa89fdddbb7c42f1b6019fa3b1}{current\+\_\+mask}}
+\item 
+struct \mbox{\hyperlink{structshm__conf}{shm\+\_\+conf}} $\ast$ \mbox{\hyperlink{main_8c_afec317dfe8d38f10717665f51bec0f93}{shm\+\_\+conf\+\_\+pointer}}
+\item 
+struct \mbox{\hyperlink{structshm__book__master}{shm\+\_\+book\+\_\+master}} $\ast$ \mbox{\hyperlink{main_8c_a22ca1f6fad3851c36b9f56873280d4b0}{shm\+\_\+masterbook\+\_\+pointer}}
+\item 
+int \mbox{\hyperlink{main_8c_a407735af6edb3ec1ee9116424bd4b308}{simulation\+\_\+end}} = -\/1
+\item 
+int \mbox{\hyperlink{main_8c_ac4572743fa6381f0d1da552ee9d46676}{shm\+\_\+conf\+\_\+id}} = -\/1
+\item 
+int \mbox{\hyperlink{main_8c_ab8ed6dcbaa8297382efef0cb03a36a9c}{shm\+\_\+masterbook\+\_\+id}} = -\/1
+\item 
+int \mbox{\hyperlink{main_8c_acf2b73ea2f17461b2dc97b4722fe894e}{msg\+\_\+report\+\_\+id\+\_\+master}} = -\/1
+\item 
+int \mbox{\hyperlink{main_8c_a773972c762dba61130354b356f0a5594}{msg\+\_\+report\+\_\+id\+\_\+users}} = -\/1
+\item 
+int \mbox{\hyperlink{main_8c_acb453ef4f7bd0de131d722078ee5f252}{msg\+\_\+report\+\_\+id\+\_\+nodes}} = -\/1
+\item 
+int \mbox{\hyperlink{main_8c_ac62b22414674bece75bc2fea3847c48f}{semaphore\+\_\+start\+\_\+id}} = -\/1
+\item 
+int \mbox{\hyperlink{main_8c_a311818db5457e986b0808c3d6ddcb420}{semaphore\+\_\+masterbook\+\_\+id}} = -\/1
+\item 
+int \mbox{\hyperlink{main_8c_ae5f591ad56c16a7b4c12125eae48a6f2}{semaphore\+\_\+to\+\_\+fill\+\_\+id}} = -\/1
+\item 
+int \mbox{\hyperlink{main_8c_a1d01d8e411dc32dde1ab25208eab05f8}{last\+\_\+signal}} = -\/1
+\item 
+pid\+\_\+t \mbox{\hyperlink{main_8c_ac9d2f1b1e789bbdf9d41b6bceaa33b19}{main\+\_\+pid}}
+\item 
+\mbox{\hyperlink{boolean_8h_afdcfe6db5bea87bd493a3fe2c513d5ef}{Bool}} \mbox{\hyperlink{main_8c_a00a762302e09057ade405064c53f6258}{printed}} = \mbox{\hyperlink{boolean_8h_aa93f0eb578d23995850d61f7d61c55c1}{FALSE}}
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Function Documentation}
+\mbox{\Hypertarget{main_8c_a804c0d548beaeb2d3a5037cd13b887fc}\label{main_8c_a804c0d548beaeb2d3a5037cd13b887fc}} 
+\index{main.c@{main.c}!check\_runnability@{check\_runnability}}
+\index{check\_runnability@{check\_runnability}!main.c@{main.c}}
+\doxysubsubsection{\texorpdfstring{check\_runnability()}{check\_runnability()}}
+{\footnotesize\ttfamily \mbox{\hyperlink{boolean_8h_afdcfe6db5bea87bd493a3fe2c513d5ef}{Bool}} check\+\_\+runnability (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})}
+
+
+
+Check if masterbook is full or not. If full, return FALSE, else TRUE. Check if there\textquotesingle{}re enough process running to fill the masterbook. 
+
+\mbox{\Hypertarget{main_8c_a96f85df63ec1f6d9335fe42b6be328b6}\label{main_8c_a96f85df63ec1f6d9335fe42b6be328b6}} 
+\index{main.c@{main.c}!create\_master\_msg\_report\_queue@{create\_master\_msg\_report\_queue}}
+\index{create\_master\_msg\_report\_queue@{create\_master\_msg\_report\_queue}!main.c@{main.c}}
+\doxysubsubsection{\texorpdfstring{create\_master\_msg\_report\_queue()}{create\_master\_msg\_report\_queue()}}
+{\footnotesize\ttfamily void create\+\_\+master\+\_\+msg\+\_\+report\+\_\+queue (\begin{DoxyParamCaption}\item[{void}]{ }\end{DoxyParamCaption})}
+
+Create the message queue for kid to master communication \mbox{\Hypertarget{main_8c_a39cc218eef4b64fbdb8b4c3aa2f12400}\label{main_8c_a39cc218eef4b64fbdb8b4c3aa2f12400}} 
+\index{main.c@{main.c}!create\_masterbook@{create\_masterbook}}
+\index{create\_masterbook@{create\_masterbook}!main.c@{main.c}}
+\doxysubsubsection{\texorpdfstring{create\_masterbook()}{create\_masterbook()}}
+{\footnotesize\ttfamily void create\+\_\+masterbook (\begin{DoxyParamCaption}\item[{void}]{ }\end{DoxyParamCaption})}
+
+Create the shared memory for the master-\/book \mbox{\Hypertarget{main_8c_acf67ebe761ac67252e1683a170dab724}\label{main_8c_acf67ebe761ac67252e1683a170dab724}} 
+\index{main.c@{main.c}!create\_node\_proc@{create\_node\_proc}}
+\index{create\_node\_proc@{create\_node\_proc}!main.c@{main.c}}
+\doxysubsubsection{\texorpdfstring{create\_node\_proc()}{create\_node\_proc()}}
+{\footnotesize\ttfamily int create\+\_\+node\+\_\+proc (\begin{DoxyParamCaption}\item[{int}]{new\+\_\+node\+\_\+id }\end{DoxyParamCaption})}
+
+Create a node\+\_\+proc as support friend process in case of TP\+\_\+\+FULL 
+\begin{DoxyParams}{Parameters}
+{\em node\+\_\+id} & The queue\+\_\+id of the node to be created \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+The pid of the created process 
+\end{DoxyReturn}
+\mbox{\Hypertarget{main_8c_a7193784c8c3bdb156ab81ec7e459c636}\label{main_8c_a7193784c8c3bdb156ab81ec7e459c636}} 
+\index{main.c@{main.c}!create\_nodes\_msg\_queue@{create\_nodes\_msg\_queue}}
+\index{create\_nodes\_msg\_queue@{create\_nodes\_msg\_queue}!main.c@{main.c}}
+\doxysubsubsection{\texorpdfstring{create\_nodes\_msg\_queue()}{create\_nodes\_msg\_queue()}}
+{\footnotesize\ttfamily void create\+\_\+nodes\+\_\+msg\+\_\+queue (\begin{DoxyParamCaption}\item[{void}]{ }\end{DoxyParamCaption})}
+
+Create the nodes message queues for processes to nodes communication \mbox{\Hypertarget{main_8c_a787b4bbeeeb79ff0f64710665794154f}\label{main_8c_a787b4bbeeeb79ff0f64710665794154f}} 
+\index{main.c@{main.c}!create\_nodes\_proc@{create\_nodes\_proc}}
+\index{create\_nodes\_proc@{create\_nodes\_proc}!main.c@{main.c}}
+\doxysubsubsection{\texorpdfstring{create\_nodes\_proc()}{create\_nodes\_proc()}}
+{\footnotesize\ttfamily int create\+\_\+nodes\+\_\+proc (\begin{DoxyParamCaption}\item[{int $\ast$}]{nodes\+\_\+pids,  }\item[{int $\ast$}]{nodes\+\_\+queues\+\_\+ids }\end{DoxyParamCaption})}
+
+
+
+Create the nodes processes and lunch the with execve utilize simulation configuration in the file conf for generating the exact number of nodes. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em nodes\+\_\+pids} & pointer to an array of pids to be filled with the generated once \\
+\hline
+{\em nodes\+\_\+queues\+\_\+ids} & pointer to an array of pids to be filled with the generate once \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+-\/1 in case of FAILURE. 0 otherwise 
+\end{DoxyReturn}
+\texorpdfstring{$<$}{<} 11 is the number of characters INT\+\_\+\+MAX+1\mbox{\Hypertarget{main_8c_a5a5b46995552658a135731aacb9a2827}\label{main_8c_a5a5b46995552658a135731aacb9a2827}} 
+\index{main.c@{main.c}!create\_semaphores@{create\_semaphores}}
+\index{create\_semaphores@{create\_semaphores}!main.c@{main.c}}
+\doxysubsubsection{\texorpdfstring{create\_semaphores()}{create\_semaphores()}}
+{\footnotesize\ttfamily void create\+\_\+semaphores (\begin{DoxyParamCaption}\item[{void}]{ }\end{DoxyParamCaption})}
+
+Create the semaphores needed for the access regulation for this specific program \mbox{\Hypertarget{main_8c_a9c6e451d2e0b4c649c326ef0989ff87b}\label{main_8c_a9c6e451d2e0b4c649c326ef0989ff87b}} 
+\index{main.c@{main.c}!create\_shm\_conf@{create\_shm\_conf}}
+\index{create\_shm\_conf@{create\_shm\_conf}!main.c@{main.c}}
+\doxysubsubsection{\texorpdfstring{create\_shm\_conf()}{create\_shm\_conf()}}
+{\footnotesize\ttfamily void create\+\_\+shm\+\_\+conf (\begin{DoxyParamCaption}\item[{void}]{ }\end{DoxyParamCaption})}
+
+Create the shared memory for configuration purposes of kid processes \mbox{\Hypertarget{main_8c_adc8fa39ef258c14a949ec446ab34ae67}\label{main_8c_adc8fa39ef258c14a949ec446ab34ae67}} 
+\index{main.c@{main.c}!create\_users\_msg\_queue@{create\_users\_msg\_queue}}
+\index{create\_users\_msg\_queue@{create\_users\_msg\_queue}!main.c@{main.c}}
+\doxysubsubsection{\texorpdfstring{create\_users\_msg\_queue()}{create\_users\_msg\_queue()}}
+{\footnotesize\ttfamily void create\+\_\+users\+\_\+msg\+\_\+queue (\begin{DoxyParamCaption}\item[{void}]{ }\end{DoxyParamCaption})}
+
+Create the users message queues for processes to users communication \mbox{\Hypertarget{main_8c_a6e73c7a803b836c03a6dce53658d4064}\label{main_8c_a6e73c7a803b836c03a6dce53658d4064}} 
+\index{main.c@{main.c}!create\_users\_proc@{create\_users\_proc}}
+\index{create\_users\_proc@{create\_users\_proc}!main.c@{main.c}}
+\doxysubsubsection{\texorpdfstring{create\_users\_proc()}{create\_users\_proc()}}
+{\footnotesize\ttfamily int create\+\_\+users\+\_\+proc (\begin{DoxyParamCaption}\item[{int $\ast$}]{users\+\_\+pids,  }\item[{int $\ast$}]{users\+\_\+queues\+\_\+ids }\end{DoxyParamCaption})}
+
+
+
+Create the users processes and lunch them with execve utilize simulation configuration in the file conf for generating the exact number of users. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em users\+\_\+pids} & pointer to an array of pids to be filled with the generated once \\
+\hline
+{\em users\+\_\+queues\+\_\+ids} & pointer to an array of pids to be filled with the generated once \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+-\/1 in case of FAILURE. 0 otherwise 
+\end{DoxyReturn}
+\mbox{\Hypertarget{main_8c_aa63a9c12cbb017bbc6037d9fb3349c6f}\label{main_8c_aa63a9c12cbb017bbc6037d9fb3349c6f}} 
+\index{main.c@{main.c}!end\_simulation@{end\_simulation}}
+\index{end\_simulation@{end\_simulation}!main.c@{main.c}}
+\doxysubsubsection{\texorpdfstring{end\_simulation()}{end\_simulation()}}
+{\footnotesize\ttfamily void end\+\_\+simulation (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})}
+
+
+
+End the simulation by killing all the processes and cleaning the shared memory. 
+
+\mbox{\Hypertarget{main_8c_a5b86e611e659eb33da1bf16fa0f0f706}\label{main_8c_a5b86e611e659eb33da1bf16fa0f0f706}} 
+\index{main.c@{main.c}!free\_mem@{free\_mem}}
+\index{free\_mem@{free\_mem}!main.c@{main.c}}
+\doxysubsubsection{\texorpdfstring{free\_mem()}{free\_mem()}}
+{\footnotesize\ttfamily void free\+\_\+mem (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{main_8c_af12135b661432807367ffcda3659303a}\label{main_8c_af12135b661432807367ffcda3659303a}} 
+\index{main.c@{main.c}!free\_sysVar@{free\_sysVar}}
+\index{free\_sysVar@{free\_sysVar}!main.c@{main.c}}
+\doxysubsubsection{\texorpdfstring{free\_sysVar()}{free\_sysVar()}}
+{\footnotesize\ttfamily void free\+\_\+sys\+Var (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{main_8c_aaf620aa55642ed2367a4360cbc692ee6}\label{main_8c_aaf620aa55642ed2367a4360cbc692ee6}} 
+\index{main.c@{main.c}!generate\_nodes\_friends\_array@{generate\_nodes\_friends\_array}}
+\index{generate\_nodes\_friends\_array@{generate\_nodes\_friends\_array}!main.c@{main.c}}
+\doxysubsubsection{\texorpdfstring{generate\_nodes\_friends\_array()}{generate\_nodes\_friends\_array()}}
+{\footnotesize\ttfamily void generate\+\_\+nodes\+\_\+friends\+\_\+array (\begin{DoxyParamCaption}\item[{int $\ast$}]{nodes\+\_\+friends,  }\item[{int $\ast$}]{nodes }\end{DoxyParamCaption})}
+
+
+
+Return an array of int with the friends of each nodes in the simulation. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em nodes\+\_\+friends} & pointer to an array of int to be filled with the generated once \\
+\hline
+{\em nodes} & pointer to an array of int with the nodes in the simulation (in 0 index there\textquotesingle{}s the number of nodes) \\
+\hline
+\end{DoxyParams}
+\mbox{\Hypertarget{main_8c_a079743923282f767812eb0d3c397ead3}\label{main_8c_a079743923282f767812eb0d3c397ead3}} 
+\index{main.c@{main.c}!get\_end\_simulation\_msg@{get\_end\_simulation\_msg}}
+\index{get\_end\_simulation\_msg@{get\_end\_simulation\_msg}!main.c@{main.c}}
+\doxysubsubsection{\texorpdfstring{get\_end\_simulation\_msg()}{get\_end\_simulation\_msg()}}
+{\footnotesize\ttfamily char $\ast$ get\+\_\+end\+\_\+simulation\+\_\+msg (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})}
+
+
+
+Get the string related to the simulation end code. 
+
+\mbox{\Hypertarget{main_8c_a5dc3e8d6f7b91131cc37078d736f96fa}\label{main_8c_a5dc3e8d6f7b91131cc37078d736f96fa}} 
+\index{main.c@{main.c}!kill\_kids@{kill\_kids}}
+\index{kill\_kids@{kill\_kids}!main.c@{main.c}}
+\doxysubsubsection{\texorpdfstring{kill\_kids()}{kill\_kids()}}
+{\footnotesize\ttfamily void kill\+\_\+kids (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{main_8c_a0fc598a9b6ec2290200171dd672e2a0a}\label{main_8c_a0fc598a9b6ec2290200171dd672e2a0a}} 
+\index{main.c@{main.c}!lock\_to\_fill\_sem@{lock\_to\_fill\_sem}}
+\index{lock\_to\_fill\_sem@{lock\_to\_fill\_sem}!main.c@{main.c}}
+\doxysubsubsection{\texorpdfstring{lock\_to\_fill\_sem()}{lock\_to\_fill\_sem()}}
+{\footnotesize\ttfamily void lock\+\_\+to\+\_\+fill\+\_\+sem (\begin{DoxyParamCaption}\item[{void}]{ }\end{DoxyParamCaption})}
+
+
+
+Lock the semaphore for to fill masterbook shared memory. 
+
+\mbox{\Hypertarget{main_8c_ae66f6b31b5ad750f1fe042a706a4e3d4}\label{main_8c_ae66f6b31b5ad750f1fe042a706a4e3d4}} 
+\index{main.c@{main.c}!main@{main}}
+\index{main@{main}!main.c@{main.c}}
+\doxysubsubsection{\texorpdfstring{main()}{main()}}
+{\footnotesize\ttfamily int main (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{main_8c_a190b857174a83bb93fe2c99ee14b6e34}\label{main_8c_a190b857174a83bb93fe2c99ee14b6e34}} 
+\index{main.c@{main.c}!print\_info@{print\_info}}
+\index{print\_info@{print\_info}!main.c@{main.c}}
+\doxysubsubsection{\texorpdfstring{print\_info()}{print\_info()}}
+{\footnotesize\ttfamily void print\+\_\+info (\begin{DoxyParamCaption}\item[{void}]{ }\end{DoxyParamCaption})}
+
+Print all the information requested by the project specification \mbox{\Hypertarget{main_8c_a9e7667e03677146fe95909bacc2616df}\label{main_8c_a9e7667e03677146fe95909bacc2616df}} 
+\index{main.c@{main.c}!read\_conf@{read\_conf}}
+\index{read\_conf@{read\_conf}!main.c@{main.c}}
+\doxysubsubsection{\texorpdfstring{read\_conf()}{read\_conf()}}
+{\footnotesize\ttfamily \mbox{\hyperlink{boolean_8h_afdcfe6db5bea87bd493a3fe2c513d5ef}{Bool}} read\+\_\+conf (\begin{DoxyParamCaption}\item[{void}]{ }\end{DoxyParamCaption})}
+
+
+
+Read the conf file present in te project dir load the configuration directly in the struct conf configuration that is a Sys\+Var. 
+
+\mbox{\Hypertarget{main_8c_a0324001b34579cd20af7ded0bc581881}\label{main_8c_a0324001b34579cd20af7ded0bc581881}} 
+\index{main.c@{main.c}!remove\_proc\_from\_list@{remove\_proc\_from\_list}}
+\index{remove\_proc\_from\_list@{remove\_proc\_from\_list}!main.c@{main.c}}
+\doxysubsubsection{\texorpdfstring{remove\_proc\_from\_list()}{remove\_proc\_from\_list()}}
+{\footnotesize\ttfamily \mbox{\hyperlink{boolean_8h_afdcfe6db5bea87bd493a3fe2c513d5ef}{Bool}} remove\+\_\+proc\+\_\+from\+\_\+list (\begin{DoxyParamCaption}\item[{int $\ast$}]{list,  }\item[{int}]{pid }\end{DoxyParamCaption})}
+
+
+
+Remove the pid in the given list. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em list} & The list to search the pid in \\
+\hline
+{\em pid} & The pid to be removed \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+TRUE if the pid was removed, FALSE otherwise 
+\end{DoxyReturn}
+\mbox{\Hypertarget{main_8c_a08fbcbe043cd5a696b4bd287c5844784}\label{main_8c_a08fbcbe043cd5a696b4bd287c5844784}} 
+\index{main.c@{main.c}!remove\_processes\_from\_list@{remove\_processes\_from\_list}}
+\index{remove\_processes\_from\_list@{remove\_processes\_from\_list}!main.c@{main.c}}
+\doxysubsubsection{\texorpdfstring{remove\_processes\_from\_list()}{remove\_processes\_from\_list()}}
+{\footnotesize\ttfamily \mbox{\hyperlink{boolean_8h_afdcfe6db5bea87bd493a3fe2c513d5ef}{Bool}} remove\+\_\+processes\+\_\+from\+\_\+list (\begin{DoxyParamCaption}\item[{int $\ast$}]{list,  }\item[{int $\ast$}]{pids }\end{DoxyParamCaption})}
+
+@\+Remove the list of pids in the given list 
+\begin{DoxyParams}{Parameters}
+{\em list} & The list to search the pid in \\
+\hline
+{\em pids} & The list of pids to be removed \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+TRUE if the pid was removed, FALSE otherwise 
+\end{DoxyReturn}
+Remove the processes from the list\mbox{\Hypertarget{main_8c_a006432e4184f3dbe41eba8f06473b781}\label{main_8c_a006432e4184f3dbe41eba8f06473b781}} 
+\index{main.c@{main.c}!set\_signal\_handlers@{set\_signal\_handlers}}
+\index{set\_signal\_handlers@{set\_signal\_handlers}!main.c@{main.c}}
+\doxysubsubsection{\texorpdfstring{set\_signal\_handlers()}{set\_signal\_handlers()}}
+{\footnotesize\ttfamily void set\+\_\+signal\+\_\+handlers (\begin{DoxyParamCaption}\item[{struct sigaction}]{sa }\end{DoxyParamCaption})}
+
+Set the handler for signals of the current main\+\_\+proc 
+\begin{DoxyParams}{Parameters}
+{\em sa} & describe the type of action to performed when a signal arrive \\
+\hline
+\end{DoxyParams}
+\mbox{\Hypertarget{main_8c_a6af3c0bed2d48bb950788acf54f4de74}\label{main_8c_a6af3c0bed2d48bb950788acf54f4de74}} 
+\index{main.c@{main.c}!signals\_handler@{signals\_handler}}
+\index{signals\_handler@{signals\_handler}!main.c@{main.c}}
+\doxysubsubsection{\texorpdfstring{signals\_handler()}{signals\_handler()}}
+{\footnotesize\ttfamily void signals\+\_\+handler (\begin{DoxyParamCaption}\item[{int}]{signum }\end{DoxyParamCaption})}
+
+handler of the signal 
+\begin{DoxyParams}{Parameters}
+{\em signum} & type of signal to be handled \\
+\hline
+\end{DoxyParams}
+Check if there is space in the node message queue
+
+Receive new friends from master and update the friends list
+
+Inform master of the node state\mbox{\Hypertarget{main_8c_a0f8bcf452d847d662611b193956d0fbc}\label{main_8c_a0f8bcf452d847d662611b193956d0fbc}} 
+\index{main.c@{main.c}!tp\_full\_handler@{tp\_full\_handler}}
+\index{tp\_full\_handler@{tp\_full\_handler}!main.c@{main.c}}
+\doxysubsubsection{\texorpdfstring{tp\_full\_handler()}{tp\_full\_handler()}}
+{\footnotesize\ttfamily void tp\+\_\+full\+\_\+handler (\begin{DoxyParamCaption}\item[{struct \mbox{\hyperlink{structmaster__msg__report}{master\+\_\+msg\+\_\+report}} $\ast$}]{msg\+\_\+repo }\end{DoxyParamCaption})}
+
+
+
+handle the message queue of type TP\+\_\+\+FULL 
+
+
+\begin{DoxyParams}{Parameters}
+{\em msg\+\_\+repo} & message to be handled \\
+\hline
+\end{DoxyParams}
+\mbox{\Hypertarget{main_8c_a59ca45fa14ad739571937371cbd4c7e4}\label{main_8c_a59ca45fa14ad739571937371cbd4c7e4}} 
+\index{main.c@{main.c}!unlock\_to\_fill\_sem@{unlock\_to\_fill\_sem}}
+\index{unlock\_to\_fill\_sem@{unlock\_to\_fill\_sem}!main.c@{main.c}}
+\doxysubsubsection{\texorpdfstring{unlock\_to\_fill\_sem()}{unlock\_to\_fill\_sem()}}
+{\footnotesize\ttfamily void unlock\+\_\+to\+\_\+fill\+\_\+sem (\begin{DoxyParamCaption}\item[{void}]{ }\end{DoxyParamCaption})}
+
+
+
+unlock the semaphore to fill the master book 
+
+\mbox{\Hypertarget{main_8c_abaea341f02b3295f5823edb8b52b6380}\label{main_8c_abaea341f02b3295f5823edb8b52b6380}} 
+\index{main.c@{main.c}!update\_kids\_info@{update\_kids\_info}}
+\index{update\_kids\_info@{update\_kids\_info}!main.c@{main.c}}
+\doxysubsubsection{\texorpdfstring{update\_kids\_info()}{update\_kids\_info()}}
+{\footnotesize\ttfamily void update\+\_\+kids\+\_\+info (\begin{DoxyParamCaption}\item[{void}]{ }\end{DoxyParamCaption})}
+
+Update the budget of kids process saved into the proc\+\_\+list via master message queue Resend the signal to the processes that are not responding
+
+Remove the process from the waiting list and acknowledge the msg\+\_\+report\mbox{\Hypertarget{main_8c_ac379c799940e7126b56cf088db5f90ac}\label{main_8c_ac379c799940e7126b56cf088db5f90ac}} 
+\index{main.c@{main.c}!wait\_kids@{wait\_kids}}
+\index{wait\_kids@{wait\_kids}!main.c@{main.c}}
+\doxysubsubsection{\texorpdfstring{wait\_kids()}{wait\_kids()}}
+{\footnotesize\ttfamily void wait\+\_\+kids (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})}
+
+
+
+\doxysubsection{Variable Documentation}
+\mbox{\Hypertarget{main_8c_a230c4eaa89fdddbb7c42f1b6019fa3b1}\label{main_8c_a230c4eaa89fdddbb7c42f1b6019fa3b1}} 
+\index{main.c@{main.c}!current\_mask@{current\_mask}}
+\index{current\_mask@{current\_mask}!main.c@{main.c}}
+\doxysubsubsection{\texorpdfstring{current\_mask}{current\_mask}}
+{\footnotesize\ttfamily sigset\+\_\+t current\+\_\+mask}
+
+\mbox{\Hypertarget{main_8c_a1d01d8e411dc32dde1ab25208eab05f8}\label{main_8c_a1d01d8e411dc32dde1ab25208eab05f8}} 
+\index{main.c@{main.c}!last\_signal@{last\_signal}}
+\index{last\_signal@{last\_signal}!main.c@{main.c}}
+\doxysubsubsection{\texorpdfstring{last\_signal}{last\_signal}}
+{\footnotesize\ttfamily int last\+\_\+signal = -\/1}
+
+\mbox{\Hypertarget{main_8c_ac9d2f1b1e789bbdf9d41b6bceaa33b19}\label{main_8c_ac9d2f1b1e789bbdf9d41b6bceaa33b19}} 
+\index{main.c@{main.c}!main\_pid@{main\_pid}}
+\index{main\_pid@{main\_pid}!main.c@{main.c}}
+\doxysubsubsection{\texorpdfstring{main\_pid}{main\_pid}}
+{\footnotesize\ttfamily pid\+\_\+t main\+\_\+pid}
+
+\mbox{\Hypertarget{main_8c_acf2b73ea2f17461b2dc97b4722fe894e}\label{main_8c_acf2b73ea2f17461b2dc97b4722fe894e}} 
+\index{main.c@{main.c}!msg\_report\_id\_master@{msg\_report\_id\_master}}
+\index{msg\_report\_id\_master@{msg\_report\_id\_master}!main.c@{main.c}}
+\doxysubsubsection{\texorpdfstring{msg\_report\_id\_master}{msg\_report\_id\_master}}
+{\footnotesize\ttfamily int msg\+\_\+report\+\_\+id\+\_\+master = -\/1}
+
+\mbox{\Hypertarget{main_8c_acb453ef4f7bd0de131d722078ee5f252}\label{main_8c_acb453ef4f7bd0de131d722078ee5f252}} 
+\index{main.c@{main.c}!msg\_report\_id\_nodes@{msg\_report\_id\_nodes}}
+\index{msg\_report\_id\_nodes@{msg\_report\_id\_nodes}!main.c@{main.c}}
+\doxysubsubsection{\texorpdfstring{msg\_report\_id\_nodes}{msg\_report\_id\_nodes}}
+{\footnotesize\ttfamily int msg\+\_\+report\+\_\+id\+\_\+nodes = -\/1}
+
+\mbox{\Hypertarget{main_8c_a773972c762dba61130354b356f0a5594}\label{main_8c_a773972c762dba61130354b356f0a5594}} 
+\index{main.c@{main.c}!msg\_report\_id\_users@{msg\_report\_id\_users}}
+\index{msg\_report\_id\_users@{msg\_report\_id\_users}!main.c@{main.c}}
+\doxysubsubsection{\texorpdfstring{msg\_report\_id\_users}{msg\_report\_id\_users}}
+{\footnotesize\ttfamily int msg\+\_\+report\+\_\+id\+\_\+users = -\/1}
+
+\mbox{\Hypertarget{main_8c_a00a762302e09057ade405064c53f6258}\label{main_8c_a00a762302e09057ade405064c53f6258}} 
+\index{main.c@{main.c}!printed@{printed}}
+\index{printed@{printed}!main.c@{main.c}}
+\doxysubsubsection{\texorpdfstring{printed}{printed}}
+{\footnotesize\ttfamily \mbox{\hyperlink{boolean_8h_afdcfe6db5bea87bd493a3fe2c513d5ef}{Bool}} printed = \mbox{\hyperlink{boolean_8h_aa93f0eb578d23995850d61f7d61c55c1}{FALSE}}}
+
+\mbox{\Hypertarget{main_8c_a203f1362008a8171971c8ac1bd6bce04}\label{main_8c_a203f1362008a8171971c8ac1bd6bce04}} 
+\index{main.c@{main.c}!proc\_list@{proc\_list}}
+\index{proc\_list@{proc\_list}!main.c@{main.c}}
+\doxysubsubsection{\texorpdfstring{proc\_list}{proc\_list}}
+{\footnotesize\ttfamily Proc\+List proc\+\_\+list}
+
+\mbox{\Hypertarget{main_8c_a311818db5457e986b0808c3d6ddcb420}\label{main_8c_a311818db5457e986b0808c3d6ddcb420}} 
+\index{main.c@{main.c}!semaphore\_masterbook\_id@{semaphore\_masterbook\_id}}
+\index{semaphore\_masterbook\_id@{semaphore\_masterbook\_id}!main.c@{main.c}}
+\doxysubsubsection{\texorpdfstring{semaphore\_masterbook\_id}{semaphore\_masterbook\_id}}
+{\footnotesize\ttfamily int semaphore\+\_\+masterbook\+\_\+id = -\/1}
+
+\mbox{\Hypertarget{main_8c_ac62b22414674bece75bc2fea3847c48f}\label{main_8c_ac62b22414674bece75bc2fea3847c48f}} 
+\index{main.c@{main.c}!semaphore\_start\_id@{semaphore\_start\_id}}
+\index{semaphore\_start\_id@{semaphore\_start\_id}!main.c@{main.c}}
+\doxysubsubsection{\texorpdfstring{semaphore\_start\_id}{semaphore\_start\_id}}
+{\footnotesize\ttfamily int semaphore\+\_\+start\+\_\+id = -\/1}
+
+\mbox{\Hypertarget{main_8c_ae5f591ad56c16a7b4c12125eae48a6f2}\label{main_8c_ae5f591ad56c16a7b4c12125eae48a6f2}} 
+\index{main.c@{main.c}!semaphore\_to\_fill\_id@{semaphore\_to\_fill\_id}}
+\index{semaphore\_to\_fill\_id@{semaphore\_to\_fill\_id}!main.c@{main.c}}
+\doxysubsubsection{\texorpdfstring{semaphore\_to\_fill\_id}{semaphore\_to\_fill\_id}}
+{\footnotesize\ttfamily int semaphore\+\_\+to\+\_\+fill\+\_\+id = -\/1}
+
+\mbox{\Hypertarget{main_8c_ac4572743fa6381f0d1da552ee9d46676}\label{main_8c_ac4572743fa6381f0d1da552ee9d46676}} 
+\index{main.c@{main.c}!shm\_conf\_id@{shm\_conf\_id}}
+\index{shm\_conf\_id@{shm\_conf\_id}!main.c@{main.c}}
+\doxysubsubsection{\texorpdfstring{shm\_conf\_id}{shm\_conf\_id}}
+{\footnotesize\ttfamily int shm\+\_\+conf\+\_\+id = -\/1}
+
+\mbox{\Hypertarget{main_8c_afec317dfe8d38f10717665f51bec0f93}\label{main_8c_afec317dfe8d38f10717665f51bec0f93}} 
+\index{main.c@{main.c}!shm\_conf\_pointer@{shm\_conf\_pointer}}
+\index{shm\_conf\_pointer@{shm\_conf\_pointer}!main.c@{main.c}}
+\doxysubsubsection{\texorpdfstring{shm\_conf\_pointer}{shm\_conf\_pointer}}
+{\footnotesize\ttfamily struct \mbox{\hyperlink{structshm__conf}{shm\+\_\+conf}}$\ast$ shm\+\_\+conf\+\_\+pointer}
+
+\mbox{\Hypertarget{main_8c_ab8ed6dcbaa8297382efef0cb03a36a9c}\label{main_8c_ab8ed6dcbaa8297382efef0cb03a36a9c}} 
+\index{main.c@{main.c}!shm\_masterbook\_id@{shm\_masterbook\_id}}
+\index{shm\_masterbook\_id@{shm\_masterbook\_id}!main.c@{main.c}}
+\doxysubsubsection{\texorpdfstring{shm\_masterbook\_id}{shm\_masterbook\_id}}
+{\footnotesize\ttfamily int shm\+\_\+masterbook\+\_\+id = -\/1}
+
+\mbox{\Hypertarget{main_8c_a22ca1f6fad3851c36b9f56873280d4b0}\label{main_8c_a22ca1f6fad3851c36b9f56873280d4b0}} 
+\index{main.c@{main.c}!shm\_masterbook\_pointer@{shm\_masterbook\_pointer}}
+\index{shm\_masterbook\_pointer@{shm\_masterbook\_pointer}!main.c@{main.c}}
+\doxysubsubsection{\texorpdfstring{shm\_masterbook\_pointer}{shm\_masterbook\_pointer}}
+{\footnotesize\ttfamily struct \mbox{\hyperlink{structshm__book__master}{shm\+\_\+book\+\_\+master}}$\ast$ shm\+\_\+masterbook\+\_\+pointer}
+
+\mbox{\Hypertarget{main_8c_a9088e3a86cb03d1836e53b1c141d458b}\label{main_8c_a9088e3a86cb03d1836e53b1c141d458b}} 
+\index{main.c@{main.c}!simulation\_conf@{simulation\_conf}}
+\index{simulation\_conf@{simulation\_conf}!main.c@{main.c}}
+\doxysubsubsection{\texorpdfstring{simulation\_conf}{simulation\_conf}}
+{\footnotesize\ttfamily struct \mbox{\hyperlink{structconf}{conf}} simulation\+\_\+conf}
+
+\mbox{\Hypertarget{main_8c_a407735af6edb3ec1ee9116424bd4b308}\label{main_8c_a407735af6edb3ec1ee9116424bd4b308}} 
+\index{main.c@{main.c}!simulation\_end@{simulation\_end}}
+\index{simulation\_end@{simulation\_end}!main.c@{main.c}}
+\doxysubsubsection{\texorpdfstring{simulation\_end}{simulation\_end}}
+{\footnotesize\ttfamily int simulation\+\_\+end = -\/1}
+

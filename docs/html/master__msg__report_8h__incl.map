@@ -1,0 +1,10 @@
+<map id="src/local_lib/headers/master_msg_report.h" name="src/local_lib/headers/master_msg_report.h">
+<area shape="rect" id="node1" title="Header file for the master_msg_report.c module. Contains the definitions of the functions,..." alt="" coords="71,5,236,47"/>
+<area shape="rect" id="node2" title=" " alt="" coords="5,169,80,196"/>
+<area shape="rect" id="node3" href="$boolean_8h.html" title="Type Definition for the boolean type using integer values Done for C89 compatibility." alt="" coords="105,169,191,196"/>
+<area shape="rect" id="node4" href="$process__info__list_8h.html" title="Header file for the process_info_list.c file. Contains the definition of the ProcessInfo structure an..." alt="" coords="27,95,170,121"/>
+<area shape="rect" id="node6" href="$transaction__list_8h.html" title="Header file for the transaction_list.c file. Contains the definition of the Transaction structure and..." alt="" coords="246,95,381,121"/>
+<area shape="rect" id="node5" title=" " alt="" coords="216,169,312,196"/>
+<area shape="rect" id="node7" title=" " alt="" coords="424,169,491,196"/>
+<area shape="rect" id="node8" title=" " alt="" coords="336,169,400,196"/>
+</map>

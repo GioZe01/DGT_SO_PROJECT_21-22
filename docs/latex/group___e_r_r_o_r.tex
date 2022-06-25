@@ -1,0 +1,60 @@
+\hypertarget{group___e_r_r_o_r}{}\doxysection{EXIT SEQUENCES}
+\label{group___e_r_r_o_r}\index{EXIT SEQUENCES@{EXIT SEQUENCES}}
+
+
+Macros for the procedure of ending the different types of processes in case of error.  
+
+
+\doxysubsection*{Macros}
+\begin{DoxyCompactItemize}
+\item 
+\#define \mbox{\hyperlink{group___e_r_r_o_r_gaf5443cfb24409cbb68dbbe9bc8cabb44}{ERROR\+\_\+\+EXIT\+\_\+\+SEQUENCE\+\_\+\+MAIN}}(str)
+\item 
+\#define \mbox{\hyperlink{group___e_r_r_o_r_ga162993553cf79cddb1716629dd84d2f5}{ERROR\+\_\+\+EXIT\+\_\+\+SEQUENCE\+\_\+\+USER}}(str)
+\item 
+\#define \mbox{\hyperlink{group___e_r_r_o_r_gad9a11684a1eee8d301143dab730f6f6a}{ERROR\+\_\+\+EXIT\+\_\+\+SEQUENCE\+\_\+\+NODE}}(str)
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+Macros for the procedure of ending the different types of processes in case of error. 
+
+
+
+\doxysubsection{Macro Definition Documentation}
+\mbox{\Hypertarget{group___e_r_r_o_r_gaf5443cfb24409cbb68dbbe9bc8cabb44}\label{group___e_r_r_o_r_gaf5443cfb24409cbb68dbbe9bc8cabb44}} 
+\index{EXIT SEQUENCES@{EXIT SEQUENCES}!ERROR\_EXIT\_SEQUENCE\_MAIN@{ERROR\_EXIT\_SEQUENCE\_MAIN}}
+\index{ERROR\_EXIT\_SEQUENCE\_MAIN@{ERROR\_EXIT\_SEQUENCE\_MAIN}!EXIT SEQUENCES@{EXIT SEQUENCES}}
+\doxysubsubsection{\texorpdfstring{ERROR\_EXIT\_SEQUENCE\_MAIN}{ERROR\_EXIT\_SEQUENCE\_MAIN}}
+{\footnotesize\ttfamily \#define ERROR\+\_\+\+EXIT\+\_\+\+SEQUENCE\+\_\+\+MAIN(\begin{DoxyParamCaption}\item[{}]{str }\end{DoxyParamCaption})}
+
+{\bfseries Value\+:}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{                            \mbox{\hyperlink{simulation__errors_8h_a3361e4404cd111be303ad514abea1f52}{ERROR\_MESSAGE}}(str);\(\backslash\)}
+\DoxyCodeLine{                            EXIT\_PROCEDURE\_MAIN(EXIT\_FAILURE)}
+
+\end{DoxyCode}
+\mbox{\Hypertarget{group___e_r_r_o_r_gad9a11684a1eee8d301143dab730f6f6a}\label{group___e_r_r_o_r_gad9a11684a1eee8d301143dab730f6f6a}} 
+\index{EXIT SEQUENCES@{EXIT SEQUENCES}!ERROR\_EXIT\_SEQUENCE\_NODE@{ERROR\_EXIT\_SEQUENCE\_NODE}}
+\index{ERROR\_EXIT\_SEQUENCE\_NODE@{ERROR\_EXIT\_SEQUENCE\_NODE}!EXIT SEQUENCES@{EXIT SEQUENCES}}
+\doxysubsubsection{\texorpdfstring{ERROR\_EXIT\_SEQUENCE\_NODE}{ERROR\_EXIT\_SEQUENCE\_NODE}}
+{\footnotesize\ttfamily \#define ERROR\+\_\+\+EXIT\+\_\+\+SEQUENCE\+\_\+\+NODE(\begin{DoxyParamCaption}\item[{}]{str }\end{DoxyParamCaption})}
+
+{\bfseries Value\+:}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{                            \mbox{\hyperlink{simulation__errors_8h_a3361e4404cd111be303ad514abea1f52}{ERROR\_MESSAGE}}(str); \(\backslash\)}
+\DoxyCodeLine{                            EXIT\_PROCEDURE\_NODE(EXIT\_FAILURE)}
+
+\end{DoxyCode}
+\mbox{\Hypertarget{group___e_r_r_o_r_ga162993553cf79cddb1716629dd84d2f5}\label{group___e_r_r_o_r_ga162993553cf79cddb1716629dd84d2f5}} 
+\index{EXIT SEQUENCES@{EXIT SEQUENCES}!ERROR\_EXIT\_SEQUENCE\_USER@{ERROR\_EXIT\_SEQUENCE\_USER}}
+\index{ERROR\_EXIT\_SEQUENCE\_USER@{ERROR\_EXIT\_SEQUENCE\_USER}!EXIT SEQUENCES@{EXIT SEQUENCES}}
+\doxysubsubsection{\texorpdfstring{ERROR\_EXIT\_SEQUENCE\_USER}{ERROR\_EXIT\_SEQUENCE\_USER}}
+{\footnotesize\ttfamily \#define ERROR\+\_\+\+EXIT\+\_\+\+SEQUENCE\+\_\+\+USER(\begin{DoxyParamCaption}\item[{}]{str }\end{DoxyParamCaption})}
+
+{\bfseries Value\+:}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{                            \mbox{\hyperlink{simulation__errors_8h_a3361e4404cd111be303ad514abea1f52}{ERROR\_MESSAGE}}(str); \(\backslash\)}
+\DoxyCodeLine{                            EXIT\_PROCEDURE\_USER(EXIT\_FAILURE)}
+
+\end{DoxyCode}

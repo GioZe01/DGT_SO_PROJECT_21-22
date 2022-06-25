@@ -1,0 +1,450 @@
+\hypertarget{process__info__list_8h}{}\doxysection{src/local\+\_\+lib/headers/process\+\_\+info\+\_\+list.h File Reference}
+\label{process__info__list_8h}\index{src/local\_lib/headers/process\_info\_list.h@{src/local\_lib/headers/process\_info\_list.h}}
+
+
+Header file for the \mbox{\hyperlink{process__info__list_8c}{process\+\_\+info\+\_\+list.\+c}} file. Contains the definition of the \mbox{\hyperlink{struct_process_info}{Process\+Info}} structure and the functions to manipulate it as well as the typedef for the Process\+Info\+List.  
+
+
+{\ttfamily \#include $<$unistd.\+h$>$}\newline
+{\ttfamily \#include $<$sys/types.\+h$>$}\newline
+{\ttfamily \#include \char`\"{}boolean.\+h\char`\"{}}\newline
+Include dependency graph for process\+\_\+info\+\_\+list.\+h\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=310pt]{process__info__list_8h__incl}
+\end{center}
+\end{figure}
+This graph shows which files directly or indirectly include this file\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{process__info__list_8h__dep__incl}
+\end{center}
+\end{figure}
+\doxysubsection*{Data Structures}
+\begin{DoxyCompactItemize}
+\item 
+struct \mbox{\hyperlink{struct_process_info}{Proc}}
+\begin{DoxyCompactList}\small\item\em Structure for the information of a process. \end{DoxyCompactList}\end{DoxyCompactItemize}
+\doxysubsection*{Enumerations}
+\begin{DoxyCompactItemize}
+\item 
+enum \mbox{\hyperlink{process__info__list_8h_adcfd73fb435fd887e97d37de4d424ea8}{PROCTYPE}} \{ \mbox{\hyperlink{process__info__list_8h_adcfd73fb435fd887e97d37de4d424ea8a7e985cfcbe89451c8f8fc0b59a723e2c}{PROC\+\_\+\+TYPE\+\_\+\+USER}}
+, \mbox{\hyperlink{process__info__list_8h_adcfd73fb435fd887e97d37de4d424ea8a6dd0305bf8522cfdcf0b0c807b04b08d}{PROC\+\_\+\+TYPE\+\_\+\+NODE}}
+ \}
+\end{DoxyCompactItemize}
+\doxysubsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+Proc\+List \mbox{\hyperlink{process__info__list_8h_acebe0ae866a12e6cb8b9cfba85b81a71}{proc\+\_\+list\+\_\+create}} ()
+\item 
+\mbox{\hyperlink{boolean_8h_afdcfe6db5bea87bd493a3fe2c513d5ef}{Bool}} \mbox{\hyperlink{process__info__list_8h_aef1b966b9a95d149e850f1ece9c65d9d}{insert\+\_\+in\+\_\+list}} (Proc\+List $\ast$self, pid\+\_\+t pid, int id\+\_\+queue, short int proc\+\_\+state, short int proc\+\_\+type, float budget)
+\item 
+\mbox{\hyperlink{boolean_8h_afdcfe6db5bea87bd493a3fe2c513d5ef}{Bool}} \mbox{\hyperlink{process__info__list_8h_a156ac42ef2292e903980a66d6b9ae975}{proc\+\_\+list\+\_\+is\+\_\+empty}} (const Proc\+List self)
+\item 
+struct \mbox{\hyperlink{struct_process_info}{Process\+Info}} \mbox{\hyperlink{process__info__list_8h_a5693a26b77c4d681d880b08a50a87e1a}{get\+\_\+proc\+\_\+from\+\_\+pid}} (Proc\+List self, pid\+\_\+t pid)
+\item 
+struct \mbox{\hyperlink{struct_process_info}{Process\+Info}} \mbox{\hyperlink{process__info__list_8h_a4713db12978188c533867607822df971}{get\+\_\+proc\+\_\+from\+\_\+queue\+\_\+id}} (Proc\+List self, int id\+\_\+queue)
+\item 
+void \mbox{\hyperlink{process__info__list_8h_ae0efd1224d7e5a78fc055d0a55c8b66b}{send\+\_\+sig\+\_\+to\+\_\+all}} (Proc\+List \mbox{\hyperlink{main_8c_a203f1362008a8171971c8ac1bd6bce04}{proc\+\_\+list}}, int signal, int $\ast$pids)
+\begin{DoxyCompactList}\small\item\em Send the given signal to all proc saved via kill() method and save in pids the list of pid of the processes killed. \end{DoxyCompactList}\item 
+int \mbox{\hyperlink{process__info__list_8h_a33ce8aa25c7ed22e321b8eafc51b9b43}{send\+\_\+sig\+\_\+to\+\_\+all\+\_\+nodes}} (Proc\+List \mbox{\hyperlink{main_8c_a203f1362008a8171971c8ac1bd6bce04}{proc\+\_\+list}}, int signal, \mbox{\hyperlink{boolean_8h_afdcfe6db5bea87bd493a3fe2c513d5ef}{Bool}} exclude\+\_\+last)
+\item 
+void \mbox{\hyperlink{process__info__list_8h_ad96760aa2062e90e4ebe2f940594136d}{print\+\_\+list}} (Proc\+List self)
+\item 
+void \mbox{\hyperlink{process__info__list_8h_ad6216a160e2c146aa08fcea5ec8d58ca}{list\+\_\+free}} (Proc\+List self)
+\item 
+void \mbox{\hyperlink{process__info__list_8h_aa8147ed0beac165a74224441d0eb06eb}{list\+\_\+set\+\_\+state}} (Proc\+List self, pid\+\_\+t pid, short int state)
+\item 
+void \mbox{\hyperlink{process__info__list_8h_a7fffb7531f2b35fee3264db43fba017d}{terminator}} (Proc\+List self)
+\item 
+void \mbox{\hyperlink{process__info__list_8h_ac7a45a08d8356ffb5bb5588457bd937e}{saving\+\_\+private\+\_\+ryan}} (Proc\+List self, int queue\+\_\+id)
+\item 
+int \mbox{\hyperlink{process__info__list_8h_a2adccd38ed14c76131db873843616a8a}{get\+\_\+num\+\_\+of\+\_\+proc}} (Proc\+List self)
+\begin{DoxyCompactList}\small\item\em Return the number of proc in the list. \end{DoxyCompactList}\item 
+int \mbox{\hyperlink{process__info__list_8h_a8be3d87cbdfc3396f354b9686e32ad93}{get\+\_\+num\+\_\+of\+\_\+user\+\_\+proc\+\_\+running}} (Proc\+List self)
+\item 
+int \mbox{\hyperlink{process__info__list_8h_ab6afa16bf98766e584d2179bc831770b}{get\+\_\+num\+\_\+of\+\_\+node\+\_\+proc\+\_\+running}} (Proc\+List self)
+\item 
+\mbox{\hyperlink{boolean_8h_afdcfe6db5bea87bd493a3fe2c513d5ef}{Bool}} \mbox{\hyperlink{process__info__list_8h_a1ad4d7a8798f819f07d3ef03d563b01e}{send\+\_\+msg\+\_\+to\+\_\+all\+\_\+nodes}} (int queue\+\_\+id, int retry, Proc\+List \mbox{\hyperlink{main_8c_a203f1362008a8171971c8ac1bd6bce04}{proc\+\_\+list}}, int node\+\_\+id, \mbox{\hyperlink{boolean_8h_afdcfe6db5bea87bd493a3fe2c513d5ef}{Bool}} exclude\+\_\+last)
+\begin{DoxyCompactList}\small\item\em send a msg with the new node id to all the other nodes \end{DoxyCompactList}\item 
+void \mbox{\hyperlink{process__info__list_8h_a4ab1839d98bc544a6c8c96853eefc9ac}{get\+\_\+random\+\_\+node\+\_\+list}} (Proc\+List \mbox{\hyperlink{main_8c_a203f1362008a8171971c8ac1bd6bce04}{proc\+\_\+list}}, Proc\+List node\+\_\+list, int num\+\_\+of\+\_\+node)
+\begin{DoxyCompactList}\small\item\em Extract randomly a num\+\_\+of\+\_\+node from the proc\+\_\+list and insert them into the node\+\_\+list. \end{DoxyCompactList}\item 
+struct \mbox{\hyperlink{struct_process_info}{Process\+Info}} \mbox{\hyperlink{process__info__list_8h_a82641ad98a3aace394b6c999dd37d5f2}{get\+\_\+first}} (Proc\+List self)
+\begin{DoxyCompactList}\small\item\em Get the first proc in the list. \end{DoxyCompactList}\item 
+int \mbox{\hyperlink{process__info__list_8h_ae0642aea0cb00ade7371665798befb0f}{update\+\_\+proc}} (Proc\+List self, int pid, float budget, short int proc\+\_\+state)
+\begin{DoxyCompactList}\small\item\em Update if found the proc with the given pid in the list. \end{DoxyCompactList}\item 
+void \mbox{\hyperlink{process__info__list_8h_ac839df6c86ee45f990d501077b6d3438}{get\+\_\+running\+\_\+node\+\_\+proc}} (Proc\+List self, Proc\+List node\+\_\+list)
+\begin{DoxyCompactList}\small\item\em Get the running node in the list. \end{DoxyCompactList}\item 
+int \mbox{\hyperlink{process__info__list_8h_a18838db972c83b665de6dabff20d3c33}{get\+\_\+num\+\_\+proc\+\_\+running}} (Proc\+List self)
+\begin{DoxyCompactList}\small\item\em Get the num of proc in running state. \end{DoxyCompactList}\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+Header file for the \mbox{\hyperlink{process__info__list_8c}{process\+\_\+info\+\_\+list.\+c}} file. Contains the definition of the \mbox{\hyperlink{struct_process_info}{Process\+Info}} structure and the functions to manipulate it as well as the typedef for the Process\+Info\+List. 
+
+\begin{DoxyAuthor}{Author}
+Giovanni Terzuolo 
+\end{DoxyAuthor}
+
+
+\doxysubsection{Enumeration Type Documentation}
+\mbox{\Hypertarget{process__info__list_8h_adcfd73fb435fd887e97d37de4d424ea8}\label{process__info__list_8h_adcfd73fb435fd887e97d37de4d424ea8}} 
+\index{process\_info\_list.h@{process\_info\_list.h}!PROCTYPE@{PROCTYPE}}
+\index{PROCTYPE@{PROCTYPE}!process\_info\_list.h@{process\_info\_list.h}}
+\doxysubsubsection{\texorpdfstring{PROCTYPE}{PROCTYPE}}
+{\footnotesize\ttfamily enum \mbox{\hyperlink{process__info__list_8h_adcfd73fb435fd887e97d37de4d424ea8}{PROCTYPE}}}
+
+\begin{DoxyEnumFields}{Enumerator}
+\raisebox{\heightof{T}}[0pt][0pt]{\index{PROC\_TYPE\_USER@{PROC\_TYPE\_USER}!process\_info\_list.h@{process\_info\_list.h}}\index{process\_info\_list.h@{process\_info\_list.h}!PROC\_TYPE\_USER@{PROC\_TYPE\_USER}}}\mbox{\Hypertarget{process__info__list_8h_adcfd73fb435fd887e97d37de4d424ea8a7e985cfcbe89451c8f8fc0b59a723e2c}\label{process__info__list_8h_adcfd73fb435fd887e97d37de4d424ea8a7e985cfcbe89451c8f8fc0b59a723e2c}} 
+PROC\+\_\+\+TYPE\+\_\+\+USER&\\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{PROC\_TYPE\_NODE@{PROC\_TYPE\_NODE}!process\_info\_list.h@{process\_info\_list.h}}\index{process\_info\_list.h@{process\_info\_list.h}!PROC\_TYPE\_NODE@{PROC\_TYPE\_NODE}}}\mbox{\Hypertarget{process__info__list_8h_adcfd73fb435fd887e97d37de4d424ea8a6dd0305bf8522cfdcf0b0c807b04b08d}\label{process__info__list_8h_adcfd73fb435fd887e97d37de4d424ea8a6dd0305bf8522cfdcf0b0c807b04b08d}} 
+PROC\+\_\+\+TYPE\+\_\+\+NODE&\\
+\hline
+
+\end{DoxyEnumFields}
+
+
+\doxysubsection{Function Documentation}
+\mbox{\Hypertarget{process__info__list_8h_a82641ad98a3aace394b6c999dd37d5f2}\label{process__info__list_8h_a82641ad98a3aace394b6c999dd37d5f2}} 
+\index{process\_info\_list.h@{process\_info\_list.h}!get\_first@{get\_first}}
+\index{get\_first@{get\_first}!process\_info\_list.h@{process\_info\_list.h}}
+\doxysubsubsection{\texorpdfstring{get\_first()}{get\_first()}}
+{\footnotesize\ttfamily struct \mbox{\hyperlink{struct_process_info}{Process\+Info}} get\+\_\+first (\begin{DoxyParamCaption}\item[{Proc\+List}]{self }\end{DoxyParamCaption})}
+
+
+
+Get the first proc in the list. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em self} & the list to search in \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+The first proc in the list 
+\end{DoxyReturn}
+\mbox{\Hypertarget{process__info__list_8h_ab6afa16bf98766e584d2179bc831770b}\label{process__info__list_8h_ab6afa16bf98766e584d2179bc831770b}} 
+\index{process\_info\_list.h@{process\_info\_list.h}!get\_num\_of\_node\_proc\_running@{get\_num\_of\_node\_proc\_running}}
+\index{get\_num\_of\_node\_proc\_running@{get\_num\_of\_node\_proc\_running}!process\_info\_list.h@{process\_info\_list.h}}
+\doxysubsubsection{\texorpdfstring{get\_num\_of\_node\_proc\_running()}{get\_num\_of\_node\_proc\_running()}}
+{\footnotesize\ttfamily int get\+\_\+num\+\_\+of\+\_\+node\+\_\+proc\+\_\+running (\begin{DoxyParamCaption}\item[{Proc\+List}]{self }\end{DoxyParamCaption})}
+
+Return the number of active node\+\_\+proc \begin{DoxyReturn}{Returns}
+integer rappresenting the number of active user 
+\end{DoxyReturn}
+\mbox{\Hypertarget{process__info__list_8h_a2adccd38ed14c76131db873843616a8a}\label{process__info__list_8h_a2adccd38ed14c76131db873843616a8a}} 
+\index{process\_info\_list.h@{process\_info\_list.h}!get\_num\_of\_proc@{get\_num\_of\_proc}}
+\index{get\_num\_of\_proc@{get\_num\_of\_proc}!process\_info\_list.h@{process\_info\_list.h}}
+\doxysubsubsection{\texorpdfstring{get\_num\_of\_proc()}{get\_num\_of\_proc()}}
+{\footnotesize\ttfamily int get\+\_\+num\+\_\+of\+\_\+proc (\begin{DoxyParamCaption}\item[{Proc\+List}]{self }\end{DoxyParamCaption})}
+
+
+
+Return the number of proc in the list. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em self} & the list to search in \\
+\hline
+\end{DoxyParams}
+\mbox{\Hypertarget{process__info__list_8h_a8be3d87cbdfc3396f354b9686e32ad93}\label{process__info__list_8h_a8be3d87cbdfc3396f354b9686e32ad93}} 
+\index{process\_info\_list.h@{process\_info\_list.h}!get\_num\_of\_user\_proc\_running@{get\_num\_of\_user\_proc\_running}}
+\index{get\_num\_of\_user\_proc\_running@{get\_num\_of\_user\_proc\_running}!process\_info\_list.h@{process\_info\_list.h}}
+\doxysubsubsection{\texorpdfstring{get\_num\_of\_user\_proc\_running()}{get\_num\_of\_user\_proc\_running()}}
+{\footnotesize\ttfamily int get\+\_\+num\+\_\+of\+\_\+user\+\_\+proc\+\_\+running (\begin{DoxyParamCaption}\item[{Proc\+List}]{self }\end{DoxyParamCaption})}
+
+Return the number of active user\+\_\+proc \begin{DoxyReturn}{Returns}
+integer rappresenting the number of active user 
+\end{DoxyReturn}
+\mbox{\Hypertarget{process__info__list_8h_a18838db972c83b665de6dabff20d3c33}\label{process__info__list_8h_a18838db972c83b665de6dabff20d3c33}} 
+\index{process\_info\_list.h@{process\_info\_list.h}!get\_num\_proc\_running@{get\_num\_proc\_running}}
+\index{get\_num\_proc\_running@{get\_num\_proc\_running}!process\_info\_list.h@{process\_info\_list.h}}
+\doxysubsubsection{\texorpdfstring{get\_num\_proc\_running()}{get\_num\_proc\_running()}}
+{\footnotesize\ttfamily int get\+\_\+num\+\_\+proc\+\_\+running (\begin{DoxyParamCaption}\item[{Proc\+List}]{self }\end{DoxyParamCaption})}
+
+
+
+Get the num of proc in running state. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em self} & the list to search in \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+the number of proc in running state 
+\end{DoxyReturn}
+\mbox{\Hypertarget{process__info__list_8h_a5693a26b77c4d681d880b08a50a87e1a}\label{process__info__list_8h_a5693a26b77c4d681d880b08a50a87e1a}} 
+\index{process\_info\_list.h@{process\_info\_list.h}!get\_proc\_from\_pid@{get\_proc\_from\_pid}}
+\index{get\_proc\_from\_pid@{get\_proc\_from\_pid}!process\_info\_list.h@{process\_info\_list.h}}
+\doxysubsubsection{\texorpdfstring{get\_proc\_from\_pid()}{get\_proc\_from\_pid()}}
+{\footnotesize\ttfamily struct \mbox{\hyperlink{struct_process_info}{Process\+Info}} get\+\_\+proc\+\_\+from\+\_\+pid (\begin{DoxyParamCaption}\item[{Proc\+List}]{self,  }\item[{pid\+\_\+t}]{pid }\end{DoxyParamCaption})}
+
+Return the process inside the list associated with the pid given as param 
+\begin{DoxyParams}{Parameters}
+{\em self} & the list to search in \\
+\hline
+{\em pid} & the value to search for \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+the element with the specified pid if found. Otherwise NULL 
+\end{DoxyReturn}
+\mbox{\Hypertarget{process__info__list_8h_a4713db12978188c533867607822df971}\label{process__info__list_8h_a4713db12978188c533867607822df971}} 
+\index{process\_info\_list.h@{process\_info\_list.h}!get\_proc\_from\_queue\_id@{get\_proc\_from\_queue\_id}}
+\index{get\_proc\_from\_queue\_id@{get\_proc\_from\_queue\_id}!process\_info\_list.h@{process\_info\_list.h}}
+\doxysubsubsection{\texorpdfstring{get\_proc\_from\_queue\_id()}{get\_proc\_from\_queue\_id()}}
+{\footnotesize\ttfamily struct \mbox{\hyperlink{struct_process_info}{Process\+Info}} get\+\_\+proc\+\_\+from\+\_\+queue\+\_\+id (\begin{DoxyParamCaption}\item[{Proc\+List}]{self,  }\item[{int}]{id\+\_\+queue }\end{DoxyParamCaption})}
+
+Return the process inside the list associated with the id\+\_\+queue given as param 
+\begin{DoxyParams}{Parameters}
+{\em self} & the list to search in \\
+\hline
+{\em queue\+\_\+id} & the value to search for \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+the element with the specified pid if found. Otherwise NULL 
+\end{DoxyReturn}
+\mbox{\Hypertarget{process__info__list_8h_a4ab1839d98bc544a6c8c96853eefc9ac}\label{process__info__list_8h_a4ab1839d98bc544a6c8c96853eefc9ac}} 
+\index{process\_info\_list.h@{process\_info\_list.h}!get\_random\_node\_list@{get\_random\_node\_list}}
+\index{get\_random\_node\_list@{get\_random\_node\_list}!process\_info\_list.h@{process\_info\_list.h}}
+\doxysubsubsection{\texorpdfstring{get\_random\_node\_list()}{get\_random\_node\_list()}}
+{\footnotesize\ttfamily void get\+\_\+random\+\_\+node\+\_\+list (\begin{DoxyParamCaption}\item[{Proc\+List}]{proc\+\_\+list,  }\item[{Proc\+List}]{node\+\_\+list,  }\item[{int}]{num\+\_\+of\+\_\+node }\end{DoxyParamCaption})}
+
+
+
+Extract randomly a num\+\_\+of\+\_\+node from the proc\+\_\+list and insert them into the node\+\_\+list. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em proc\+\_\+list} & the list of proc to extract from \\
+\hline
+{\em node\+\_\+list} & the list of node to insert into \\
+\hline
+{\em num\+\_\+of\+\_\+node} & the number of node to extract \\
+\hline
+\end{DoxyParams}
+\begin{DoxyWarning}{Warning}
+if the number of nodes into the proc\+\_\+list is less than the num\+\_\+of\+\_\+node, the node\+\_\+list will be equal to the proc\+\_\+list 
+\end{DoxyWarning}
+\mbox{\Hypertarget{process__info__list_8h_ac839df6c86ee45f990d501077b6d3438}\label{process__info__list_8h_ac839df6c86ee45f990d501077b6d3438}} 
+\index{process\_info\_list.h@{process\_info\_list.h}!get\_running\_node\_proc@{get\_running\_node\_proc}}
+\index{get\_running\_node\_proc@{get\_running\_node\_proc}!process\_info\_list.h@{process\_info\_list.h}}
+\doxysubsubsection{\texorpdfstring{get\_running\_node\_proc()}{get\_running\_node\_proc()}}
+{\footnotesize\ttfamily void get\+\_\+running\+\_\+node\+\_\+proc (\begin{DoxyParamCaption}\item[{Proc\+List}]{self,  }\item[{Proc\+List}]{node\+\_\+list }\end{DoxyParamCaption})}
+
+
+
+Get the running node in the list. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em self} & the list to search in \\
+\hline
+{\em node\+\_\+list} & the list to insert the running node \\
+\hline
+\end{DoxyParams}
+\mbox{\Hypertarget{process__info__list_8h_aef1b966b9a95d149e850f1ece9c65d9d}\label{process__info__list_8h_aef1b966b9a95d149e850f1ece9c65d9d}} 
+\index{process\_info\_list.h@{process\_info\_list.h}!insert\_in\_list@{insert\_in\_list}}
+\index{insert\_in\_list@{insert\_in\_list}!process\_info\_list.h@{process\_info\_list.h}}
+\doxysubsubsection{\texorpdfstring{insert\_in\_list()}{insert\_in\_list()}}
+{\footnotesize\ttfamily \mbox{\hyperlink{boolean_8h_afdcfe6db5bea87bd493a3fe2c513d5ef}{Bool}} insert\+\_\+in\+\_\+list (\begin{DoxyParamCaption}\item[{Proc\+List $\ast$}]{self,  }\item[{pid\+\_\+t}]{pid,  }\item[{int}]{id\+\_\+queue,  }\item[{short int}]{proc\+\_\+state,  }\item[{short int}]{proc\+\_\+type,  }\item[{float}]{budget }\end{DoxyParamCaption})}
+
+Insert the new process and initialize it in running mode 
+\begin{DoxyParams}{Parameters}
+{\em self} & the next of the list to be linked with \\
+\hline
+{\em pid} & the pid of the new process \\
+\hline
+{\em id\+\_\+queue} & the id of the queue of the new process \\
+\hline
+{\em proc\+\_\+type} & the type of the new process \\
+\hline
+{\em budget} & of the new process \\
+\hline
+{\em proc\+\_\+state} & the state of the new process \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+FALSE if the process is not inserted, TRUE otherwise 
+\end{DoxyReturn}
+Copy the Proc pointer into the new node\mbox{\Hypertarget{process__info__list_8h_ad6216a160e2c146aa08fcea5ec8d58ca}\label{process__info__list_8h_ad6216a160e2c146aa08fcea5ec8d58ca}} 
+\index{process\_info\_list.h@{process\_info\_list.h}!list\_free@{list\_free}}
+\index{list\_free@{list\_free}!process\_info\_list.h@{process\_info\_list.h}}
+\doxysubsubsection{\texorpdfstring{list\_free()}{list\_free()}}
+{\footnotesize\ttfamily void list\+\_\+free (\begin{DoxyParamCaption}\item[{Proc\+List}]{self }\end{DoxyParamCaption})}
+
+Free the memory from the list 
+\begin{DoxyParams}{Parameters}
+{\em self} & ref. to the list to free \\
+\hline
+\end{DoxyParams}
+\mbox{\Hypertarget{process__info__list_8h_aa8147ed0beac165a74224441d0eb06eb}\label{process__info__list_8h_aa8147ed0beac165a74224441d0eb06eb}} 
+\index{process\_info\_list.h@{process\_info\_list.h}!list\_set\_state@{list\_set\_state}}
+\index{list\_set\_state@{list\_set\_state}!process\_info\_list.h@{process\_info\_list.h}}
+\doxysubsubsection{\texorpdfstring{list\_set\_state()}{list\_set\_state()}}
+{\footnotesize\ttfamily void list\+\_\+set\+\_\+state (\begin{DoxyParamCaption}\item[{Proc\+List}]{self,  }\item[{pid\+\_\+t}]{pid,  }\item[{short int}]{state }\end{DoxyParamCaption})}
+
+Change the flag state of a record in the list 
+\begin{DoxyParams}{Parameters}
+{\em self} & ref. of the list \\
+\hline
+{\em pid} & record identifier \\
+\hline
+{\em state} & the proc\+\_\+state to be set \\
+\hline
+\end{DoxyParams}
+\mbox{\Hypertarget{process__info__list_8h_ad96760aa2062e90e4ebe2f940594136d}\label{process__info__list_8h_ad96760aa2062e90e4ebe2f940594136d}} 
+\index{process\_info\_list.h@{process\_info\_list.h}!print\_list@{print\_list}}
+\index{print\_list@{print\_list}!process\_info\_list.h@{process\_info\_list.h}}
+\doxysubsubsection{\texorpdfstring{print\_list()}{print\_list()}}
+{\footnotesize\ttfamily void print\+\_\+list (\begin{DoxyParamCaption}\item[{Proc\+List}]{self }\end{DoxyParamCaption})}
+
+Print at console the specified list if the list is too big (MAX\+\_\+\+PROC\+\_\+\+TO\+\_\+\+PRINT into \mbox{\hyperlink{glob_8h}{glob.\+h}}) it will print the processes with the highest budget 
+\begin{DoxyParams}{Parameters}
+{\em self} & ref of the list to print\+\_\+list \\
+\hline
+\end{DoxyParams}
+\begin{DoxyWarning}{Warning}
+the list is sorted by budget 
+\end{DoxyWarning}
+\mbox{\Hypertarget{process__info__list_8h_acebe0ae866a12e6cb8b9cfba85b81a71}\label{process__info__list_8h_acebe0ae866a12e6cb8b9cfba85b81a71}} 
+\index{process\_info\_list.h@{process\_info\_list.h}!proc\_list\_create@{proc\_list\_create}}
+\index{proc\_list\_create@{proc\_list\_create}!process\_info\_list.h@{process\_info\_list.h}}
+\doxysubsubsection{\texorpdfstring{proc\_list\_create()}{proc\_list\_create()}}
+{\footnotesize\ttfamily Proc\+List proc\+\_\+list\+\_\+create (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})}
+
+Create the Proc\+List Linked list 
+\begin{DoxyParams}{Parameters}
+{\em list} & the list to be created \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+FALSE if the list is not created, TRUE otherwise 
+\end{DoxyReturn}
+\mbox{\Hypertarget{process__info__list_8h_a156ac42ef2292e903980a66d6b9ae975}\label{process__info__list_8h_a156ac42ef2292e903980a66d6b9ae975}} 
+\index{process\_info\_list.h@{process\_info\_list.h}!proc\_list\_is\_empty@{proc\_list\_is\_empty}}
+\index{proc\_list\_is\_empty@{proc\_list\_is\_empty}!process\_info\_list.h@{process\_info\_list.h}}
+\doxysubsubsection{\texorpdfstring{proc\_list\_is\_empty()}{proc\_list\_is\_empty()}}
+{\footnotesize\ttfamily \mbox{\hyperlink{boolean_8h_afdcfe6db5bea87bd493a3fe2c513d5ef}{Bool}} proc\+\_\+list\+\_\+is\+\_\+empty (\begin{DoxyParamCaption}\item[{const Proc\+List}]{self }\end{DoxyParamCaption})}
+
+Check if the Proc\+List is empty \begin{DoxyReturn}{Returns}
+TRUE if is empty, FALSE otherwise 
+\end{DoxyReturn}
+\mbox{\Hypertarget{process__info__list_8h_ac7a45a08d8356ffb5bb5588457bd937e}\label{process__info__list_8h_ac7a45a08d8356ffb5bb5588457bd937e}} 
+\index{process\_info\_list.h@{process\_info\_list.h}!saving\_private\_ryan@{saving\_private\_ryan}}
+\index{saving\_private\_ryan@{saving\_private\_ryan}!process\_info\_list.h@{process\_info\_list.h}}
+\doxysubsubsection{\texorpdfstring{saving\_private\_ryan()}{saving\_private\_ryan()}}
+{\footnotesize\ttfamily void saving\+\_\+private\+\_\+ryan (\begin{DoxyParamCaption}\item[{Proc\+List}]{self,  }\item[{int}]{queue\+\_\+id }\end{DoxyParamCaption})}
+
+Wait for all proc to terminate 
+\begin{DoxyParams}{Parameters}
+{\em self} & list of all the proc to wait for \\
+\hline
+{\em queue\+\_\+id} & id of the queue of master msg \\
+\hline
+\end{DoxyParams}
+\mbox{\Hypertarget{process__info__list_8h_a1ad4d7a8798f819f07d3ef03d563b01e}\label{process__info__list_8h_a1ad4d7a8798f819f07d3ef03d563b01e}} 
+\index{process\_info\_list.h@{process\_info\_list.h}!send\_msg\_to\_all\_nodes@{send\_msg\_to\_all\_nodes}}
+\index{send\_msg\_to\_all\_nodes@{send\_msg\_to\_all\_nodes}!process\_info\_list.h@{process\_info\_list.h}}
+\doxysubsubsection{\texorpdfstring{send\_msg\_to\_all\_nodes()}{send\_msg\_to\_all\_nodes()}}
+{\footnotesize\ttfamily \mbox{\hyperlink{boolean_8h_afdcfe6db5bea87bd493a3fe2c513d5ef}{Bool}} send\+\_\+msg\+\_\+to\+\_\+all\+\_\+nodes (\begin{DoxyParamCaption}\item[{int}]{queue\+\_\+id,  }\item[{int}]{retry,  }\item[{Proc\+List}]{proc\+\_\+list,  }\item[{int}]{node\+\_\+id,  }\item[{\mbox{\hyperlink{boolean_8h_afdcfe6db5bea87bd493a3fe2c513d5ef}{Bool}}}]{exclude\+\_\+last }\end{DoxyParamCaption})}
+
+
+
+send a msg with the new node id to all the other nodes 
+
+
+\begin{DoxyParams}{Parameters}
+{\em queue\+\_\+id} & id of the queue to snd the msg on \\
+\hline
+{\em retry} & number of retry to send the single msg \\
+\hline
+{\em node\+\_\+id} & the new node id @exclude\+\_\+last exclude the last node from the list \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+FALSE in case of FAILURE, TRUE otherwise 
+\end{DoxyReturn}
+\mbox{\Hypertarget{process__info__list_8h_ae0efd1224d7e5a78fc055d0a55c8b66b}\label{process__info__list_8h_ae0efd1224d7e5a78fc055d0a55c8b66b}} 
+\index{process\_info\_list.h@{process\_info\_list.h}!send\_sig\_to\_all@{send\_sig\_to\_all}}
+\index{send\_sig\_to\_all@{send\_sig\_to\_all}!process\_info\_list.h@{process\_info\_list.h}}
+\doxysubsubsection{\texorpdfstring{send\_sig\_to\_all()}{send\_sig\_to\_all()}}
+{\footnotesize\ttfamily void send\+\_\+sig\+\_\+to\+\_\+all (\begin{DoxyParamCaption}\item[{Proc\+List}]{proc\+\_\+list,  }\item[{int}]{signal,  }\item[{int $\ast$}]{pids }\end{DoxyParamCaption})}
+
+
+
+Send the given signal to all proc saved via kill() method and save in pids the list of pid of the processes killed. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em proc\+\_\+list} & the list of proced to receive the signal \\
+\hline
+{\em signal} & signal to be sent \\
+\hline
+{\em pids} & the list where the pid of the killed processes will be saved \\
+\hline
+\end{DoxyParams}
+\begin{DoxyWarning}{Warning}
+in the 0 index of the pids list is saved the number of processes killed 
+\end{DoxyWarning}
+errno == ESRCH is allowed because it might be that the proc intrest is terminated and the termination has not been read by main, in this case need wait on the proc to update the proc-\/list state\mbox{\Hypertarget{process__info__list_8h_a33ce8aa25c7ed22e321b8eafc51b9b43}\label{process__info__list_8h_a33ce8aa25c7ed22e321b8eafc51b9b43}} 
+\index{process\_info\_list.h@{process\_info\_list.h}!send\_sig\_to\_all\_nodes@{send\_sig\_to\_all\_nodes}}
+\index{send\_sig\_to\_all\_nodes@{send\_sig\_to\_all\_nodes}!process\_info\_list.h@{process\_info\_list.h}}
+\doxysubsubsection{\texorpdfstring{send\_sig\_to\_all\_nodes()}{send\_sig\_to\_all\_nodes()}}
+{\footnotesize\ttfamily int send\+\_\+sig\+\_\+to\+\_\+all\+\_\+nodes (\begin{DoxyParamCaption}\item[{Proc\+List}]{proc\+\_\+list,  }\item[{int}]{signal,  }\item[{\mbox{\hyperlink{boolean_8h_afdcfe6db5bea87bd493a3fe2c513d5ef}{Bool}}}]{exclude\+\_\+last }\end{DoxyParamCaption})}
+
+Send the given signal to the process with type node 
+\begin{DoxyParams}{Parameters}
+{\em proc\+\_\+list} & the list of proced to receive the signal \\
+\hline
+{\em signal} & signal to be sent \\
+\hline
+{\em exclude\+\_\+last} & if TRUE the last node will not receive the signal \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+-\/1 in case of failure. the number of proc to wait responce for 
+\end{DoxyReturn}
+errno == ESRCH is allowed because it might be that the proc intrest is terminated and the termination has not been read by main, in this case need wait on the proc to update the proc-\/list state
+
+errno == ESRCH is allowed because it might be that the proc intrest is terminated and the termination has not been read by main, in this case need wait on the proc to update the proc-\/list state\mbox{\Hypertarget{process__info__list_8h_a7fffb7531f2b35fee3264db43fba017d}\label{process__info__list_8h_a7fffb7531f2b35fee3264db43fba017d}} 
+\index{process\_info\_list.h@{process\_info\_list.h}!terminator@{terminator}}
+\index{terminator@{terminator}!process\_info\_list.h@{process\_info\_list.h}}
+\doxysubsubsection{\texorpdfstring{terminator()}{terminator()}}
+{\footnotesize\ttfamily void terminator (\begin{DoxyParamCaption}\item[{Proc\+List}]{self }\end{DoxyParamCaption})}
+
+Kill all the process in the list 
+\begin{DoxyParams}{Parameters}
+{\em self} & the list of proc to kill \\
+\hline
+\end{DoxyParams}
+errno == ESRCH is allowed because it might be that the proc intrest is terminated and the termination has not been read by main, in this case need wait on the proc to update the proc-\/list state\mbox{\Hypertarget{process__info__list_8h_ae0642aea0cb00ade7371665798befb0f}\label{process__info__list_8h_ae0642aea0cb00ade7371665798befb0f}} 
+\index{process\_info\_list.h@{process\_info\_list.h}!update\_proc@{update\_proc}}
+\index{update\_proc@{update\_proc}!process\_info\_list.h@{process\_info\_list.h}}
+\doxysubsubsection{\texorpdfstring{update\_proc()}{update\_proc()}}
+{\footnotesize\ttfamily int update\+\_\+proc (\begin{DoxyParamCaption}\item[{Proc\+List}]{self,  }\item[{int}]{pid,  }\item[{float}]{budget,  }\item[{short int}]{proc\+\_\+state }\end{DoxyParamCaption})}
+
+
+
+Update if found the proc with the given pid in the list. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em self} & the list to search in \\
+\hline
+{\em pid} & the pid to search for \\
+\hline
+{\em budget} & the new budget \\
+\hline
+{\em proc\+\_\+state} & the new proc\+\_\+state \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+-\/2 if the pid is not found, -\/1 if the budget is not valid, 0 otherwise 
+\end{DoxyReturn}

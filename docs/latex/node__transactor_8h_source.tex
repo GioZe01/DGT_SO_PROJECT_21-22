@@ -1,0 +1,39 @@
+\hypertarget{node__transactor_8h_source}{}\doxysection{node\+\_\+transactor.\+h}
+\label{node__transactor_8h_source}\index{src/local\_lib/headers/node\_transactor.h@{src/local\_lib/headers/node\_transactor.h}}
+\mbox{\hyperlink{node__transactor_8h}{Go to the documentation of this file.}}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{1 }
+\DoxyCodeLine{7 \textcolor{preprocessor}{\#ifndef DGT\_SO\_PROJECT\_21\_22\_NODE\_TRANSACTOR\_H}}
+\DoxyCodeLine{8 \textcolor{preprocessor}{\#define DGT\_SO\_PROJECT\_21\_22\_NODE\_TRANSACTOR\_H}}
+\DoxyCodeLine{9 }
+\DoxyCodeLine{10 }
+\DoxyCodeLine{11 \textcolor{preprocessor}{\#include "{}\mbox{\hyperlink{transaction__list_8h}{transaction\_list.h}}"{}}}
+\DoxyCodeLine{12 }
+\DoxyCodeLine{21 \textcolor{keyword}{typedef} int(*\mbox{\hyperlink{node__transactor_8h_a1718c8e04c968b7d95cf3142bff81e46}{Reward}})(\textcolor{keyword}{struct }\mbox{\hyperlink{structnode}{node}} *self, \textcolor{keywordtype}{float} \mbox{\hyperlink{structnode_a34c5b668208550b3c34a2ed0eec615f5}{percentage}}, \mbox{\hyperlink{boolean_8h_afdcfe6db5bea87bd493a3fe2c513d5ef}{Bool}} use\_default, \textcolor{keywordtype}{float} *block\_tot\_reward);}
+\DoxyCodeLine{22 }
+\DoxyCodeLine{27 \textcolor{keyword}{struct }\mbox{\hyperlink{structnode}{node}} \{}
+\DoxyCodeLine{28     pid\_t \mbox{\hyperlink{structnode_ae0d46a978d5cd6707411f276ad869b9c}{pid}}; }
+\DoxyCodeLine{29     \textcolor{keywordtype}{int} \mbox{\hyperlink{structnode_a3c903aa740f7504a1b3907bf27bce01d}{node\_id}}; }
+\DoxyCodeLine{30     \textcolor{keywordtype}{short} \textcolor{keywordtype}{int} \mbox{\hyperlink{structnode_ae7a9d7856dc91cc7dfe694046d892b85}{exec\_state}};}
+\DoxyCodeLine{31     \textcolor{keywordtype}{float} \mbox{\hyperlink{structnode_aba96c1bfea2a8500bcdbbd1c64fddffb}{budget}}; }
+\DoxyCodeLine{32     \textcolor{keywordtype}{int} \mbox{\hyperlink{structnode_a4815db050d5f27d4b4e922d61bf6ca88}{tp\_size}}; }
+\DoxyCodeLine{33     \textcolor{keywordtype}{int} \mbox{\hyperlink{structnode_a70b27761c7d0bd5cd90f4fe47e569b94}{block\_size}}; }
+\DoxyCodeLine{34     \textcolor{keywordtype}{float} \mbox{\hyperlink{structnode_a34c5b668208550b3c34a2ed0eec615f5}{percentage}}; }
+\DoxyCodeLine{35     Queue \mbox{\hyperlink{structnode_acd48ecee26244dc76aa4268dfce00f3b}{transactions\_pool}};}
+\DoxyCodeLine{36     Queue \mbox{\hyperlink{structnode_a37423ab7a4227ac1171c72cbb63b6c18}{transactions\_block}}; }
+\DoxyCodeLine{37     \mbox{\hyperlink{node__transactor_8h_a1718c8e04c968b7d95cf3142bff81e46}{Reward}} \mbox{\hyperlink{structnode_a303a3a5f822155b2bc220f509113cc9c}{calc\_reward}}; }
+\DoxyCodeLine{38 \};}
+\DoxyCodeLine{39 }
+\DoxyCodeLine{51 \textcolor{keywordtype}{void}}
+\DoxyCodeLine{52 \mbox{\hyperlink{node__transactor_8h_afa259136136a9d42301bd3fef04fd447}{node\_create}}(\textcolor{keyword}{struct} \mbox{\hyperlink{structnode}{node}} *self, pid\_t node\_pid, \textcolor{keywordtype}{int} node\_id, \textcolor{keywordtype}{float} budget, \textcolor{keywordtype}{int} tp\_size, \textcolor{keywordtype}{int} block\_size, \textcolor{keywordtype}{float} percentage,}
+\DoxyCodeLine{53             \mbox{\hyperlink{node__transactor_8h_a1718c8e04c968b7d95cf3142bff81e46}{Reward}} \mbox{\hyperlink{node__transactor_8h_abe2b1e44c1b3e8f4d2ff9892303534b9}{calc\_reward}});}
+\DoxyCodeLine{54 }
+\DoxyCodeLine{59 \textcolor{keywordtype}{void} \mbox{\hyperlink{node__transactor_8h_a299d12e82c779a508560581eb517e732}{free\_node}}(\textcolor{keyword}{struct} \mbox{\hyperlink{structnode}{node}} *self);}
+\DoxyCodeLine{60 }
+\DoxyCodeLine{66 \textcolor{keywordtype}{int} \mbox{\hyperlink{node__transactor_8h_adacf7b2e97d8ad2355279da06d9345d3}{update\_budget}}(\textcolor{keyword}{struct} \mbox{\hyperlink{structnode}{node}} *self);}
+\DoxyCodeLine{67 }
+\DoxyCodeLine{77 \textcolor{keywordtype}{int} \mbox{\hyperlink{node__transactor_8h_abe2b1e44c1b3e8f4d2ff9892303534b9}{calc\_reward}}(\textcolor{keyword}{struct} \mbox{\hyperlink{structnode}{node}} *self, \textcolor{keywordtype}{float} percentage, \mbox{\hyperlink{boolean_8h_afdcfe6db5bea87bd493a3fe2c513d5ef}{Bool}} use\_default, \textcolor{keywordtype}{float} *block\_tot\_reward);}
+\DoxyCodeLine{78 }
+\DoxyCodeLine{79 \textcolor{preprocessor}{\#endif }\textcolor{comment}{/*DGT\_SO\_PROJECT\_21\_22\_NODE\_TRANSACTOR\_H*/}\textcolor{preprocessor}{}}
+
+\end{DoxyCode}

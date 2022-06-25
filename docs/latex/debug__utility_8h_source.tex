@@ -1,0 +1,31 @@
+\hypertarget{debug__utility_8h_source}{}\doxysection{debug\+\_\+utility.\+h}
+\label{debug__utility_8h_source}\index{src/local\_lib/headers/debug\_utility.h@{src/local\_lib/headers/debug\_utility.h}}
+\mbox{\hyperlink{debug__utility_8h}{Go to the documentation of this file.}}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{1 }
+\DoxyCodeLine{6 \textcolor{preprocessor}{\#ifndef DGT\_SO\_PROJECT\_21\_22\_DEBUG\_UTILITY\_H}}
+\DoxyCodeLine{7 \textcolor{preprocessor}{\#define DGT\_SO\_PROJECT\_21\_22\_DEBUG\_UTILITY\_H}}
+\DoxyCodeLine{8 }
+\DoxyCodeLine{9 \textcolor{preprocessor}{\#include "{}\mbox{\hyperlink{glob_8h}{glob.h}}"{}}}
+\DoxyCodeLine{10 \textcolor{comment}{/*  DEBUG\_MESSAGE definitions:  */}}
+\DoxyCodeLine{11 \textcolor{preprocessor}{\#ifdef DEBUG}}
+\DoxyCodeLine{12 \textcolor{preprocessor}{\#define DEBUG\_BLOCK\_ACTION\_START(mex) fprintf(stderr, "{}\%s-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/ \%s -\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/\(\backslash\)n\%s"{}},COLOR\_RESET\_ANSI\_CODE, mex, COLOR\_RESET\_ANSI\_CODE); }
+\DoxyCodeLine{13 \textcolor{preprocessor}{\#define DEBUG\_BLOCK\_ACTION\_END() fprintf(stderr, "{}\%s-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/ END -\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/\(\backslash\)n\%s"{}},COLOR\_RESET\_ANSI\_CODE,COLOR\_RESET\_ANSI\_CODE); }
+\DoxyCodeLine{14 \textcolor{preprocessor}{\#define DEBUG\_NOTIFY\_ACTIVITY\_RUNNING(mex) fprintf(stderr,"{}\%s\%s [DEBUG-\/NOTIFY] \%d := \%s\%s\(\backslash\)n"{}}, COLOR\_RESET\_ANSI\_CODE,COLOR\_YELLOW\_ANSI\_CODE, getpid(),mex,COLOR\_RESET\_ANSI\_CODE) }
+\DoxyCodeLine{15 \textcolor{preprocessor}{\#define DEBUG\_NOTIFY\_ACTIVITY\_DONE(mex) fprintf(stderr,"{}\%s\%s [DEBUG-\/NOTIFY] \%d := \%s\%s\(\backslash\)n"{}}, COLOR\_RESET\_ANSI\_CODE,COLOR\_GREEN\_ANSI\_CODE, getpid(),mex,COLOR\_RESET\_ANSI\_CODE) }
+\DoxyCodeLine{16 \textcolor{preprocessor}{\#define DEBUG\_MESSAGE(mex) fprintf(stderr, "{}\%s\%s [DEBUG] := | file\_in: \%s | pid: \%d | line \%d |\(\backslash\)n -\/> \%s\(\backslash\)n\%s"{}}, COLOR\_RESET\_ANSI\_CODE, COLOR\_BLUE\_ANSI\_CODE, \_\_FILE\_\_, getpid(), \_\_LINE\_\_,mex, COLOR\_RESET\_ANSI\_CODE) }
+\DoxyCodeLine{17 \textcolor{preprocessor}{\#define DEBUG\_SIGNAL(mex, signum) fprintf(stderr, "{}\%s\%s [DEBUG-\/SIGNAL]:= | file\_in: \%s | pid: \%d | line \%d |\(\backslash\)n -\/> \%s, \{\%d\}\(\backslash\)n\%s"{}},COLOR\_RESET\_ANSI\_CODE, COLOR\_YELLOW\_ANSI\_CODE, \_\_FILE\_\_, getpid(), \_\_LINE\_\_,mex, signum,COLOR\_RESET\_ANSI\_CODE) }
+\DoxyCodeLine{18 \textcolor{preprocessor}{\#define DEBUG\_ERROR\_MESSAGE(mex) fprintf(stderr, "{}\%s\%s [DEBUG]:= | file\_in: \%s | pid: \%d | line \%d |\(\backslash\)n -\/> \%s\(\backslash\)n\%s"{}}, COLOR\_RESET\_ANSI\_CODE, COLOR\_WHITE\_ANSI\_CODE, \_\_FILE\_\_, getpid(), \_\_LINE\_\_, mex, COLOR\_RESET\_ANSI\_CODE) }
+\DoxyCodeLine{19 \textcolor{preprocessor}{\#endif}}
+\DoxyCodeLine{20 \textcolor{preprocessor}{\#ifndef DEBUG}}
+\DoxyCodeLine{21 \textcolor{preprocessor}{\#define DEBUG\_NOTIFY\_ACTIVITY\_RUNNING(mex)}}
+\DoxyCodeLine{22 \textcolor{preprocessor}{\#define DEBUG\_NOTIFY\_ACTIVITY\_DONE(mex)}}
+\DoxyCodeLine{23 \textcolor{preprocessor}{\#define DEBUG\_MESSAGE(mex)}}
+\DoxyCodeLine{24 \textcolor{preprocessor}{\#define DEBUG\_SIGNAL(mex, signum)}}
+\DoxyCodeLine{25 \textcolor{preprocessor}{\#define DEBUG\_ERROR\_MESSAGE(mex)}}
+\DoxyCodeLine{26 \textcolor{preprocessor}{\#define DEBUG\_BLOCK\_ACTION\_START(mex)}}
+\DoxyCodeLine{27 \textcolor{preprocessor}{\#define DEBUG\_BLOCK\_ACTION\_END()}}
+\DoxyCodeLine{28 \textcolor{preprocessor}{\#endif}}
+\DoxyCodeLine{29 \textcolor{preprocessor}{\#endif }\textcolor{comment}{/*DGT\_SO\_PROJECT\_21\_22\_DEBUG\_UTILITY\_H*/}\textcolor{preprocessor}{}}
+
+\end{DoxyCode}

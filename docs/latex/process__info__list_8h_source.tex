@@ -1,0 +1,71 @@
+\hypertarget{process__info__list_8h_source}{}\doxysection{process\+\_\+info\+\_\+list.\+h}
+\label{process__info__list_8h_source}\index{src/local\_lib/headers/process\_info\_list.h@{src/local\_lib/headers/process\_info\_list.h}}
+\mbox{\hyperlink{process__info__list_8h}{Go to the documentation of this file.}}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{1 }
+\DoxyCodeLine{7 \textcolor{preprocessor}{\#ifndef DGT\_SO\_PROJECT\_21\_22\_PROCESS\_INFO\_LIST\_H}}
+\DoxyCodeLine{8 \textcolor{preprocessor}{\#define DGT\_SO\_PROJECT\_21\_22\_PROCESS\_INFO\_LIST\_H}}
+\DoxyCodeLine{9 }
+\DoxyCodeLine{10 \textcolor{preprocessor}{\#include <unistd.h>}}
+\DoxyCodeLine{11 \textcolor{preprocessor}{\#include <sys/types.h>}}
+\DoxyCodeLine{12 }
+\DoxyCodeLine{13 \textcolor{preprocessor}{\#include "{}\mbox{\hyperlink{boolean_8h}{boolean.h}}"{}}}
+\DoxyCodeLine{14 }
+\DoxyCodeLine{19 \textcolor{keyword}{typedef} \textcolor{keyword}{enum} \{}
+\DoxyCodeLine{20     \mbox{\hyperlink{process__info__list_8h_adcfd73fb435fd887e97d37de4d424ea8a7e985cfcbe89451c8f8fc0b59a723e2c}{PROC\_TYPE\_USER}}, \mbox{\hyperlink{process__info__list_8h_adcfd73fb435fd887e97d37de4d424ea8a6dd0305bf8522cfdcf0b0c807b04b08d}{PROC\_TYPE\_NODE}},}
+\DoxyCodeLine{21 \} \mbox{\hyperlink{process__info__list_8h_adcfd73fb435fd887e97d37de4d424ea8}{PROCTYPE}};}
+\DoxyCodeLine{22 }
+\DoxyCodeLine{27 \textcolor{keyword}{struct }\mbox{\hyperlink{struct_process_info}{ProcessInfo}} \{}
+\DoxyCodeLine{28     pid\_t \mbox{\hyperlink{struct_process_info_ae0d46a978d5cd6707411f276ad869b9c}{pid}}; }
+\DoxyCodeLine{29     \textcolor{keywordtype}{int} \mbox{\hyperlink{struct_process_info_af811a825a44e92ce22aede30a39fe36c}{id\_queue}}; }
+\DoxyCodeLine{30     \textcolor{keywordtype}{short} \textcolor{keywordtype}{int} \mbox{\hyperlink{struct_process_info_a1649e226ef5bfb302ffffe76036ba22b}{proc\_state}}; }
+\DoxyCodeLine{31     \textcolor{keywordtype}{short} \textcolor{keywordtype}{int} \mbox{\hyperlink{struct_process_info_aa0add69501be5040af4a167fd0d50168}{proc\_type}}; }
+\DoxyCodeLine{32     \textcolor{keywordtype}{float} \mbox{\hyperlink{struct_process_info_aba96c1bfea2a8500bcdbbd1c64fddffb}{budget}}; }
+\DoxyCodeLine{33 \};}
+\DoxyCodeLine{38 \textcolor{keyword}{typedef} \textcolor{keyword}{struct }\mbox{\hyperlink{struct_process_info}{ProcessInfo}} *Proc;}
+\DoxyCodeLine{43 \textcolor{keyword}{typedef} \textcolor{keyword}{struct }\mbox{\hyperlink{structprocesses__info__list}{processes\_info\_list}} *ProcList;}
+\DoxyCodeLine{44 }
+\DoxyCodeLine{50 ProcList \mbox{\hyperlink{process__info__list_8h_acebe0ae866a12e6cb8b9cfba85b81a71}{proc\_list\_create}}();}
+\DoxyCodeLine{51 }
+\DoxyCodeLine{62 \mbox{\hyperlink{boolean_8h_afdcfe6db5bea87bd493a3fe2c513d5ef}{Bool}} \mbox{\hyperlink{process__info__list_8h_aef1b966b9a95d149e850f1ece9c65d9d}{insert\_in\_list}}(ProcList *self, pid\_t pid, \textcolor{keywordtype}{int} id\_queue, \textcolor{keywordtype}{short} \textcolor{keywordtype}{int} proc\_state, \textcolor{keywordtype}{short} \textcolor{keywordtype}{int} proc\_type, \textcolor{keywordtype}{float} budget);}
+\DoxyCodeLine{63 }
+\DoxyCodeLine{68 \mbox{\hyperlink{boolean_8h_afdcfe6db5bea87bd493a3fe2c513d5ef}{Bool}} \mbox{\hyperlink{process__info__list_8h_a156ac42ef2292e903980a66d6b9ae975}{proc\_list\_is\_empty}}(\textcolor{keyword}{const} ProcList self);}
+\DoxyCodeLine{69 }
+\DoxyCodeLine{76 \textcolor{keyword}{struct }\mbox{\hyperlink{struct_process_info}{ProcessInfo}} \mbox{\hyperlink{process__info__list_8h_a5693a26b77c4d681d880b08a50a87e1a}{get\_proc\_from\_pid}}(ProcList self, pid\_t \mbox{\hyperlink{struct_process_info_ae0d46a978d5cd6707411f276ad869b9c}{pid}});}
+\DoxyCodeLine{77 }
+\DoxyCodeLine{84 \textcolor{keyword}{struct }\mbox{\hyperlink{struct_process_info}{ProcessInfo}} \mbox{\hyperlink{process__info__list_8h_a4713db12978188c533867607822df971}{get\_proc\_from\_queue\_id}}(ProcList self, int \mbox{\hyperlink{struct_process_info_af811a825a44e92ce22aede30a39fe36c}{id\_queue}});}
+\DoxyCodeLine{85 }
+\DoxyCodeLine{94 \textcolor{keywordtype}{void} \mbox{\hyperlink{process__info__list_8h_ae0efd1224d7e5a78fc055d0a55c8b66b}{send\_sig\_to\_all}}(ProcList \mbox{\hyperlink{main_8c_a203f1362008a8171971c8ac1bd6bce04}{proc\_list}}, \textcolor{keywordtype}{int} signal, \textcolor{keywordtype}{int} *pids);}
+\DoxyCodeLine{95 }
+\DoxyCodeLine{103 \textcolor{keywordtype}{int} \mbox{\hyperlink{process__info__list_8h_a33ce8aa25c7ed22e321b8eafc51b9b43}{send\_sig\_to\_all\_nodes}}(ProcList \mbox{\hyperlink{main_8c_a203f1362008a8171971c8ac1bd6bce04}{proc\_list}}, \textcolor{keywordtype}{int} signal, \mbox{\hyperlink{boolean_8h_afdcfe6db5bea87bd493a3fe2c513d5ef}{Bool}} exclude\_last);}
+\DoxyCodeLine{104 }
+\DoxyCodeLine{110 \textcolor{keywordtype}{void} \mbox{\hyperlink{process__info__list_8h_ad96760aa2062e90e4ebe2f940594136d}{print\_list}}(ProcList self);}
+\DoxyCodeLine{111 }
+\DoxyCodeLine{116 \textcolor{keywordtype}{void} \mbox{\hyperlink{process__info__list_8h_ad6216a160e2c146aa08fcea5ec8d58ca}{list\_free}}(ProcList self);}
+\DoxyCodeLine{117 }
+\DoxyCodeLine{124 \textcolor{keywordtype}{void} \mbox{\hyperlink{process__info__list_8h_aa8147ed0beac165a74224441d0eb06eb}{list\_set\_state}}(ProcList self, pid\_t \mbox{\hyperlink{struct_process_info_ae0d46a978d5cd6707411f276ad869b9c}{pid}}, \textcolor{keywordtype}{short} \textcolor{keywordtype}{int} state);}
+\DoxyCodeLine{125 }
+\DoxyCodeLine{130 \textcolor{keywordtype}{void} \mbox{\hyperlink{process__info__list_8h_a7fffb7531f2b35fee3264db43fba017d}{terminator}}(ProcList self);}
+\DoxyCodeLine{131 }
+\DoxyCodeLine{137 \textcolor{keywordtype}{void} \mbox{\hyperlink{process__info__list_8h_ac7a45a08d8356ffb5bb5588457bd937e}{saving\_private\_ryan}}(ProcList self, \textcolor{keywordtype}{int} queue\_id);}
+\DoxyCodeLine{138 }
+\DoxyCodeLine{143 \textcolor{keywordtype}{int} \mbox{\hyperlink{process__info__list_8h_a2adccd38ed14c76131db873843616a8a}{get\_num\_of\_proc}}(ProcList self);}
+\DoxyCodeLine{144 }
+\DoxyCodeLine{149 \textcolor{keywordtype}{int} \mbox{\hyperlink{process__info__list_8h_a8be3d87cbdfc3396f354b9686e32ad93}{get\_num\_of\_user\_proc\_running}}(ProcList self);}
+\DoxyCodeLine{150 }
+\DoxyCodeLine{155 \textcolor{keywordtype}{int} \mbox{\hyperlink{process__info__list_8h_ab6afa16bf98766e584d2179bc831770b}{get\_num\_of\_node\_proc\_running}}(ProcList self);}
+\DoxyCodeLine{156 }
+\DoxyCodeLine{165 \mbox{\hyperlink{boolean_8h_afdcfe6db5bea87bd493a3fe2c513d5ef}{Bool}} \mbox{\hyperlink{process__info__list_8h_a1ad4d7a8798f819f07d3ef03d563b01e}{send\_msg\_to\_all\_nodes}}(\textcolor{keywordtype}{int} queue\_id, \textcolor{keywordtype}{int} retry, ProcList \mbox{\hyperlink{main_8c_a203f1362008a8171971c8ac1bd6bce04}{proc\_list}}, \textcolor{keywordtype}{int} node\_id, \mbox{\hyperlink{boolean_8h_afdcfe6db5bea87bd493a3fe2c513d5ef}{Bool}} exclude\_last);}
+\DoxyCodeLine{166 }
+\DoxyCodeLine{174 \textcolor{keywordtype}{void} \mbox{\hyperlink{process__info__list_8h_a4ab1839d98bc544a6c8c96853eefc9ac}{get\_random\_node\_list}}(ProcList \mbox{\hyperlink{main_8c_a203f1362008a8171971c8ac1bd6bce04}{proc\_list}}, ProcList node\_list, \textcolor{keywordtype}{int} num\_of\_node);}
+\DoxyCodeLine{175 }
+\DoxyCodeLine{181 \textcolor{keyword}{struct }\mbox{\hyperlink{struct_process_info}{ProcessInfo}} \mbox{\hyperlink{process__info__list_8h_a82641ad98a3aace394b6c999dd37d5f2}{get\_first}}(ProcList self);}
+\DoxyCodeLine{182 }
+\DoxyCodeLine{191 \textcolor{keywordtype}{int} \mbox{\hyperlink{process__info__list_8h_ae0642aea0cb00ade7371665798befb0f}{update\_proc}}(ProcList self, \textcolor{keywordtype}{int} \mbox{\hyperlink{struct_process_info_ae0d46a978d5cd6707411f276ad869b9c}{pid}}, \textcolor{keywordtype}{float} \mbox{\hyperlink{struct_process_info_aba96c1bfea2a8500bcdbbd1c64fddffb}{budget}}, \textcolor{keywordtype}{short} \textcolor{keywordtype}{int} \mbox{\hyperlink{struct_process_info_a1649e226ef5bfb302ffffe76036ba22b}{proc\_state}});}
+\DoxyCodeLine{192 }
+\DoxyCodeLine{198 \textcolor{keywordtype}{void} \mbox{\hyperlink{process__info__list_8h_ac839df6c86ee45f990d501077b6d3438}{get\_running\_node\_proc}}(ProcList self, ProcList node\_list);}
+\DoxyCodeLine{199 }
+\DoxyCodeLine{205 \textcolor{keywordtype}{int} \mbox{\hyperlink{process__info__list_8h_a18838db972c83b665de6dabff20d3c33}{get\_num\_proc\_running}}(ProcList self);}
+\DoxyCodeLine{206 \textcolor{preprocessor}{\#endif }\textcolor{comment}{/*DGT\_SO\_PROJECT\_21\_22\_PROCESS\_INFO\_LIST\_H*/}\textcolor{preprocessor}{}}
+
+\end{DoxyCode}

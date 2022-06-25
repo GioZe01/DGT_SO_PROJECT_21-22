@@ -1,0 +1,12 @@
+<map id="src/local_lib/book_master_shm.c" name="src/local_lib/book_master_shm.c">
+<area shape="rect" id="node1" title=" " alt="" coords="115,5,250,47"/>
+<area shape="rect" id="node2" title=" " alt="" coords="5,259,72,285"/>
+<area shape="rect" id="node3" title=" " alt="" coords="64,102,152,129"/>
+<area shape="rect" id="node4" href="$book__master__shm_8h.html" title="header file for the book_master_shm.c file Defines the functions used to create and manage the shared..." alt="" coords="176,95,339,136"/>
+<area shape="rect" id="node10" href="$glob_8h.html" title="Definition of Values and Macros for the project." alt="" coords="342,184,405,211"/>
+<area shape="rect" id="node5" href="$transaction__list_8h.html" title="Header file for the transaction_list.c file. Contains the definition of the Transaction structure and..." alt="" coords="177,184,311,211"/>
+<area shape="rect" id="node6" title=" " alt="" coords="419,259,493,285"/>
+<area shape="rect" id="node7" title=" " alt="" coords="211,259,275,285"/>
+<area shape="rect" id="node8" title=" " alt="" coords="299,259,395,285"/>
+<area shape="rect" id="node9" href="$boolean_8h.html" title="Type Definition for the boolean type using integer values Done for C89 compatibility." alt="" coords="99,259,186,285"/>
+</map>

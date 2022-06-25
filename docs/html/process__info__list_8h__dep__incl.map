@@ -1,0 +1,9 @@
+<map id="src/local_lib/headers/process_info_list.h" name="src/local_lib/headers/process_info_list.h">
+<area shape="rect" id="node1" title="Header file for the process_info_list.c file. Contains the definition of the ProcessInfo structure an..." alt="" coords="248,5,403,47"/>
+<area shape="rect" id="node2" href="$master__msg__report_8h.html" title="Header file for the master_msg_report.c module. Contains the definitions of the functions,..." alt="" coords="323,95,488,136"/>
+<area shape="rect" id="node3" href="$master__msg__report_8c.html" title=" " alt="" coords="5,184,155,225"/>
+<area shape="rect" id="node4" href="$process__info__list_8c.html" title=" " alt="" coords="179,184,333,225"/>
+<area shape="rect" id="node5" href="$main_8c.html" title=" " alt="" coords="647,191,737,218"/>
+<area shape="rect" id="node6" href="$node__proc_8c.html" title=" " alt="" coords="500,191,623,218"/>
+<area shape="rect" id="node7" href="$user__proc_8c.html" title=" " alt="" coords="357,191,475,218"/>
+</map>

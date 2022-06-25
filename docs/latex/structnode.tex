@@ -1,0 +1,162 @@
+\hypertarget{structnode}{}\doxysection{node Struct Reference}
+\label{structnode}\index{node@{node}}
+
+
+Node structure used to represent a node.  
+
+
+
+
+{\ttfamily \#include $<$node\+\_\+transactor.\+h$>$}
+
+
+
+Collaboration diagram for node\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=217pt]{structnode__coll__graph}
+\end{center}
+\end{figure}
+\doxysubsection*{Data Fields}
+\begin{DoxyCompactItemize}
+\item 
+pid\+\_\+t \mbox{\hyperlink{structnode_ae0d46a978d5cd6707411f276ad869b9c}{pid}}
+\item 
+int \mbox{\hyperlink{structnode_a3c903aa740f7504a1b3907bf27bce01d}{node\+\_\+id}}
+\item 
+short int \mbox{\hyperlink{structnode_ae7a9d7856dc91cc7dfe694046d892b85}{exec\+\_\+state}}
+\item 
+float \mbox{\hyperlink{structnode_aba96c1bfea2a8500bcdbbd1c64fddffb}{budget}}
+\item 
+int \mbox{\hyperlink{structnode_a4815db050d5f27d4b4e922d61bf6ca88}{tp\+\_\+size}}
+\item 
+int \mbox{\hyperlink{structnode_a70b27761c7d0bd5cd90f4fe47e569b94}{block\+\_\+size}}
+\item 
+float \mbox{\hyperlink{structnode_a34c5b668208550b3c34a2ed0eec615f5}{percentage}}
+\item 
+Queue \mbox{\hyperlink{structnode_acd48ecee26244dc76aa4268dfce00f3b}{transactions\+\_\+pool}}
+\item 
+Queue \mbox{\hyperlink{structnode_a37423ab7a4227ac1171c72cbb63b6c18}{transactions\+\_\+block}}
+\item 
+\mbox{\hyperlink{node__transactor_8h_a1718c8e04c968b7d95cf3142bff81e46}{Reward}} \mbox{\hyperlink{structnode_a303a3a5f822155b2bc220f509113cc9c}{calc\+\_\+reward}}
+\item 
+int \mbox{\hyperlink{structnode_af811a825a44e92ce22aede30a39fe36c}{id\+\_\+queue}}
+\item 
+short int \mbox{\hyperlink{structnode_a1649e226ef5bfb302ffffe76036ba22b}{proc\+\_\+state}}
+\item 
+short int \mbox{\hyperlink{structnode_aa0add69501be5040af4a167fd0d50168}{proc\+\_\+type}}
+\item 
+struct \mbox{\hyperlink{structnode}{node}} $\ast$ \mbox{\hyperlink{structnode_a186d66a4e734583e507c691fbf168b05}{next}}
+\item 
+struct \mbox{\hyperlink{struct_transaction}{Transaction}} \mbox{\hyperlink{structnode_a56bd9d2b5fdd55a29ec318130a05d84f}{t}}
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+Node structure used to represent a node. 
+
+Structure representing a node (a process) in the process list. 
+
+\doxysubsection{Field Documentation}
+\mbox{\Hypertarget{structnode_a70b27761c7d0bd5cd90f4fe47e569b94}\label{structnode_a70b27761c7d0bd5cd90f4fe47e569b94}} 
+\index{node@{node}!block\_size@{block\_size}}
+\index{block\_size@{block\_size}!node@{node}}
+\doxysubsubsection{\texorpdfstring{block\_size}{block\_size}}
+{\footnotesize\ttfamily int block\+\_\+size}
+
+Current size of the block \mbox{\Hypertarget{structnode_aba96c1bfea2a8500bcdbbd1c64fddffb}\label{structnode_aba96c1bfea2a8500bcdbbd1c64fddffb}} 
+\index{node@{node}!budget@{budget}}
+\index{budget@{budget}!node@{node}}
+\doxysubsubsection{\texorpdfstring{budget}{budget}}
+{\footnotesize\ttfamily float budget}
+
+Current budget of the node
+
+Budget of the process of the node \mbox{\Hypertarget{structnode_a303a3a5f822155b2bc220f509113cc9c}\label{structnode_a303a3a5f822155b2bc220f509113cc9c}} 
+\index{node@{node}!calc\_reward@{calc\_reward}}
+\index{calc\_reward@{calc\_reward}!node@{node}}
+\doxysubsubsection{\texorpdfstring{calc\_reward}{calc\_reward}}
+{\footnotesize\ttfamily \mbox{\hyperlink{node__transactor_8h_a1718c8e04c968b7d95cf3142bff81e46}{Reward}} calc\+\_\+reward}
+
+Reward function used to calculate the reward for the node based on the transaction \mbox{\Hypertarget{structnode_ae7a9d7856dc91cc7dfe694046d892b85}\label{structnode_ae7a9d7856dc91cc7dfe694046d892b85}} 
+\index{node@{node}!exec\_state@{exec\_state}}
+\index{exec\_state@{exec\_state}!node@{node}}
+\doxysubsubsection{\texorpdfstring{exec\_state}{exec\_state}}
+{\footnotesize\ttfamily short int exec\+\_\+state}
+
+Current state of the node proc \mbox{\Hypertarget{structnode_af811a825a44e92ce22aede30a39fe36c}\label{structnode_af811a825a44e92ce22aede30a39fe36c}} 
+\index{node@{node}!id\_queue@{id\_queue}}
+\index{id\_queue@{id\_queue}!node@{node}}
+\doxysubsubsection{\texorpdfstring{id\_queue}{id\_queue}}
+{\footnotesize\ttfamily int id\+\_\+queue}
+
+ID of the queue where the process is \mbox{\Hypertarget{structnode_a186d66a4e734583e507c691fbf168b05}\label{structnode_a186d66a4e734583e507c691fbf168b05}} 
+\index{node@{node}!next@{next}}
+\index{next@{next}!node@{node}}
+\doxysubsubsection{\texorpdfstring{next}{next}}
+{\footnotesize\ttfamily struct \mbox{\hyperlink{structnode}{node}} $\ast$ next}
+
+Pointer to the next node \mbox{\Hypertarget{structnode_a3c903aa740f7504a1b3907bf27bce01d}\label{structnode_a3c903aa740f7504a1b3907bf27bce01d}} 
+\index{node@{node}!node\_id@{node\_id}}
+\index{node\_id@{node\_id}!node@{node}}
+\doxysubsubsection{\texorpdfstring{node\_id}{node\_id}}
+{\footnotesize\ttfamily int node\+\_\+id}
+
+Index id of the node into the message queues for nodes \mbox{\Hypertarget{structnode_a34c5b668208550b3c34a2ed0eec615f5}\label{structnode_a34c5b668208550b3c34a2ed0eec615f5}} 
+\index{node@{node}!percentage@{percentage}}
+\index{percentage@{percentage}!node@{node}}
+\doxysubsubsection{\texorpdfstring{percentage}{percentage}}
+{\footnotesize\ttfamily float percentage}
+
+Percentage of the budget to be used for the reward \mbox{\Hypertarget{structnode_ae0d46a978d5cd6707411f276ad869b9c}\label{structnode_ae0d46a978d5cd6707411f276ad869b9c}} 
+\index{node@{node}!pid@{pid}}
+\index{pid@{pid}!node@{node}}
+\doxysubsubsection{\texorpdfstring{pid}{pid}}
+{\footnotesize\ttfamily pid\+\_\+t pid}
+
+PID of the node
+
+Process PID of the node \mbox{\Hypertarget{structnode_a1649e226ef5bfb302ffffe76036ba22b}\label{structnode_a1649e226ef5bfb302ffffe76036ba22b}} 
+\index{node@{node}!proc\_state@{proc\_state}}
+\index{proc\_state@{proc\_state}!node@{node}}
+\doxysubsubsection{\texorpdfstring{proc\_state}{proc\_state}}
+{\footnotesize\ttfamily short int proc\+\_\+state}
+
+State of the process of the node \mbox{\Hypertarget{structnode_aa0add69501be5040af4a167fd0d50168}\label{structnode_aa0add69501be5040af4a167fd0d50168}} 
+\index{node@{node}!proc\_type@{proc\_type}}
+\index{proc\_type@{proc\_type}!node@{node}}
+\doxysubsubsection{\texorpdfstring{proc\_type}{proc\_type}}
+{\footnotesize\ttfamily short int proc\+\_\+type}
+
+Type of the process of the node \mbox{\Hypertarget{structnode_a56bd9d2b5fdd55a29ec318130a05d84f}\label{structnode_a56bd9d2b5fdd55a29ec318130a05d84f}} 
+\index{node@{node}!t@{t}}
+\index{t@{t}!node@{node}}
+\doxysubsubsection{\texorpdfstring{t}{t}}
+{\footnotesize\ttfamily struct \mbox{\hyperlink{struct_transaction}{Transaction}} t}
+
+\mbox{\Hypertarget{structnode_a4815db050d5f27d4b4e922d61bf6ca88}\label{structnode_a4815db050d5f27d4b4e922d61bf6ca88}} 
+\index{node@{node}!tp\_size@{tp\_size}}
+\index{tp\_size@{tp\_size}!node@{node}}
+\doxysubsubsection{\texorpdfstring{tp\_size}{tp\_size}}
+{\footnotesize\ttfamily int tp\+\_\+size}
+
+Current size of the transaction pool \mbox{\Hypertarget{structnode_a37423ab7a4227ac1171c72cbb63b6c18}\label{structnode_a37423ab7a4227ac1171c72cbb63b6c18}} 
+\index{node@{node}!transactions\_block@{transactions\_block}}
+\index{transactions\_block@{transactions\_block}!node@{node}}
+\doxysubsubsection{\texorpdfstring{transactions\_block}{transactions\_block}}
+{\footnotesize\ttfamily Queue transactions\+\_\+block}
+
+Queue of the transactions block \mbox{\Hypertarget{structnode_acd48ecee26244dc76aa4268dfce00f3b}\label{structnode_acd48ecee26244dc76aa4268dfce00f3b}} 
+\index{node@{node}!transactions\_pool@{transactions\_pool}}
+\index{transactions\_pool@{transactions\_pool}!node@{node}}
+\doxysubsubsection{\texorpdfstring{transactions\_pool}{transactions\_pool}}
+{\footnotesize\ttfamily Queue transactions\+\_\+pool}
+
+Queue of the transactions pool 
+
+The documentation for this struct was generated from the following files\+:\begin{DoxyCompactItemize}
+\item 
+src/local\+\_\+lib/headers/\mbox{\hyperlink{node__transactor_8h}{node\+\_\+transactor.\+h}}\item 
+src/local\+\_\+lib/\mbox{\hyperlink{process__info__list_8c}{process\+\_\+info\+\_\+list.\+c}}\item 
+src/local\+\_\+lib/\mbox{\hyperlink{transaction__list_8c}{transaction\+\_\+list.\+c}}\end{DoxyCompactItemize}

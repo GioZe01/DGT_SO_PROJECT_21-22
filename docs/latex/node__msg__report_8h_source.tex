@@ -1,0 +1,33 @@
+\hypertarget{node__msg__report_8h_source}{}\doxysection{node\+\_\+msg\+\_\+report.\+h}
+\label{node__msg__report_8h_source}\index{src/local\_lib/headers/node\_msg\_report.h@{src/local\_lib/headers/node\_msg\_report.h}}
+\mbox{\hyperlink{node__msg__report_8h}{Go to the documentation of this file.}}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{1 }
+\DoxyCodeLine{7 \textcolor{preprocessor}{\#ifndef DGT\_SO\_PROJECT\_21\_22\_NODE\_MSG\_REPORT\_H}}
+\DoxyCodeLine{8 \textcolor{preprocessor}{\#define DGT\_SO\_PROJECT\_21\_22\_NODE\_MSG\_REPORT\_H}}
+\DoxyCodeLine{9 }
+\DoxyCodeLine{10 \textcolor{preprocessor}{\#include <unistd.h>}}
+\DoxyCodeLine{11 \textcolor{preprocessor}{\#include "{}\mbox{\hyperlink{transaction__list_8h}{transaction\_list.h}}"{}}}
+\DoxyCodeLine{12 }
+\DoxyCodeLine{18 \textcolor{preprocessor}{\#define DELTA\_NODE\_MSG\_TYPE 3}}
+\DoxyCodeLine{19 \textcolor{preprocessor}{\#define MSG\_MASTER\_ORIGIN\_ID 1}}
+\DoxyCodeLine{20 \textcolor{preprocessor}{\#define MSG\_NODE\_ORIGIN\_TYPE 2}}
+\DoxyCodeLine{21 \textcolor{preprocessor}{\#define MSG\_TRANSACTION\_TYPE 3}}
+\DoxyCodeLine{28 \textcolor{keyword}{struct }\mbox{\hyperlink{structnode__msg}{node\_msg}} \{}
+\DoxyCodeLine{29     \textcolor{keywordtype}{long} \mbox{\hyperlink{structnode__msg_a6a83a8677f7c78fd146859325e08209a}{type}}; }
+\DoxyCodeLine{30     pid\_t \mbox{\hyperlink{structnode__msg_a7d2e6afe0d983572b540b9bb159e29f2}{sender\_pid}}; }
+\DoxyCodeLine{31     \textcolor{keyword}{struct }\mbox{\hyperlink{struct_transaction}{Transaction}} \mbox{\hyperlink{structnode__msg_a56bd9d2b5fdd55a29ec318130a05d84f}{t}}; }
+\DoxyCodeLine{32 \};}
+\DoxyCodeLine{33 }
+\DoxyCodeLine{43 \textcolor{keywordtype}{int} \mbox{\hyperlink{node__msg__report_8h_a9d2c934098d235a432f6b52fa970c208}{node\_msg\_create}}(\textcolor{keyword}{struct} \mbox{\hyperlink{structnode__msg}{node\_msg}} *self, \textcolor{keywordtype}{long} type, pid\_t sender\_pid, \textcolor{keyword}{struct} \mbox{\hyperlink{struct_transaction}{Transaction}} *t, \textcolor{keywordtype}{int} message\_type);}
+\DoxyCodeLine{44 }
+\DoxyCodeLine{49 \textcolor{keywordtype}{void} \mbox{\hyperlink{node__msg__report_8h_abc4d6316c635d202764888c5d3a3b4c8}{node\_msg\_print}}(\textcolor{keyword}{struct} \mbox{\hyperlink{structnode__msg}{node\_msg}} *self);}
+\DoxyCodeLine{50 }
+\DoxyCodeLine{64 \textcolor{keywordtype}{int} \mbox{\hyperlink{node__msg__report_8h_a1dc698259028b41778d2e4b75382af3e}{node\_msg\_snd}}(\textcolor{keywordtype}{int} \textcolor{keywordtype}{id}, \textcolor{keyword}{struct} \mbox{\hyperlink{structnode__msg}{node\_msg}} *msg, \textcolor{keywordtype}{long} type, \textcolor{keyword}{struct} \mbox{\hyperlink{struct_transaction}{Transaction}} *t, pid\_t \mbox{\hyperlink{struct_transaction_a36060e3785ebad7b278cb01d5159c0c5}{sender}}, \mbox{\hyperlink{boolean_8h_afdcfe6db5bea87bd493a3fe2c513d5ef}{Bool}} crete, \textcolor{keywordtype}{int} so\_retry,}
+\DoxyCodeLine{65                  \textcolor{keywordtype}{int} queue\_id);}
+\DoxyCodeLine{66 }
+\DoxyCodeLine{75 \textcolor{keywordtype}{int} \mbox{\hyperlink{node__msg__report_8h_a2656196f431726550a66e94d6bcca92f}{node\_msg\_receive}}(\textcolor{keywordtype}{int} \textcolor{keywordtype}{id}, \textcolor{keyword}{struct} \mbox{\hyperlink{structnode__msg}{node\_msg}} *msg, \textcolor{keywordtype}{long} type);}
+\DoxyCodeLine{76 }
+\DoxyCodeLine{77 \textcolor{preprocessor}{\#endif }\textcolor{comment}{/*DGT\_SO\_PROJECT\_21\_22\_NODE\_MSG\_REPORT\_H*/}\textcolor{preprocessor}{}}
+
+\end{DoxyCode}

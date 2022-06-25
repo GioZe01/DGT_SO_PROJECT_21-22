@@ -1,0 +1,54 @@
+\hypertarget{transaction__list_8h_source}{}\doxysection{transaction\+\_\+list.\+h}
+\label{transaction__list_8h_source}\index{src/local\_lib/headers/transaction\_list.h@{src/local\_lib/headers/transaction\_list.h}}
+\mbox{\hyperlink{transaction__list_8h}{Go to the documentation of this file.}}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{1 }
+\DoxyCodeLine{7 \textcolor{preprocessor}{\#ifndef DGT\_SO\_PROJECT\_21\_22\_TRANSACTION\_LIST\_H}}
+\DoxyCodeLine{8 \textcolor{preprocessor}{\#define DGT\_SO\_PROJECT\_21\_22\_TRANSACTION\_LIST\_H}}
+\DoxyCodeLine{9 \textcolor{preprocessor}{\#include <stdio.h>}}
+\DoxyCodeLine{10 \textcolor{preprocessor}{\#include <unistd.h>}}
+\DoxyCodeLine{11 \textcolor{preprocessor}{\#include <time.h>}}
+\DoxyCodeLine{12 \textcolor{preprocessor}{\#include <sys/types.h>}}
+\DoxyCodeLine{13 \textcolor{preprocessor}{\#include "{}\mbox{\hyperlink{boolean_8h}{boolean.h}}"{}}}
+\DoxyCodeLine{19 \textcolor{preprocessor}{\#define TRANSACTION\_SUCCES 0}}
+\DoxyCodeLine{20 \textcolor{preprocessor}{\#define TRANSACTION\_FAILED -\/1}}
+\DoxyCodeLine{21 \textcolor{preprocessor}{\#define TRANSACTION\_WAITING 1}}
+\DoxyCodeLine{27 \textcolor{keyword}{struct }\mbox{\hyperlink{struct_transaction}{Transaction}}\{}
+\DoxyCodeLine{28     \textcolor{keywordtype}{short} \textcolor{keywordtype}{int} \mbox{\hyperlink{struct_transaction_ab1b70be237357a0db43b60039356d9b6}{t\_type}}; }
+\DoxyCodeLine{29     \textcolor{keyword}{struct }timespec \mbox{\hyperlink{struct_transaction_a2aace03835c4d951b3dee117b328ef87}{timestamp}}; }
+\DoxyCodeLine{30     pid\_t \mbox{\hyperlink{struct_transaction_a36060e3785ebad7b278cb01d5159c0c5}{sender}}; }
+\DoxyCodeLine{31     pid\_t \mbox{\hyperlink{struct_transaction_acad987b21b0117106d60e5974013d337}{reciver}}; }
+\DoxyCodeLine{32     \textcolor{keywordtype}{float} \mbox{\hyperlink{struct_transaction_a8937702ad328ce8656cb75a43d42cc4a}{amount}}; }
+\DoxyCodeLine{33     \textcolor{keywordtype}{float} \mbox{\hyperlink{struct_transaction_ab18e03604d8452d6d86f55873e19732a}{reward}}; }
+\DoxyCodeLine{34     \textcolor{keywordtype}{int} \mbox{\hyperlink{struct_transaction_acffe3b32e3f02235895edf2fb41af2c2}{hops}}; }
+\DoxyCodeLine{35 \};}
+\DoxyCodeLine{36 }
+\DoxyCodeLine{41 \textcolor{keyword}{typedef} \textcolor{keyword}{struct }\mbox{\hyperlink{structtransaction__list}{transaction\_list}} *Queue;}
+\DoxyCodeLine{42 \textcolor{comment}{/*Functionality*/}}
+\DoxyCodeLine{43 \textcolor{keywordtype}{int} \mbox{\hyperlink{transaction__list_8h_a2a36e946d79aa2164121998cb2a60d75}{create\_transaction}}(\textcolor{keyword}{struct} \mbox{\hyperlink{struct_transaction}{Transaction}} *t,pid\_t sender, pid\_t receiver, \textcolor{keywordtype}{float} amount);}
+\DoxyCodeLine{48 Queue \mbox{\hyperlink{transaction__list_8h_a24a786275016ae7b4831f94fa44dd6a8}{queue\_create}}(\textcolor{keywordtype}{void});}
+\DoxyCodeLine{53 \textcolor{keywordtype}{void} \mbox{\hyperlink{transaction__list_8h_a4b43e06a4ecbf63d97c657b2713c482e}{queue\_destroy}}(Queue q);}
+\DoxyCodeLine{59 \textcolor{keywordtype}{void} \mbox{\hyperlink{transaction__list_8h_a3cf1de6854c5ceaf45344cd84795886a}{queue\_append}}(Queue q, \textcolor{keyword}{struct} \mbox{\hyperlink{struct_transaction}{Transaction}} i);}
+\DoxyCodeLine{64 \textcolor{keywordtype}{void} \mbox{\hyperlink{transaction__list_8h_a58f069167e5ce83fd53fc0472e446c9a}{queue\_remove\_head}}(Queue q);}
+\DoxyCodeLine{70 \textcolor{keyword}{struct }\mbox{\hyperlink{struct_transaction}{Transaction}} * \mbox{\hyperlink{transaction__list_8h_ad6e2542da82cf7ad128342f55af7168b}{queue\_head}}(Queue q);}
+\DoxyCodeLine{76 \textcolor{keyword}{struct }\mbox{\hyperlink{struct_transaction}{Transaction}} \mbox{\hyperlink{transaction__list_8h_a0822880f1cc2fc8be1497d1c075ce602}{queue\_last}}(Queue q);}
+\DoxyCodeLine{82 \mbox{\hyperlink{boolean_8h_afdcfe6db5bea87bd493a3fe2c513d5ef}{Bool}} \mbox{\hyperlink{transaction__list_8h_ae770c903ab121bcd43dd5914c731b931}{queue\_is\_empty}}(Queue q);}
+\DoxyCodeLine{89 \textcolor{keywordtype}{float} \mbox{\hyperlink{transaction__list_8h_a54c8919b16e7e3a12c3455c5ca31fc2e}{queue\_apt\_amount\_reward}}(Queue q, \textcolor{keywordtype}{float} percentage);}
+\DoxyCodeLine{95 \textcolor{keywordtype}{float} \mbox{\hyperlink{transaction__list_8h_ab7181a1b1aea65ba8a23c0be5268de2d}{queue\_get\_reward}}(Queue q);}
+\DoxyCodeLine{100 \textcolor{keywordtype}{void} \mbox{\hyperlink{transaction__list_8h_a01a21c03bc602f27f94653f323d0e4ef}{queue\_print}}(Queue q);}
+\DoxyCodeLine{105 \textcolor{keywordtype}{void} \mbox{\hyperlink{transaction__list_8h_a2ea5e61e8576c1c4c1751f63d4f77cab}{transaction\_print}}(\textcolor{keyword}{struct} \mbox{\hyperlink{struct_transaction}{Transaction}} t);}
+\DoxyCodeLine{111 \textcolor{keywordtype}{int} \mbox{\hyperlink{transaction__list_8h_ae8be3c873d5030e3205e21cfc2288185}{get\_num\_transactions}}(Queue q);}
+\DoxyCodeLine{118 \textcolor{keywordtype}{int} \mbox{\hyperlink{transaction__list_8h_a6bc9d809f7097558ebe3b8d87f974d68}{queue\_to\_array}}(Queue q, \textcolor{keyword}{struct} \mbox{\hyperlink{struct_transaction}{Transaction}}* vector);}
+\DoxyCodeLine{119 }
+\DoxyCodeLine{126 \textcolor{keywordtype}{int} \mbox{\hyperlink{transaction__list_8h_a9e3b375d7349e6135e54e63bf55274f9}{array\_to\_queue}}(Queue q, \textcolor{keyword}{struct} \mbox{\hyperlink{struct_transaction}{Transaction}}* vector);}
+\DoxyCodeLine{127 }
+\DoxyCodeLine{135 \mbox{\hyperlink{boolean_8h_afdcfe6db5bea87bd493a3fe2c513d5ef}{Bool}} \mbox{\hyperlink{transaction__list_8h_ad8fc45e2f26ef0060da11359d4d87cfe}{queue\_copy\_n\_transactions}}(Queue q, Queue r, \textcolor{keywordtype}{int} n);}
+\DoxyCodeLine{136 }
+\DoxyCodeLine{141 \textcolor{keywordtype}{void} \mbox{\hyperlink{transaction__list_8h_ad4e71b33c67d7c97003a968baee1fb4d}{empty\_queue}}(Queue q);}
+\DoxyCodeLine{142 }
+\DoxyCodeLine{147 \textcolor{keywordtype}{void} \mbox{\hyperlink{transaction__list_8h_aa800cb1cf4fca227ec58d3e9194bd87d}{create\_empty\_transaction}}(\textcolor{keyword}{struct}  \mbox{\hyperlink{struct_transaction}{Transaction}} *t);}
+\DoxyCodeLine{148 }
+\DoxyCodeLine{155 \textcolor{keywordtype}{int} \mbox{\hyperlink{transaction__list_8h_a734dc553e25dce539c134e72ac979219}{copy\_transaction}}(\textcolor{keyword}{struct} \mbox{\hyperlink{struct_transaction}{Transaction}} * t, \textcolor{keyword}{struct} \mbox{\hyperlink{struct_transaction}{Transaction}}* t\_copy);}
+\DoxyCodeLine{156 \textcolor{preprocessor}{\#endif }\textcolor{comment}{/*DGT\_SO\_PROJECT\_21\_22\_TRANSACTION\_LIST\_H*/}\textcolor{preprocessor}{}}
+
+\end{DoxyCode}
