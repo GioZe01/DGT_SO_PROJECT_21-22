@@ -1,6 +1,5 @@
 \hypertarget{index_autotoc_md0}{}\doxysection{GT\+\_\+\+SO\+\_\+\+PROJECT\+\_\+21-\/22}\label{index_autotoc_md0}
-\DoxyHorRuler{0}
- \hypertarget{index_autotoc_md2}{}\doxysection{Description of the project}\label{index_autotoc_md2}
+For more detail on the project see the \href{../../docs/html/index.html}{\texttt{ docs}}\hypertarget{index_autotoc_md1}{}\doxysection{Description of the project}\label{index_autotoc_md1}
 The project is meant to be an example of the use of IPC (Inter-\/\+Process Communication) between different processes; simulating a ledger. Utilizing the IPC, the project will be able to send and receive messages between different processes\+:
 
 
@@ -10,54 +9,104 @@ The project is meant to be an example of the use of IPC (Inter-\/\+Process Commu
 \item SO\+\_\+\+NODE\+\_\+\+NUM number of {\bfseries{nodes}} that elaborate the transactions.
 \end{DoxyItemize}
 
-For the full text of the project, please visit the \href{/docs/2021.12.19_consegna_progetto.pdf}{\texttt{ Consegna Progetto}}.\textbackslash{} The implementation follows the SYSTEM V IPC (Semaphores, Shared Memory, Message Queues) model and C89 standard. \hypertarget{index_autotoc_md3}{}\doxysection{Requirements}\label{index_autotoc_md3}
+For the full text of the project, please visit the \href{../../docs/2021.12.19_consegna_progetto.pdf}{\texttt{ Consegna Progetto}}.\textbackslash{} The implementation follows the SYSTEM V IPC (Semaphores, Shared Memory, Message Queues) model and C89 standard.\hypertarget{index_autotoc_md2}{}\doxysection{Requirements}\label{index_autotoc_md2}
 
 \begin{DoxyItemize}
 \item Doxygen\+: for rendering the documentation
 \item Unix Sys\+: Tested on Ubuntu 21.\+10
 \item GCC or GDB\+: make sure to set the {\itshape {\bfseries{correct compiler flags into the Makefile}}}
 \item Cmake
-\end{DoxyItemize}\hypertarget{index_autotoc_md4}{}\doxysection{Installing}\label{index_autotoc_md4}
-Using .zip file\+: 
+\end{DoxyItemize}\hypertarget{index_autotoc_md3}{}\doxysection{Installing}\label{index_autotoc_md3}
+Using .zip file\+:
+
+
 \begin{DoxyCode}{0}
 \DoxyCodeLine{unzip gt-\/so-\/project-\/21-\/22.zip}
 
 \end{DoxyCode}
- Using git\+: 
+
+
+Using git \+:zipper\+\_\+mouth\+\_\+face\+: \+:
+
+
 \begin{DoxyCode}{0}
-\DoxyCodeLine{Not allowed by University of Turin :zipper\_mouth\_face:}
+\DoxyCodeLine{Not allowed by University of Turin }
 
 \end{DoxyCode}
-\hypertarget{index_autotoc_md5}{}\doxysection{Information about the chosen implementation}\label{index_autotoc_md5}
-\hypertarget{index_autotoc_md6}{}\doxysubsection{Signals utilized by the project}\label{index_autotoc_md6}
+ \hypertarget{index_autotoc_md4}{}\doxysection{Running}\label{index_autotoc_md4}
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{cd gt-\/so-\/project-\/21-\/22}
+\DoxyCodeLine{make all }
+\DoxyCodeLine{make run}
+
+\end{DoxyCode}
+ {\bfseries{NOTE\+: make sure to have all the folders in the right place and checked the compiler fleg into the Makefile}} \hypertarget{index_autotoc_md5}{}\doxysection{Information about the chosen implementation\+:}\label{index_autotoc_md5}
+For each IPC there is a specific implementation check the .h files to see which implementation is used and how it is implemented. Specifically for the message queue.\hypertarget{index_autotoc_md6}{}\doxysubsection{Message Queue}\label{index_autotoc_md6}
+There are 3 message queues with the respected \href{../../src/local_lib/headers/glob.h}{\texttt{ values}} (click to see).
+\begin{DoxyEnumerate}
+\item Master message queue whose messages are defined in the \href{../../src/local_lib/headers/master_msg_report.h}{\texttt{ master\+\_\+msg\+\_\+report}} header.
+\item Users message queue in which each user has its own priority queue of messages. The value of each process position is incremental with a delta described in \href{../../src/local_lib/headers/user_msg_report.h}{\texttt{ user\+\_\+msg\+\_\+report.\+h}} header, so that when a process is created his value will be the one before + the delta.
+\item Nodes message queue in which each node has its own priority queue of messages. The value of each process position is incremental with a delta described in \href{../../src/local_lib/headers/node_msg_report.h}{\texttt{ node\+\_\+msg\+\_\+report.\+h}} header, so that when a process is created his value will be the one before + the delta. 
+\end{DoxyEnumerate}\hypertarget{index_autotoc_md7}{}\doxysubsection{Shared Memory}\label{index_autotoc_md7}
+There are 2 shared memory with the respected \href{../../src/local_lib/headers/glob.h}{\texttt{ values}} (click to see).
+\begin{DoxyEnumerate}
+\item Shared mamory for the configuration of the simulation.
+\item Shared memory for the ledger. Each of which has its own way of regulating the access to the shared memory via semaphores. In the respected header files you can find the details.
+\end{DoxyEnumerate}\hypertarget{index_autotoc_md8}{}\doxysubsection{Signals utilized by the project}\label{index_autotoc_md8}
 
 \begin{DoxyItemize}
 \item SIGINT\+: used to terminate the program
 \item SIGALRM\+: used to simulate the time of the program and make routine tasks by the processes
 \item SIGUSR2\+: used by the Master to get the status of the processes
 \item SIGUSR1\+: involved in the handling of a new node process (the node process is created by the Master)
-\end{DoxyItemize}\hypertarget{index_autotoc_md7}{}\doxysubsection{Master proc\+:}\label{index_autotoc_md7}
+\end{DoxyItemize}\hypertarget{index_autotoc_md9}{}\doxysubsection{Master proc\+:}\label{index_autotoc_md9}
+\label{index_autotoc_md10}%
+\Hypertarget{index_autotoc_md10}%
+ \doxysubparagraph*{Activity\+:}
+
 
 \begin{DoxyEnumerate}
-\item The master process read the conf file, creates all the necessary IPC resources starting from the semaphores and the shared memory. It creates a shm for the configuration in order to share between the processes the information about the number of users and the number of nodes and their positioning into the message queue, and in case of the nodes the friends of each node.\textbackslash{}
-\item Proceeds to create the processes of the users and the nodes adding them to the shm for the configuration.\textbackslash{}
-\item Fill the friends positioning into the shm for the configuration.\textbackslash{}
+\item The master process read the conf file, creates all the necessary IPC resources starting from the semaphores and the shared memory. It creates a shm for the configuration in order to share between the processes the information about the number of users and the number of nodes and their positioning into the message queue, and in case of the nodes the friends of each node.
+\item Proceeds to create the processes of the users and the nodes adding them to the shm for the configuration.
+\item Fill the friends positioning into the shm for the configuration.
 \item Configure a signal handler
-\item start\textquotesingle{}s the simulation utilizing a semaphore to sinchronize the processes.\textbackslash{}
+\item start\textquotesingle{}s the simulation utilizing a semaphore to sinchronize the processes.
 \item Lunch a SIGALRM to print information about the current status of the simulation.
 \item Wait for the SIGINT signal to terminate the program.
-\end{DoxyEnumerate}\hypertarget{index_autotoc_md8}{}\doxysubsection{Users\+:}\label{index_autotoc_md8}
-
-\begin{DoxyEnumerate}
-\item The user after reading the conf file attaches to the IPC resources and waits on the starting semaphore.\textbackslash{}
-\item Lunch a SIGALRM to generate a transaction. (is not related to point 3)\textbackslash{}
-\item Start generating transactions. until the balance allows to do so.\textbackslash{}
-\item Wants to get richer, and if it is possible, it does and get back to point 3.\textbackslash{}
-\end{DoxyEnumerate}\hypertarget{index_autotoc_md9}{}\doxysubsection{Nodes\+:}\label{index_autotoc_md9}
-
-\begin{DoxyEnumerate}
-\item The node after reading the conf file attaches to the IPC resources and waits on the starting semaphore.\textbackslash{}
-\item Lunch a SIGALRM to generate send a transaction to a random node friend. (is not related to point 3)\textbackslash{}
-\item Handle transactions.
-\item 
 \end{DoxyEnumerate}
+
+\label{index_autotoc_md11}%
+\Hypertarget{index_autotoc_md11}%
+ \doxysubparagraph*{Additional info\+:}
+
+While the node generate the processes they are added into a Linked List call Proc\+List which is and Abstract Data Type. For his implementation check the \href{../../src/local_lib/process_info_list.c}{\texttt{ process\+\_\+info\+\_\+list.\+c}} file.\textbackslash{} The implementation of the ADT is based on the information acquired during the reading of the book \char`\"{}\+C Programming A Modern Approach\char`\"{} by K.\+N. King second edition for C89 and C99.
+
+The printing of the information of the state of the simulation utilizes a merge sort algorithm on a linked list of \mbox{\hyperlink{process__info__list_8c}{process\+\_\+info\+\_\+list.\+c}}. Could have been done differently, but for the sake of simplicity I decided to use the merge sort algorithm which is a stable sort for linked lists.
+
+The information regarding the node\textquotesingle{}s friends is store into an integer value using the bitwise operators, for his implementation check the \href{../../src/local_lib/int_condenser.c}{\texttt{ int\+\_\+condenser.\+c}} file. \hypertarget{index_autotoc_md12}{}\doxysubsection{Users\+:}\label{index_autotoc_md12}
+
+\begin{DoxyEnumerate}
+\item The user after reading the conf file attaches to the IPC resources and waits on the starting semaphore.
+\item Lunch a SIGALRM to generate a transaction. (is not related to point 3)
+\item Start generating transactions. until the balance allows to do so.
+\item Wants to get richer, and if it is possible, it does and get back to point 3.
+\end{DoxyEnumerate}
+
+\label{index_autotoc_md13}%
+\Hypertarget{index_autotoc_md13}%
+ \doxysubparagraph*{Additional info\+:}
+
+As it has been said the user is kept in a loop until the reception of a SIGINT signal. otherwise it keeps hoping for more money to then spend. I\textquotesingle{}m totally aware of the fact that the user is kept in a loop, and can be improved by waiting for a Specific signal to resume his activity instead of waiting for a message. \hypertarget{index_autotoc_md14}{}\doxysubsection{Nodes\+:}\label{index_autotoc_md14}
+
+\begin{DoxyEnumerate}
+\item The node after reading the conf file attaches to the IPC resources and waits on the starting semaphore.
+\item Lunch a SIGALRM to generate send a transaction to a random node friend. (is not related to point 3)
+\item Handle transactions. In case of tp\+\_\+full and hops exceeded the node advice the master via a master msg queue.
+\item Add the block into the ledger.
+\item back to point 3. \label{index_autotoc_md15}%
+\Hypertarget{index_autotoc_md15}%
+ \doxysubparagraph*{Additional info\+:}
+\end{DoxyEnumerate}
+
+In case of SIGUSR1 the node will wait for a message containing the new friend of the node and will add it to the \char`\"{}list\char`\"{} of friends. 

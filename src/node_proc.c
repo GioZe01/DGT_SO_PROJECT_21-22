@@ -33,6 +33,7 @@
 #include "local_lib/headers/gt_sig_handler.h"
 
 /* Support Functions*/
+
 /**
  * If it finds node msg of type NODE_TRANSACTION it proccess them
  * and make the aknowledgement
@@ -505,7 +506,7 @@ Bool lock_shm_masterbook(void) {
 #ifdef DEBUG_NODE
     DEBUG_NOTIFY_ACTIVITY_RUNNING("NODE:= LOCKING THE SHM FOR ADDING THE BLOCK...");
 #endif
-    if (node_configuration.so_min_trans_proc_nsec > 0 && node_configuration.so_max_trans_proc_nsec>0){
+    if (node_configuration.so_min_trans_proc_nsec > 0 && node_configuration.so_max_trans_proc_nsec > 0) {
         struct timespec trans_proc_sim;
         gen_sleep_time(&trans_proc_sim);
         nanosleep(&trans_proc_sim, (void *) NULL);
@@ -690,7 +691,8 @@ void adv_users_of_block(void) {
                     queue_id_user_proc = get_queueid_by_pid(shm_conf_pointer_node, sender_pid, TRUE);
                     while (user_msg_snd(queue_user_id, &u_msg_rep, MSG_TRANSACTION_FAILED_TYPE, t, current_node.pid,
                                         TRUE, queue_id_user_proc) < 0 && retry < node_configuration.so_retry) {
-                        if (node_configuration.so_min_trans_proc_nsec > 0 && node_configuration.so_max_trans_proc_nsec){
+                        if (node_configuration.so_min_trans_proc_nsec > 0 &&
+                            node_configuration.so_max_trans_proc_nsec) {
                             gen_sleep_time(&ts);
                             nanosleep(&ts, NULL);
                         }
@@ -755,6 +757,9 @@ void print_node_info() {
                    shm_conf_pointer_node->nodes_snapshots[(friends_pos[i]) + 1][0]);
         }
         printf("\n");
+
+    }
+    if (friends_pos != NULL) {
         free(friends_pos);
     }
 }

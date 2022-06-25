@@ -27,14 +27,17 @@ var NAVTREE =
   [ "Sistemi Operativi 2021/22", "index.html", [
     [ "Information about the project", "index.html", [
       [ "GT_SO_PROJECT_21-22", "index.html#autotoc_md0", null ],
-      [ "Description of the project", "index.html#autotoc_md2", null ],
-      [ "Requirements", "index.html#autotoc_md3", null ],
-      [ "Installing", "index.html#autotoc_md4", null ],
-      [ "Information about the chosen implementation", "index.html#autotoc_md5", [
-        [ "Signals utilized by the project", "index.html#autotoc_md6", null ],
-        [ "Master proc:", "index.html#autotoc_md7", null ],
-        [ "Users:", "index.html#autotoc_md8", null ],
-        [ "Nodes:", "index.html#autotoc_md9", null ]
+      [ "Description of the project", "index.html#autotoc_md1", null ],
+      [ "Requirements", "index.html#autotoc_md2", null ],
+      [ "Installing", "index.html#autotoc_md3", null ],
+      [ "Running", "index.html#autotoc_md4", null ],
+      [ "Information about the chosen implementation:", "index.html#autotoc_md5", [
+        [ "Message Queue", "index.html#autotoc_md6", null ],
+        [ "Shared Memory", "index.html#autotoc_md7", null ],
+        [ "Signals utilized by the project", "index.html#autotoc_md8", null ],
+        [ "Master proc:", "index.html#autotoc_md9", null ],
+        [ "Users:", "index.html#autotoc_md12", null ],
+        [ "Nodes:", "index.html#autotoc_md14", null ]
       ] ]
     ] ],
     [ "Modules", "modules.html", "modules" ],
@@ -64,8 +67,8 @@ var NAVTREE =
 var NAVTREEINDEX =
 [
 "annotated.html",
-"main_8c.html#abaea341f02b3295f5823edb8b52b6380",
-"structconf.html#a8eeec73826b15cb3070cbf05a494ffd8"
+"main_8c.html#aa63a9c12cbb017bbc6037d9fb3349c6f",
+"structconf.html#a4a334db5ae608fd5325b36b4f2cbf7a6"
 ];
 
 var SYNCONMSG = 'click to disable panel synchronisation';
