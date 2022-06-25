@@ -201,7 +201,7 @@ int main() {
     int *nodes_queues_ids; /*in 0 position is saved the actual size of the array of ids saved in the pointer*/
     int number_of_nodes = -1; /*Number of nodes in the network*/
     main_pid = getpid();
-    if (read_conf() == TRUE) {
+    if (read_conf() == TRUE && SO_BLOCK_SIZE < simulation_conf.so_tp_size) {
         /* Pointers allocation  */
         users_pids = malloc(sizeof(int) * (simulation_conf.so_user_num + 1));
         nodes_pids = malloc(sizeof(int) * (simulation_conf.so_nodes_num + 1));
@@ -659,11 +659,11 @@ void update_kids_info(void) {
         } else if (found_info == -2) {
             if (check_for_termination(&msg_report, msg_report_id_master, pid, proc_list) == -3) {
                 tp_full_handler(&msg_report);
-            }
-            if (pid[0] > 0) {
+            } else if (pid[0] > 0) {
                 remove_processes_from_list(to_wait_proc, pid);
             }
             retry++;
+
         } else if (found_info == -1) {
             ERROR_MESSAGE("IMPOSSIBLE TO RECEIVE INFO FROM PROCESS");
             return;

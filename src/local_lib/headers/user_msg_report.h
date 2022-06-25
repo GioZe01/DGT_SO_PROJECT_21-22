@@ -1,19 +1,34 @@
+/**
+ * \file user_msg_report.h
+ * \brief Header file for user_msg_report.c
+ * Contains the function prototypes for user_msg_report.c and the structs used in it.
+ * \author Giovanni Terzuolo
+ */
 #ifndef DGT_SO_PROJECT_21_22_USER_MSG_REPORT_H
 #define DGT_SO_PROJECT_21_22_USER_MSG_REPORT_H
 
 #include <unistd.h>
 #include "transaction_list.h"
 #include "boolean.h"
-
-#define DELTA_USER_MSG_TYPE 3/*To give priority to single user*/
+/**
+ * \defgroup USER MSG TYPES
+ * \brief Types values for the different types of messages
+ */
+/**@{*/
+#define DELTA_USER_MSG_TYPE 3
 #define MSG_TRANSACTION_FAILED_TYPE 1
 #define MSG_TRANSACTION_INCOME_TYPE 2
-#define MSG_TRANSACTION_CONFIRMED_TYPE 3/*Default value*/
+#define MSG_TRANSACTION_CONFIRMED_TYPE 3 /**< Defaults to 3 because of the DELTA_USER_MSG_TYPE */
+/**@}*/
 
+/**
+ * \struct user_msg_report_t
+ * \brief Struct used to represent a user message report
+ */
 struct user_msg {
-    long type;
-    pid_t sender_pid;
-    struct Transaction t;
+    long type; /**< Type of the message */
+    pid_t sender_pid; /**< PID of the sender */
+    struct Transaction t; /**< Transaction of the message */
 };
 
 /**

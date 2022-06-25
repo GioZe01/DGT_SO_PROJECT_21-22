@@ -1,3 +1,9 @@
+/**
+ * \file process_info_list.h
+ * \brief Header file for the process_info_list.c file.
+ * Contains the definition of the ProcessInfo structure and the functions to manipulate it as well as the typedef for the ProcessInfoList.
+ * \author Giovanni Terzuolo
+ */
 #ifndef DGT_SO_PROJECT_21_22_PROCESS_INFO_LIST_H
 #define DGT_SO_PROJECT_21_22_PROCESS_INFO_LIST_H
 
@@ -6,18 +12,34 @@
 
 #include "boolean.h"
 
+/**
+ * \typedef PROC_TYPE enum
+ * \brief Enumeration for the type of process that can be stored in the ProcessInfo structure.
+ */
 typedef enum {
     PROC_TYPE_USER, PROC_TYPE_NODE,
 } PROCTYPE;
 
+/**
+ * \struct ProcessInfo
+ * \brief Structure for the information of a process.
+ */
 struct ProcessInfo {
-    pid_t pid;
-    int id_queue;/*Id for calculating range type of a user*/
-    short int proc_state;
-    short int proc_type;
-    float budget;/*TODO: verificare se basta*/
+    pid_t pid; /**< PID of the process. */
+    int id_queue; /**< ID of the queue of the process. */
+    short int proc_state; /**< State of the process. */
+    short int proc_type; /**< Type of the process. */
+    float budget; /**< Budget of the process. */
 };
+/**
+ * \typedef Proc
+ * \brief Typedef for the ProcessInfo structure.
+ */
 typedef struct ProcessInfo *Proc;
+/**
+ * \typedef ProcList
+ * \brief Typedef for the list of ProcessInfo structures.
+ */
 typedef struct processes_info_list *ProcList;
 
 /**
@@ -181,5 +203,4 @@ void get_running_node_proc(ProcList self, ProcList node_list);
  * @return the number of proc in running state
  */
 int get_num_proc_running(ProcList self);
-/*TODO: implementare budget maggiore get -> vedere se fare una hash table di processi*/
 #endif /*DGT_SO_PROJECT_21_22_PROCESS_INFO_LIST_H*/

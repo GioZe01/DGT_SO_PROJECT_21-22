@@ -1,6 +1,5 @@
 /* Std*/
 #include <stdio.h>
-#include <stdlib.h>
 /* Local*/
 #include "headers/conf_shm.h"
 #include "headers/boolean.h"

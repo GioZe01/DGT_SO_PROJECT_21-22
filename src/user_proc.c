@@ -269,7 +269,7 @@ void signals_handler_user(int signum) {
             int gen_value = generate_transaction(&current_user, current_user.pid, shm_conf_pointer);
             if (check_balance(&current_user) == TRUE && gen_value < 0) {
                 advice_master_of_termination(IMPOSSIBLE_TO_GENERATE_TRANSACTION);
-                ERROR_EXIT_SEQUENCE_USER("IMPOSSIBLE TO GENERATE TRANSACTION");
+                EXIT_PROCEDURE_USER("IMPOSSIBLE TO GENERATE TRANSACTION");
             }
             if (gen_value >= 0 && send_to_node() == -1) {
                 ERROR_MESSAGE("IMPOSISBLE TO SEND TO THE NODE");
@@ -392,7 +392,7 @@ int send_to_node(void) {
             while ((msq_ds.msg_qnum + 1) * sizeof(struct node_msg) > msq_ds.msg_qbytes) {
                 if (retry++ > configuration.so_retry) {
                     advice_master_of_termination(IMPOSSIBLE_TO_SEND_TRANSACTION);
-                    ERROR_EXIT_SEQUENCE_USER("ENDED DURING SENDING TRANSACTION TO NODE");
+                    EXIT_PROCEDURE_USER(0);
                 }
             }
             node_msg_snd(queue_node_id, &msg, MSG_TRANSACTION_TYPE, t,

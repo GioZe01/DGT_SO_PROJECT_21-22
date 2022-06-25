@@ -1,27 +1,44 @@
+/**
+ * \file transaction_list.h
+ * \brief Header file for the transaction_list.c file.
+ * Contains the definition of the Transaction structure and the typedef for the QUEUE. (ADT is implemented in transaction_list.c)
+ * \author Giovanni Terzuolo
+ */
 #ifndef DGT_SO_PROJECT_21_22_TRANSACTION_LIST_H
 #define DGT_SO_PROJECT_21_22_TRANSACTION_LIST_H
-/*TODO: Implementare transaction -> ogni user_transaction avra una transaction list per quelli processati e quelli da fare*/
 #include <stdio.h>
 #include <unistd.h>
 #include <time.h>
 #include <sys/types.h>
 #include "boolean.h"
+/**
+ * \defgroup TRANSACTION STATES
+ * \brief States of the transaction
+ */
+/** @{ */
 #define TRANSACTION_SUCCES 0
 #define TRANSACTION_FAILED -1
 #define TRANSACTION_WAITING 1
-/*Utility macro for node sender identification*/
-#define SENDER_NODE_TRANSACTION -1
+/** @} */
+/**
+ * \struct Transaction
+ * \brief Structure for the transaction.
+ */
 struct Transaction{
-    short int t_type;
-    struct timespec timestamp;
-    pid_t sender;
-    pid_t reciver;
-    float amount; /*Cambiare nel caso in cui non bastasse*/
-    float reward;
-    int hops;
+    short int t_type; /**< Type of the transaction. */
+    struct timespec timestamp; /**< Timestamp of the transaction. */
+    pid_t sender; /**< PID of the sender. */
+    pid_t reciver; /**< PID of the reciver. */
+    float amount; /**< Amount of the transaction. */
+    float reward; /**< Reward of the transaction. */
+    int hops; /**< Number of hops of the transaction. */
 };
 
-typedef struct transaction_list *Queue;/*Real impl in transaction_list.c*/
+/**
+ * \typedef Queue
+ * \brief Typedef for the transactions queue.
+ */
+typedef struct transaction_list *Queue;
 /*Functionality*/
 int create_transaction(struct Transaction *t,pid_t sender, pid_t receiver, float amount);
 /**

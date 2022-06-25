@@ -1,4 +1,8 @@
-
+/**
+ * \file conf_file.h
+ * \brief Header file for the configuration file parser conf_file.c
+ * \author Giovanni Terzuolo
+ */
 
 #ifndef DGT_SO_PROJECT_21_22_CONF_FILE_H
 #define DGT_SO_PROJECT_21_22_CONF_FILE_H
@@ -7,24 +11,20 @@
 
 #define CONFIGURATION_FILE_PATH "/home/golia/CLionProjects/DGT_SO_PROJECT_21-22/conf"
 
-struct conf
-{
-    /*TODO: Verificare tipi*/
-    /*TODO: Finire di scrivere la configurazione -> potrebbe arrivare da socket*/
-    int so_user_num;
-    int so_nodes_num;
-    float so_buget_init;
-    float so_reward;
-    long so_min_trans_gen_nsec;
-    long so_max_trans_gen_nsec;
-    int so_retry;
-    int so_tp_size;
-    long so_min_trans_proc_nsec;
-    long so_max_trans_proc_nsec;
-    long so_sim_sec;
-    short int so_num_friends;
-    int so_hops;
-    /*TODO: aggiungere per versione max 30*/
+struct conf {
+    int so_user_num; /**< The number of users */
+    int so_nodes_num; /**< The number of nodes */
+    float so_buget_init; /**< The initial budget */
+    float so_reward; /**< The reward for each node */
+    long so_min_trans_gen_nsec; /**< Min time for transaction generation*/
+    long so_max_trans_gen_nsec; /**< Max time for transaction generation*/
+    int so_retry; /**< Number of retry before failing after sending a transaction to a node*/
+    int so_tp_size; /**< Transaction pool size*/
+    long so_min_trans_proc_nsec; /**< Min time for transaction processing*/
+    long so_max_trans_proc_nsec; /**< Max time for transaction processing*/
+    long so_sim_sec; /**< Execution time of the simulation*/
+    short int so_num_friends; /**< Number of node's friends*/
+    int so_hops; /**< Number of hops*/
 };
 
 /**

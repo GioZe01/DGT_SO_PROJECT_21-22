@@ -1,3 +1,8 @@
+/**
+ * \file glob.h
+ * \brief Definition of Values and Macros for the project
+ * \author Giovanni Terzuolo
+ */
 #ifndef DGT_SO_PROJECT_21_22_GLOB_H
 #define DGT_SO_PROJECT_21_22_GLOB_H
 
@@ -16,7 +21,6 @@
  *  \brief defines the number of processes
  */
 /**@{*/
-
 /*! \def USERS_MAX
  * \brief The number of processes that can be created
  */
@@ -26,7 +30,6 @@
  */
 #define NODES_MAX 100
 /**@} */
-/**#{main}*/
 
 /**! \defgroup SINCRONIZATION KEY
  * \brief The key used to synchronize the processes
@@ -116,20 +119,23 @@
  *
  */
 /**@{*/
-/**! \def SO_REGISTRY_SIZE
+/**\def SO_REGISTRY_SIZE
  * \brief The size of the registry of the shared objects
  */
 #ifndef SO_REGISTRY_SIZE
 #define SO_REGISTRY_SIZE 100
 #endif
-/**! \def SO_BLOCK_SIZE
+/**\def SO_BLOCK_SIZE
  * \brief The size of the block of the shared objects
  */
 #ifndef SO_BLOCK_SIZE
 #define SO_BLOCK_SIZE 10
 #endif
 /**@}*/
-/*  GENERAL UTILITY MACROS*/
+/** \defgroup GENERAL UTILITY MACROS
+ * \brief The general utility macros
+ */
+/**@{*/
 #define REALLOC_MARGIN 10 /*!< delta in wich is not usefull to realloc TODO: make a function that calculate it*/
 #define MAX_FAILURE_SHM_LOADING 1000 /**< max number of times that the shm loading can fail*/
 #define MAX_UNSED_CICLE_OF_NODE_PROC 10000000 /**< max number of times that the node process can be unused*/
@@ -140,7 +146,7 @@
 #define MAX_RETRY_UPDATE_KIDS_INFO 100000 /**< max number of times that the update of the kids info can be retried*/
 #define MAX_TIME_NSEC 999999999 /**< max time in nsec*/
 #define SLEEP_TIME_UPDATE_KIDS_INFO 10000 /**< sleep time in ms between two retries of the update of the kids info*/
-
+/**@}*/
 /*SIMULATION END TYPES*/
 /*! \enum SIMULATION_END_TYPE
  * \brief The type of the simulation that can occured

@@ -1,3 +1,9 @@
+/**
+ * \file user_transaction.h
+ * \brief Header file for user_transaction.c
+ * Contains the definition of the struct user_transaction and the functions used to manipulate it.
+ * \author Giovanni Terzuolo
+ */
 #ifndef DGT_SO_PROJECT_21_22_USER_TRANSACTION_H
 #define DGT_SO_PROJECT_21_22_USER_TRANSACTION_H
 
@@ -6,35 +12,45 @@
 #include "transaction_list.h"
 #include "conf_shm.h"
 
-typedef double (*Balance)(struct user_transaction* self);
+/**
+ * \typedef Balance function pointer
+ * \brief Function pointer for the balance function of a user.
+ * \param [in] self user
+ */
+typedef double (*Balance)(struct user_transaction *self);
 
-typedef int (*CalcCashFlow)(struct user_transaction*self, struct Transaction t);
+/**
+ * \typedef CalcCashFlow function pointer
+ * \brief Function pointer for the calcCashFlow function of a user, based on the transaction given as parameter.
+ * \param [in] self user
+ * \param [in] t transaction to be used to calculate the cash flow
+ */
+typedef int (*CalcCashFlow)(struct user_transaction *self, struct Transaction t);
 
+/**
+ * \typedef UCashFlow struct
+ * \brief Structure used to represent the cash flow of a user.
+ */
 typedef struct {
-    float entries;
-    float outcomes;
-}UCashFlow;
+    float entries; /**< Cash flow of the user in entries */
+    float outcomes; /**< Cash flow of the user in outcomes */
+} UCashFlow;
+/**
+ * \struct user_transaction
+ * \brief Structure used to represent a user.
+ */
 struct user_transaction {
-    int pid;
-    short int exec_state; /*current execution state of the user proc*/
-    float budget; /*Contains the confirmed by nodes value in the pocket of the current user*/
-    Balance u_balance;
-    Queue transactions_failed; /*transactions_failed not processed by any node*/
-    Queue in_process;/*Validated, but still to be confirmed by the nodes_proc*/
-    UCashFlow cash_flow;
-    CalcCashFlow update_cash_flow; /*Can set the function u desire while implementing, consider the one already implemented below*/
-    float expected_out; /* Expected outcomes to still be processed*/
-    int to_wait_transaction;/*Num Transactions to waite on for the conformation of processing */
+    int pid; /**< PID of the user proc */
+    short int exec_state; /**<Current execution state of the user proc*/
+    float budget; /**<Contains the confirmed by nodes value in the pocket of the current user*/
+    Balance u_balance; /**<Function pointer to the balance function of the user*/
+    Queue transactions_failed; /**< Transactions_failed not processed by any node*/
+    Queue in_process;/**< Validated, but still to be confirmed by the nodes_proc*/
+    UCashFlow cash_flow; /**< Cash flow of the user*/
+    CalcCashFlow update_cash_flow; /**< Function pointer to the calcCashFlow function of the user*/
+    float expected_out; /**< Expected outcomes to still be processed*/
+    int to_wait_transaction;/**< Num Transactions to wait for the conformation of processing */
 };
-
-struct user_snapshot {
-    int pid;
-    int budget;
-    float u_balance;
-    float entries;
-    float outcomes;
-    float expected_out;
-};/*Structure to be saved in sharedmemory*/
 
 /**
  * Initialize the user_transaction to default value with entries set as budget given
@@ -71,7 +87,7 @@ double calc_balance(struct user_transaction *self);
  * Print the cashflow info
  * @param self the user to be printed
  */
-void print_cashflow(struct user_transaction * self);
+void print_cashflow(struct user_transaction *self);
 
 /**
  * Update entries, outcomes and budget based on transaction
@@ -88,7 +104,8 @@ int update_cash_flow(struct user_transaction *self, struct Transaction t);
  * @param users_num pointer to a vector of users available
  * @return -1 in case o failure. 0 otherwise.
  */
-int generate_transaction(struct user_transaction *self, pid_t user_proc_pid,struct shm_conf *shm_conf);
+int generate_transaction(struct user_transaction *self, pid_t user_proc_pid, struct shm_conf *shm_conf);
+
 /**
  * Remove the transaction from the list
  * @param q the transaction list

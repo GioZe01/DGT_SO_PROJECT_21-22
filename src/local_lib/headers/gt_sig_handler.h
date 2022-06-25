@@ -1,3 +1,9 @@
+/**
+ * \file gt_sig_handler.h
+ * \brief Header for gt_sig_handler.c
+ * Define the sig handler function prototype
+ * \author Giovanni Terzuolo
+ */
 #ifndef DGT_SO_PROJECT_21_22_GT_SIG_HANDLER_H
 #define DGT_SO_PROJECT_21_22_GT_SIG_HANDLER_H
 /* Standard includes */

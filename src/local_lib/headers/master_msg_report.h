@@ -1,4 +1,9 @@
-
+/**
+ * \file master_msg_report.h
+ * \brief Header file for the master_msg_report.c module.
+ * Contains the definitions of the functions,structures and types used to handle the master_msg_report.c module.
+ * \author Giovanni Terzuolo
+ */
 #ifndef DGT_SO_PROJECT_21_22_MASTER_MSG_REPORT_H
 #define DGT_SO_PROJECT_21_22_MASTER_MSG_REPORT_H
 /* Std */
@@ -9,9 +14,17 @@
 #include "process_info_list.h"
 #include "transaction_list.h"
 
+/**
+ * \typedef PROCSTATE enum
+ * \brief Enumeration of the possible states of a process.
+ */
 typedef enum {
     PROC_STATE_INIT, PROC_STATE_RUNNING, PROC_STATE_TERMINATED, PROC_STATE_WAITING, PROC_STATE_NODE_SERV_TRANS
 } PROCSTATE;
+/**
+ * \typedef MSG_REPORT_TYPE enum
+ * \brief Types of messages that can be delivered or received.
+ */
 typedef enum {
     TERMINATION_END_CORRECTLY = 1,
     IMPOSSIBLE_TO_SEND_TRANSACTION = 2,
@@ -27,18 +40,27 @@ typedef enum {
     MAX_FAILURE_SHM_REACHED = 12,
 } MSG_REPORT_TYPE;
 
+/**
+ * \typedef PROC_TYPE enum
+ * \brief Types of processes that can be created.
+ */
 typedef enum {
     USER,
     NODE,
 } PROC_TYPE;
 
+/**
+ * \struct master_msg_report
+ * \brief Structure used to store the information about a process.
+ * @warning The transaction stored is not always used, depends on the type of action to be performed after the message is received or sent.
+ */
 struct master_msg_report {
-    long type;
-    long proc_type;
-    pid_t sender_pid;
-    short int state;
-    float budget;
-    struct Transaction t;
+    long type; /**< Type of message. */
+    long proc_type; /**< Type of process. */
+    pid_t sender_pid; /**< PID of the process that sent the message. */
+    short int state; /**< State of the process. */
+    float budget; /**< Budget of the process. */
+    struct Transaction t; /**< Transaction for the process. */
 };
 
 /**
@@ -142,4 +164,5 @@ char *from_proctype_to_string(long proc_type);
  * @return -3 in case of tp_full, -1 in case of failure. 0 otherwise
  */
 int check_for_termination(struct master_msg_report *msg_report, int msg_report_id_master, int *ris, ProcList proc_list);
+
 #endif /*DGT_SO_PROJECT_21_22_MASTER_MSG_REPORT_H*/

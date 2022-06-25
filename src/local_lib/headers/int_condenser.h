@@ -1,3 +1,9 @@
+/**
+ * \file int_condenser.h
+ * \brief Header file for the int_condenser.c file.
+ * Condense information into an integer using bit manipulation.
+ * \author Giovanni Terzuolo
+ */
 #ifndef DGT_SO_PROJECT_21_22_INT_CONDENSER_H
 #define DGT_SO_PROJECT_21_22_INT_CONDENSER_H
 

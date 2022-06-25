@@ -1,4 +1,8 @@
-
+/**
+ * \file semaphore.h
+ * \brief Semaphore header file.
+ * \author Giovanni Terzuolo
+ */
 #ifndef DGT_SO_PROJECT_21_22_SEMAPHORE_H
 #define DGT_SO_PROJECT_21_22_SEMAPHORE_H
 

@@ -27,17 +27,25 @@
 #endif
 
 /* Struct definitions */
+/**
+ * \struct node
+ * \brief Structure representing a node (a process) in the process list.
+ */
 struct node {
-    pid_t pid;
-    int id_queue; /*Id for calculating range type of a user*/
-    short int proc_state;
-    short int proc_type;
-    float budget;
-    struct node *next;
+    pid_t pid; /**< Process PID of the node */
+    int id_queue; /**< ID of the queue where the process is */
+    short int proc_state; /**< State of the process of the node */
+    short int proc_type; /**< Type of the process of the node */
+    float budget; /**< Budget of the process of the node */
+    struct node *next; /**< Pointer to the next node */
 };
+/**
+ * \struct process_info_list
+ * \brief Structure representing a process list.
+ */
 struct processes_info_list {
-    struct node *first;
-    int num_proc;
+    struct node *first; /**< Pointer to the first node */
+    int num_proc; /**< Number of processes in the list */
 };
 
 /*  Helper Function Definitions */
@@ -227,7 +235,7 @@ void process_info_print(struct node *p) {
                state,
                p->budget);
     else
-        DEBUG_ERROR_MESSAGE("Calling print_list on NULL process info");
+            DEBUG_ERROR_MESSAGE("Calling print_list on NULL process info");
 }
 
 void list_free(ProcList self) {
@@ -479,7 +487,7 @@ void get_random_node_list(ProcList proc_list, ProcList node_list, int num_of_nod
         node_list = proc_list;
         return;
     }
-    int random_node=-1, last_node = -1;
+    int random_node = -1, last_node = -1;
     int i = 0;
     ProcList running_nodes = proc_list_create();
     get_running_node_proc(proc_list, running_nodes);
@@ -489,7 +497,7 @@ void get_random_node_list(ProcList proc_list, ProcList node_list, int num_of_nod
         }
         struct node *tmp = running_nodes->first;
         int j = 0;
-        for (; j < random_node-1; j++) {
+        for (; j < random_node - 1; j++) {
             if (tmp->next != NULL) {
                 tmp = tmp->next;
             }

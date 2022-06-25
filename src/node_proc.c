@@ -27,15 +27,12 @@
 #include "local_lib/headers/conf_shm.h"
 #include "local_lib/headers/book_master_shm.h"
 #include "local_lib/headers/master_msg_report.h"
-#include "local_lib/headers/node_tp_shm.h"
 #include "local_lib/headers/debug_utility.h"
 #include "local_lib/headers/transaction_list.h"
 #include "local_lib/headers/int_condenser.h"
 #include "local_lib/headers/gt_sig_handler.h"
 
 /* Support Functions*/
-
-/* TODO: refactoring of comments of the following process transaction*/
 /**
  * If it finds node msg of type NODE_TRANSACTION it proccess them
  * and make the aknowledgement
@@ -197,7 +194,6 @@ struct node current_node;                       /* Current representation of the
 struct conf node_configuration;                 /* Configuration File representation*/
 struct shm_conf *shm_conf_pointer_node;         /* Ref to the shm for configuration of the node*/
 struct shm_book_master *shm_masterbook_pointer; /* Ref to the shm for the masterbook shm */
-int number_of_insertion = 0;                    /* Number of insertion in the masterbook shm TODO: To remove*/
 
 int main(int argc, char const *argv[]) {
     DEBUG_MESSAGE("NODE PROCESS STARTED");
@@ -521,7 +517,6 @@ Bool lock_shm_masterbook(void) {
     struct Transaction block_list[get_num_transactions(current_node.transactions_block)];
     queue_to_array(current_node.transactions_block, block_list);
     if (insert_block(shm_masterbook_pointer, block_list) == 0) {
-        number_of_insertion++;
         current_node.budget += current_block_reward;
     } else {
         ERROR_MESSAGE("IMPOSSIBLE TO INSERT BLOCK");
