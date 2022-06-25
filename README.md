@@ -2,7 +2,7 @@
 
 # GT_SO_PROJECT_21-22
 
-For more detail on the project see the [docs] (/docs/html/index.html)
+For more detail on the project see the [docs](/docs/html/index.html)
 
 # Description of the project
 
